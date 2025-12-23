@@ -101,3 +101,150 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Build a Romanian financial news platform (Yahoo Finance style) with BVB stocks, global indices, news aggregation, and BNR currency rates. 100% Romanian focused MVP with mock BVB data."
+
+backend:
+  - task: "BVB Stocks API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GET /api/stocks/bvb returns 10 mock BVB stocks with prices, changes, volumes"
+        
+  - task: "Global Indices API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GET /api/stocks/global returns 6 indices (S&P 500, NASDAQ, Dow Jones, DAX, FTSE 100, Nikkei)"
+
+  - task: "News API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GET /api/news returns financial news from NewsAPI"
+
+  - task: "Currencies API (BNR)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "GET /api/currencies returns 38 currency rates from BNR XML feed"
+
+  - task: "CRON Jobs Scheduler"
+    implemented: true
+    working: true
+    file: "/app/backend/jobs/scheduler.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Scheduler runs on startup, updates stocks every 5min, news every 15min, currencies every 1h"
+
+frontend:
+  - task: "Homepage with market overview"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/HomePage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Shows BVB stocks, global indices, currencies widget, and news. Verified via screenshot."
+
+  - task: "Stocks BVB Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/StocksPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Full table with 10 BVB stocks, search, sort, stats cards. Verified via screenshot."
+
+  - task: "News Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/NewsPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "News list with images, sources, timestamps. Links open in new tab."
+
+  - task: "Currencies Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/CurrenciesPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "38 currencies with flags, search, main currencies highlighted. Verified via screenshot."
+
+  - task: "Navigation and Dark Mode"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Responsive nav with mobile menu, dark mode toggle with localStorage persistence"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "BVB Stocks API"
+    - "Global Indices API"
+    - "News API"
+    - "Currencies API"
+    - "Homepage UI"
+    - "Stocks Page UI"
+    - "Currencies Page UI"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "FinRomania MVP completed. Backend has 4 main APIs + refresh endpoints + CRON scheduler. Frontend has 4 pages (Home, Stocks, News, Currencies) in Romanian. BVB data is MOCK. Ready for full testing."
