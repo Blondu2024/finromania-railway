@@ -1,0 +1,249 @@
+{
+  "summary": {
+    "total_tests": 17,
+    "passed_tests": 17,
+    "success_rate": "100.0%",
+    "timestamp": "2025-12-23T19:07:07.167305"
+  },
+  "detailed_results": [
+    {
+      "test_name": "Setup Test User & Session",
+      "success": true,
+      "details": "Created test user: test-user-1766516821",
+      "timestamp": "2025-12-23T19:07:04.906417",
+      "response_sample": null
+    },
+    {
+      "test_name": "Auth - Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.050652",
+      "response_sample": {
+        "user_id": "test-user-1766516821",
+        "email": "test.user.1766516821@example.com",
+        "name": "Test User",
+        "picture": "https://via.placeholder.com/150",
+        "created_at": "2025-12-23T19:07:04.807Z",
+        "is_admin": true
+      }
+    },
+    {
+      "test_name": "Auth - Unauthorized Access (Expected 401)",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2025-12-23T19:07:05.120150",
+      "response_sample": null
+    },
+    {
+      "test_name": "Search API - Stock Search",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.191394",
+      "response_sample": {
+        "query": "TLV",
+        "stocks": [
+          {
+            "symbol": "TLV",
+            "change": 0.06,
+            "change_percent": 0.21,
+            "currency": "RON",
+            "high": 28.63,
+            "is_mock": true,
+            "last_updated": "2025-12-23T19:06:05.323000",
+            "low": 28.0,
+            "market": "BVB",
+            "name": "Banca Transilvania",
+            "open": 28.28,
+            "price": 28.34,
+            "source": "mock_data",
+            "volume": 441552,
+            "stock_type": "bvb"
+          }
+        ],
+        "news": [],
+        "total": 1
+      }
+    },
+    {
+      "test_name": "Newsletter - Subscribe",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.264061",
+      "response_sample": {
+        "message": "Successfully subscribed",
+        "status": "subscribed"
+      }
+    },
+    {
+      "test_name": "Watchlist - Get Empty List",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.342980",
+      "response_sample": []
+    },
+    {
+      "test_name": "Watchlist - Add Item",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.440250",
+      "response_sample": {
+        "id": "wl_8741459d58a5",
+        "user_id": "test-user-1766516821",
+        "symbol": "TLV",
+        "type": "bvb",
+        "name": "Banca Transilvania",
+        "target_price": 25.0,
+        "alert_enabled": true,
+        "created_at": "2025-12-23T19:07:05.418230+00:00"
+      }
+    },
+    {
+      "test_name": "Watchlist - Get List with Items",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.526496",
+      "response_sample": [
+        {
+          "id": "wl_8741459d58a5",
+          "user_id": "test-user-1766516821",
+          "symbol": "TLV",
+          "type": "bvb",
+          "name": "Banca Transilvania",
+          "target_price": 25.0,
+          "alert_enabled": true,
+          "created_at": "2025-12-23T19:07:05.418230+00:00"
+        }
+      ]
+    },
+    {
+      "test_name": "Portfolio - Get Empty Holdings",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.595789",
+      "response_sample": []
+    },
+    {
+      "test_name": "Portfolio - Add Buy Transaction",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.707354",
+      "response_sample": {
+        "message": "Transaction recorded",
+        "transaction_id": "txn_ba3875270a43"
+      }
+    },
+    {
+      "test_name": "Portfolio - Get Holdings After Transaction",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.774898",
+      "response_sample": [
+        {
+          "symbol": "TLV",
+          "type": "bvb",
+          "name": "Banca Transilvania",
+          "quantity": 100,
+          "avg_price": 24.5,
+          "total_invested": 2450.0,
+          "current_value": 2834.0,
+          "profit_loss": 384.0,
+          "profit_loss_percent": 15.673469387755102
+        }
+      ]
+    },
+    {
+      "test_name": "Portfolio - Get Summary",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.852040",
+      "response_sample": {
+        "total_invested": 2450.0,
+        "total_current": 2834.0,
+        "profit_loss": 384.0,
+        "profit_loss_percent": 15.67,
+        "holdings_count": 1
+      }
+    },
+    {
+      "test_name": "Portfolio - Get Transaction History",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:05.923962",
+      "response_sample": [
+        {
+          "id": "txn_ba3875270a43",
+          "user_id": "test-user-1766516821",
+          "symbol": "TLV",
+          "type": "bvb",
+          "name": "Banca Transilvania",
+          "action": "buy",
+          "quantity": 100,
+          "price": 24.5,
+          "total": 2450.0,
+          "created_at": "2025-12-23T19:07:05.668822+00:00"
+        }
+      ]
+    },
+    {
+      "test_name": "Admin - Get Platform Statistics",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:06.015033",
+      "response_sample": {
+        "totals": {
+          "users": 1,
+          "articles": 215,
+          "watchlist_items": 1,
+          "portfolio_transactions": 1,
+          "newsletter_subscribers": 2
+        },
+        "today": {
+          "logins": 0,
+          "page_visits": 0
+        },
+        "last_7_days": {
+          "new_users": 1
+        }
+      }
+    },
+    {
+      "test_name": "Admin - Get Users List",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:06.080314",
+      "response_sample": {
+        "users": [
+          {
+            "user_id": "test-user-1766516821",
+            "email": "test.user.1766516821@example.com",
+            "name": "Test User",
+            "picture": "https://via.placeholder.com/150",
+            "is_admin": true,
+            "created_at": "2025-12-23T19:07:04.807Z"
+          }
+        ],
+        "total": 1,
+        "skip": 0,
+        "limit": 5
+      }
+    },
+    {
+      "test_name": "Watchlist - Remove Item",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:06.159942",
+      "response_sample": {
+        "message": "Item removed from watchlist"
+      }
+    },
+    {
+      "test_name": "Auth - Logout",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T19:07:06.231339",
+      "response_sample": {
+        "message": "Logged out successfully"
+      }
+    }
+  ]
+}
