@@ -118,10 +118,50 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>
-        <footer className="border-t py-6 mt-8">
-          <div className="max-w-7xl mx-auto px-4 text-center text-sm text-muted-foreground">
-            <p>© 2025 FinRomania - Platformă de știri financiare pentru România</p>
-            <p className="mt-1">Date BVB: <Badge variant="outline" className="text-xs">MOCK</Badge> (MVP)</p>
+        <footer className="border-t py-8 mt-8 bg-muted/30">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+              <div>
+                <h4 className="font-semibold mb-3">FinRomania</h4>
+                <p className="text-sm text-muted-foreground">
+                  Platformă de știri și date financiare pentru România
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3">Navigare</h4>
+                <ul className="space-y-2 text-sm">
+                  <li><Link to="/" className="text-muted-foreground hover:text-foreground">Acasă</Link></li>
+                  <li><Link to="/stocks" className="text-muted-foreground hover:text-foreground">Acțiuni BVB</Link></li>
+                  <li><Link to="/news" className="text-muted-foreground hover:text-foreground">Știri</Link></li>
+                  <li><Link to="/currencies" className="text-muted-foreground hover:text-foreground">Valute</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3">Legal</h4>
+                <ul className="space-y-2 text-sm">
+                  <li><Link to="/privacy" className="text-muted-foreground hover:text-foreground">Politica de Confidențialitate</Link></li>
+                  <li><Link to="/terms" className="text-muted-foreground hover:text-foreground">Termeni și Condiții</Link></li>
+                  <li><Link to="/cookies" className="text-muted-foreground hover:text-foreground">Politica de Cookie-uri</Link></li>
+                  <li><Link to="/disclaimer" className="text-muted-foreground hover:text-foreground">Disclaimer</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3">Contact</h4>
+                <ul className="space-y-2 text-sm">
+                  <li><Link to="/contact" className="text-muted-foreground hover:text-foreground">Contactează-ne</Link></li>
+                  <li><span className="text-muted-foreground">contact@finromania.ro</span></li>
+                </ul>
+              </div>
+            </div>
+            <div className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                © 2025 FinRomania - Toate drepturile rezervate
+              </p>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">Date BVB: MOCK</Badge>
+                <Badge variant="secondary" className="text-xs">MVP v2.0</Badge>
+              </div>
+            </div>
           </div>
         </footer>
       </div>
