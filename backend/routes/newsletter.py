@@ -1,6 +1,7 @@
 """Newsletter routes pentru FinRomania"""
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 from datetime import datetime, timezone
 import uuid
 from config.database import get_database
@@ -10,8 +11,6 @@ router = APIRouter(prefix="/newsletter", tags=["newsletter"])
 class NewsletterSubscribe(BaseModel):
     email: EmailStr
     name: Optional[str] = None
-
-from typing import Optional
 
 @router.post("/subscribe")
 async def subscribe(data: NewsletterSubscribe):
