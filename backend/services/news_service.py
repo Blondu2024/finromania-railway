@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 import uuid
 from apis.romanian_rss_client import romanian_rss_client
+from apis.article_scraper import article_scraper
 from config.database import get_database
 
 logger = logging.getLogger(__name__)
@@ -13,6 +14,7 @@ class NewsService:
     
     def __init__(self):
         self.rss_client = romanian_rss_client
+        self.scraper = article_scraper
     
     async def fetch_and_store_news(self) -> int:
         """Fetch știri noi din surse românești și salvează în DB"""
@@ -35,6 +37,7 @@ class NewsService:
                 
                 if not existing:
                     article['created_at'] = datetime.utcnow().isoformat()
+                    article['full_content_scraped'] = False
                     await db.articles.insert_one(article)
                     count += 1
             
@@ -56,9 +59,56 @@ class NewsService:
         return await cursor.to_list(length=limit)
     
     async def get_article_by_id(self, article_id: str) -> Optional[Dict]:
-        """Obține un articol specific"""
+        """Obține un articol specific și extrage conținutul complet dacă nu există"""
         db = await get_database()
         article = await db.articles.find_one({'id': article_id}, {"_id": 0})
+        
+        if not article:
+            return None
+        
+        # Dacă nu avem conținutul complet, facem scraping
+        if not article.get('full_content_scraped') and article.get('url'):
+            try:
+                logger.info(f"Scraping full content for article: {article_id}")
+                scraped_data = self.scraper.scrape_article(article['url'])
+                
+                if scraped_data and scraped_data.get('content'):
+                    # Actualizăm articolul cu conținutul complet
+                    update_data = {
+                        'content': scraped_data['content'],
+                        'full_content_scraped': True,
+                        'scraped_at': datetime.utcnow().isoformat()
+                    }
+                    
+                    # Actualizăm imaginea dacă nu există
+                    if not article.get('image_url') and scraped_data.get('image_url'):
+                        update_data['image_url'] = scraped_data['image_url']
+                    
+                    await db.articles.update_one(
+                        {'id': article_id},
+                        {'$set': update_data}
+                    )
+                    
+                    # Actualizăm articolul local
+                    article['content'] = scraped_data['content']
+                    article['full_content_scraped'] = True
+                    if not article.get('image_url') and scraped_data.get('image_url'):
+                        article['image_url'] = scraped_data['image_url']
+                    
+                    logger.info(f"✅ Successfully scraped full content for: {article_id}")
+                else:
+                    # Marcăm că am încercat să facem scraping
+                    await db.articles.update_one(
+                        {'id': article_id},
+                        {'$set': {'full_content_scraped': True, 'scrape_failed': True}}
+                    )
+                    article['full_content_scraped'] = True
+                    article['scrape_failed'] = True
+                    logger.warning(f"Could not scrape content for: {article_id}")
+                    
+            except Exception as e:
+                logger.error(f"Error scraping article {article_id}: {e}")
+        
         return article
     
     async def search_news_by_topic(self, topic: str, limit: int = 10) -> List[Dict]:
