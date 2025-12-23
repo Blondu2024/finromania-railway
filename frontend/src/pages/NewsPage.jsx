@@ -131,9 +131,9 @@ export default function NewsPage() {
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              {news.length} articole disponibile
+              {news.length} articole din surse românești
             </span>
-            <Badge variant="outline">Click pe articol pentru traducere în română</Badge>
+            <Badge variant="secondary">🇷🇴 ZF, Profit.ro, Bursa, Wall-Street</Badge>
           </div>
         </CardContent>
       </Card>
