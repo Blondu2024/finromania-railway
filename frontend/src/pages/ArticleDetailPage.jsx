@@ -218,6 +218,11 @@ export default function ArticleDetailPage() {
             Autor: {article.author}
           </p>
         )}
+
+        {/* Social Share */}
+        <div className="border-t pt-4 mt-4">
+          <SocialShare title={article.title} url={window.location.href} />
+        </div>
       </article>
     </div>
   );

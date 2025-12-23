@@ -99,6 +99,12 @@ export default function StockDetailPage() {
         </div>
       </div>
 
+      {/* Actions */}
+      <div className="flex items-center gap-4 flex-wrap">
+        <AddToWatchlistButton symbol={data.symbol} type={type} name={data.name} />
+        <SocialShare title={`${data.name} (${data.symbol})`} />
+      </div>
+
       {/* Chart */}
       <Card>
         <CardHeader>
