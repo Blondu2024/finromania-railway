@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, RefreshCw, TrendingUp, TrendingDown, Search } from 'lucide-react';
+import { DollarSign, RefreshCw, Search } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -90,7 +90,7 @@ export default function CurrenciesPage() {
 
   useEffect(() => {
     fetchCurrencies();
-    const interval = setInterval(fetchCurrencies, 3600000); // Refresh every hour
+    const interval = setInterval(fetchCurrencies, 3600000);
     return () => clearInterval(interval);
   }, []);
 

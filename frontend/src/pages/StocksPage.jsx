@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { TrendingUp, TrendingDown, RefreshCw, Search, ArrowUpDown } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -61,7 +62,6 @@ export default function StocksPage() {
       return 0;
     });
 
-  // Calculate market stats
   const marketStats = {
     gainers: stocks.filter(s => s.change_percent > 0).length,
     losers: stocks.filter(s => s.change_percent < 0).length,
@@ -167,7 +167,7 @@ export default function StocksPage() {
                   </div>
                 </TableHead>
                 <TableHead className="text-right">Volum</TableHead>
-                <TableHead className="text-right">Min/Max</TableHead>
+                <TableHead className="text-right">Acțiune</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -194,8 +194,10 @@ export default function StocksPage() {
                     <TableCell className="text-right font-mono">
                       {stock.volume?.toLocaleString('ro-RO')}
                     </TableCell>
-                    <TableCell className="text-right text-sm text-muted-foreground">
-                      {stock.low?.toFixed(2)} / {stock.high?.toFixed(2)}
+                    <TableCell className="text-right">
+                      <Link to={`/stocks/bvb/${stock.symbol}`}>
+                        <Button variant="ghost" size="sm">Detalii</Button>
+                      </Link>
                     </TableCell>
                   </TableRow>
                 );
