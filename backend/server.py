@@ -158,12 +158,12 @@ async def get_bvb_stocks():
     """Obține toate acțiunile BVB"""
     try:
         db = await get_database()
-        stocks = await db.stocks_bvb.find({}, {"_id": 0}).to_list(100)
+        stocks = await db.stocks_bvb.find({}, {"_id": 0}).limit(100).to_list(100)
         
         if not stocks:
             # Dacă nu există date, forțează update
             await stock_service.update_bvb_stocks()
-            stocks = await db.stocks_bvb.find({}, {"_id": 0}).to_list(100)
+            stocks = await db.stocks_bvb.find({}, {"_id": 0}).limit(100).to_list(100)
         
         return stocks
     except Exception as e:
