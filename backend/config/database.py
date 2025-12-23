@@ -46,8 +46,14 @@ async def create_indexes():
     """Create database indexes for performance"""
     db = db_instance.db
     
+    # Drop old index if exists and create new one
+    try:
+        await db.articles.drop_index('link_1')
+    except:
+        pass
+    
     # Articles indexes
-    await db.articles.create_index('link', unique=True)
+    await db.articles.create_index('url', unique=True, sparse=True)
     await db.articles.create_index('published_at')
     await db.articles.create_index('source.name')
     await db.articles.create_index('language')
