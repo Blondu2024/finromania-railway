@@ -13,7 +13,8 @@ class AIService:
     """Service pentru traducere și rescriere știri cu AI"""
     
     def __init__(self):
-        self.api_key = os.getenv('EMERGENT_LLM_KEY')
+        # Try both key names
+        self.api_key = os.getenv('EMERGENT_LLM_KEY') or os.getenv('EMERGENT_UNIVERSAL_KEY')
         self.model_provider = "openai"
         self.model_name = "gpt-4o-mini"
     
