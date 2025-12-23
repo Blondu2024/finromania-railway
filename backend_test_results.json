@@ -1,26 +1,26 @@
 {
   "summary": {
-    "total_tests": 12,
-    "passed_tests": 12,
+    "total_tests": 15,
+    "passed_tests": 15,
     "success_rate": "100.0%",
-    "timestamp": "2025-12-23T14:34:49.307347"
+    "timestamp": "2025-12-23T15:28:21.758339"
   },
   "detailed_results": [
     {
       "test_name": "Health Check",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:39.979285",
+      "timestamp": "2025-12-23T15:28:16.836241",
       "response_sample": {
         "status": "healthy",
-        "timestamp": "2025-12-23T14:34:39.968826+00:00"
+        "timestamp": "2025-12-23T15:28:16.831140+00:00"
       }
     },
     {
       "test_name": "API Root Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:40.215865",
+      "timestamp": "2025-12-23T15:28:16.996790",
       "response_sample": {
         "message": "FinRomania API",
         "version": "1.0.0",
@@ -37,18 +37,18 @@
       "test_name": "BVB Stocks (MOCK)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:40.487076",
+      "timestamp": "2025-12-23T15:28:17.164829",
       "response_sample": [
         {
           "symbol": "H2O",
           "name": "Hidroelectrica",
-          "price": 153.6,
-          "change": -2.59,
-          "change_percent": -1.66,
-          "volume": 190615,
-          "open": 156.19,
-          "high": 157.75,
-          "low": 152.06,
+          "price": 155.01,
+          "change": 2.51,
+          "change_percent": 1.64,
+          "volume": 494966,
+          "open": 152.5,
+          "high": 156.56,
+          "low": 150.97,
           "currency": "RON",
           "market": "BVB",
           "source": "mock_data",
@@ -57,13 +57,13 @@
         {
           "symbol": "TLV",
           "name": "Banca Transilvania",
-          "price": 27.97,
-          "change": -0.33,
-          "change_percent": -1.18,
-          "volume": 499054,
-          "open": 28.31,
-          "high": 28.59,
-          "low": 27.69,
+          "price": 28.7,
+          "change": 0.3,
+          "change_percent": 1.06,
+          "volume": 488528,
+          "open": 28.4,
+          "high": 28.99,
+          "low": 28.12,
           "currency": "RON",
           "market": "BVB",
           "source": "mock_data",
@@ -75,32 +75,32 @@
       "test_name": "Global Indices (Yahoo Finance)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:40.769897",
+      "timestamp": "2025-12-23T15:28:17.304351",
       "response_sample": [
         {
           "symbol": "^GSPC",
           "name": "S&P 500",
-          "price": 6880.56,
-          "change": 2.0698242,
-          "change_percent": 0.03009047,
+          "price": 6883.95,
+          "change": 5.459961,
+          "change_percent": 0.07937674,
           "previous_close": 6878.49,
           "open": 6872.41,
-          "high": 6880.74,
+          "high": 6891.83,
           "low": 6868.81,
-          "volume": 57562213,
+          "volume": 368943241,
           "source": "yahoo_finance"
         },
         {
           "symbol": "^IXIC",
           "name": "NASDAQ",
-          "price": 23437.393,
-          "change": 8.5625,
-          "change_percent": 0.036553513,
+          "price": 23437.508,
+          "change": 8.677734,
+          "change_percent": 0.037038773,
           "previous_close": 23428.83,
           "open": 23407.695,
-          "high": 23437.393,
-          "low": 23400.928,
-          "volume": 734244414,
+          "high": 23490.406,
+          "low": 23377.486,
+          "volume": 2096199000,
           "source": "yahoo_finance"
         }
       ]
@@ -109,22 +109,27 @@
       "test_name": "Financial News (NewsAPI)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:41.058449",
+      "timestamp": "2025-12-23T15:28:17.487086",
       "response_sample": [
         {
-          "title": "Navan joins Russell 3000, Russell 2000 indexes",
+          "id": "aa9afd53-e47e-4e57-ad2e-ac25eb59f8cc",
+          "title": "Poet Technologies call volume above normal and directionally bullish",
           "description": "See the rest of the story here.\n\nthefly.com provides the latest financial news as it breaks. Known as a leader in market intelligence, The Fly's real-time, streaming news feed keeps individual investors, professional money managers, active traders, and corpor\u2026",
           "content": "Earnings calls, analyst events, roadshows and more",
-          "url": "https://thefly.com/permalinks/entry.php/id4260938/NAVN-Navan-joins-Russell--Russell--indexes",
-          "image_url": "https://thefly.com/images/meta/hotstocks.jpg",
+          "url": "https://thefly.com/permalinks/entry.php/id4260990/POET-Poet-Technologies-call-volume-above-normal-and-directionally-bullish",
+          "image_url": "https://thefly.com/images/meta/options.jpg",
           "source": {
             "name": "Thefly.com",
-            "url": "https://thefly.com/permalinks/entry.php/id4260938/NAVN-Navan-joins-Russell--Russell--indexes"
+            "url": "https://thefly.com/permalinks/entry.php/id4260990/POET-Poet-Technologies-call-volume-above-normal-and-directionally-bullish"
           },
           "author": null,
-          "published_at": "2025-12-22T14:17:54Z",
+          "published_at": "2025-12-22T15:25:01Z",
           "language": "en",
-          "is_rewritten": false
+          "is_rewritten": false,
+          "is_translated": true,
+          "title_ro": "Volumul apelurilor de la Poet Technologies dep\u0103\u0219e\u0219te normalul \u0219i are o direc\u021bie optimist\u0103",
+          "description_ro": "Afla\u021bi mai multe detalii aici.",
+          "content_ro": "Apeluri de profit, evenimente pentru anali\u0219ti, prezent\u0103ri de tip roadshow \u0219i alte activit\u0103\u021bi."
         }
       ]
     },
@@ -132,7 +137,7 @@
       "test_name": "Currency Rates (BNR)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:41.292644",
+      "timestamp": "2025-12-23T15:28:17.795750",
       "response_sample": {
         "sample_rates": [
           "AED",
@@ -147,7 +152,7 @@
       "test_name": "Market Overview (Combined)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:42.151157",
+      "timestamp": "2025-12-23T15:28:18.265424",
       "response_sample": {
         "bvb_count": 10,
         "global_count": 6
@@ -157,7 +162,7 @@
       "test_name": "Manual Refresh BVB",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:42.286072",
+      "timestamp": "2025-12-23T15:28:18.361939",
       "response_sample": {
         "message": "Updated 10 BVB stocks",
         "count": 10
@@ -167,7 +172,7 @@
       "test_name": "Manual Refresh Currencies",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:45.241128",
+      "timestamp": "2025-12-23T15:28:19.282071",
       "response_sample": {
         "message": "Currency rates updated",
         "success": true
@@ -177,17 +182,17 @@
       "test_name": "Manual Refresh News",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:46.969237",
+      "timestamp": "2025-12-23T15:28:19.741762",
       "response_sample": {
-        "message": "Fetched 19 new articles",
-        "count": 19
+        "message": "Fetched 0 new articles",
+        "count": 0
       }
     },
     {
       "test_name": "Manual Refresh Global Indices",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:49.138139",
+      "timestamp": "2025-12-23T15:28:20.802434",
       "response_sample": {
         "message": "Updated 6 global indices",
         "count": 6
@@ -197,21 +202,51 @@
       "test_name": "Individual BVB Stock (H2O)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T14:34:49.306283",
+      "timestamp": "2025-12-23T15:28:20.883811",
       "response_sample": {
         "symbol": "H2O",
         "name": "Hidroelectrica",
-        "price": 153.53,
-        "change": 1.03,
-        "change_percent": 0.67,
-        "volume": 199143,
-        "open": 152.5,
-        "high": 155.06,
-        "low": 150.97,
+        "price": 148.58,
+        "change": 0.24,
+        "change_percent": 0.16,
+        "volume": 167500,
+        "open": 148.34,
+        "high": 150.06,
+        "low": 146.85,
         "currency": "RON",
         "market": "BVB",
         "source": "mock_data",
         "is_mock": true
+      }
+    },
+    {
+      "test_name": "BVB Stock Details with 30-day History",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T15:28:20.995473",
+      "response_sample": {
+        "history_count": 30,
+        "has_chart_data": true
+      }
+    },
+    {
+      "test_name": "Global Index Details with 30-day History",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T15:28:21.538703",
+      "response_sample": {
+        "history_count": 21,
+        "has_chart_data": true
+      }
+    },
+    {
+      "test_name": "Article Translation to Romanian",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-23T15:28:21.757739",
+      "response_sample": {
+        "has_translation": true,
+        "has_romanian_content": true
       }
     }
   ]
