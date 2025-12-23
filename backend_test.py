@@ -196,6 +196,57 @@ class FinRomaniaAPITester:
             
         return True, "Valid market overview with all components"
 
+    def validate_stock_details(self, data: Dict) -> tuple:
+        """Validate stock/index details with history response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+            
+        required_fields = ['symbol', 'name', 'history', 'period']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+                
+        history = data.get('history', [])
+        if not isinstance(history, list):
+            return False, "History should be a list"
+            
+        if len(history) == 0:
+            return False, "No history data returned"
+            
+        # Should have around 30 days of data
+        if len(history) < 20:
+            return False, f"Too few history entries: {len(history)}, expected around 30"
+            
+        # Validate first history entry structure
+        if history:
+            entry = history[0]
+            required_history_fields = ['date', 'open', 'high', 'low', 'close', 'volume']
+            for field in required_history_fields:
+                if field not in entry:
+                    return False, f"Missing history field: {field}"
+                    
+        return True, f"Valid stock details with {len(history)} days of history"
+
+    def validate_article_translation(self, data: Dict) -> tuple:
+        """Validate article translation response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+            
+        required_fields = ['id', 'title', 'url', 'source']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+                
+        # Check if translation was attempted (should have Romanian fields or is_translated flag)
+        has_translation = data.get('is_translated', False)
+        has_romanian_title = bool(data.get('title_ro'))
+        has_romanian_content = bool(data.get('content_ro'))
+        
+        if not has_translation and not has_romanian_title:
+            return False, "Article should be translated or have translation attempted"
+            
+        return True, f"Valid article with translation status: {has_translation}"
+
     def run_all_tests(self):
         """Run comprehensive test suite"""
         print("🚀 Starting FinRomania API Testing...")
