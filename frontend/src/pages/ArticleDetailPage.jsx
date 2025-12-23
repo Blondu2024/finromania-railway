@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Clock, Building2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Clock, Building2, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -40,7 +40,15 @@ export default function ArticleDetailPage() {
         <Skeleton className="h-8 w-32" />
         <Skeleton className="h-12 w-full" />
         <Skeleton className="h-64 w-full" />
-        <Skeleton className="h-96 w-full" />
+        <div className="space-y-4">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span className="text-sm">Se încarcă articolul complet...</span>
+        </div>
       </div>
     );
   }
@@ -56,6 +64,46 @@ export default function ArticleDetailPage() {
     );
   }
 
+  // Format content with paragraphs
+  const formatContent = (content) => {
+    if (!content) return null;
+    
+    return content.split('\n\n').map((paragraph, idx) => {
+      // Check if it's a heading (bold text)
+      if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+        return (
+          <h2 key={idx} className="text-xl font-semibold mt-6 mb-3">
+            {paragraph.replace(/\*\*/g, '')}
+          </h2>
+        );
+      }
+      // Check if it's a blockquote
+      if (paragraph.startsWith('>')) {
+        return (
+          <blockquote key={idx} className="border-l-4 border-blue-500 pl-4 italic text-muted-foreground my-4">
+            {paragraph.substring(1).trim()}
+          </blockquote>
+        );
+      }
+      // Check if it's a list item
+      if (paragraph.startsWith('•')) {
+        return (
+          <li key={idx} className="ml-4">
+            {paragraph.substring(1).trim()}
+          </li>
+        );
+      }
+      // Regular paragraph
+      return (
+        <p key={idx} className="mb-4 leading-relaxed">
+          {paragraph}
+        </p>
+      );
+    });
+  };
+
+  const hasFullContent = article.content && article.content.length > 200;
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Back Button */}
@@ -68,7 +116,7 @@ export default function ArticleDetailPage() {
       {/* Article Header */}
       <article className="space-y-6">
         <header>
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex flex-wrap items-center gap-2 mb-4">
             <Badge variant="secondary">
               <Building2 className="w-3 h-3 mr-1" />
               {article.source?.name}
@@ -88,11 +136,16 @@ export default function ArticleDetailPage() {
                 🇷🇴 Sursă Română
               </Badge>
             )}
+            {hasFullContent && (
+              <Badge variant="default" className="bg-green-600">
+                ✓ Articol Complet
+              </Badge>
+            )}
           </div>
           
           <h1 className="text-3xl font-bold leading-tight">{article.title}</h1>
           
-          {article.description && (
+          {article.description && !hasFullContent && (
             <p className="text-lg text-muted-foreground mt-4 leading-relaxed">
               {article.description}
             </p>
@@ -105,7 +158,7 @@ export default function ArticleDetailPage() {
             <img 
               src={article.image_url} 
               alt={article.title}
-              className="w-full h-auto object-cover"
+              className="w-full h-auto object-cover max-h-96"
               onError={(e) => e.target.style.display = 'none'}
             />
           </div>
@@ -113,33 +166,45 @@ export default function ArticleDetailPage() {
 
         {/* Article Content */}
         <div className="prose prose-lg dark:prose-invert max-w-none">
-          {article.content ? (
-            <div className="text-base leading-relaxed whitespace-pre-wrap">
-              {article.content}
+          {hasFullContent ? (
+            <div className="text-base">
+              {formatContent(article.content)}
+            </div>
+          ) : article.description ? (
+            <div>
+              <p className="text-base leading-relaxed mb-6">{article.description}</p>
+              <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200">
+                <CardContent className="p-4">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                    ℹ️ Conținutul complet nu a putut fi extras automat. 
+                    Pentru a citi articolul integral, vizitează sursa originală.
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           ) : (
             <p className="text-muted-foreground italic">
-              Pentru a citi articolul complet, vizitează sursa originală.
+              Conținutul nu este disponibil. Vizitează sursa originală.
             </p>
           )}
         </div>
 
-        {/* Source Link */}
-        <Card className="bg-muted/50">
+        {/* Source Link - always visible but not prominent */}
+        <Card className="bg-muted/30 border-dashed">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Sursă originală</p>
-                <p className="font-medium">{article.source?.name}</p>
+                <p className="text-xs text-muted-foreground">Sursă originală</p>
+                <p className="text-sm font-medium">{article.source?.name}</p>
               </div>
               <a 
                 href={article.url} 
                 target="_blank" 
                 rel="noopener noreferrer"
               >
-                <Button variant="outline" size="sm">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Citește la sursă
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                  <ExternalLink className="w-3 h-3 mr-1" />
+                  <span className="text-xs">Vizitează sursa</span>
                 </Button>
               </a>
             </div>
@@ -147,7 +212,7 @@ export default function ArticleDetailPage() {
         </Card>
 
         {/* Author */}
-        {article.author && (
+        {article.author && article.author !== article.source?.name && (
           <p className="text-sm text-muted-foreground">
             Autor: {article.author}
           </p>
