@@ -118,7 +118,7 @@ export default function NewsPage() {
             <Newspaper className="w-8 h-8 text-blue-600" />
             Știri Financiare
           </h1>
-          <p className="text-muted-foreground">Ultimele știri din lumea financiară - traduse în română</p>
+          <p className="text-muted-foreground">Ultimele știri financiare din surse românești</p>
         </div>
         <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
           <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
