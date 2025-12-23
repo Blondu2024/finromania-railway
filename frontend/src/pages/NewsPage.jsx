@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Newspaper, RefreshCw, ExternalLink, Clock, Building2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Newspaper, RefreshCw, Clock, Building2 } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -12,48 +13,45 @@ function NewsCard({ article }) {
   const timeAgo = getTimeAgo(publishedDate);
   
   return (
-    <Card className="hover:shadow-lg transition-all duration-300 overflow-hidden group">
-      <CardContent className="p-0">
-        <div className="flex flex-col md:flex-row">
-          {article.image_url && (
-            <div className="md:w-48 h-48 md:h-auto flex-shrink-0 overflow-hidden">
-              <img 
-                src={article.image_url} 
-                alt="" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => e.target.parentElement.style.display = 'none'}
-              />
+    <Link to={`/news/${article.id}`}>
+      <Card className="hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer">
+        <CardContent className="p-0">
+          <div className="flex flex-col md:flex-row">
+            {article.image_url && (
+              <div className="md:w-48 h-48 md:h-auto flex-shrink-0 overflow-hidden">
+                <img 
+                  src={article.image_url} 
+                  alt="" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => e.target.parentElement.style.display = 'none'}
+                />
+              </div>
+            )}
+            <div className="flex-1 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="secondary" className="text-xs">
+                  <Building2 className="w-3 h-3 mr-1" />
+                  {article.source?.name || 'Unknown'}
+                </Badge>
+                <span className="text-xs text-muted-foreground flex items-center">
+                  <Clock className="w-3 h-3 mr-1" />
+                  {timeAgo}
+                </span>
+              </div>
+              <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                {article.title}
+              </h3>
+              <p className="text-sm text-muted-foreground line-clamp-3">
+                {article.description || article.content}
+              </p>
+              <p className="text-sm text-blue-600 mt-3 font-medium">
+                Citește articolul →
+              </p>
             </div>
-          )}
-          <div className="flex-1 p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant="secondary" className="text-xs">
-                <Building2 className="w-3 h-3 mr-1" />
-                {article.source?.name || 'Unknown'}
-              </Badge>
-              <span className="text-xs text-muted-foreground flex items-center">
-                <Clock className="w-3 h-3 mr-1" />
-                {timeAgo}
-              </span>
-            </div>
-            <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-              {article.title}
-            </h3>
-            <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-              {article.description || article.content}
-            </p>
-            <a 
-              href={article.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
-            >
-              Citește mai mult <ExternalLink className="w-3 h-3 ml-1" />
-            </a>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
 
@@ -90,7 +88,7 @@ export default function NewsPage() {
 
   useEffect(() => {
     fetchNews();
-    const interval = setInterval(fetchNews, 300000); // Refresh every 5 minutes
+    const interval = setInterval(fetchNews, 300000);
     return () => clearInterval(interval);
   }, []);
 
@@ -120,7 +118,7 @@ export default function NewsPage() {
             <Newspaper className="w-8 h-8 text-blue-600" />
             Știri Financiare
           </h1>
-          <p className="text-muted-foreground">Ultimele știri din lumea financiară</p>
+          <p className="text-muted-foreground">Ultimele știri din lumea financiară - traduse în română</p>
         </div>
         <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
           <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
@@ -135,7 +133,7 @@ export default function NewsPage() {
             <span className="text-sm text-muted-foreground">
               {news.length} articole disponibile
             </span>
-            <Badge variant="outline">Actualizare automată la 15 minute</Badge>
+            <Badge variant="outline">Click pe articol pentru traducere în română</Badge>
           </div>
         </CardContent>
       </Card>
@@ -155,7 +153,7 @@ export default function NewsPage() {
           </Card>
         ) : (
           news.map((article, idx) => (
-            <NewsCard key={article.url || idx} article={article} />
+            <NewsCard key={article.id || idx} article={article} />
           ))
         )}
       </div>

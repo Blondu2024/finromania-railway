@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Newspaper, BarChart3, DollarSign, Menu, X, RefreshCw, Moon, Sun } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, BarChart3, DollarSign, Menu, Moon, Sun } from 'lucide-react';
 import { Button } from './components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from './components/ui/card';
 import { Badge } from './components/ui/badge';
-import { Skeleton } from './components/ui/skeleton';
 import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
 import HomePage from './pages/HomePage';
 import StocksPage from './pages/StocksPage';
 import NewsPage from './pages/NewsPage';
 import CurrenciesPage from './pages/CurrenciesPage';
+import StockDetailPage from './pages/StockDetailPage';
+import ArticleDetailPage from './pages/ArticleDetailPage';
+import TickerBar from './components/TickerBar';
 import './App.css';
-
-const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 function Navigation({ darkMode, toggleDarkMode }) {
   const location = useLocation();
@@ -27,7 +26,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+      <div className="max-w-7xl mx-auto px-4 flex h-14 items-center">
         <Link to="/" className="flex items-center space-x-2 mr-6">
           <BarChart3 className="h-6 w-6 text-blue-600" />
           <span className="font-bold text-xl hidden sm:inline">FinRomania</span>
@@ -98,16 +97,19 @@ function App() {
     <Router>
       <div className={`min-h-screen bg-background ${darkMode ? 'dark' : ''}`}>
         <Navigation darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
-        <main className="container py-6">
+        <TickerBar />
+        <main className="max-w-7xl mx-auto px-4 py-6">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/stocks" element={<StocksPage />} />
+            <Route path="/stocks/:type/:symbol" element={<StockDetailPage />} />
             <Route path="/news" element={<NewsPage />} />
+            <Route path="/news/:articleId" element={<ArticleDetailPage />} />
             <Route path="/currencies" element={<CurrenciesPage />} />
           </Routes>
         </main>
         <footer className="border-t py-6 mt-8">
-          <div className="container text-center text-sm text-muted-foreground">
+          <div className="max-w-7xl mx-auto px-4 text-center text-sm text-muted-foreground">
             <p>© 2025 FinRomania - Platformă de știri financiare pentru România</p>
             <p className="mt-1">Date BVB: <Badge variant="outline" className="text-xs">MOCK</Badge> (MVP)</p>
           </div>
