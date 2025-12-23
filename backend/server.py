@@ -344,6 +344,76 @@ async def refresh_currencies():
         logger.error(f"Error refreshing currencies: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============================================
+# INDEX/STOCK DETAILS WITH HISTORY
+# ============================================
+
+@api_router.get("/stocks/global/{symbol}/details")
+async def get_global_index_details(symbol: str, period: str = Query(default="1mo")):
+    """Obține detalii și istoric pentru un indice global"""
+    try:
+        history = stock_service.get_index_history(symbol, period)
+        
+        if not history:
+            raise HTTPException(status_code=404, detail=f"Index {symbol} not found")
+        
+        # Get related news
+        index_name = history.get('name', symbol)
+        related_news = await news_service.search_news_by_topic(index_name, limit=5)
+        
+        return {
+            **history,
+            'related_news': related_news
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting index details for {symbol}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/stocks/bvb/{symbol}/details")
+async def get_bvb_stock_details(symbol: str):
+    """Obține detalii și istoric pentru o acțiune BVB"""
+    try:
+        history = stock_service.get_bvb_stock_history(symbol.upper())
+        
+        if not history:
+            raise HTTPException(status_code=404, detail=f"Stock {symbol} not found")
+        
+        # Get related news
+        stock_name = history.get('name', symbol)
+        related_news = await news_service.search_news_by_topic(stock_name, limit=5)
+        
+        return {
+            **history,
+            'related_news': related_news
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting BVB stock details for {symbol}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============================================
+# ARTICLE DETAILS (with translation)
+# ============================================
+
+@api_router.get("/news/{article_id}")
+async def get_article_detail(article_id: str):
+    """Obține detalii articol cu traducere în română"""
+    try:
+        article = await news_service.get_article_by_id(article_id)
+        
+        if not article:
+            raise HTTPException(status_code=404, detail="Article not found")
+        
+        return article
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting article {article_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
