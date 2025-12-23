@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Newspaper, BarChart3, DollarSign, Menu, Moon, Sun, User, LogOut, Star, Briefcase, Shield } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, BarChart3, DollarSign, Menu, Moon, Sun, User, LogOut, Star, Briefcase, Shield, BookOpen, Bot, ClipboardCheck } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
@@ -22,6 +22,10 @@ import AuthCallback from './pages/AuthCallback';
 import WatchlistPage from './pages/WatchlistPage';
 import PortfolioPage from './pages/PortfolioPage';
 import AdminDashboard from './pages/AdminDashboard';
+import EducationPage from './pages/EducationPage';
+import LessonPage from './pages/LessonPage';
+import RiskAssessmentPage from './pages/RiskAssessmentPage';
+import AIAdvisorPage from './pages/AIAdvisorPage';
 import TickerBar from './components/TickerBar';
 import SearchBar from './components/SearchBar';
 import NewsletterSignup from './components/NewsletterSignup';
