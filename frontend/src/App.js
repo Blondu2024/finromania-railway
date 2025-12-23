@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Newspaper, BarChart3, DollarSign, Menu, Moon, Sun } from 'lucide-react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { TrendingUp, TrendingDown, Newspaper, BarChart3, DollarSign, Menu, Moon, Sun, User, LogOut, Star, Briefcase, Shield } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './components/ui/dropdown-menu';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import HomePage from './pages/HomePage';
 import StocksPage from './pages/StocksPage';
 import NewsPage from './pages/NewsPage';
@@ -15,12 +17,80 @@ import TermsOfServicePage from './pages/TermsOfServicePage';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import DisclaimerPage from './pages/DisclaimerPage';
 import ContactPage from './pages/ContactPage';
+import LoginPage from './pages/LoginPage';
+import AuthCallback from './pages/AuthCallback';
+import WatchlistPage from './pages/WatchlistPage';
+import PortfolioPage from './pages/PortfolioPage';
+import AdminDashboard from './pages/AdminDashboard';
 import TickerBar from './components/TickerBar';
+import SearchBar from './components/SearchBar';
+import NewsletterSignup from './components/NewsletterSignup';
 import './App.css';
+
+function UserMenu() {
+  const { user, logout, login } = useAuth();
+  const navigate = useNavigate();
+
+  if (!user) {
+    return (
+      <Button onClick={login} variant="default" size="sm">
+        <User className="w-4 h-4 mr-2" />
+        Conectare
+      </Button>
+    );
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="flex items-center gap-2">
+          {user.picture ? (
+            <img src={user.picture} alt="" className="w-8 h-8 rounded-full" />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+              <span className="text-blue-600 font-bold text-sm">{user.name?.[0]}</span>
+            </div>
+          )}
+          <span className="hidden md:inline text-sm">{user.name?.split(' ')[0]}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <div className="px-2 py-1.5">
+          <p className="text-sm font-medium">{user.name}</p>
+          <p className="text-xs text-muted-foreground">{user.email}</p>
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate('/watchlist')}>
+          <Star className="w-4 h-4 mr-2" />
+          Watchlist
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/portfolio')}>
+          <Briefcase className="w-4 h-4 mr-2" />
+          Portofoliu
+        </DropdownMenuItem>
+        {user.is_admin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate('/admin')}>
+              <Shield className="w-4 h-4 mr-2" />
+              Admin Dashboard
+            </DropdownMenuItem>
+          </>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={logout} className="text-red-600">
+          <LogOut className="w-4 h-4 mr-2" />
+          Deconectare
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 function Navigation({ darkMode, toggleDarkMode }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user } = useAuth();
   
   const navItems = [
     { path: '/', label: 'Acasă', icon: <BarChart3 className="w-4 h-4" /> },
@@ -28,6 +98,11 @@ function Navigation({ darkMode, toggleDarkMode }) {
     { path: '/news', label: 'Știri', icon: <Newspaper className="w-4 h-4" /> },
     { path: '/currencies', label: 'Valute', icon: <DollarSign className="w-4 h-4" /> },
   ];
+
+  const userNavItems = user ? [
+    { path: '/watchlist', label: 'Watchlist', icon: <Star className="w-4 h-4" /> },
+    { path: '/portfolio', label: 'Portofoliu', icon: <Briefcase className="w-4 h-4" /> },
+  ] : [];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -37,8 +112,18 @@ function Navigation({ darkMode, toggleDarkMode }) {
           <span className="font-bold text-xl hidden sm:inline">FinRomania</span>
         </Link>
         
-        <nav className="hidden md:flex items-center space-x-4 flex-1">
+        <nav className="hidden lg:flex items-center space-x-1 flex-1">
           {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === item.path ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </Link>
+          ))}
+          {userNavItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
@@ -51,19 +136,28 @@ function Navigation({ darkMode, toggleDarkMode }) {
         </nav>
 
         <div className="flex items-center space-x-2 ml-auto">
+          <div className="hidden md:block">
+            <SearchBar />
+          </div>
+          
           <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
             {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
           
+          <UserMenu />
+          
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild className="md:hidden">
+            <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64">
+            <SheetContent side="left" className="w-72">
               <div className="flex flex-col space-y-4 mt-8">
-                {navItems.map((item) => (
+                <div className="mb-4">
+                  <SearchBar />
+                </div>
+                {[...navItems, ...userNavItems].map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
@@ -83,6 +177,37 @@ function Navigation({ darkMode, toggleDarkMode }) {
   );
 }
 
+function AppRouter() {
+  const location = useLocation();
+  
+  // CRITICAL: Check URL fragment for session_id synchronously during render
+  // This prevents race conditions with ProtectedRoute checks
+  if (location.hash?.includes('session_id=')) {
+    return <AuthCallback />;
+  }
+  
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/stocks" element={<StocksPage />} />
+      <Route path="/stocks/:type/:symbol" element={<StockDetailPage />} />
+      <Route path="/news" element={<NewsPage />} />
+      <Route path="/news/:articleId" element={<ArticleDetailPage />} />
+      <Route path="/currencies" element={<CurrenciesPage />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms" element={<TermsOfServicePage />} />
+      <Route path="/cookies" element={<CookiePolicyPage />} />
+      <Route path="/disclaimer" element={<DisclaimerPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/watchlist" element={<WatchlistPage />} />
+      <Route path="/portfolio" element={<PortfolioPage />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+    </Routes>
+  );
+}
+
 function App() {
   const [darkMode, setDarkMode] = useState(false);
 
@@ -99,73 +224,63 @@ function App() {
   }, [darkMode]);
 
   return (
-    <Router>
-      <div className={`min-h-screen bg-background ${darkMode ? 'dark' : ''}`}>
-        <Navigation darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
-        <TickerBar />
-        <main className="max-w-7xl mx-auto px-4 py-6">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/stocks" element={<StocksPage />} />
-            <Route path="/stocks/:type/:symbol" element={<StockDetailPage />} />
-            <Route path="/news" element={<NewsPage />} />
-            <Route path="/news/:articleId" element={<ArticleDetailPage />} />
-            <Route path="/currencies" element={<CurrenciesPage />} />
-            <Route path="/privacy" element={<PrivacyPolicyPage />} />
-            <Route path="/terms" element={<TermsOfServicePage />} />
-            <Route path="/cookies" element={<CookiePolicyPage />} />
-            <Route path="/disclaimer" element={<DisclaimerPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-          </Routes>
-        </main>
-        <footer className="border-t py-8 mt-8 bg-muted/30">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-              <div>
-                <h4 className="font-semibold mb-3">FinRomania</h4>
+    <AuthProvider>
+      <Router>
+        <div className={`min-h-screen bg-background ${darkMode ? 'dark' : ''}`}>
+          <Navigation darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
+          <TickerBar />
+          <main className="max-w-7xl mx-auto px-4 py-6">
+            <AppRouter />
+          </main>
+          <footer className="border-t py-8 mt-8 bg-muted/30">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                  <h4 className="font-semibold mb-3">FinRomania</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Platformă de știri și date financiare pentru România
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-3">Navigare</h4>
+                  <ul className="space-y-2 text-sm">
+                    <li><Link to="/" className="text-muted-foreground hover:text-foreground">Acasă</Link></li>
+                    <li><Link to="/stocks" className="text-muted-foreground hover:text-foreground">Acțiuni BVB</Link></li>
+                    <li><Link to="/news" className="text-muted-foreground hover:text-foreground">Știri</Link></li>
+                    <li><Link to="/currencies" className="text-muted-foreground hover:text-foreground">Valute</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-3">Legal</h4>
+                  <ul className="space-y-2 text-sm">
+                    <li><Link to="/privacy" className="text-muted-foreground hover:text-foreground">Politica de Confidențialitate</Link></li>
+                    <li><Link to="/terms" className="text-muted-foreground hover:text-foreground">Termeni și Condiții</Link></li>
+                    <li><Link to="/cookies" className="text-muted-foreground hover:text-foreground">Politica de Cookie-uri</Link></li>
+                    <li><Link to="/disclaimer" className="text-muted-foreground hover:text-foreground">Disclaimer</Link></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-3">Newsletter</h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Primește ultimele știri financiare
+                  </p>
+                  <NewsletterSignup variant="inline" />
+                </div>
+              </div>
+              <div className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p className="text-sm text-muted-foreground">
-                  Platformă de știri și date financiare pentru România
+                  © 2025 FinRomania - Toate drepturile rezervate
                 </p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Navigare</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><Link to="/" className="text-muted-foreground hover:text-foreground">Acasă</Link></li>
-                  <li><Link to="/stocks" className="text-muted-foreground hover:text-foreground">Acțiuni BVB</Link></li>
-                  <li><Link to="/news" className="text-muted-foreground hover:text-foreground">Știri</Link></li>
-                  <li><Link to="/currencies" className="text-muted-foreground hover:text-foreground">Valute</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Legal</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><Link to="/privacy" className="text-muted-foreground hover:text-foreground">Politica de Confidențialitate</Link></li>
-                  <li><Link to="/terms" className="text-muted-foreground hover:text-foreground">Termeni și Condiții</Link></li>
-                  <li><Link to="/cookies" className="text-muted-foreground hover:text-foreground">Politica de Cookie-uri</Link></li>
-                  <li><Link to="/disclaimer" className="text-muted-foreground hover:text-foreground">Disclaimer</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3">Contact</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><Link to="/contact" className="text-muted-foreground hover:text-foreground">Contactează-ne</Link></li>
-                  <li><span className="text-muted-foreground">contact@finromania.ro</span></li>
-                </ul>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">Date BVB: MOCK</Badge>
+                  <Badge variant="secondary" className="text-xs">MVP v2.0</Badge>
+                </div>
               </div>
             </div>
-            <div className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-sm text-muted-foreground">
-                © 2025 FinRomania - Toate drepturile rezervate
-              </p>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">Date BVB: MOCK</Badge>
-                <Badge variant="secondary" className="text-xs">MVP v2.0</Badge>
-              </div>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </Router>
+          </footer>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
