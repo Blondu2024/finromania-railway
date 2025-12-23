@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Clock, Building2, Loader2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Clock, Building2 } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -12,21 +12,18 @@ export default function ArticleDetailPage() {
   const { articleId } = useParams();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [translating, setTranslating] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
         setLoading(true);
-        setTranslating(true);
         
         const res = await fetch(`${API_URL}/api/news/${articleId}`);
         if (!res.ok) throw new Error('Article not found');
         
         const data = await res.json();
         setArticle(data);
-        setTranslating(false);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -59,12 +56,6 @@ export default function ArticleDetailPage() {
     );
   }
 
-  // Use translated content if available
-  const title = article.title_ro || article.title;
-  const description = article.description_ro || article.description;
-  const content = article.content_ro || article.content;
-  const isTranslated = article.is_translated;
-
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Back Button */}
@@ -92,18 +83,18 @@ export default function ArticleDetailPage() {
                 minute: '2-digit'
               })}
             </Badge>
-            {isTranslated && (
-              <Badge variant="default" className="bg-green-600">
-                Tradus în Română
+            {article.is_romanian_source && (
+              <Badge variant="default" className="bg-blue-600">
+                🇷🇴 Sursă Română
               </Badge>
             )}
           </div>
           
-          <h1 className="text-3xl font-bold leading-tight">{title}</h1>
+          <h1 className="text-3xl font-bold leading-tight">{article.title}</h1>
           
-          {description && (
+          {article.description && (
             <p className="text-lg text-muted-foreground mt-4 leading-relaxed">
-              {description}
+              {article.description}
             </p>
           )}
         </header>
@@ -113,34 +104,22 @@ export default function ArticleDetailPage() {
           <div className="rounded-lg overflow-hidden">
             <img 
               src={article.image_url} 
-              alt={title}
+              alt={article.title}
               className="w-full h-auto object-cover"
               onError={(e) => e.target.style.display = 'none'}
             />
           </div>
         )}
 
-        {/* Translation Notice */}
-        {translating && !isTranslated && (
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-              <span className="text-sm text-muted-foreground">
-                Se traduce articolul în română...
-              </span>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Article Content */}
         <div className="prose prose-lg dark:prose-invert max-w-none">
-          {content ? (
+          {article.content ? (
             <div className="text-base leading-relaxed whitespace-pre-wrap">
-              {content}
+              {article.content}
             </div>
           ) : (
             <p className="text-muted-foreground italic">
-              Conținutul complet nu este disponibil. Vizitează sursa originală pentru articolul complet.
+              Pentru a citi articolul complet, vizitează sursa originală.
             </p>
           )}
         </div>
