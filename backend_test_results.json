@@ -1,26 +1,26 @@
 {
   "summary": {
     "total_tests": 15,
-    "passed_tests": 15,
-    "success_rate": "100.0%",
-    "timestamp": "2025-12-23T15:28:21.758339"
+    "passed_tests": 14,
+    "success_rate": "93.3%",
+    "timestamp": "2025-12-23T19:06:15.137706"
   },
   "detailed_results": [
     {
       "test_name": "Health Check",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:16.836241",
+      "timestamp": "2025-12-23T19:06:04.795429",
       "response_sample": {
         "status": "healthy",
-        "timestamp": "2025-12-23T15:28:16.831140+00:00"
+        "timestamp": "2025-12-23T19:06:04.789906+00:00"
       }
     },
     {
       "test_name": "API Root Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:16.996790",
+      "timestamp": "2025-12-23T19:06:04.864923",
       "response_sample": {
         "message": "FinRomania API",
         "version": "1.0.0",
@@ -37,18 +37,18 @@
       "test_name": "BVB Stocks (MOCK)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:17.164829",
+      "timestamp": "2025-12-23T19:06:04.937788",
       "response_sample": [
         {
           "symbol": "H2O",
           "name": "Hidroelectrica",
-          "price": 155.01,
-          "change": 2.51,
-          "change_percent": 1.64,
-          "volume": 494966,
-          "open": 152.5,
-          "high": 156.56,
-          "low": 150.97,
+          "price": 150.93,
+          "change": 0.84,
+          "change_percent": 0.56,
+          "volume": 382447,
+          "open": 150.09,
+          "high": 152.44,
+          "low": 148.59,
           "currency": "RON",
           "market": "BVB",
           "source": "mock_data",
@@ -57,13 +57,13 @@
         {
           "symbol": "TLV",
           "name": "Banca Transilvania",
-          "price": 28.7,
-          "change": 0.3,
-          "change_percent": 1.06,
-          "volume": 488528,
-          "open": 28.4,
-          "high": 28.99,
-          "low": 28.12,
+          "price": 28.84,
+          "change": 0.42,
+          "change_percent": 1.49,
+          "volume": 315859,
+          "open": 28.42,
+          "high": 29.13,
+          "low": 28.13,
           "currency": "RON",
           "market": "BVB",
           "source": "mock_data",
@@ -75,32 +75,32 @@
       "test_name": "Global Indices (Yahoo Finance)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:17.304351",
+      "timestamp": "2025-12-23T19:06:05.013186",
       "response_sample": [
         {
           "symbol": "^GSPC",
           "name": "S&P 500",
-          "price": 6883.95,
-          "change": 5.459961,
-          "change_percent": 0.07937674,
+          "price": 6905.38,
+          "change": 26.889648,
+          "change_percent": 0.39092538,
           "previous_close": 6878.49,
           "open": 6872.41,
-          "high": 6891.83,
+          "high": 6906.32,
           "low": 6868.81,
-          "volume": 368943241,
+          "volume": 1129785000,
           "source": "yahoo_finance"
         },
         {
           "symbol": "^IXIC",
           "name": "NASDAQ",
-          "price": 23437.508,
-          "change": 8.677734,
-          "change_percent": 0.037038773,
+          "price": 23535.637,
+          "change": 106.80664,
+          "change_percent": 0.45587298,
           "previous_close": 23428.83,
           "open": 23407.695,
-          "high": 23490.406,
+          "high": 23537.484,
           "low": 23377.486,
-          "volume": 2096199000,
+          "volume": 4593050000,
           "source": "yahoo_finance"
         }
       ]
@@ -109,27 +109,28 @@
       "test_name": "Financial News (NewsAPI)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:17.487086",
+      "timestamp": "2025-12-23T19:06:05.117376",
       "response_sample": [
         {
-          "id": "aa9afd53-e47e-4e57-ad2e-ac25eb59f8cc",
-          "title": "Poet Technologies call volume above normal and directionally bullish",
-          "description": "See the rest of the story here.\n\nthefly.com provides the latest financial news as it breaks. Known as a leader in market intelligence, The Fly's real-time, streaming news feed keeps individual investors, professional money managers, active traders, and corpor\u2026",
-          "content": "Earnings calls, analyst events, roadshows and more",
-          "url": "https://thefly.com/permalinks/entry.php/id4260990/POET-Poet-Technologies-call-volume-above-normal-and-directionally-bullish",
-          "image_url": "https://thefly.com/images/meta/options.jpg",
+          "id": "b0bc4204-5f59-437d-9a01-396a27250d21",
+          "title": "Reguli stricte pentru posesorii de animale. Risc\u0103 \u00eenchisoarea dac\u0103 le \u00eencalc\u0103",
+          "description": "Condamnare cu executare pentru cruzime fa\u021b\u0103 de un c\u00e2ine \u00een Bucure\u0219ti Un b\u0103rbat de 71 de ani din Sectorul 5 al Capitalei a fost condamnat recent la doi ani de \u00eenchisoare pentru agresarea unui c\u00e2ine de talie mic\u0103, incident petrecut \u00een luna iulie 2025. Instan\u021ba a dispus, totodat\u0103, interzicerea dreptului de a de\u021bine animale pentru [\u2026]",
+          "content": "Condamnare cu executare pentru cruzime fa\u021b\u0103 de un c\u00e2ine \u00een Bucure\u0219ti Un b\u0103rbat de 71 de ani din Sectorul 5 al Capitalei a fost condamnat recent la doi ani de \u00eenchisoare pentru agresarea unui c\u00e2ine de talie mic\u0103, incident petrecut \u00een luna iulie 2025. Instan\u021ba a dispus, totodat\u0103, interzicerea dreptului de a de\u021bine animale pentru [\u2026]",
+          "url": "https://www.capital.ro/reguli-stricte-pentru-posesorii-de-animale-risca-inchisoarea-daca-le-incalca.html",
+          "image_url": null,
           "source": {
-            "name": "Thefly.com",
-            "url": "https://thefly.com/permalinks/entry.php/id4260990/POET-Poet-Technologies-call-volume-above-normal-and-directionally-bullish"
+            "name": "Capital.ro",
+            "url": "https://www.capital.ro/reguli-stricte-pentru-posesorii-de-animale-risca-inchisoarea-daca-le-incalca.html",
+            "category": "business"
           },
-          "author": null,
-          "published_at": "2025-12-22T15:25:01Z",
-          "language": "en",
+          "author": "Corina Chiriac",
+          "published_at": "2025-12-23T18:48:18",
+          "language": "ro",
           "is_rewritten": false,
-          "is_translated": true,
-          "title_ro": "Volumul apelurilor de la Poet Technologies dep\u0103\u0219e\u0219te normalul \u0219i are o direc\u021bie optimist\u0103",
-          "description_ro": "Afla\u021bi mai multe detalii aici.",
-          "content_ro": "Apeluri de profit, evenimente pentru anali\u0219ti, prezent\u0103ri de tip roadshow \u0219i alte activit\u0103\u021bi."
+          "is_translated": false,
+          "title_ro": null,
+          "description_ro": null,
+          "content_ro": null
         }
       ]
     },
@@ -137,7 +138,7 @@
       "test_name": "Currency Rates (BNR)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:17.795750",
+      "timestamp": "2025-12-23T19:06:05.191932",
       "response_sample": {
         "sample_rates": [
           "AED",
@@ -152,7 +153,7 @@
       "test_name": "Market Overview (Combined)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:18.265424",
+      "timestamp": "2025-12-23T19:06:05.263553",
       "response_sample": {
         "bvb_count": 10,
         "global_count": 6
@@ -162,7 +163,7 @@
       "test_name": "Manual Refresh BVB",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:18.361939",
+      "timestamp": "2025-12-23T19:06:05.341206",
       "response_sample": {
         "message": "Updated 10 BVB stocks",
         "count": 10
@@ -172,7 +173,7 @@
       "test_name": "Manual Refresh Currencies",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:19.282071",
+      "timestamp": "2025-12-23T19:06:06.352831",
       "response_sample": {
         "message": "Currency rates updated",
         "success": true
@@ -182,17 +183,17 @@
       "test_name": "Manual Refresh News",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:19.741762",
+      "timestamp": "2025-12-23T19:06:12.596431",
       "response_sample": {
-        "message": "Fetched 0 new articles",
-        "count": 0
+        "message": "Fetched 3 new articles",
+        "count": 3
       }
     },
     {
       "test_name": "Manual Refresh Global Indices",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:20.802434",
+      "timestamp": "2025-12-23T19:06:13.666185",
       "response_sample": {
         "message": "Updated 6 global indices",
         "count": 6
@@ -202,17 +203,17 @@
       "test_name": "Individual BVB Stock (H2O)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:20.883811",
+      "timestamp": "2025-12-23T19:06:13.737955",
       "response_sample": {
         "symbol": "H2O",
         "name": "Hidroelectrica",
-        "price": 148.58,
-        "change": 0.24,
-        "change_percent": 0.16,
-        "volume": 167500,
-        "open": 148.34,
-        "high": 150.06,
-        "low": 146.85,
+        "price": 152.49,
+        "change": 0.58,
+        "change_percent": 0.38,
+        "volume": 402782,
+        "open": 151.91,
+        "high": 154.01,
+        "low": 150.39,
         "currency": "RON",
         "market": "BVB",
         "source": "mock_data",
@@ -223,7 +224,7 @@
       "test_name": "BVB Stock Details with 30-day History",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:20.995473",
+      "timestamp": "2025-12-23T19:06:13.813618",
       "response_sample": {
         "history_count": 30,
         "has_chart_data": true
@@ -233,7 +234,7 @@
       "test_name": "Global Index Details with 30-day History",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:21.538703",
+      "timestamp": "2025-12-23T19:06:14.287806",
       "response_sample": {
         "history_count": 21,
         "has_chart_data": true
@@ -241,12 +242,12 @@
     },
     {
       "test_name": "Article Translation to Romanian",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-23T15:28:21.757739",
+      "success": false,
+      "details": "Validation failed: Article should be translated or have translation attempted",
+      "timestamp": "2025-12-23T19:06:15.136769",
       "response_sample": {
-        "has_translation": true,
-        "has_romanian_content": true
+        "has_translation": null,
+        "has_romanian_content": false
       }
     }
   ]
