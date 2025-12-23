@@ -4,10 +4,10 @@ import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from datetime import datetime
-from ..services.stock_service import StockService
-from ..services.news_service import NewsService
-from ..services.currency_service import CurrencyService
-from ..config.settings import settings
+from services.stock_service import StockService
+from services.news_service import NewsService
+from services.currency_service import CurrencyService
+from config.settings import settings
 
 logging.basicConfig(
     level=logging.INFO,

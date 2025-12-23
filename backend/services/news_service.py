@@ -2,8 +2,8 @@
 from typing import List, Dict
 import logging
 from datetime import datetime
-from ..apis.news_client import NewsAPIClient
-from ..config.database import get_database
+from apis.news_client import NewsAPIClient
+from config.database import get_database
 
 logger = logging.getLogger(__name__)
 

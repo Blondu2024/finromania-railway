@@ -1,6 +1,6 @@
 """Database configuration and connection"""
 from motor.motor_asyncio import AsyncIOMotorClient
-from .settings import settings
+from config.settings import settings
 import logging
 
 logger = logging.getLogger(__name__)

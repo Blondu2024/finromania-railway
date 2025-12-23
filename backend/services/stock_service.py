@@ -2,10 +2,10 @@
 from typing import List, Dict, Optional
 import logging
 from datetime import datetime
-from ..apis.yahoo_finance_client import YahooFinanceClient
-from ..apis.bvb_mock_client import BVBMockClient
-from ..config.database import get_database
-from ..config.settings import settings
+from apis.yahoo_finance_client import YahooFinanceClient
+from apis.bvb_mock_client import BVBMockClient
+from config.database import get_database
+from config.settings import settings
 
 logger = logging.getLogger(__name__)
 

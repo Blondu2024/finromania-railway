@@ -1,8 +1,8 @@
 """Service pentru cursuri valutare"""
 from typing import Dict, Optional
 import logging
-from ..apis.bnr_client import BNRClient
-from ..config.database import get_database
+from apis.bnr_client import BNRClient
+from config.database import get_database
 
 logger = logging.getLogger(__name__)
 
