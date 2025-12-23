@@ -11,6 +11,7 @@ class BNRClient:
     """Client pentru BNR - cursuri valutare"""
     
     BASE_URL = "https://www.bnr.ro/nbrfxrates.xml"
+    NAMESPACE = {'bnr': 'http://www.bnr.ro/xsd'}
     
     def get_exchange_rates(self) -> Optional[Dict]:
         """Obține toate cursurile valutare de la BNR"""
@@ -20,26 +21,30 @@ class BNRClient:
             
             root = ElementTree.fromstring(response.content)
             
-            # Extract date
-            date_str = root.attrib.get('Date')
+            # Extract date from Cube element
+            cube = root.find('.//bnr:Cube', self.NAMESPACE)
+            date_str = cube.attrib.get('date') if cube is not None else None
             
             # Extract rates
             rates = {}
-            for currency in root.findall('.//Rate'):
-                code = currency.attrib.get('currency')
-                value = float(currency.text)
-                multiplier = int(currency.attrib.get('multiplier', 1))
+            for rate_elem in root.findall('.//bnr:Rate', self.NAMESPACE):
+                code = rate_elem.attrib.get('currency')
+                value = float(rate_elem.text)
+                multiplier = int(rate_elem.attrib.get('multiplier', 1))
                 
                 rates[code] = {
-                    'rate': value / multiplier,
-                    'multiplier': multiplier
+                    'rate': round(value / multiplier, 4),
+                    'multiplier': multiplier,
+                    'original_value': value
                 }
+            
+            logger.info(f"Fetched {len(rates)} currency rates from BNR")
             
             return {
                 'date': date_str,
                 'rates': rates,
                 'source': 'BNR',
-                'last_updated': datetime.utcnow()
+                'last_updated': datetime.utcnow().isoformat()
             }
             
         except Exception as e:
