@@ -269,6 +269,38 @@ class FinRomaniaAPITester:
             success, details, data = self.test_api_endpoint('GET', '/api/stocks/bvb/H2O')
             self.log_test("Individual BVB Stock (H2O)", success, details, data)
         
+        # Test 13: BVB Stock Details with History (V2 Feature)
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/stocks/bvb/H2O/details',
+            validate_response=self.validate_stock_details
+        )
+        self.log_test("BVB Stock Details with 30-day History", success, details, 
+                     {"history_count": len(data.get('history', [])), "has_chart_data": bool(data.get('history'))} if isinstance(data, dict) else data)
+        
+        # Test 14: Global Index Details with History (V2 Feature)
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/stocks/global/%5EGSPC/details',  # S&P 500 encoded
+            validate_response=self.validate_stock_details
+        )
+        self.log_test("Global Index Details with 30-day History", success, details,
+                     {"history_count": len(data.get('history', [])), "has_chart_data": bool(data.get('history'))} if isinstance(data, dict) else data)
+        
+        # Test 15: Article Translation (V2 Feature) - Get first article and test translation
+        if self.test_results[4]['success']:  # News test passed
+            # First get news to get an article ID
+            success, details, news_data = self.test_api_endpoint('GET', '/api/news?limit=1')
+            if success and isinstance(news_data, list) and len(news_data) > 0:
+                article_id = news_data[0].get('id')
+                if article_id:
+                    success, details, data = self.test_api_endpoint(
+                        'GET', f'/api/news/{article_id}',
+                        validate_response=self.validate_article_translation
+                    )
+                    self.log_test("Article Translation to Romanian", success, details,
+                                 {"has_translation": data.get('is_translated'), "has_romanian_content": bool(data.get('title_ro'))} if isinstance(data, dict) else data)
+                else:
+                    self.log_test("Article Translation to Romanian", False, "No article ID found in news response")
+        
         print("=" * 60)
         print(f"📊 Test Results: {self.tests_passed}/{self.tests_run} passed")
         
