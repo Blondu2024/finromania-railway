@@ -94,6 +94,7 @@ class IndexResponse(BaseModel):
 
 class ArticleResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
+    id: Optional[str] = None
     title: str
     description: Optional[str] = None
     content: Optional[str] = None
@@ -104,6 +105,10 @@ class ArticleResponse(BaseModel):
     published_at: Optional[str] = None
     language: str
     is_rewritten: Optional[bool] = False
+    is_translated: Optional[bool] = False
+    title_ro: Optional[str] = None
+    description_ro: Optional[str] = None
+    content_ro: Optional[str] = None
 
 class CurrencyRate(BaseModel):
     currency: str
