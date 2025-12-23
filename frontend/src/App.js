@@ -111,6 +111,11 @@ function App() {
             <Route path="/news" element={<NewsPage />} />
             <Route path="/news/:articleId" element={<ArticleDetailPage />} />
             <Route path="/currencies" element={<CurrenciesPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfServicePage />} />
+            <Route path="/cookies" element={<CookiePolicyPage />} />
+            <Route path="/disclaimer" element={<DisclaimerPage />} />
+            <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>
         <footer className="border-t py-6 mt-8">
