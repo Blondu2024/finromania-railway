@@ -441,6 +441,44 @@ app.include_router(admin_router, prefix="/api")
 app.include_router(newsletter_router, prefix="/api")
 app.include_router(search_router, prefix="/api")
 app.include_router(analytics_router, prefix="/api")
+app.include_router(education_router, prefix="/api")
+app.include_router(risk_assessment_router, prefix="/api")
+app.include_router(ai_advisor_router, prefix="/api")
+
+# Stripe Webhook endpoint
+from fastapi import Request as FastAPIRequest
+from emergentintegrations.payments.stripe.checkout import StripeCheckout
+
+@app.post("/api/webhook/stripe")
+async def stripe_webhook(request: FastAPIRequest):
+    """Handle Stripe webhooks"""
+    try:
+        api_key = os.environ.get("STRIPE_API_KEY")
+        host_url = str(request.base_url).rstrip("/")
+        webhook_url = f"{host_url}/api/webhook/stripe"
+        
+        stripe_checkout = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
+        
+        body = await request.body()
+        signature = request.headers.get("Stripe-Signature")
+        
+        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        
+        # Update payment transaction if needed
+        if webhook_response.payment_status == "paid":
+            db = await get_database()
+            await db.payment_transactions.update_one(
+                {"session_id": webhook_response.session_id},
+                {"$set": {
+                    "payment_status": "paid",
+                    "webhook_received": True
+                }}
+            )
+        
+        return {"status": "received"}
+    except Exception as e:
+        logger.error(f"Webhook error: {e}")
+        return {"status": "error"}
 
 app.add_middleware(
     CORSMiddleware,
