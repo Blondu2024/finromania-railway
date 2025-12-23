@@ -6,6 +6,8 @@ import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import AddToWatchlistButton from '../components/AddToWatchlistButton';
+import SocialShare from '../components/SocialShare';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
