@@ -78,14 +78,14 @@ class StockService:
     async def get_all_bvb_stocks(self) -> List[Dict]:
         """Obține toate stocks BVB din DB"""
         db = await get_database()
-        cursor = db.stocks_bvb.find({}, {"_id": 0})
-        return await cursor.to_list(length=None)
+        cursor = db.stocks_bvb.find({}, {"_id": 0}).limit(100)
+        return await cursor.to_list(length=100)
     
     async def get_all_global_indices(self) -> List[Dict]:
         """Obține toți indicii globali din DB"""
         db = await get_database()
-        cursor = db.stocks_global.find({}, {"_id": 0})
-        return await cursor.to_list(length=None)
+        cursor = db.stocks_global.find({}, {"_id": 0}).limit(100)
+        return await cursor.to_list(length=100)
     
     def get_index_history(self, symbol: str, period: str = "1mo") -> Optional[Dict]:
         """Obține istoricul unui indice (date reale de la Yahoo Finance)"""
