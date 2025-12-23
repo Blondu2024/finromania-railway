@@ -10,6 +10,11 @@ import NewsPage from './pages/NewsPage';
 import CurrenciesPage from './pages/CurrenciesPage';
 import StockDetailPage from './pages/StockDetailPage';
 import ArticleDetailPage from './pages/ArticleDetailPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import CookiePolicyPage from './pages/CookiePolicyPage';
+import DisclaimerPage from './pages/DisclaimerPage';
+import ContactPage from './pages/ContactPage';
 import TickerBar from './components/TickerBar';
 import './App.css';
 
