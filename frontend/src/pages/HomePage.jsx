@@ -241,6 +241,9 @@ export default function HomePage() {
               })}
             </CardContent>
           </Card>
+
+          {/* Newsletter Signup */}
+          <NewsletterSignup variant="card" />
         </div>
       </div>
     </div>
