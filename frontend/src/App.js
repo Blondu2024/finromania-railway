@@ -210,6 +210,11 @@ function AppRouter() {
       <Route path="/watchlist" element={<WatchlistPage />} />
       <Route path="/portfolio" element={<PortfolioPage />} />
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/education" element={<EducationPage />} />
+      <Route path="/education/success" element={<EducationPage />} />
+      <Route path="/education/lesson/:lessonId" element={<LessonPage />} />
+      <Route path="/risk-assessment" element={<RiskAssessmentPage />} />
+      <Route path="/advisor" element={<AIAdvisorPage />} />
     </Routes>
   );
 }
