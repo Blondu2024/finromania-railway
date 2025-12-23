@@ -78,13 +78,13 @@ export default function LessonPage() {
         <div className="p-4 bg-yellow-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
           <BookOpen className="w-8 h-8 text-yellow-600" />
         </div>
-        <h2 className="text-2xl font-bold mb-2">Lec\u021bie Premium</h2>
+        <h2 className="text-2xl font-bold mb-2">Lecție Premium</h2>
         <p className="text-muted-foreground mb-6">
-          Aceast\u0103 lec\u021bie face parte din pachetul educa\u021bional premium.
+          Această lecție face parte din pachetul educațional premium.
         </p>
         <div className="space-x-4">
           <Link to="/education">
-            <Button><ArrowLeft className="w-4 h-4 mr-2" /> \u00cenapoi la Curs</Button>
+            <Button><ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Curs</Button>
           </Link>
         </div>
       </div>
@@ -94,9 +94,9 @@ export default function LessonPage() {
   if (error || !lesson) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Lec\u021bia nu a fost g\u0103sit\u0103</p>
+        <p className="text-muted-foreground">Lecția nu a fost găsită</p>
         <Link to="/education">
-          <Button className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> \u00cenapoi</Button>
+          <Button className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> Înapoi</Button>
         </Link>
       </div>
     );
@@ -107,14 +107,14 @@ export default function LessonPage() {
       {/* Navigation */}
       <Link to="/education">
         <Button variant="ghost" size="sm">
-          <ArrowLeft className="w-4 h-4 mr-2" /> \u00cenapoi la Curs
+          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Curs
         </Button>
       </Link>
 
       {/* Lesson Header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <Badge variant="secondary">Lec\u021bia {lesson.order}</Badge>
+          <Badge variant="secondary">Lecția {lesson.order}</Badge>
           <Badge variant="outline" className="flex items-center gap-1">
             <Clock className="w-3 h-3" /> {lesson.duration}
           </Badge>
@@ -171,7 +171,7 @@ export default function LessonPage() {
           nextLesson.is_locked ? (
             <Link to="/education">
               <Button>
-                Deblocheaz\u0103 Restul Cursului <ArrowRight className="w-4 h-4 ml-2" />
+                Deblochează Restul Cursului <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
           ) : (

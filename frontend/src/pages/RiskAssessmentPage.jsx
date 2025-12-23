@@ -118,7 +118,7 @@ export default function RiskAssessmentPage() {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2">Profilul T\u0103u de Risc</h1>
+          <h1 className="text-3xl font-bold mb-2">Profilul Tău de Risc</h1>
           <p className="text-muted-foreground">Evaluat pe {new Date(existingProfile.assessed_at).toLocaleDateString('ro-RO')}</p>
         </div>
 
@@ -133,15 +133,15 @@ export default function RiskAssessmentPage() {
           </div>
           
           <CardContent className="p-6">
-            <h3 className="font-semibold mb-3">Alocare Recomandat\u0103:</h3>
+            <h3 className="font-semibold mb-3">Alocare Recomandată:</h3>
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-blue-600">{profile.allocation.stocks}%</p>
-                <p className="text-sm text-muted-foreground">Ac\u021biuni</p>
+                <p className="text-sm text-muted-foreground">Acțiuni</p>
               </div>
               <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-green-600">{profile.allocation.bonds}%</p>
-                <p className="text-sm text-muted-foreground">Obliga\u021biuni</p>
+                <p className="text-sm text-muted-foreground">Obligațiuni</p>
               </div>
               <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-yellow-600">{profile.allocation.cash}%</p>
@@ -154,7 +154,7 @@ export default function RiskAssessmentPage() {
                 Mergi la Portofoliu
               </Button>
               <Button variant="outline" className="w-full" onClick={() => setExistingProfile(null)}>
-                Ref\u0103 Evaluarea
+                Refă Evaluarea
               </Button>
             </div>
           </CardContent>
@@ -170,7 +170,7 @@ export default function RiskAssessmentPage() {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold">Evaluare Complet\u0103!</h1>
+          <h1 className="text-3xl font-bold">Evaluare Completă!</h1>
         </div>
 
         <Card className="overflow-hidden">
@@ -178,21 +178,21 @@ export default function RiskAssessmentPage() {
             <div className="inline-flex p-4 rounded-full mb-4" style={{ backgroundColor: profile.color, color: 'white' }}>
               <ProfileIcon profileKey={profile.key} />
             </div>
-            <h2 className="text-3xl font-bold" style={{ color: profile.color }}>E\u0219ti {profile.name}</h2>
+            <h2 className="text-3xl font-bold" style={{ color: profile.color }}>Ești {profile.name}</h2>
             <p className="text-muted-foreground mt-2 max-w-md mx-auto">{profile.description}</p>
             <p className="mt-4 text-sm">Scor: {result.score}/{result.max_score}</p>
           </div>
           
           <CardContent className="p-6">
-            <h3 className="font-semibold mb-3">Alocare Recomandat\u0103:</h3>
+            <h3 className="font-semibold mb-3">Alocare Recomandată:</h3>
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-blue-600">{profile.allocation.stocks}%</p>
-                <p className="text-sm text-muted-foreground">Ac\u021biuni</p>
+                <p className="text-sm text-muted-foreground">Acțiuni</p>
               </div>
               <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-green-600">{profile.allocation.bonds}%</p>
-                <p className="text-sm text-muted-foreground">Obliga\u021biuni</p>
+                <p className="text-sm text-muted-foreground">Obligațiuni</p>
               </div>
               <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-yellow-600">{profile.allocation.cash}%</p>
@@ -200,7 +200,7 @@ export default function RiskAssessmentPage() {
               </div>
             </div>
 
-            <h3 className="font-semibold mb-3">Recomand\u0103ri:</h3>
+            <h3 className="font-semibold mb-3">Recomandări:</h3>
             <ul className="space-y-2 mb-6">
               {profile.recommendations.map((rec, idx) => (
                 <li key={idx} className="flex items-start gap-2">
@@ -212,10 +212,10 @@ export default function RiskAssessmentPage() {
 
             <div className="space-y-3">
               <Button className="w-full" onClick={() => navigate('/portfolio')}>
-                Creeaz\u0103-\u021bi Portofoliul
+                Creează-ți Portofoliul
               </Button>
               <Button variant="outline" className="w-full" onClick={() => navigate('/education')}>
-                Continu\u0103 s\u0103 \u00cenve\u021bi
+                Continuă să Înveți
               </Button>
             </div>
           </CardContent>
@@ -237,9 +237,9 @@ export default function RiskAssessmentPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="text-center">
         <ClipboardCheck className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-        <h1 className="text-3xl font-bold">Evalueaz\u0103-\u021bi Profilul de Risc</h1>
+        <h1 className="text-3xl font-bold">Evaluează-ți Profilul de Risc</h1>
         <p className="text-muted-foreground mt-2">
-          R\u0103spunde la {questions.length} \u00eentreb\u0103ri pentru a descoperi ce tip de investitor e\u0219ti
+          Răspunde la {questions.length} întrebări pentru a descoperi ce tip de investitor ești
         </p>
       </div>
 
@@ -247,7 +247,7 @@ export default function RiskAssessmentPage() {
         <CardHeader>
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-muted-foreground">
-              \u00centrebarea {currentQuestion + 1} din {questions.length}
+              Întrebarea {currentQuestion + 1} din {questions.length}
             </span>
             <span className="text-sm font-medium">{Math.round(progress)}%</span>
           </div>
@@ -276,7 +276,7 @@ export default function RiskAssessmentPage() {
               onClick={handlePrev}
               disabled={currentQuestion === 0}
             >
-              <ArrowLeft className="w-4 h-4 mr-2" /> \u00cenapoi
+              <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi
             </Button>
             
             {currentQuestion === questions.length - 1 ? (
@@ -285,9 +285,9 @@ export default function RiskAssessmentPage() {
                 disabled={!canSubmit || submitting}
               >
                 {submitting ? (
-                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Se proceseaz\u0103...</>
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Se procesează...</>
                 ) : (
-                  <>Finalizeaz\u0103 <CheckCircle className="w-4 h-4 ml-2" /></>
+                  <>Finalizează <CheckCircle className="w-4 h-4 ml-2" /></>
                 )}
               </Button>
             ) : (
@@ -295,7 +295,7 @@ export default function RiskAssessmentPage() {
                 onClick={handleNext}
                 disabled={!answers[currentQ.id]}
               >
-                Urm\u0103toarea <ArrowRight className="w-4 h-4 ml-2" />
+                Următoarea <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
           </div>
@@ -304,7 +304,7 @@ export default function RiskAssessmentPage() {
 
       {!user && (
         <p className="text-center text-sm text-muted-foreground">
-          Vei fi rugat s\u0103 te autentifici pentru a salva rezultatul.
+          Vei fi rugat să te autentifici pentru a salva rezultatul.
         </p>
       )}
     </div>

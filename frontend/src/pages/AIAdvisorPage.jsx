@@ -86,7 +86,7 @@ export default function AIAdvisorPage() {
         </div>
         <h1 className="text-4xl font-bold mb-4">Consilier AI</h1>
         <p className="text-lg text-muted-foreground">
-          Prime\u0219te sfaturi \u0219i educa\u021bie financiar\u0103 personalizat\u0103
+          Primește sfaturi și educație financiară personalizată
         </p>
       </div>
 
@@ -119,13 +119,13 @@ export default function AIAdvisorPage() {
               Sfaturi pentru Portofoliu
             </CardTitle>
             <CardDescription>
-              Recomand\u0103ri bazate pe profilul t\u0103u de risc
+              Recomandări bazate pe profilul tău de risc
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!user ? (
               <div className="text-center py-6">
-                <p className="text-muted-foreground mb-4">Conecteaz\u0103-te pentru sfaturi personalizate</p>
+                <p className="text-muted-foreground mb-4">Conectează-te pentru sfaturi personalizate</p>
                 <Button onClick={login}>Conectare</Button>
               </div>
             ) : loading.advice ? (
@@ -136,7 +136,7 @@ export default function AIAdvisorPage() {
               <div className="text-center py-6">
                 <p className="text-muted-foreground mb-4">{portfolioAdvice.advice}</p>
                 <Link to="/risk-assessment">
-                  <Button>Completeaz\u0103 Chestionarul</Button>
+                  <Button>Completează Chestionarul</Button>
                 </Link>
               </div>
             ) : (
@@ -150,13 +150,13 @@ export default function AIAdvisorPage() {
                     Profil: {portfolioAdvice?.profile === 'conservative' ? 'Conservator' :
                              portfolioAdvice?.profile === 'moderate' ? 'Moderat' : 'Agresiv'}
                   </Badge>
-                  <Badge variant="outline">{portfolioAdvice?.holdings_count || 0} de\u021bineri</Badge>
+                  <Badge variant="outline">{portfolioAdvice?.holdings_count || 0} dețineri</Badge>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <p className="whitespace-pre-wrap">{portfolioAdvice?.advice}</p>
                 </div>
                 <Button variant="outline" className="w-full" onClick={fetchPortfolioAdvice}>
-                  <Sparkles className="w-4 h-4 mr-2" /> Regenereaz\u0103 Sfatul
+                  <Sparkles className="w-4 h-4 mr-2" /> Regenerează Sfatul
                 </Button>
               </div>
             )}
@@ -168,10 +168,10 @@ export default function AIAdvisorPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-blue-600" />
-              \u00centreab\u0103 Consilierul
+              Întreabă Consilierul
             </CardTitle>
             <CardDescription>
-              Pune orice \u00eentrebare despre investi\u021bii
+              Pune orice întrebare despre investiții
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -189,16 +189,16 @@ export default function AIAdvisorPage() {
             
             {answer && (
               <div className="p-4 bg-muted/50 rounded-lg">
-                <p className="font-medium mb-2">\u00centrebare: {answer.question}</p>
+                <p className="font-medium mb-2">Întrebare: {answer.question}</p>
                 <p className="whitespace-pre-wrap text-muted-foreground">{answer.answer}</p>
                 <p className="text-xs text-muted-foreground mt-3 italic">{answer.disclaimer}</p>
               </div>
             )}
 
             <div className="pt-4 border-t">
-              <p className="text-sm text-muted-foreground mb-3">\u00centreb\u0103ri populare:</p>
+              <p className="text-sm text-muted-foreground mb-3">Întrebări populare:</p>
               <div className="flex flex-wrap gap-2">
-                {['Ce este un ETF?', 'Cum func\u021bioneaz\u0103 bursa?', 'Ce înseamn\u0103 diversificare?'].map((q) => (
+                {['Ce este un ETF?', 'Cum funcționează bursa?', 'Ce înseamnă diversificare?'].map((q) => (
                   <Button
                     key={q}
                     variant="outline"
@@ -223,7 +223,7 @@ export default function AIAdvisorPage() {
                 <TrendingUp className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="font-semibold">Evaluare Risc</h3>
-              <p className="text-sm text-muted-foreground">Descoper\u0103-\u021bi profilul de investitor</p>
+              <p className="text-sm text-muted-foreground">Descoperă-ți profilul de investitor</p>
             </CardContent>
           </Card>
         </Link>
@@ -234,8 +234,8 @@ export default function AIAdvisorPage() {
               <div className="p-3 bg-green-100 dark:bg-green-900 rounded-full w-fit mx-auto mb-3">
                 <Lightbulb className="w-6 h-6 text-green-600" />
               </div>
-              <h3 className="font-semibold">Curs Investi\u021bii</h3>
-              <p className="text-sm text-muted-foreground">\u00cenva\u021b\u0103 bazele de la zero</p>
+              <h3 className="font-semibold">Curs Investiții</h3>
+              <p className="text-sm text-muted-foreground">Învață bazele de la zero</p>
             </CardContent>
           </Card>
         </Link>
@@ -247,7 +247,7 @@ export default function AIAdvisorPage() {
                 <Bot className="w-6 h-6 text-purple-600" />
               </div>
               <h3 className="font-semibold">Portofoliu Virtual</h3>
-              <p className="text-sm text-muted-foreground">Practic\u0103 f\u0103r\u0103 risc</p>
+              <p className="text-sm text-muted-foreground">Practică fără risc</p>
             </CardContent>
           </Card>
         </Link>
@@ -257,8 +257,8 @@ export default function AIAdvisorPage() {
       <Card className="bg-muted/30">
         <CardContent className="p-4">
           <p className="text-sm text-muted-foreground text-center">
-            \u26a0\ufe0f <strong>Disclaimer:</strong> Informa\u021biile oferite sunt doar \u00een scop educa\u021bional \u0219i nu constituie sfat de investi\u021bii. 
-            Consulta\u021bi un specialist financiar autorizat \u00eenainte de a lua decizii de investi\u021bii.
+            \u26a0\ufe0f <strong>Disclaimer:</strong> Informațiile oferite sunt doar în scop educațional și nu constituie sfat de investiții. 
+            Consultați un specialist financiar autorizat înainte de a lua decizii de investiții.
           </p>
         </CardContent>
       </Card>

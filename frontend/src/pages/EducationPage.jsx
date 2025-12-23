@@ -99,11 +99,11 @@ export default function EducationPage() {
         window.location.href = data.url;
       } else {
         const error = await res.json();
-        alert(error.detail || 'Eroare la procesarea pl\u0103\u021bii');
+        alert(error.detail || 'Eroare la procesarea plății');
       }
     } catch (error) {
       console.error('Purchase error:', error);
-      alert('Eroare la conectarea cu serviciul de pl\u0103\u021bi');
+      alert('Eroare la conectarea cu serviciul de plăți');
     } finally {
       setPurchasing(false);
     }
@@ -126,8 +126,8 @@ export default function EducationPage() {
       <div className="min-h-[50vh] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-600" />
-          <h2 className="text-xl font-semibold">Se verific\u0103 plata...</h2>
-          <p className="text-muted-foreground">Te rug\u0103m s\u0103 a\u0219tep\u021bi</p>
+          <h2 className="text-xl font-semibold">Se verifică plata...</h2>
+          <p className="text-muted-foreground">Te rugăm să aștepți</p>
         </div>
       </div>
     );
@@ -142,9 +142,9 @@ export default function EducationPage() {
             <BookOpen className="w-10 h-10 text-blue-600" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold mb-4">Academie Investi\u021bii</h1>
+        <h1 className="text-4xl font-bold mb-4">Academie Investiții</h1>
         <p className="text-lg text-muted-foreground">
-          \u00cenva\u021b\u0103 bazele investi\u021biilor de la zero. Pachet complet pentru \u00eencep\u0103tori.
+          Învață bazele investițiilor de la zero. Pachet complet pentru începători.
         </p>
       </div>
 
@@ -155,10 +155,10 @@ export default function EducationPage() {
             <CheckCircle className="w-6 h-6 text-green-600" />
             <div>
               <p className="font-semibold text-green-800 dark:text-green-200">
-                Ai acces complet la toate lec\u021biile!
+                Ai acces complet la toate lecțiile!
               </p>
               <p className="text-sm text-green-700 dark:text-green-300">
-                Mul\u021bumim pentru achizi\u021bie. \u00cencepe s\u0103 \u00eenve\u021bi acum.
+                Mulțumim pentru achiziție. Începe să înveți acum.
               </p>
             </div>
           </CardContent>
@@ -187,7 +187,7 @@ export default function EducationPage() {
                   <span className="text-6xl font-bold">{packageInfo.price}</span>
                   <span className="text-2xl ml-1">RON</span>
                 </div>
-                <p className="text-blue-100 mb-6">Plat\u0103 unic\u0103 - Acces permanent</p>
+                <p className="text-blue-100 mb-6">Plată unică - Acces permanent</p>
                 <Button 
                   size="lg" 
                   variant="secondary" 
@@ -196,14 +196,14 @@ export default function EducationPage() {
                   disabled={purchasing}
                 >
                   {purchasing ? (
-                    <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Se proceseaz\u0103...</>
+                    <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Se procesează...</>
                   ) : (
-                    <><ShoppingCart className="w-5 h-5 mr-2" /> Cump\u0103r\u0103 Acum</>
+                    <><ShoppingCart className="w-5 h-5 mr-2" /> Cumpără Acum</>
                   )}
                 </Button>
                 {!user && (
                   <p className="text-sm text-blue-200 mt-3">
-                    Trebuie s\u0103 fii autentificat pentru a cump\u0103ra
+                    Trebuie să fii autentificat pentru a cumpăra
                   </p>
                 )}
               </div>
@@ -216,7 +216,7 @@ export default function EducationPage() {
       <div>
         <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
           <Play className="w-6 h-6 text-blue-600" />
-          Con\u021binut Curs ({lessons.length} lec\u021bii)
+          Conținut Curs ({lessons.length} lecții)
         </h2>
         
         <div className="grid gap-4">
@@ -265,7 +265,7 @@ export default function EducationPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-green-600" />
-              E-Book: Ghidul \u00cencep\u0103torului
+              E-Book: Ghidul Începătorului
             </CardTitle>
             <CardDescription>
               Descarcă ghidul complet în format PDF
@@ -274,7 +274,7 @@ export default function EducationPage() {
           <CardContent>
             <Button disabled>
               <FileText className="w-4 h-4 mr-2" />
-              Desc\u0103rcare PDF (\u00een cur\u00e2nd)
+              Descărcare PDF (în curând)
             </Button>
           </CardContent>
         </Card>
@@ -285,27 +285,27 @@ export default function EducationPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-yellow-500" />
-            De ce s\u0103 \u00eenve\u021bi cu noi?
+            De ce să înveți cu noi?
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-6">
             <div>
-              <h4 className="font-semibold mb-2">\ud83c\udfaf Con\u021binut Practic</h4>
+              <h4 className="font-semibold mb-2">\ud83c\udfaf Conținut Practic</h4>
               <p className="text-sm text-muted-foreground">
-                Nu teorie abstract\u0103, ci exemple reale \u0219i strategii pe care le po\u021bi aplica imediat.
+                Nu teorie abstractă, ci exemple reale și strategii pe care le poți aplica imediat.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">\ud83c\uddf7\ud83c\uddf4 Adaptat Rom\u00e2niei</h4>
+              <h4 className="font-semibold mb-2">\ud83c\uddf7\ud83c\uddf4 Adaptat României</h4>
               <p className="text-sm text-muted-foreground">
-                Con\u021binut specific pentru investitorii rom\u00e2ni, cu exemple de pe BVB.
+                Conținut specific pentru investitorii români, cu exemple de pe BVB.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">\ud83d\ude80 F\u0103r\u0103 Cunostin\u021be Prealabile</h4>
+              <h4 className="font-semibold mb-2">\ud83d\ude80 Fără Cunostințe Prealabile</h4>
               <p className="text-sm text-muted-foreground">
-                Po\u021bi \u00eencepe de la zero. Explic\u0103m totul pas cu pas.
+                Poți începe de la zero. Explicăm totul pas cu pas.
               </p>
             </div>
           </div>
