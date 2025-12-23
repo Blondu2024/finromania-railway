@@ -399,12 +399,12 @@ async def get_bvb_stock_details(symbol: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ============================================
-# ARTICLE DETAILS (with translation)
+# ARTICLE DETAILS
 # ============================================
 
 @api_router.get("/news/{article_id}")
 async def get_article_detail(article_id: str):
-    """Obține detalii articol cu traducere în română"""
+    """Obține detalii articol"""
     try:
         article = await news_service.get_article_by_id(article_id)
         
