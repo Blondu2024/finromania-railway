@@ -209,14 +209,13 @@ async def get_global_indices():
 
 @api_router.get("/news", response_model=List[ArticleResponse])
 async def get_news(
-    limit: int = Query(default=20, ge=1, le=100),
-    language: str = Query(default="en")
+    limit: int = Query(default=20, ge=1, le=100)
 ):
     """Obține ultimele știri"""
     try:
         db = await get_database()
         articles = await db.articles.find(
-            {"language": language},
+            {},
             {"_id": 0}
         ).sort("published_at", -1).limit(limit).to_list(limit)
         
@@ -224,7 +223,7 @@ async def get_news(
             # Dacă nu există date, forțează fetch
             await news_service.fetch_and_store_news()
             articles = await db.articles.find(
-                {"language": language},
+                {},
                 {"_id": 0}
             ).sort("published_at", -1).limit(limit).to_list(limit)
         
