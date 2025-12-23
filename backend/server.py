@@ -282,10 +282,10 @@ async def get_market_overview():
         db = await get_database()
         
         # Get BVB stocks
-        bvb_stocks = await db.stocks_bvb.find({}, {"_id": 0}).to_list(100)
+        bvb_stocks = await db.stocks_bvb.find({}, {"_id": 0}).limit(100).to_list(100)
         
         # Get global indices
-        global_indices = await db.stocks_global.find({}, {"_id": 0}).to_list(100)
+        global_indices = await db.stocks_global.find({}, {"_id": 0}).limit(100).to_list(100)
         
         # Get currencies
         currencies = await db.currencies.find_one(
