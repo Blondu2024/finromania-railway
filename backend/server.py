@@ -196,12 +196,12 @@ async def get_global_indices():
     """Obține toți indicii globali"""
     try:
         db = await get_database()
-        indices = await db.stocks_global.find({}, {"_id": 0}).to_list(100)
+        indices = await db.stocks_global.find({}, {"_id": 0}).limit(100).to_list(100)
         
         if not indices:
             # Dacă nu există date, forțează update
             await stock_service.update_global_indices()
-            indices = await db.stocks_global.find({}, {"_id": 0}).to_list(100)
+            indices = await db.stocks_global.find({}, {"_id": 0}).limit(100).to_list(100)
         
         return indices
     except Exception as e:
