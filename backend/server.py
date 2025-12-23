@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / '.env', override=False)
 
 # Import services and database
 from config.database import connect_to_mongodb, close_mongodb_connection, get_database
