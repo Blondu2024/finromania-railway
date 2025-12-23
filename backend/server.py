@@ -430,6 +430,15 @@ async def get_article_detail(article_id: str):
 # Include the router in the main app
 app.include_router(api_router)
 
+# Include additional routers
+app.include_router(auth_router, prefix="/api")
+app.include_router(watchlist_router, prefix="/api")
+app.include_router(portfolio_router, prefix="/api")
+app.include_router(admin_router, prefix="/api")
+app.include_router(newsletter_router, prefix="/api")
+app.include_router(search_router, prefix="/api")
+app.include_router(analytics_router, prefix="/api")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
