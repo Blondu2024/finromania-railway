@@ -329,7 +329,7 @@ class TradingSchoolTester:
             'GET', '/api/trading-school/lessons',
             validate_response=self.validate_tier_system
         )
-        self.log_test("Tier System - 5 free + 11 premium", success, details, data)
+        self.log_test("Tier System - 5 free + 12 premium", success, details, data)
         
         # ============================================
         # TEST 3: GET SPECIFIC LESSON (lesson_1)
