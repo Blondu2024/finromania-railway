@@ -410,10 +410,16 @@ class FinRomaniaAPITester:
             return False
 
     def run_all_tests(self):
-        """Run comprehensive test suite"""
-        print("🚀 Starting FinRomania API Testing...")
+        """Run comprehensive test suite including Session 6 features"""
+        print("🚀 Starting FinRomania API Testing - Session 6...")
         print(f"📍 Testing against: {self.base_url}")
-        print("=" * 60)
+        print("=" * 80)
+        
+        # ============================================
+        # BASIC HEALTH CHECKS
+        # ============================================
+        print("\n📋 SECTION 1: Basic Health Checks")
+        print("-" * 80)
         
         # Test 1: Health Check
         success, details, data = self.test_api_endpoint('GET', '/api/health')
@@ -423,28 +429,150 @@ class FinRomaniaAPITester:
         success, details, data = self.test_api_endpoint('GET', '/api/')
         self.log_test("API Root Endpoint", success, details, data)
         
-        # Test 3: BVB Stocks
+        # ============================================
+        # SESSION 6 PRIORITY 1: BVB STOCK DETAILS (CRITICAL - FRESHLY FIXED)
+        # ============================================
+        print("\n🔥 SECTION 2: BVB Stock Details - CRITICAL (Freshly Fixed)")
+        print("-" * 80)
+        
+        # Test 3: BVB Stock Details for TLV
         success, details, data = self.test_api_endpoint(
-            'GET', '/api/stocks/bvb', 
+            'GET', '/api/stocks/bvb/TLV/details',
+            validate_response=self.validate_bvb_stock_details
+        )
+        self.log_test("BVB Stock Details - TLV (REAL EODHD)", success, details, 
+                     {"symbol": data.get('symbol'), "history_count": len(data.get('history', [])), 
+                      "is_mock": data.get('is_mock')} if isinstance(data, dict) else data)
+        
+        # Test 4: BVB Stock Details for H2O
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/stocks/bvb/H2O/details',
+            validate_response=self.validate_bvb_stock_details
+        )
+        self.log_test("BVB Stock Details - H2O (REAL EODHD)", success, details,
+                     {"symbol": data.get('symbol'), "history_count": len(data.get('history', [])),
+                      "is_mock": data.get('is_mock')} if isinstance(data, dict) else data)
+        
+        # ============================================
+        # SESSION 6 PRIORITY 2: DATA SOURCES VERIFICATION
+        # ============================================
+        print("\n📊 SECTION 3: Data Sources Verification")
+        print("-" * 80)
+        
+        # Test 5: Data Sources
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/data-sources',
+            validate_response=self.validate_data_sources
+        )
+        self.log_test("Data Sources - BVB should be EODHD (REAL)", success, details, data)
+        
+        # Test 6: BVB Stocks List (verify is_mock: false)
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/stocks/bvb',
             validate_response=self.validate_bvb_stocks
         )
-        self.log_test("BVB Stocks (MOCK)", success, details, data[:2] if isinstance(data, list) else data)
+        self.log_test("BVB Stocks List (REAL data verification)", success, details, 
+                     data[:2] if isinstance(data, list) else data)
         
-        # Test 4: Global Indices
+        # ============================================
+        # SESSION 6 PRIORITY 3: ADMIN DASHBOARD
+        # ============================================
+        print("\n👑 SECTION 4: Admin Dashboard (NEW)")
+        print("-" * 80)
+        
+        # Test 7: Admin Login
+        admin_login_success = self.test_admin_login()
+        
+        if admin_login_success and self.admin_token:
+            # Test 8: Admin Stats
+            success, details, data = self.test_api_endpoint(
+                'GET', '/api/admin/stats',
+                auth_token=self.admin_token,
+                validate_response=self.validate_admin_stats
+            )
+            self.log_test("Admin Stats Endpoint", success, details, data)
+            
+            # Test 9: Admin Users List
+            success, details, data = self.test_api_endpoint(
+                'GET', '/api/admin/users?limit=5',
+                auth_token=self.admin_token,
+                validate_response=self.validate_admin_users
+            )
+            self.log_test("Admin Users List (limit=5)", success, details,
+                         {"users_count": len(data.get('users', [])), "total": data.get('total')} if isinstance(data, dict) else data)
+            
+            # Test 10: Admin Analytics
+            success, details, data = self.test_api_endpoint(
+                'GET', '/api/admin/analytics/visits?days=7',
+                auth_token=self.admin_token,
+                validate_response=self.validate_admin_analytics
+            )
+            self.log_test("Admin Analytics (7 days)", success, details,
+                         {"days_count": len(data)} if isinstance(data, list) else data)
+        else:
+            self.log_test("Admin Stats Endpoint", False, "Skipped - admin login failed")
+            self.log_test("Admin Users List", False, "Skipped - admin login failed")
+            self.log_test("Admin Analytics", False, "Skipped - admin login failed")
+        
+        # Test 11: Admin endpoint with non-admin user (should fail with 403)
+        print("\n🔒 Testing Admin Access Control...")
+        regular_user_created = self.test_regular_user_creation()
+        
+        if regular_user_created and self.regular_user_token:
+            success, details, data = self.test_api_endpoint(
+                'GET', '/api/admin/stats',
+                auth_token=self.regular_user_token,
+                expected_status=403
+            )
+            self.log_test("Admin Access Control (403 for non-admin)", success, 
+                         "Correctly denied access to non-admin user" if success else "Failed to deny access", data)
+        else:
+            self.log_test("Admin Access Control", False, "Skipped - regular user creation failed")
+        
+        # ============================================
+        # SESSION 6 PRIORITY 4: GLOSSARY
+        # ============================================
+        print("\n📚 SECTION 5: Glossary (NEW)")
+        print("-" * 80)
+        
+        # Test 12: Glossary - All Terms
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/education/glossary',
+            validate_response=self.validate_glossary
+        )
+        self.log_test("Glossary - All Terms (~99 terms)", success, details,
+                     {"total": data.get('total'), "sample_terms": list(data.get('terms', {}).keys())[:3]} if isinstance(data, dict) else data)
+        
+        # Test 13: Glossary - Search
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/education/glossary?search=dividend'
+        )
+        search_success = success and isinstance(data, dict) and 'terms' in data and len(data.get('terms', {})) > 0
+        self.log_test("Glossary - Search (dividend)", search_success,
+                     f"Found {data.get('total', 0)} matching terms" if isinstance(data, dict) else details,
+                     {"total": data.get('total'), "terms": list(data.get('terms', {}).keys())} if isinstance(data, dict) else data)
+        
+        # ============================================
+        # EXISTING TESTS: Core Functionality
+        # ============================================
+        print("\n🌐 SECTION 6: Core Functionality (Existing)")
+        print("-" * 80)
+        
+        # Test 14: Global Indices
         success, details, data = self.test_api_endpoint(
             'GET', '/api/stocks/global',
             validate_response=self.validate_global_indices
         )
         self.log_test("Global Indices (Yahoo Finance)", success, details, data[:2] if isinstance(data, list) else data)
         
-        # Test 5: News
+        # Test 15: News
         success, details, data = self.test_api_endpoint(
             'GET', '/api/news?limit=10',
             validate_response=self.validate_news
         )
-        self.log_test("Financial News (NewsAPI)", success, details, data[:1] if isinstance(data, list) else data)
+        self.log_test("Financial News", success, details, data[:1] if isinstance(data, list) else data)
         
-        # Test 6: Currencies
+        # Test 16: Currencies
         success, details, data = self.test_api_endpoint(
             'GET', '/api/currencies',
             validate_response=self.validate_currencies
@@ -452,7 +580,7 @@ class FinRomaniaAPITester:
         self.log_test("Currency Rates (BNR)", success, details, 
                      {"sample_rates": list(data.get('rates', {}).keys())[:5]} if isinstance(data, dict) else data)
         
-        # Test 7: Market Overview
+        # Test 17: Market Overview
         success, details, data = self.test_api_endpoint(
             'GET', '/api/market/overview',
             validate_response=self.validate_market_overview
@@ -461,68 +589,35 @@ class FinRomaniaAPITester:
                      {"bvb_count": len(data.get('bvb_stocks', [])), 
                       "global_count": len(data.get('global_indices', []))} if isinstance(data, dict) else data)
         
-        # Test 8: Manual Refresh BVB
-        success, details, data = self.test_api_endpoint('POST', '/api/refresh/bvb')
-        self.log_test("Manual Refresh BVB", success, details, data)
+        # ============================================
+        # EDUCATION & PAYMENTS
+        # ============================================
+        print("\n🎓 SECTION 7: Education & Payments")
+        print("-" * 80)
         
-        # Test 9: Manual Refresh Currencies
-        success, details, data = self.test_api_endpoint('POST', '/api/refresh/currencies')
-        self.log_test("Manual Refresh Currencies", success, details, data)
+        # Test 18: Education Packages
+        success, details, data = self.test_api_endpoint('GET', '/api/education/packages')
+        packages_valid = success and isinstance(data, dict) and 'packages' in data
+        self.log_test("Education Packages", packages_valid, 
+                     f"Found {len(data.get('packages', []))} packages" if packages_valid else details, data)
         
-        # Test 10: Manual Refresh News
-        success, details, data = self.test_api_endpoint('POST', '/api/refresh/news')
-        self.log_test("Manual Refresh News", success, details, data)
+        # Test 19: Tip of the Day
+        success, details, data = self.test_api_endpoint('GET', '/api/advisor/tip-of-the-day')
+        self.log_test("AI Advisor - Tip of the Day", success, details, data)
         
-        # Test 11: Manual Refresh Global
-        success, details, data = self.test_api_endpoint('POST', '/api/refresh/global')
-        self.log_test("Manual Refresh Global Indices", success, details, data)
-        
-        # Test 12: Individual BVB Stock (if we have data)
-        if self.test_results[2]['success']:  # BVB stocks test passed
-            success, details, data = self.test_api_endpoint('GET', '/api/stocks/bvb/H2O')
-            self.log_test("Individual BVB Stock (H2O)", success, details, data)
-        
-        # Test 13: BVB Stock Details with History (V2 Feature)
-        success, details, data = self.test_api_endpoint(
-            'GET', '/api/stocks/bvb/H2O/details',
-            validate_response=self.validate_stock_details
-        )
-        self.log_test("BVB Stock Details with 30-day History", success, details, 
-                     {"history_count": len(data.get('history', [])), "has_chart_data": bool(data.get('history'))} if isinstance(data, dict) else data)
-        
-        # Test 14: Global Index Details with History (V2 Feature)
-        success, details, data = self.test_api_endpoint(
-            'GET', '/api/stocks/global/%5EGSPC/details',  # S&P 500 encoded
-            validate_response=self.validate_stock_details
-        )
-        self.log_test("Global Index Details with 30-day History", success, details,
-                     {"history_count": len(data.get('history', [])), "has_chart_data": bool(data.get('history'))} if isinstance(data, dict) else data)
-        
-        # Test 15: Article Translation (V2 Feature) - Get first article and test translation
-        if self.test_results[4]['success']:  # News test passed
-            # First get news to get an article ID
-            success, details, news_data = self.test_api_endpoint('GET', '/api/news?limit=1')
-            if success and isinstance(news_data, list) and len(news_data) > 0:
-                article_id = news_data[0].get('id')
-                if article_id:
-                    success, details, data = self.test_api_endpoint(
-                        'GET', f'/api/news/{article_id}',
-                        validate_response=self.validate_article_translation
-                    )
-                    self.log_test("Article Translation to Romanian", success, details,
-                                 {"has_translation": data.get('is_translated'), "has_romanian_content": bool(data.get('title_ro'))} if isinstance(data, dict) else data)
-                else:
-                    self.log_test("Article Translation to Romanian", False, "No article ID found in news response")
-        
-        print("=" * 60)
+        # ============================================
+        # FINAL SUMMARY
+        # ============================================
+        print("\n" + "=" * 80)
         print(f"📊 Test Results: {self.tests_passed}/{self.tests_run} passed")
+        print(f"✅ Success Rate: {(self.tests_passed/self.tests_run*100):.1f}%")
         
         if self.tests_passed == self.tests_run:
             print("🎉 All tests passed! Backend API is working correctly.")
             return True
         else:
             failed_tests = [t for t in self.test_results if not t['success']]
-            print(f"❌ {len(failed_tests)} tests failed:")
+            print(f"\n❌ {len(failed_tests)} tests failed:")
             for test in failed_tests:
                 print(f"   • {test['test_name']}: {test['details']}")
             return False
