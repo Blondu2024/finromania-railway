@@ -47,10 +47,15 @@ class FinRomaniaAPITester:
         print()
 
     def test_api_endpoint(self, method: str, endpoint: str, expected_status: int = 200, 
-                         data: Dict = None, validate_response: callable = None) -> tuple:
+                         data: Dict = None, validate_response: callable = None, 
+                         auth_token: str = None) -> tuple:
         """Generic API endpoint tester"""
         url = f"{self.base_url}{endpoint}"
         headers = {'Content-Type': 'application/json'}
+        
+        # Add authorization header if token provided
+        if auth_token:
+            headers['Authorization'] = f'Bearer {auth_token}'
         
         try:
             if method == 'GET':
