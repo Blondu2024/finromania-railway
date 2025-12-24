@@ -218,6 +218,7 @@ function AppRouter() {
       <Route path="/risk-assessment" element={<RiskAssessmentPage />} />
       <Route path="/advisor" element={<AIAdvisorPage />} />
       <Route path="/converter" element={<CurrencyConverterPage />} />
+      <Route path="/glossary" element={<GlossaryPage />} />
     </Routes>
   );
 }
