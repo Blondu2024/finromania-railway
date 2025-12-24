@@ -316,7 +316,7 @@ class TradingSchoolTester:
             'GET', '/api/trading-school/lessons',
             validate_response=self.validate_all_lessons
         )
-        self.log_test("GET /api/trading-school/lessons - All 16 lessons", success, details,
+        self.log_test("GET /api/trading-school/lessons - All 17 lessons", success, details,
                      {"total": data.get('total'), "lesson_count": len(data.get('lessons', []))} if isinstance(data, dict) else data)
         
         # ============================================
