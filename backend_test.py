@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Testing for FinRomania Platform
-Tests all endpoints for BVB stocks, global indices, news, currencies, and market overview
+Comprehensive Backend API Testing for FinRomania Platform - Session 6
+Tests all endpoints including:
+- BVB stocks with REAL EODHD data
+- Admin Dashboard
+- Glossary
+- Data sources verification
 """
 
 import requests
 import sys
 import json
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 class FinRomaniaAPITester:
     def __init__(self, base_url="https://finromania-1.preview.emergentagent.com"):
@@ -16,6 +20,8 @@ class FinRomaniaAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.test_results = []
+        self.admin_token = None
+        self.regular_user_token = None
         
     def log_test(self, name: str, success: bool, details: str = "", response_data: Any = None):
         """Log test result"""
