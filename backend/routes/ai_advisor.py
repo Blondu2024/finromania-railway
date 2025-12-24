@@ -27,8 +27,8 @@ class AdviceRequest(BaseModel):
 
 import uuid
 
-def get_ai_response_sync(prompt: str, system_prompt: str = None) -> str:
-    """Get AI response using Emergent Universal Key (sync version)"""
+async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
+    """Get AI response using Emergent Universal Key"""
     if not HAS_AI:
         return "Serviciul AI nu este disponibil momentan."
     
@@ -46,18 +46,12 @@ def get_ai_response_sync(prompt: str, system_prompt: str = None) -> str:
             system_message=system_msg
         )
         
-        user_msg = UserMessage(text=prompt)  # Fixed: use 'text' not 'message'
-        response = chat.send_message(user_msg)
+        user_msg = UserMessage(text=prompt)
+        response = await chat.send_message(user_msg)  # Use await since it's async
         return response
     except Exception as e:
         logger.error(f"AI error: {e}")
-        return f"Nu am putut genera răspunsul. Încearcă din nou."
-
-async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
-    """Async wrapper for AI response"""
-    import asyncio
-    return await asyncio.get_event_loop().run_in_executor(
-        None, get_ai_response_sync, prompt, system_prompt
+        return f"Nu am putut genera răspunsul. Eroare: {str(e)[:100]}"
     )
 
 @router.get("/portfolio-advice")
