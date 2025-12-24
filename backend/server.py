@@ -34,6 +34,7 @@ from routes.ai_advisor import router as ai_advisor_router
 from routes.currency_converter import router as currency_converter_router
 from routes.curated_indices import router as curated_router
 from routes.live_market import router as live_market_router
+from routes.trading_school import router as trading_school_router
 
 # Configure logging
 logging.basicConfig(
@@ -485,6 +486,7 @@ app.include_router(ai_advisor_router, prefix="/api")
 app.include_router(currency_converter_router, prefix="/api")
 app.include_router(curated_router, prefix="/api")
 app.include_router(live_market_router, prefix="/api")
+app.include_router(trading_school_router, prefix="/api")
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest
