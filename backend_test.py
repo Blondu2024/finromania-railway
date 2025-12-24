@@ -258,6 +258,157 @@ class FinRomaniaAPITester:
             
         return True, f"Valid article with translation status: {has_translation}"
 
+    def validate_bvb_stock_details(self, data: Dict) -> tuple:
+        """Validate BVB stock details with REAL EODHD data"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+            
+        required_fields = ['symbol', 'name', 'history']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        # Check is_mock should be false for REAL data
+        if data.get('is_mock', True):
+            return False, "BVB stock details should have is_mock: false for REAL data"
+        
+        history = data.get('history', [])
+        if not isinstance(history, list):
+            return False, "History should be a list"
+            
+        if len(history) == 0:
+            return False, "No history data returned"
+            
+        # Should have around 30 days of data
+        if len(history) < 20:
+            return False, f"Too few history entries: {len(history)}, expected around 30"
+            
+        return True, f"Valid BVB stock details with {len(history)} days of REAL history"
+
+    def validate_data_sources(self, data: Dict) -> tuple:
+        """Validate data sources - BVB should be EODHD (REAL)"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        bvb_source = data.get('bvb', {}).get('source', '')
+        if 'EODHD' not in bvb_source or 'REAL' not in bvb_source:
+            return False, f"BVB source should be 'EODHD (REAL)', got: {bvb_source}"
+        
+        return True, f"Valid data sources: BVB = {bvb_source}"
+
+    def validate_admin_stats(self, data: Dict) -> tuple:
+        """Validate admin stats response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_sections = ['totals', 'today', 'last_7_days']
+        for section in required_sections:
+            if section not in data:
+                return False, f"Missing section: {section}"
+        
+        # Check totals section
+        totals = data.get('totals', {})
+        required_totals = ['users', 'articles', 'watchlist_items', 'portfolio_transactions', 'newsletter_subscribers']
+        for field in required_totals:
+            if field not in totals:
+                return False, f"Missing totals field: {field}"
+        
+        return True, f"Valid admin stats with {totals.get('users', 0)} users"
+
+    def validate_admin_users(self, data: Dict) -> tuple:
+        """Validate admin users list response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        if 'users' not in data or 'total' not in data:
+            return False, "Missing 'users' or 'total' field"
+        
+        users = data.get('users', [])
+        if not isinstance(users, list):
+            return False, "Users should be a list"
+        
+        return True, f"Valid users list: {len(users)} users returned, {data.get('total', 0)} total"
+
+    def validate_admin_analytics(self, data: List[Dict]) -> tuple:
+        """Validate admin analytics response"""
+        if not isinstance(data, list):
+            return False, "Response should be a list"
+        
+        if len(data) == 0:
+            return False, "No analytics data returned"
+        
+        # Check first entry structure
+        entry = data[0]
+        required_fields = ['date', 'visits', 'logins']
+        for field in required_fields:
+            if field not in entry:
+                return False, f"Missing field: {field}"
+        
+        return True, f"Valid analytics: {len(data)} days of data"
+
+    def validate_glossary(self, data: Dict) -> tuple:
+        """Validate glossary response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        if 'terms' not in data or 'total' not in data:
+            return False, "Missing 'terms' or 'total' field"
+        
+        terms = data.get('terms', {})
+        total = data.get('total', 0)
+        
+        if not isinstance(terms, dict):
+            return False, "Terms should be a dictionary"
+        
+        # Should have around 99 terms
+        if total < 90:
+            return False, f"Too few terms: {total}, expected around 99"
+        
+        return True, f"Valid glossary: {total} financial terms"
+
+    def test_admin_login(self) -> bool:
+        """Test admin login and store token"""
+        print("\n🔐 Testing Admin Authentication...")
+        
+        success, details, data = self.test_api_endpoint(
+            'POST', '/api/auth/login',
+            data={
+                "email": "admin@finromania.ro",
+                "password": "admin123"
+            }
+        )
+        
+        if success and isinstance(data, dict) and 'token' in data:
+            self.admin_token = data['token']
+            self.log_test("Admin Login", True, f"Admin authenticated successfully. Token obtained.", {"has_token": True})
+            return True
+        else:
+            self.log_test("Admin Login", False, f"Failed to authenticate admin: {details}", data)
+            return False
+
+    def test_regular_user_creation(self) -> bool:
+        """Create a regular test user"""
+        print("\n👤 Creating Regular Test User...")
+        
+        test_email = f"testuser_{datetime.now().timestamp()}@test.com"
+        
+        success, details, data = self.test_api_endpoint(
+            'POST', '/api/auth/session',
+            data={
+                "email": test_email,
+                "name": "Test User",
+                "picture": "https://example.com/pic.jpg"
+            }
+        )
+        
+        if success and isinstance(data, dict) and 'token' in data:
+            self.regular_user_token = data['token']
+            self.log_test("Regular User Creation", True, f"Test user created: {test_email}", {"has_token": True})
+            return True
+        else:
+            self.log_test("Regular User Creation", False, f"Failed to create test user: {details}", data)
+            return False
+
     def run_all_tests(self):
         """Run comprehensive test suite"""
         print("🚀 Starting FinRomania API Testing...")
