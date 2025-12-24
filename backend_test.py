@@ -372,23 +372,36 @@ class FinRomaniaAPITester:
         return True, f"Valid glossary: {total} financial terms"
 
     def test_admin_login(self) -> bool:
-        """Test admin login and store token"""
-        print("\n🔐 Testing Admin Authentication...")
+        """Test admin authentication - use pre-created session token"""
+        print("\n🔐 Setting up Admin Authentication...")
         
-        success, details, data = self.test_api_endpoint(
-            'POST', '/api/auth/login',
-            data={
-                "email": "admin@finromania.ro",
-                "password": "admin123"
+        # For testing, we'll create a session token directly in the database
+        # since there's no password-based login endpoint
+        import subprocess
+        result = subprocess.run([
+            'mongosh', 'mongodb://localhost:27017/stock_news_romania', '--quiet', '--eval',
+            """
+            const adminUser = db.users.findOne({email: 'admin@finromania.ro'});
+            if (adminUser) {
+              const sessionToken = 'test_admin_token_' + Date.now();
+              const expiresAt = new Date(Date.now() + 7*24*60*60*1000);
+              db.user_sessions.insertOne({
+                user_id: adminUser.user_id,
+                session_token: sessionToken,
+                expires_at: expiresAt.toISOString(),
+                created_at: new Date().toISOString()
+              });
+              print(sessionToken);
             }
-        )
+            """
+        ], capture_output=True, text=True)
         
-        if success and isinstance(data, dict) and 'token' in data:
-            self.admin_token = data['token']
-            self.log_test("Admin Login", True, f"Admin authenticated successfully. Token obtained.", {"has_token": True})
+        if result.returncode == 0 and result.stdout.strip():
+            self.admin_token = result.stdout.strip()
+            self.log_test("Admin Authentication Setup", True, f"Admin session token created", {"has_token": True})
             return True
         else:
-            self.log_test("Admin Login", False, f"Failed to authenticate admin: {details}", data)
+            self.log_test("Admin Authentication Setup", False, f"Failed to create admin session", None)
             return False
 
     def test_regular_user_creation(self) -> bool:
