@@ -439,8 +439,466 @@ Exemplu: 10 bănci românești → TOATE scad când sectorul bancar scade!
                 "explanation": "Perfect! Opțiunea C diversifică pe sectoare (bancă, energie, petrol, aur, indice global). Celelalte sunt fie concentrate (A,B) fie prea fragmentate (D)."
             }
         ]
+    },
+    {
+        "id": "lesson_6",
+        "module": 3,
+        "order": 6,
+        "title": "Psihologia Tradingului - Emoțiile Tale",
+        "subtitle": "Cum să nu lași frica și lăcomia să decidă",
+        "duration": "12 min",
+        "difficulty": "intermediate",
+        "emoji": "🧠",
+        "tier": "premium",
+        "content": """
+# Psihologia Tradingului
+
+## 🧠 Cel Mai Mare Dușman: TU ÎNSUȚI
+
+**90% din traderi pierd bani NU pentru că nu știu analiza, ci pentru că nu-și controlează emoțiile!**
+
+## 😨 FRICA (Fear)
+
+**Scenariul:**
+- Ai profit de +100 RON (+10%)
+- Frica: "Dacă scade? Mai bine vând ACUM!"
+- Vinzi prea devreme
+- Acțiunea crește la +50% fără tine 😢
+
+**Regula:** Setează Take Profit în avans, nu decide emoțional!
+
+## 🤑 LĂCOMIA (Greed)
+
+**Scenariul:**
+- Ai profit de +500 RON (+50%)
+- Lăcomia: "Poate crește la +100%!"
+- Aștepți prea mult
+- Acțiunea scade la +10% 😱
+- Ai pierdut +400 RON profit!
+
+**Regula:** Respectă-ți planul! Take Profit setat = execută!
+
+## 🎲 FOMO (Fear of Missing Out)
+
+**Scenariul:**
+- Vezi știrea: "Bitcoin +20% azi!"
+- FOMO: "Trebuie să cumpăr ACUM!"
+- Cumperi la vârf (all-time high)
+- Scade 30% a doua zi 💀
+
+**Regula:** NU cumpăra din FOMO! Analizează înainte!
+
+## 💔 Revenge Trading
+
+**Scenariul:**
+- Pierzi 500 RON pe Oil
+- Furie: "Vreau banii înapoi!"
+- Intri imediat în altă poziție (fără analiză)
+- Pierzi încă 500 RON 😭
+
+**Regula:** După pierdere → PAUZĂ! Nu trade emoțional!
+
+## ✅ Reguli de Aur
+
+1. **Fă un PLAN** înainte de trade
+2. **Respectă-ți Stop Loss** (nu-l muți!)
+3. **Nu trade după pierderi mari** (pauză 24h)
+4. **Setează limite zilnice** (max 3 trades/zi)
+5. **Jurnal de trading** (notează de ce ai intrat/ieșit)
+""",
+        "quiz": [
+            {
+                "question": "Ai +200 RON profit (+20%). Frica te face să vinzi. Acțiunea apoi crește la +50%. Ce greșeală ai făcut?",
+                "options": [
+                    "Ai vândut prea devreme din FRICĂ",
+                    "Ai așteptat prea mult din LĂCOMIE",
+                    "Ai cumpărat din FOMO",
+                    "Revenge trading"
+                ],
+                "correct": 0,
+                "explanation": "Corect! FRICA te-a făcut să vinzi prea devreme. Dacă aveai Take Profit setat în avans, nu dădeai emoțiilor să decidă!"
+            },
+            {
+                "question": "După ce pierzi 500 RON, ce ar trebui să faci?",
+                "options": [
+                    "Intru imediat în alt trade să recuperez",
+                    "PAUZĂ 24h - nu tradez emoțional",
+                    "Cresc leverage-ul pentru recovery rapid",
+                    "Schimb strategia complet"
+                ],
+                "correct": 1,
+                "explanation": "Perfect! După pierdere mare, ia o PAUZĂ. Revenge trading = calea spre pierderi mai mari. Liniștește-te, analizează ce-a mers prost, apoi revino."
+            }
+        ]
+    },
+    {
+        "id": "lesson_7",
+        "module": 3,
+        "order": 7,
+        "title": "Cum Citești un Grafic - Candlesticks",
+        "subtitle": "Limbajul vizual al pieței",
+        "duration": "15 min",
+        "difficulty": "intermediate",
+        "emoji": "📊",
+        "tier": "premium",
+        "content": """
+# Cum Citești Graficele - Candlesticks
+
+## 🕯️ Ce Este un Candlestick?
+
+Un **candlestick** (lumânare) arată 4 prețuri într-o perioadă (1 min, 5 min, 1 zi):
+
+1. **Open** (deschidere)
+2. **Close** (închidere)
+3. **High** (maxim)
+4. **Low** (minim)
+
+## 🟢 Green Candle (Bullish)
+
+```
+      |  ← High (maxim)
+    ┌───┐
+    │   │ ← Body (Open → Close)
+    │   │
+    └───┘ ← Close (mai sus)
+      |  ← Open
+      |  ← Low (minim)
+```
+
+**Înseamnă:** Prețul a CRESCUT (close > open) → Cumpărători au câștigat!
+
+## 🔴 Red Candle (Bearish)
+
+```
+      |  ← High
+      |  ← Open (mai sus)
+    ┌───┐
+    │   │ ← Body (Open → Close)
+    └───┘ ← Close (mai jos)
+      |  ← Low
+```
+
+**Înseamnă:** Prețul a SCĂZUT (close < open) → Vânzători au câștigat!
+
+## 📈 Pattern-uri Importante
+
+**1. Hammer (Ciocan)** 🔨
+- Body mic sus
+- Shadow lung jos
+- **Semnificație:** Vânzătorii au încercat să coboare prețul, dar cumpărătorii l-au împins înapoi SUS
+- **Semnal:** Posibilă CREȘTERE
+
+**2. Shooting Star (Stea Căzătoare)** ⭐
+- Body mic jos
+- Shadow lung sus
+- **Semnificație:** Cumpărătorii au încercat să urce prețul, dar vânzătorii l-au tras înapoi JOS
+- **Semnal:** Posibilă SCĂDERE
+
+**3. Doji (Cruce)** ✝️
+- Open = Close (aproape)
+- Shadows egale
+- **Semnificație:** INDECIS - nimeni nu câștigă
+- **Semnal:** Posibilă SCHIMBARE de trend
+
+## 💡 Cum Folosești în Trading
+
+**Green candles multe la rând** → Trend UP (bullish)
+**Red candles multe la rând** → Trend DOWN (bearish)
+**Pattern Hammer la bază** → Posibil rebound (cumpără!)
+**Pattern Shooting Star la vârf** → Posibilă corecție (vinde!)
+""",
+        "quiz": [
+            {
+                "question": "Un candle VERDE (green) înseamnă:",
+                "options": [
+                    "Prețul a scăzut",
+                    "Prețul a crescut (close > open)",
+                    "Prețul e stabil",
+                    "Volumul e mare"
+                ],
+                "correct": 1,
+                "explanation": "Corect! Green candle = Close mai sus decât Open = prețul a CRESCUT în acea perioadă. Cumpărătorii au câștigat!"
+            },
+            {
+                "question": "Pattern 'Hammer' (ciocan) la baza unui trend de scădere semnalează:",
+                "options": [
+                    "Va continua să scadă",
+                    "Posibil rebound (creștere)",
+                    "Nu înseamnă nimic",
+                    "Trebuie să vinzi"
+                ],
+                "correct": 1,
+                "explanation": "Perfect! Hammer la bază = vânzătorii au încercat să coboare dar cumpărătorii i-au oprit. Semnal de posibilă inversare UP!"
+            }
+        ]
+    },
+    {
+        "id": "lesson_8",
+        "module": 3,
+        "order": 8,
+        "title": "Indicatori Tehnici - RSI",
+        "subtitle": "Cel mai popular indicator pentru începători",
+        "duration": "10 min",
+        "difficulty": "intermediate",
+        "emoji": "📉",
+        "tier": "premium",
+        "content": """
+# RSI - Relative Strength Index
+
+## 📊 Ce Este RSI?
+
+**RSI** măsoară dacă o acțiune este:
+- **Supracumpărată** (overbought) → Posibil să scadă
+- **Supravândută** (oversold) → Posibil să crească
+
+**Scală:** 0 - 100
+
+## 🎯 Cum Citești RSI
+
+```
+100 ──────────────── Extrem supracumpărat
+ 70 ──────────────── ZONA ROȘIE (Overbought)
+ 50 ──────────────── Neutru
+ 30 ──────────────── ZONA VERDE (Oversold)
+  0 ──────────────── Extrem supravândut
+```
+
+**Reguli Simple:**
+- 🔴 **RSI > 70:** SUPRACUMPĂRAT → Posibil să scadă (ia profit sau nu cumpăra!)
+- 🟢 **RSI < 30:** SUPRAVÂNDUT → Posibil să crească (oportunitate cumpărare!)
+- 🟡 **RSI 30-70:** NEUTRU → Niciun semnal clar
+
+## 💡 Strategia Simplă
+
+**Exemplu TLV:**
+
+**Ziua 1:** RSI = 75 (supracumpărat)
+- **NU cumpăra!** E prea sus
+- Așteaptă corecție
+
+**Ziua 5:** RSI = 28 (supravândut)
+- **Oportunitate!** Cumpără
+- TLV a scăzut prea mult, probabil rebound
+
+**Ziua 10:** RSI = 72 (supracumpărat din nou)
+- **Vinde!** Ia profit
+- E din nou prea sus
+
+**Profit:** Ai cumpărat jos (RSI 28) și ai vândut sus (RSI 72)!
+
+## ⚠️ Atenție - RSI Nu E Magic!
+
+**RSI poate rămâne în extremă mult timp!**
+
+- RSI > 70 timp de săptămâni (trend puternic UP)
+- RSI < 30 timp de săptămâni (trend puternic DOWN)
+
+**Regula:** Combină RSI cu alte semnale (trend, volume, news)
+
+## 🎯 RSI + Stop Loss
+
+**Când cumperi la RSI 28:**
+- Setează SL la -5% sub entry
+- Dacă nu crește în 2-3 zile → Ieși
+- NU așteptat infinit "să revină"
+""",
+        "quiz": [
+            {
+                "question": "TLV are RSI = 78. Ce ar trebui să faci?",
+                "options": [
+                    "Cumpăr - e în creștere!",
+                    "NU cumpăr - e supracumpărat, risc de corecție",
+                    "Cumpăr cu leverage mare",
+                    "Short - sigur scade"
+                ],
+                "correct": 1,
+                "explanation": "Corect! RSI 78 = SUPRACUMPĂRAT. Riscant să cumperi acum. Mai bine aștepți corecție la RSI < 50 sau < 30."
+            },
+            {
+                "question": "RSI < 30 înseamnă ÎNTOTDEAUNA că trebuie să cumperi?",
+                "options": [
+                    "DA - e semnal sigur!",
+                    "NU - e doar un indicator, combină cu alții",
+                    "DA - dar cu leverage mare",
+                    "NU - e semnal de vânzare"
+                ],
+                "correct": 1,
+                "explanation": "Perfect! RSI < 30 e un SEMNAL bun, dar NU garantat. Combină cu trend, volume, news. Și ÎNTOTDEAUNA folosește Stop Loss!"
+            }
+        ]
+    },
+    {
+        "id": "lesson_9",
+        "module": 3,
+        "order": 9,
+        "title": "MACD - Moving Average Convergence Divergence",
+        "subtitle": "Indicator de trend și momentum",
+        "duration": "12 min",
+        "difficulty": "advanced",
+        "emoji": "📈",
+        "tier": "premium",
+        "content": """
+# MACD - Indicator de Trend
+
+## 📊 Ce Este MACD?
+
+**MACD** arată:
+1. **Direcția trendului** (UP sau DOWN)
+2. **Puterea trendului** (puternic sau slab)
+3. **Posibile inversări** (când se schimbă trendul)
+
+**Componente:**
+- **MACD Line** (linia rapidă)
+- **Signal Line** (linia lentă)
+- **Histogram** (diferența dintre ele)
+
+## 🎯 Semnale de Trading
+
+### **Semnal CUMPĂRARE** ✅
+- MACD Line trece PESTE Signal Line
+- Histogram devine POZITIV (verde)
+- **Înseamnă:** Momentum UP, trend bullish începe!
+
+### **Semnal VÂNZARE** ❌
+- MACD Line trece SUB Signal Line
+- Histogram devine NEGATIV (roșu)
+- **Înseamnă:** Momentum DOWN, trend bearish începe!
+
+## 💡 Divergențe (Advanced)
+
+### **Divergență Bullish** (Cumpărare!)
+- Preț: Face LOW mai jos
+- MACD: Face LOW mai sus
+- **Înseamnă:** Vânzătorii slăbesc, posibil rebound!
+
+### **Divergență Bearish** (Vânzare!)
+- Preț: Face HIGH mai sus
+- MACD: Face HIGH mai jos
+- **Înseamnă:** Cumpărătorii slăbesc, posibilă corecție!
+
+## 🎯 Strategia Simplă
+
+**Exemplu Oil:**
+1. Așteaptă MACD cross (linia trece peste signal)
+2. Confirmă cu RSI (nu fie > 70)
+3. Intră în poziție
+4. Setează SL la -5%
+5. Ieși când MACD cross invers SAU Take Profit
+
+## ⚠️ False Signals
+
+**MACD dă multe false signals în piețe laterale!**
+
+**Best use:** Trending markets (când e clar UP sau DOWN)
+**Evită:** Sideways/choppy markets
+""",
+        "quiz": [
+            {
+                "question": "MACD Line trece PESTE Signal Line. Ce înseamnă?",
+                "options": [
+                    "Semnal VÂNZARE",
+                    "Semnal CUMPĂRARE",
+                    "Nimic special",
+                    "Trebuie să aștept"
+                ],
+                "correct": 1,
+                "explanation": "Corect! MACD cross UP (peste signal) = semnal BULLISH de cumpărare. Momentum se schimbă în favoarea cumpărătorilor!"
+            }
+        ]
+    },
+    {
+        "id": "lesson_10",
+        "module": 4,
+        "order": 10,
+        "title": "Strategii de Trading - Day Trading",
+        "subtitle": "Cum să câștigi în aceeași zi",
+        "duration": "15 min",
+        "difficulty": "advanced",
+        "emoji": "⚡",
+        "tier": "premium",
+        "content": """
+# Day Trading - Tranzacții Intraday
+
+## ⏰ Ce Este Day Trading?
+
+**Cumperi și vinzi în ACEEAȘI ZI!**
+
+Caracteristici:
+- Poziții deschise: 5 min - 8 ore
+- Închizi TOATE pozițiile înainte de closing
+- Profiți din mișcări mici (1-3%)
+- Multe tranzacții (5-20/zi)
+
+## 💰 Exemplu Realist
+
+**Dimineață 09:00:**
+- Oil = 75.00 USD
+- RSI = 32 (oversold)
+- MACD = Bullish cross
+- **CUMPĂR:** 100 unități cu 2x leverage
+
+**După-masă 14:00:**
+- Oil = 76.50 USD (+2%)
+- RSI = 68 (aproape overbought)
+- **VÂND:** Profit = (76.50 - 75.00) × 100 × 2 = **+300 USD**
+
+**Timp total:** 5 ore
+**Profit:** +300 USD (+40% cu 2x leverage)
+
+## 🎯 Reguli Day Trading
+
+1. **Volatilitate mare** (Oil, Gold, Forex)
+2. **Lichiditate mare** (cumperi/vinzi instant)
+3. **Stop Loss STRICT** (-1% până -2%)
+4. **Profit mic dar sigur** (+1% până +3%)
+5. **Ratio 2:1** (risc 1% pentru profit 2%)
+
+## ⚠️ Riscuri Day Trading
+
+**1. Overtrading**
+- Prea multe trades → Pierderi din comisioane
+- Oboseală → Decizii proaste
+
+**2. Stress Mare**
+- Monitorizare constantă (8 ore/zi)
+- Presiune psihologică
+
+**3. Capital Mare Necesar**
+- Pentru profit decent din +1-2% mișcări
+
+## ✅ E Day Trading Pentru Tine?
+
+**DA dacă:**
+- ✅ Ai timp 4-8 ore/zi
+- ✅ Poți lua decizii rapide
+- ✅ Rezistă la stress
+- ✅ Ai capital > 10,000 USD
+
+**NU dacă:**
+- ❌ Ai job full-time
+- ❌ Vrei "bani ușori"
+- ❌ Capital mic < 5,000 USD
+- ❌ Nu ești disciplinat
+""",
+        "quiz": [
+            {
+                "question": "Care e diferența principală între Day Trading și Swing Trading?",
+                "options": [
+                    "Day trading = închizi tot în aceeași zi",
+                    "Day trading = leverage mai mare",
+                    "Nu există diferență",
+                    "Day trading = mai puțin risc"
+                ],
+                "correct": 0,
+                "explanation": "Corect! Day trading = TOATE pozițiile se închid înainte de closing. Swing trading = ții poziții 2-10 zile."
+            }
+        ]
     }
 ]
+
+# Tier pricing
+PREMIUM_TIER_PRICE = 10.00  # RON
+PREMIUM_TIER_CURRENCY = "ron"
 
 # ============================================
 # MODELS
