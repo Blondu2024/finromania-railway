@@ -92,7 +92,7 @@ Imaginează-ți că Banca Transilvania este o pizza 🍕:
                     "text": "Bravo! Ai cumpărat 33 acțiuni TLV la 30 RON. Investiție: 990 RON.",
                     "question": "După 1 lună, TLV e la 33 RON. Vrei să vinzi?",
                     "options": ["DA - iau profit", "NU - aștept mai mult"],
-                    "correct": null,
+                    "correct": None,
                     "ai_feedback": {
                         "0": "Bună decizie! Ai vândut la 33 RON × 33 = 1,089 RON. Profit: +99 RON (+10%)!",
                         "1": "Riști mai mult, dar poate crește și mai mult! Sau poate scade..."
