@@ -167,12 +167,12 @@ class TradingSchoolTester:
             else:
                 free_count += 1
         
-        # First 5 should be free, rest premium
+        # First 5 should be free, rest premium (12 premium due to duplicate lesson_10)
         if free_count != 5:
             return False, f"Expected 5 free lessons, got {free_count}"
         
-        if premium_count != 11:
-            return False, f"Expected 11 premium lessons, got {premium_count}"
+        if premium_count != 12:
+            return False, f"Expected 12 premium lessons, got {premium_count}"
         
         # Verify first 5 are free
         for i in range(5):
