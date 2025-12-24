@@ -97,12 +97,12 @@ class TradingSchoolTester:
         if not isinstance(lessons, list):
             return False, "Lessons should be a list"
         
-        # Should have 16 lessons
-        if total != 16:
-            return False, f"Expected 16 lessons, got {total}"
+        # Should have 17 lessons (note: there are 2 lesson_10 entries in the code)
+        if total != 17:
+            return False, f"Expected 17 lessons, got {total}"
         
-        if len(lessons) != 16:
-            return False, f"Expected 16 lessons in array, got {len(lessons)}"
+        if len(lessons) != 17:
+            return False, f"Expected 17 lessons in array, got {len(lessons)}"
         
         # Validate first lesson structure
         if lessons:
