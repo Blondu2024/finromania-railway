@@ -1371,8 +1371,100 @@ Extensii comune:
                 "explanation": "Corect! Compania A e MULT mai atractivă: P/E=8 (ieftin!), ROE=20% (foarte profitabil!), Debt=0.3 (puține datorii). Compania B e supraevaluată și riscantă!"
             }
         ]
+    },
+    {
+        "id": "lesson_16",
+        "module": 5,
+        "order": 16,
+        "title": "Money Management - Cât Riști per Trade?",
+        "subtitle": "Regula 1-2% care salvează conturi",
+        "duration": "12 min",
+        "difficulty": "intermediate",
+        "emoji": "💰",
+        "tier": "premium",
+        "content": """
+# Money Management
+
+## 💰 Regula de Aur: **NU RISCA MAI MULT DE 2% per Trade!**
+
+### De Ce?
+
+**Exemplu cu 2% risc:**
+- Capital: 10,000 RON
+- Risc per trade: 200 RON (2%)
+- Pierzi 10 trades la rând: -2,000 RON (-20%)
+- **Încă ai 8,000 RON** (poți recupera!)
+
+**Exemplu cu 10% risc:**
+- Capital: 10,000 RON
+- Risc per trade: 1,000 RON (10%)
+- Pierzi 3 trades la rând: -3,000 RON (-30%)
+- Pierzi 5 trades: -5,000 RON (-50%)
+- **GAME OVER** - prea greu de recuperat!
+
+## 🎯 Cum Calculezi Position Size
+
+**Formula:**
+```
+Position Size = (Capital × 2%) ÷ Risc per acțiune
+
+Unde:
+Risc per acțiune = Entry - Stop Loss
+```
+
+**Exemplu:**
+- Capital: 10,000 RON
+- Risc 2%: 200 RON
+- Entry TLV: 30 RON
+- Stop Loss: 28.50 RON
+- Risc/acțiune: 1.50 RON
+
+**Position Size = 200 ÷ 1.50 = 133 acțiuni**
+
+Investiție: 133 × 30 = **3,990 RON**
+
+## 📊 Risk/Reward Ratio
+
+**Minim 1:2** (risc 1 pentru reward 2)
+
+**Exemplu:**
+- Entry: 30 RON
+- Stop Loss: 28.50 RON (risc -1.50)
+- Take Profit: 33 RON (reward +3)
+- **Ratio: 1:2** ✅ GOOD!
+
+**Nu face trades cu 1:1 sau 1:0.5** (risc = reward sau mai mult)!
+
+## ⚠️ Overtrading
+
+**Greșeală:** 20 trades/zi × 2% risc = **40% risc total!**
+
+**Regula:** Max 3-5 trades/zi (risc total 6-10%)
+
+## 💡 Kelly Criterion (Advanced)
+
+**Formula optimă pentru sizing:**
+```
+% Risc = (Win Rate × Avg Win - Loss Rate × Avg Loss) ÷ Avg Win
+```
+
+**Prea complicat? Folosește 1-2% regula simplă!**
+""",
+        "quiz": [
+            {
+                "question": "Ai 10,000 RON. Vrei să cumperi TLV la 30 RON cu SL la 28.50 RON. Câte acțiuni (max) bazat pe 2% risc?",
+                "options": ["666 acțiuni", "133 acțiuni", "50 acțiuni", "333 acțiuni"],
+                "correct": 1,
+                "explanation": "Corect! Risc 2% = 200 RON. Risc/acțiune = 30-28.50 = 1.50 RON. Position size = 200÷1.50 = 133 acțiuni. Investiție = 3,990 RON dar risc doar 200 RON!"
+            }
+        ]
     }
 ]
+
+# Total count tracking
+FREE_LESSONS_COUNT = len([l for l in TRADING_LESSONS if l.get("tier") != "premium"])
+PREMIUM_LESSONS_COUNT = len([l for l in TRADING_LESSONS if l.get("tier") == "premium"])
+TOTAL_LESSONS_COUNT = len(TRADING_LESSONS)
 
 # Tier pricing
 PREMIUM_TIER_PRICE = 10.00  # RON
