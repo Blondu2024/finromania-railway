@@ -1,26 +1,26 @@
 {
   "summary": {
     "total_tests": 20,
-    "passed_tests": 13,
-    "success_rate": "65.0%",
-    "timestamp": "2025-12-24T15:10:20.859470"
+    "passed_tests": 20,
+    "success_rate": "100.0%",
+    "timestamp": "2025-12-24T15:11:58.094254"
   },
   "detailed_results": [
     {
       "test_name": "Health Check",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:18.682453",
+      "timestamp": "2025-12-24T15:11:52.751684",
       "response_sample": {
         "status": "healthy",
-        "timestamp": "2025-12-24T15:10:18.676461+00:00"
+        "timestamp": "2025-12-24T15:11:52.745455+00:00"
       }
     },
     {
       "test_name": "API Root Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:18.747445",
+      "timestamp": "2025-12-24T15:11:52.819727",
       "response_sample": {
         "message": "FinRomania API",
         "version": "1.0.0",
@@ -37,7 +37,7 @@
       "test_name": "BVB Stock Details - TLV (REAL EODHD)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:19.191313",
+      "timestamp": "2025-12-24T15:11:53.298454",
       "response_sample": {
         "symbol": "TLV",
         "history_count": 21,
@@ -48,7 +48,7 @@
       "test_name": "BVB Stock Details - H2O (REAL EODHD)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:19.561054",
+      "timestamp": "2025-12-24T15:11:53.689239",
       "response_sample": {
         "symbol": "H2O",
         "history_count": 21,
@@ -57,9 +57,9 @@
     },
     {
       "test_name": "Data Sources - BVB should be EODHD (REAL)",
-      "success": false,
-      "details": "Validation failed: BVB source should be 'EODHD (REAL)', got: ",
-      "timestamp": "2025-12-24T15:10:20.081602",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-24T15:11:54.505688",
       "response_sample": {
         "bvb_source": "EODHD (REAL)",
         "global_source": "Yahoo Finance (REAL)",
@@ -70,7 +70,7 @@
       "test_name": "BVB Stocks List (REAL data verification)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:20.148686",
+      "timestamp": "2025-12-24T15:11:54.576403",
       "response_sample": [
         {
           "symbol": "H2O",
@@ -105,52 +105,78 @@
       ]
     },
     {
-      "test_name": "Admin Login",
-      "success": false,
-      "details": "Failed to authenticate admin: Expected 200, got 404",
-      "timestamp": "2025-12-24T15:10:20.214759",
-      "response_sample": "{\"detail\":\"Not Found\"}"
+      "test_name": "Admin Authentication Setup",
+      "success": true,
+      "details": "Admin session token created",
+      "timestamp": "2025-12-24T15:11:56.212870",
+      "response_sample": {
+        "has_token": true
+      }
     },
     {
       "test_name": "Admin Stats Endpoint",
-      "success": false,
-      "details": "Skipped - admin login failed",
-      "timestamp": "2025-12-24T15:10:20.214832",
-      "response_sample": null
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-24T15:11:56.341494",
+      "response_sample": {
+        "totals": {
+          "users": 2,
+          "articles": 277,
+          "watchlist_items": 1,
+          "portfolio_transactions": 1,
+          "newsletter_subscribers": 2
+        },
+        "today": {
+          "logins": 2,
+          "page_visits": 0
+        },
+        "last_7_days": {
+          "new_users": 2
+        }
+      }
     },
     {
-      "test_name": "Admin Users List",
-      "success": false,
-      "details": "Skipped - admin login failed",
-      "timestamp": "2025-12-24T15:10:20.214848",
-      "response_sample": null
+      "test_name": "Admin Users List (limit=5)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-24T15:11:56.418355",
+      "response_sample": {
+        "users_count": 2,
+        "total": 2
+      }
     },
     {
-      "test_name": "Admin Analytics",
-      "success": false,
-      "details": "Skipped - admin login failed",
-      "timestamp": "2025-12-24T15:10:20.214860",
-      "response_sample": null
+      "test_name": "Admin Analytics (7 days)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-24T15:11:56.500060",
+      "response_sample": {
+        "days_count": 7
+      }
     },
     {
       "test_name": "Regular User Creation",
-      "success": false,
-      "details": "Failed to create test user: Expected 200, got 422",
-      "timestamp": "2025-12-24T15:10:20.278425",
-      "response_sample": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"session_id\"],\"msg\":\"Field required\",\"input\":{\"email\":\"testuser_1766589020.214882@test.com\",\"name\":\"Test User\",\"picture\":\"https://example.com/pic.jpg\"},\"url\""
+      "success": true,
+      "details": "Test user created: testuser_1766589116.500144@test.com",
+      "timestamp": "2025-12-24T15:11:57.457693",
+      "response_sample": {
+        "has_token": true
+      }
     },
     {
-      "test_name": "Admin Access Control",
-      "success": false,
-      "details": "Skipped - regular user creation failed",
-      "timestamp": "2025-12-24T15:10:20.278506",
-      "response_sample": null
+      "test_name": "Admin Access Control (403 for non-admin)",
+      "success": true,
+      "details": "Correctly denied access to non-admin user",
+      "timestamp": "2025-12-24T15:11:57.526137",
+      "response_sample": {
+        "detail": "Admin access required"
+      }
     },
     {
       "test_name": "Glossary - All Terms (~99 terms)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:20.350100",
+      "timestamp": "2025-12-24T15:11:57.589919",
       "response_sample": {
         "total": 99,
         "sample_terms": [
@@ -164,7 +190,7 @@
       "test_name": "Glossary - Search (dividend)",
       "success": true,
       "details": "Found 2 matching terms",
-      "timestamp": "2025-12-24T15:10:20.418910",
+      "timestamp": "2025-12-24T15:11:57.654864",
       "response_sample": {
         "total": 2,
         "terms": [
@@ -177,32 +203,32 @@
       "test_name": "Global Indices (Yahoo Finance)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:20.499720",
+      "timestamp": "2025-12-24T15:11:57.757673",
       "response_sample": [
         {
           "symbol": "^GSPC",
           "name": "S&P 500",
-          "price": 6915.71,
-          "change": 5.919922,
-          "change_percent": 0.08567367,
+          "price": 6918.03,
+          "change": 8.239746,
+          "change_percent": 0.11924844,
           "previous_close": 6909.79,
           "open": 6904.91,
-          "high": 6916.21,
+          "high": 6918.03,
           "low": 6904.91,
-          "volume": 220778198,
+          "volume": 240633651,
           "source": "yahoo_finance"
         },
         {
           "symbol": "^IXIC",
           "name": "NASDAQ",
-          "price": 23554.2,
-          "change": -7.6445312,
-          "change_percent": -0.03244449,
+          "price": 23559.158,
+          "change": -2.6855469,
+          "change_percent": -0.011397916,
           "previous_close": 23561.844,
           "open": 23555.947,
           "high": 23565.867,
           "low": 23527.973,
-          "volume": 1240734000,
+          "volume": 1315865000,
           "source": "yahoo_finance"
         }
       ]
@@ -211,7 +237,7 @@
       "test_name": "Financial News",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:20.569465",
+      "timestamp": "2025-12-24T15:11:57.826673",
       "response_sample": [
         {
           "id": "f6f5da7b-188a-4c6b-b944-a156b7c2b3be",
@@ -240,7 +266,7 @@
       "test_name": "Currency Rates (BNR)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:20.645383",
+      "timestamp": "2025-12-24T15:11:57.891873",
       "response_sample": {
         "sample_rates": [
           "AED",
@@ -255,7 +281,7 @@
       "test_name": "Market Overview (Combined)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:20.721956",
+      "timestamp": "2025-12-24T15:11:57.959600",
       "response_sample": {
         "bvb_count": 20,
         "global_count": 6
@@ -265,7 +291,7 @@
       "test_name": "Education Packages",
       "success": true,
       "details": "Found 2 packages",
-      "timestamp": "2025-12-24T15:10:20.794383",
+      "timestamp": "2025-12-24T15:11:58.024969",
       "response_sample": {
         "packages": [
           {
@@ -315,7 +341,7 @@
       "test_name": "AI Advisor - Tip of the Day",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:10:20.858497",
+      "timestamp": "2025-12-24T15:11:58.093366",
       "response_sample": {
         "tip": "Regula 72: \u00cemparte 72 la rata de randament pentru a afla \u00een c\u00e2\u021bi ani se dubleaz\u0103 investi\u021bia. Ex: 72/8% = 9 ani.",
         "category": "Matematic\u0103 financiar\u0103",
