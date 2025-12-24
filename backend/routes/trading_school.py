@@ -893,6 +893,484 @@ Caracteristici:
                 "explanation": "Corect! Day trading = TOATE pozițiile se închid înainte de closing. Swing trading = ții poziții 2-10 zile."
             }
         ]
+    },
+    {
+        "id": "lesson_10",
+        "module": 4,
+        "order": 10,
+        "title": "Swing Trading - Tranzacții pe Zile",
+        "subtitle": "Profituri medii, risc moderat",
+        "duration": "12 min",
+        "difficulty": "intermediate",
+        "emoji": "🌊",
+        "tier": "premium",
+        "content": """
+# Swing Trading
+
+## 🌊 Ce Este?
+
+**Swing Trading** = Ții poziții **3-10 zile** pentru a profita de "swing-uri" (oscilații) de preț.
+
+**Diferență față de:**
+- Day Trading: Închizi în aceeași zi
+- Swing: Ții 3-10 zile
+- Position: Ții săptămâni-luni
+
+## 💡 Exemplu Real
+
+**Luni:** TLV = 28 RON, RSI = 25 (oversold)
+- **Cumperi** 100 acțiuni = 2,800 RON
+- Stop Loss: 26.50 RON (-5%)
+- Take Profit: 31 RON (+10%)
+
+**Marți-Joi:** Oscilează 28-29 RON (aștepți...)
+
+**Vineri:** TLV = 31 RON! (+10%)
+- **Take Profit activat!**
+- Profit: +300 RON în 5 zile
+
+## 🎯 Avantaje Swing Trading
+
+✅ **Nu trebuie să monitorizezi 8 ore/zi**
+✅ **Profituri mai mari** (5-15% per trade)
+✅ **Mai puțin stress** decât day trading
+✅ **Compatibil cu job full-time**
+
+## ⚠️ Riscuri
+
+❌ **Overnight risk** - evenimente peste noapte
+❌ **Mai mult capital blocat** (3-10 zile)
+❌ **Gap-uri** (preț deschide diferit de closing)
+
+## 💡 Strategia Simplă
+
+1. **Caută acțiuni în trend**
+2. **Așteaptă pullback** (corecție temporară)
+3. **Intră când RSI < 35** și trend UP
+4. **Stop Loss -5%**, Take Profit +10-15%
+5. **Ține 3-10 zile** max
+6. **Ieși la TP sau SL**
+""",
+        "quiz": [
+            {
+                "question": "Care e avantajul principal al Swing Trading față de Day Trading?",
+                "options": [
+                    "Profituri mai mari per trade",
+                    "Nu trebuie să monitorizezi tot timpul",
+                    "Mai puțin risc",
+                    "Toate de mai sus"
+                ],
+                "correct": 3,
+                "explanation": "Corect! Swing trading combină: profituri mai mari (5-15%), mai puțin timp de monitorizare (check 2x/zi), și e compatibil cu job full-time!"
+            }
+        ]
+    },
+    {
+        "id": "lesson_11",
+        "module": 4,
+        "order": 11,
+        "title": "Bollinger Bands - Zone de Volatilitate",
+        "subtitle": "Când prețul e prea sus sau prea jos",
+        "duration": "10 min",
+        "difficulty": "advanced",
+        "emoji": "📏",
+        "tier": "premium",
+        "content": """
+# Bollinger Bands
+
+## 📏 Ce Sunt?
+
+**Bollinger Bands** = 3 linii pe grafic:
+1. **Upper Band** (sus) - 2 devieri standard peste medie
+2. **Middle Band** (mijloc) - Media mobilă (20 zile)
+3. **Lower Band** (jos) - 2 devieri standard sub medie
+
+## 🎯 Cum Folosești
+
+**Preț atinge Upper Band:**
+- 🔴 SUPRACUMPĂRAT - posibil să scadă
+- **Acțiune:** Ia profit SAU nu cumpăra
+
+**Preț atinge Lower Band:**
+- 🟢 SUPRAVÂNDUT - posibil să crească
+- **Acțiune:** Cumpără (cu Stop Loss!)
+
+**Preț în mijloc (Middle Band):**
+- 🟡 NEUTRU - niciun semnal clar
+
+## ⚡ Squeeze (Strângere)
+
+**Când benzile se STRÂNG:**
+- Volatilitate scăzută
+- **ATENȚIE:** Vine o mișcare MARE!
+- Nu știi direcția (UP sau DOWN)
+- **Așteaptă breakout** apoi intră
+
+## 💡 Strategia Simplă
+
+**Exemplu TLV:**
+1. Preț atinge Lower Band (28 RON)
+2. RSI confirma (< 30)
+3. **CUMPĂRĂ!**
+4. Target: Middle Band (30 RON) sau Upper Band (32 RON)
+5. Stop Loss: Sub Lower Band (27 RON)
+""",
+        "quiz": [
+            {
+                "question": "Prețul atinge Lower Bollinger Band. Ce înseamnă?",
+                "options": [
+                    "E supracumpărat, vinde",
+                    "E supravândut, posibil rebound - cumpără",
+                    "Nimic special",
+                    "Schimbă strategia"
+                ],
+                "correct": 1,
+                "explanation": "Corect! Lower Band = supravândut (oversold). Istoric, prețul tinde să revină către Middle Band. Oportunitate de cumpărare cu SL sub Lower Band!"
+            }
+        ]
+    },
+    {
+        "id": "lesson_12",
+        "module": 4,
+        "order": 12,
+        "title": "Support & Resistance - Zone Cheie",
+        "subtitle": "Unde prețul se oprește",
+        "duration": "14 min",
+        "difficulty": "intermediate",
+        "emoji": "🎚️",
+        "tier": "premium",
+        "content": """
+# Support & Resistance
+
+## 🎚️ Concepte Fundamentale
+
+### **SUPPORT (Suport)** 🟢
+
+**Nivel de preț unde CUMPĂRĂTORII intră masiv**
+
+Exemplu TLV:
+- De 5 ori prețul a scăzut la 28 RON
+- De fiecare dată a reboundat (cumpărători au cumpărat)
+- **28 RON = SUPPORT**
+
+**Acțiune:** Cumpără aproape de support cu SL sub el
+
+### **RESISTANCE (Rezistență)** 🔴
+
+**Nivel de preț unde VÂNZĂTORII vând masiv**
+
+Exemplu TLV:
+- De 3 ori prețul a urcat la 35 RON
+- De fiecare dată a scăzut (vânzători au vândut)
+- **35 RON = RESISTANCE**
+
+**Acțiune:** Vinde aproape de resistance SAU așteaptă breakout
+
+## 🚀 BREAKOUT (Spargere)
+
+**Când prețul TRECE prin resistance:**
+- **Bullish Breakout** → Noul target = next resistance
+- **Vechea resistance** devine **support nou**!
+
+**Când prețul CAD sub support:**
+- **Bearish Breakdown** → Noul target = next support
+- **Vechiul support** devine **resistance nou**!
+
+## 📊 Cum Identifici S&R
+
+1. **Grafic daily** (30-90 zile)
+2. **Caută nivele atinse de 2-3+ ori**
+3. **Trasează linii orizontale**
+4. **Acolo sunt S&R**
+
+## 💡 Trading cu S&R
+
+**Buy la Support:**
+- TLV scade la 28 RON (support)
+- RSI < 35 (confirmare)
+- **Cumpără** la 28.20 RON
+- Stop Loss: 27.50 RON (sub support)
+- Take Profit: 32 RON (resistance)
+
+**Breakout Trade:**
+- Resistance la 35 RON
+- TLV sparge la 35.50 RON (breakout!)
+- Volume mare (confirmare)
+- **Cumpără** la 35.60 RON
+- Stop Loss: 34.80 RON (sub ex-resistance)
+- Take Profit: 38 RON (next resistance)
+""",
+        "quiz": [
+            {
+                "question": "TLV a atins 28 RON de 4 ori în ultima lună și de fiecare dată a reboundat. Ce e 28 RON?",
+                "options": ["Resistance", "Support", "Breakout", "Random"],
+                "correct": 1,
+                "explanation": "Corect! 28 RON e SUPPORT - nivel unde cumpărătorii intră și împing prețul înapoi SUS!"
+            },
+            {
+                "question": "Prețul sparge resistance la 35 RON și merge la 36 RON. Ce devine vechea resistance?",
+                "options": [
+                    "Dispare",
+                    "Rămâne resistance",
+                    "Devine SUPPORT nou",
+                    "Nu contează"
+                ],
+                "correct": 2,
+                "explanation": "Perfect! După breakout, vechea RESISTANCE devine SUPPORT nou. Asta e un concept cheie în analiza tehnică!"
+            }
+        ]
+    },
+    {
+        "id": "lesson_13",
+        "module": 4,
+        "order": 13,
+        "title": "Volume Analysis - Confirmarea Mișcărilor",
+        "subtitle": "Volumul spune adevărul",
+        "duration": "11 min",
+        "difficulty": "advanced",
+        "emoji": "📊",
+        "tier": "premium",
+        "content": """
+# Volume Analysis
+
+## 📊 De Ce Contează Volumul?
+
+**Volumul** = Câte acțiuni au fost tranzacționate
+
+**Preț + Volume Mare** = Mișcare REALĂ (convingere)
+**Preț + Volume Mic** = Mișcare SLABĂ (nesustenabilă)
+
+## 🎯 Reguli Fundamentale
+
+### **1. Creștere + Volume Mare** ✅
+- Bullish puternic
+- Cumpărători convinși
+- **Acțiune:** Cumpără sau ține
+
+### **2. Creștere + Volume Mic** ⚠️
+- Creștere slabă
+- Lipsă convingere
+- **Acțiune:** Fii prudent, posibil fals
+
+### **3. Scădere + Volume Mare** ❌
+- Bearish puternic
+- Panic selling
+- **Acțiune:** Ieși rapid sau nu intra
+
+### **4. Scădere + Volume Mic** 💤
+- Scădere slabă
+- Lipsă interes
+- **Acțiune:** Posibil bottom, așteaptă confirmare
+
+## 🚀 Breakout + Volume
+
+**Breakout VALID:**
+- Preț sparge resistance la 35 RON
+- Volume = **3x media zilnică**
+- **Trade:** Cumpără breakout cu convingere!
+
+**Breakout FALS:**
+- Preț sparge resistance la 35 RON
+- Volume = sub medie
+- **Trade:** NU cumpăra, probabil fals breakout
+
+## 📈 Volume Patterns
+
+**Accumulation (Acumulare):**
+- Preț lateral
+- Volume CREȘTE treptat
+- **Înseamnă:** Smart money cumpără (instituții)
+- **Acțiune:** Pregătește-te pentru breakout UP
+
+**Distribution (Distribuție):**
+- Preț lateral la vârf
+- Volume CREȘTE
+- **Înseamnă:** Smart money vinde
+- **Acțiune:** Ieși sau pregătește SHORT
+""",
+        "quiz": [
+            {
+                "question": "TLV sparge resistance cu volume 5x peste medie. Ce înseamnă?",
+                "options": [
+                    "Breakout fals, ignore",
+                    "Breakout VALID cu convingere - opportunity!",
+                    "Nimic special",
+                    "Trebuie să vinzi"
+                ],
+                "correct": 1,
+                "explanation": "Perfect! Volume mare = convingere. Breakout cu 5x volume = VALID breakout, nu fals. Opportunity de cumpărare!"
+            }
+        ]
+    },
+    {
+        "id": "lesson_14",
+        "module": 4,
+        "order": 14,
+        "title": "Fibonacci Retracements - Nivele Magice",
+        "subtitle": "38.2%, 50%, 61.8% - Unde oprește corecția?",
+        "duration": "13 min",
+        "difficulty": "advanced",
+        "emoji": "🔢",
+        "tier": "premium",
+        "content": """
+# Fibonacci Retracements
+
+## 🔢 Ce Sunt Fibonacci Levels?
+
+**Nivele matematice** unde prețul tinde să se oprească în timpul corecțiilor.
+
+**Nivelele magice:**
+- **23.6%** - Corecție foarte slabă
+- **38.2%** - Corecție ușoară (popular!)
+- **50%** - Corecție medie (psihologic)
+- **61.8%** - Corecție puternică (cel mai puternic!)
+- **78.6%** - Corecție foarte puternică
+
+## 📈 Cum Folosești
+
+**Exemplu Oil:**
+
+**Trending UP:**
+- Oil: 70 USD → 80 USD (trend puternic)
+- Apoi corecție (pullback)
+- **Unde se oprește?**
+
+**Calculul Fibonacci:**
+- Move total: 80 - 70 = 10 USD
+- 38.2% retracement: 80 - (10 × 0.382) = **76.18 USD**
+- 50% retracement: 80 - 5 = **75 USD**
+- 61.8% retracement: 80 - 6.18 = **73.82 USD**
+
+**Trading:**
+- Oil coboară la 76 USD (38.2% fib)
+- **Cumpără aici!** (probabil rebound)
+- SL: Sub 73.50 (sub 61.8%)
+- Target: 80 USD (high anterior) sau 82 USD (extensie)
+
+## 🎯 Golden Ratio (61.8%)
+
+**Cel mai puternic nivel!**
+
+- 61.8% = "Golden ratio" din matematică
+- Istoric, prețul respectă acest nivel cel mai des
+- **Strategie:** Cumpără la 61.8% fib cu SL sub el
+
+## 💡 Fibonacci Extensions
+
+**După breakout, unde merge?**
+
+Extensii comune:
+- **127.2%** - First target
+- **161.8%** - Second target
+- **200%** - Major target
+
+**Exemplu:** Oil break 80 USD → Next target 85 USD (127.2% extensie)
+""",
+        "quiz": [
+            {
+                "question": "Oil urcă de la 70 la 80 USD, apoi coboară. Cel mai probabil nivel de suport e:",
+                "options": [
+                    "73.82 USD (61.8% Fibonacci)",
+                    "90 USD",
+                    "65 USD",
+                    "85 USD"
+                ],
+                "correct": 0,
+                "explanation": "Corect! 61.8% Fibonacci = 73.82 USD e cel mai puternic nivel de retracement. Istoric, prețul respectă acest 'golden ratio'!"
+            }
+        ]
+    },
+    {
+        "id": "lesson_15",
+        "module": 4,
+        "order": 15,
+        "title": "Analiza Fundamentală - Cum Alegi Acțiuni",
+        "subtitle": "Nu doar grafice - businessul contează!",
+        "duration": "16 min",
+        "difficulty": "advanced",
+        "emoji": "🔍",
+        "tier": "premium",
+        "content": """
+# Analiza Fundamentală
+
+## 💼 Ce Este?
+
+**Analiza Fundamentală** = Studiezi BUSINESSUL companiei, nu doar graficele!
+
+**Întrebări cheie:**
+- Face profit compania?
+- Crește veniturile?
+- Are datorii mari?
+- E subevaluată sau supraev aluată?
+
+## 📊 Metrici Esențiali
+
+### **1. P/E Ratio (Price to Earnings)**
+
+**Formula:** Preț acțiune ÷ Profit pe acțiune
+
+**Exemplu TLV:**
+- Preț: 30 RON
+- Profit/acțiune: 3 RON
+- **P/E = 30 ÷ 3 = 10**
+
+**Interpretare:**
+- P/E < 15: IEFTIN (subevaluat)
+- P/E 15-25: FAIR VALUE
+- P/E > 25: SCUMP (supraevaluat)
+
+### **2. ROE (Return on Equity)**
+
+**Cât profit face din capitalul propriu?**
+
+- ROE > 15%: EXCELENT
+- ROE 10-15%: BUN
+- ROE < 10%: SLAB
+
+**TLV ROE = 18%** → Company profitabilă!
+
+### **3. Debt-to-Equity (Datorii)**
+
+**Cât de îndatorată e compania?**
+
+- D/E < 0.5: SIGUR (puține datorii)
+- D/E 0.5-1: OK
+- D/E > 2: RISCANT (datorii mari)
+
+## 🎯 Cum Combini
+
+**Stock Screening:**
+1. P/E < 20 (nu supraevaluat)
+2. ROE > 12% (profitabil)
+3. Debt < 1 (nu prea îndatorat)
+4. Venituri cresc > 10%/an
+
+**Apoi:**
+- Analiza tehnică pentru timing (când cumperi)
+- Support/Resistance pentru entry
+- RSI pentru confirmare
+
+## 💡 Value Investing
+
+**Warren Buffett style:**
+- Caută companii BUNE (ROE mare, datorii mici)
+- Cumpără când sunt IEFTINE (P/E scăzut)
+- Ține pe TERMEN LUNG (ani)
+- Ignoră volatilitatea pe termen scurt
+""",
+        "quiz": [
+            {
+                "question": "Compania A: P/E=8, ROE=20%, Debt=0.3. Compania B: P/E=35, ROE=5%, Debt=2.5. Care e mai atractivă?",
+                "options": [
+                    "Compania A (P/E scăzut, ROE mare, datorii mici)",
+                    "Compania B",
+                    "Ambele la fel",
+                    "Niciuna"
+                ],
+                "correct": 0,
+                "explanation": "Corect! Compania A e MULT mai atractivă: P/E=8 (ieftin!), ROE=20% (foarte profitabil!), Debt=0.3 (puține datorii). Compania B e supraevaluată și riscantă!"
+            }
+        ]
     }
 ]
 
