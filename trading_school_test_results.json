@@ -1,0 +1,727 @@
+{
+  "summary": {
+    "total_tests": 11,
+    "passed_tests": 7,
+    "success_rate": "63.6%",
+    "timestamp": "2025-12-24T23:54:38.671308"
+  },
+  "detailed_results": [
+    {
+      "test_name": "GET /api/trading-school/lessons - All 16 lessons",
+      "success": false,
+      "details": "Validation failed: Expected 16 lessons, got 17",
+      "timestamp": "2025-12-24T23:54:35.515258",
+      "response_sample": {
+        "total": 17,
+        "lesson_count": 17
+      }
+    },
+    {
+      "test_name": "Tier System - 5 free + 11 premium",
+      "success": false,
+      "details": "Validation failed: Expected 11 premium lessons, got 12",
+      "timestamp": "2025-12-24T23:54:35.617295",
+      "response_sample": {
+        "lessons": [
+          {
+            "id": "lesson_1",
+            "module": 1,
+            "order": 1,
+            "title": "Ce Este o Ac\u021biune?",
+            "subtitle": "Fundamentele investi\u021biilor",
+            "duration": "5 min",
+            "difficulty": "beginner",
+            "emoji": "\ud83d\udcc8",
+            "content": "\n# Ce Este o Ac\u021biune?\n\n## \ud83d\udca1 Defini\u021bie Simpl\u0103\n\nO **ac\u021biune** este o bucat\u0103 dintr-o companie. C\u00e2nd cumperi o ac\u021biune, devii **proprietar par\u021bial** al companiei!\n\n## \ud83c\udfe6 Exemplu Concret: Banca Transilvania (TLV)\n\nImagineaz\u0103-\u021bi c\u0103 Banca Transilvania este o pizza \ud83c\udf55:\n- Pizza \u00eentreag\u0103 = \u00centreaga companie\n- O felie = O ac\u021biune\n- Tu cumperi 10 felii = De\u021bii 10 ac\u021biuni\n\n**Dac\u0103 pizzeria valoreaz\u0103 mai mult (compania cre\u0219te) \u2192 feliile tale valoreaz\u0103 mai mult!**\n\n## \ud83d\udcb0 Calculul Simplu\n\n**Exemplu:**\n- 1 ac\u021biune TLV = 30 RON\n- Cumperi 10 ac\u021biuni = 300 RON investi\u021bi\n\n**Dup\u0103 1 lun\u0103:**\n- TLV cre\u0219te la 33 RON (+10%)\n- Ai acum: 10 \u00d7 33 = **330 RON**\n- **Profit: +30 RON (+10%)**\n\n## \u2705 De Re\u021binut\n\n1. Ac\u021biune = proprietate \u00eentr-o companie\n2. Pre\u021b cre\u0219te \u2192 Tu c\u00e2\u0219tigi\n3. Pre\u021b scade \u2192 Tu pierzi\n4. Po\u021bi vinde oric\u00e2nd (dac\u0103 e lichiditate)\n",
+            "quiz": [
+              {
+                "question": "Dac\u0103 ai 10 ac\u021biuni TLV la 30 RON \u0219i pre\u021bul cre\u0219te la 33 RON, c\u00e2t valoreaz\u0103 investi\u021bia ta?",
+                "options": [
+                  "300 RON (la fel)",
+                  "330 RON (cre\u0219te!)",
+                  "270 RON (scade)",
+                  "360 RON"
+                ],
+                "correct": 1,
+                "explanation": "Corect! 10 ac\u021biuni \u00d7 33 RON = 330 RON. Ai f\u0103cut +30 RON profit (+10%)!"
+              },
+              {
+                "question": "Ce \u00eenseamn\u0103 s\u0103 de\u021bii o ac\u021biune?",
+                "options": [
+                  "\u00cemprumu\u021bi bani companiei",
+                  "E\u0219ti proprietar par\u021bial al companiei",
+                  "E\u0219ti angajat al companiei",
+                  "Prime\u0219ti un discount la produse"
+                ],
+                "correct": 1,
+                "explanation": "Exact! C\u00e2nd de\u021bii ac\u021biuni, e\u0219ti co-proprietar al companiei. Dac\u0103 compania merge bine, ac\u021biunile cresc!"
+              }
+            ],
+            "scenario": {
+              "title": "Primul T\u0103u Cump\u0103rare",
+              "description": "Hai s\u0103 cump\u0103r\u0103m prima ac\u021biune \u00eempreun\u0103!",
+              "steps": [
+                {
+                  "step": 1,
+                  "text": "Ai 1,000 RON \u00een cont. Vrei s\u0103 investe\u0219ti \u00een Banca Transilvania (TLV).",
+                  "question": "C\u00e2te ac\u021biuni po\u021bi cump\u0103ra dac\u0103 TLV cost\u0103 30 RON?",
+                  "options": [
+                    "10 ac\u021biuni",
+                    "30 ac\u021biuni",
+                    "33 ac\u021biuni",
+                    "100 ac\u021biuni"
+                  ],
+                  "correct": 2,
+                  "ai_hint": "Calculeaz\u0103: Bani disponibili \u00f7 Pre\u021b per ac\u021biune = 1,000 \u00f7 30 = ?"
+                },
+                {
+                  "step": 2,
+                  "text": "Bravo! Ai cump\u0103rat 33 ac\u021biuni TLV la 30 RON. Investi\u021bie: 990 RON.",
+                  "question": "Dup\u0103 1 lun\u0103, TLV e la 33 RON. Vrei s\u0103 vinzi?",
+                  "options": [
+                    "DA - iau profit",
+                    "NU - a\u0219tept mai mult"
+                  ],
+                  "correct": null,
+                  "ai_feedback": {
+                    "0": "Bun\u0103 decizie! Ai v\u00e2ndut la 33 RON \u00d7 33 = 1,089 RON. Profit: +99 RON (+10%)!",
+                    "1": "Ri\u0219ti mai mult, dar poate cre\u0219te \u0219i mai mult! Sau poate scade..."
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "id": "lesson_2",
+            "module": 1,
+            "order": 2,
+            "title": "Long vs Short - Dou\u0103 Direc\u021bii",
+            "subtitle": "Cum c\u00e2\u0219tigi c\u00e2nd pia\u021ba scade?",
+            "duration": "7 min",
+            "difficulty": "beginner",
+            "emoji": "\u2195\ufe0f",
+            "content": "\n# Long vs Short\n\n## \ud83d\udcc8 LONG (Cump\u0103rare Clasic\u0103)\n\n**Cumperi acum, vinzi mai t\u00e2rziu LA PRE\u021a MAI MARE**\n\n**Exemplu:**\n- Cumperi TLV la 30 RON\n- Vinzi la 35 RON\n- **Profit: +5 RON per ac\u021biune**\n\n\u2705 C\u00e2\u0219tigi c\u00e2nd pre\u021bul CRE\u0218TE\n\u274c Pierzi c\u00e2nd pre\u021bul SCADE\n\n## \ud83d\udcc9 SHORT (V\u00e2nzare \u00een Lips\u0103)\n\n**Vinzi acum (\u00eemprumutat), cumperi \u00eenapoi LA PRE\u021a MAI MIC**\n\n**Exemplu:**\n- \"\u00cemprumu\u021bi\" \u0219i vinzi TLV la 30 RON\n- Cumperi \u00eenapoi la 25 RON\n- **Profit: +5 RON per ac\u021biune**\n\n\u2705 C\u00e2\u0219tigi c\u00e2nd pre\u021bul SCADE\n\u274c Pierzi c\u00e2nd pre\u021bul CRE\u0218TE\n\n## \u26a0\ufe0f Risc SHORT\n\n**LONG:** Pierdere maxim\u0103 = Investi\u021bia ta (pre\u021bul ajunge la 0)\n**SHORT:** Pierdere = INFINIT\u0102! (pre\u021bul poate cre\u0219te la infinit)\n\n**De aceea SHORT e pentru avansa\u021bi!**\n\n## \ud83c\udfaf C\u00e2nd Folose\u0219ti\n\n**LONG:** Crezi c\u0103 compania va merge bine\n**SHORT:** Crezi c\u0103 compania va merge prost (sau pia\u021ba va sc\u0103dea)\n",
+            "quiz": [
+              {
+                "question": "Ai f\u0103cut SHORT pe TLV la 30 RON (100 ac\u021biuni). Pre\u021bul cre\u0219te la 35 RON. C\u00e2t ai pierdut?",
+                "options": [
+                  "+500 RON (profit)",
+                  "-500 RON (pierdere)",
+                  "0 RON",
+                  "-100 RON"
+                ],
+                "correct": 1,
+                "explanation": "Corect, din p\u0103cate! SHORT \u00eenseamn\u0103 c\u0103 c\u00e2\u0219tigi c\u00e2nd scade. C\u00e2nd cre\u0219te, PIERZI! (35-30) \u00d7 100 = -500 RON"
+              },
+              {
+                "question": "De ce SHORT e mai riscant dec\u00e2t LONG?",
+                "options": [
+                  "E ilegal",
+                  "Pierderea poate fi infinit\u0103",
+                  "Nu po\u021bi c\u00e2\u0219tiga bani",
+                  "E mai complicat"
+                ],
+                "correct": 1,
+                "explanation": "Exact! La LONG, pierdere max = investi\u021bia (pre\u021bul ajunge la 0). La SHORT, pre\u021bul poate cre\u0219te la infinit = pierdere infinit\u0103!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_3",
+            "module": 2,
+            "order": 3,
+            "title": "Leverage - Sabie cu Dou\u0103 T\u0103i\u0219uri",
+            "subtitle": "Cum s\u0103 amplifici profitul... \u0219i pierderea",
+            "duration": "10 min",
+            "difficulty": "intermediate",
+            "emoji": "\u26a1",
+            "content": "\n# Leverage (Efect de Levier)\n\n## \ud83d\udcb0 Ce Este?\n\n**Leverage = \u00cemprumu\u021bi bani de la broker pentru a controla mai mul\u021bi bani**\n\nExemplu simplu: E ca \u0219i cum ai cump\u0103ra o cas\u0103 cu credit!\n\n## \ud83c\udfaf Exemplu F\u0103r\u0103 Leverage (1x)\n\n**Investe\u0219ti:**\n- Ai: 1,000 RON\n- Controlezi: 1,000 RON\n- Cumperi Oil la 100 RON = 10 unit\u0103\u021bi\n\n**Oil cre\u0219te la 110 RON (+10%):**\n- Vinzi: 10 \u00d7 110 = 1,100 RON\n- **Profit: +100 RON (+10%)**\n\n## \u26a1 Exemplu CU Leverage 5x\n\n**Investe\u0219ti:**\n- Ai: 1,000 RON (margin)\n- \u00cemprumu\u021bi: 4,000 RON de la broker\n- Controlezi: 5,000 RON total!\n- Cumperi Oil la 100 RON = 50 unit\u0103\u021bi\n\n**Oil cre\u0219te la 110 RON (+10%):**\n- Vinzi: 50 \u00d7 110 = 5,500 RON\n- Returnezi \u00eemprumut: 4,000 RON\n- R\u0103m\u00e2i cu: 1,500 RON\n- **Profit: +500 RON (+50%)** \ud83c\udf89\n\n## \ud83d\udea8 DAR Dac\u0103 Scade?\n\n**Oil scade la 90 RON (-10%):**\n- Vinzi: 50 \u00d7 90 = 4,500 RON\n- Returnezi \u00eemprumut: 4,000 RON\n- R\u0103m\u00e2i cu: 500 RON\n- **Pierdere: -500 RON (-50%)** \ud83d\ude31\n\n## \u26a0\ufe0f Margin Call\n\n**Dac\u0103 pierderile devin prea mari, brokerul \u00ceNCHIDE FOR\u021aAT pozi\u021bia!**\n\nExemplu: Oil scade la 80 RON (-20%)\n- Valoare: 50 \u00d7 80 = 4,000 RON\n- Trebuie s\u0103 returnezi: 4,000 RON\n- **R\u0103m\u00e2i cu: 0 RON - Ai pierdut TOT!** \ud83d\udc80\n\n## \ud83d\udcca Regula de Aur\n\n**Cu leverage 5x:**\n- Dac\u0103 pre\u021bul scade 20% \u2192 PIERZI 100% (TOT!)\n- **NU folosi leverage mare dac\u0103 nu \u0219tii ce faci!**\n\n## \ud83d\udca1 Pentru \u00cencep\u0103tori\n\n- Leverage 1x = SAFE (f\u0103r\u0103 \u00eemprumut)\n- Leverage 2x = OK (cu Stop Loss!)\n- Leverage 5x+ = PERICOL (doar pentru exper\u021bi)\n",
+            "quiz": [
+              {
+                "question": "Ai 1,000 RON, leverage 5x. Cumperi Oil la 100 RON. Oil scade la 80 RON (-20%). C\u00e2t ai pierdut?",
+                "options": [
+                  "200 RON",
+                  "500 RON",
+                  "1,000 RON (TOT!)",
+                  "100 RON"
+                ],
+                "correct": 2,
+                "explanation": "CORECT! Cu 5x leverage, o sc\u0103dere de 20% = pierdere de 100% din margin! Asta e MARGIN CALL - ai pierdut tot!"
+              },
+              {
+                "question": "De ce leverage e 'sabie cu dou\u0103 t\u0103i\u0219uri'?",
+                "options": [
+                  "E ilegal",
+                  "Amplific\u0103 profitul \u0218I pierderea",
+                  "Cost\u0103 mult",
+                  "E complicat"
+                ],
+                "correct": 1,
+                "explanation": "Exact! Leverage amplific\u0103 AMBELE direc\u021bii. +10% devine +50%, dar -10% devine -50%!"
+              },
+              {
+                "question": "Ce leverage e sigur pentru \u00eencep\u0103tori?",
+                "options": [
+                  "10x",
+                  "5x",
+                  "2x cu Stop Loss",
+                  "1x (f\u0103r\u0103 leverage)"
+                ],
+                "correct": 3,
+                "explanation": "Bravo! 1x (f\u0103r\u0103 leverage) e cel mai sigur pentru \u00eenceput. Dup\u0103 ce \u00eenve\u021bi, po\u021bi \u00eencerca 2x cu Stop Loss."
+              }
+            ],
+            "scenario": {
+              "title": "Criza Leverage - \u00cenva\u021b\u0103 din Gre\u0219eli",
+              "steps": [
+                {
+                  "step": 1,
+                  "text": "Ai 5,000 RON. E\u0219ti \u00eencrez\u0103tor \u0219i alegi leverage 10x pentru Oil.",
+                  "ai": "\u26a0\ufe0f Aten\u021bie! Cu 10x leverage, controlezi 50,000 RON! O mi\u0219care de doar -10% \u0219i pierzi TOT!",
+                  "question": "Vrei s\u0103 continui cu 10x sau schimbi la 2x?",
+                  "options": [
+                    "10x - sunt sigur!",
+                    "2x - mai sigur"
+                  ],
+                  "correct": 1
+                },
+                {
+                  "step": 2,
+                  "text": "Ai ales 2x (smart!). Cumperi Oil la 75 RON.",
+                  "ai": "Bun\u0103 decizie! Cu 2x leverage \u0219i 5,000 RON margin, controlezi 10,000 RON.",
+                  "question": "Setezi Stop Loss?",
+                  "options": [
+                    "DA - la -5% (71.25 RON)",
+                    "NU - risc tot"
+                  ],
+                  "correct": 0
+                },
+                {
+                  "step": 3,
+                  "text": "Perfect! Ai setat SL la 71.25 RON. Oil scade la 70 RON (-6.7%).",
+                  "ai": "\ud83d\udee1\ufe0f STOP LOSS ACTIVAT! Pozi\u021bia \u00eenchis\u0103 la 71.25 RON. Pierdere: -500 RON (-10%). DAR te-a salvat de pierderi mai mari!",
+                  "question": "Ce s-ar fi \u00eent\u00e2mplat F\u0102R\u0102 Stop Loss?",
+                  "calculation": "La 70 RON: Pierdere = (75-70) \u00d7 133 \u00d7 2 = -1,330 RON (-26.6%)"
+                }
+              ]
+            }
+          },
+          {
+            "id": "lesson_4",
+            "module": 2,
+            "order": 4,
+            "title": "Stop Loss - Asigurarea Ta",
+            "subtitle": "Cum s\u0103 nu pierzi tot",
+            "duration": "8 min",
+            "difficulty": "beginner",
+            "emoji": "\ud83d\udee1\ufe0f",
+            "content": "\n# Stop Loss - Asigurarea Ta\n\n## \ud83d\udca1 Ce Este?\n\n**Stop Loss** = Ordin automat de v\u00e2nzare c\u00e2nd pre\u021bul scade la un nivel setat de tine.\n\n**E ca o plas\u0103 de siguran\u021b\u0103 la circ!** \ud83c\udfaa\n\n## \ud83c\udfaf Cum Func\u021bioneaz\u0103?\n\n**Exemplu:**\n1. Cumperi TLV la 30 RON (100 ac\u021biuni = 3,000 RON)\n2. Setezi **Stop Loss la 28.5 RON** (-5%)\n3. Dac\u0103 TLV scade la 28.5 \u2192 VINDE AUTOMAT!\n\n**Rezultat:** Pierdere maxim\u0103 = -150 RON (-5%)\n\n## \ud83d\udcca Scenariul F\u0103r\u0103 SL\n\n**Ce se \u00eent\u00e2mpl\u0103 dac\u0103 NU setezi Stop Loss?**\n\n**Ziua 1:** TLV = 29 RON (-3.3%) \u2192 \"Mai a\u0219tept...\"\n**Ziua 2:** TLV = 27 RON (-10%) \u2192 \"Sigur cre\u0219te...\"\n**Ziua 3:** TLV = 24 RON (-20%) \u2192 \"\ud83d\ude31 Am pierdut 600 RON!\"\n\n**Cu Stop Loss:** Ai fi pierdut doar 150 RON \u0219i \u00eenchideai la -5%!\n\n## \u26a1 Stop Loss + Leverage\n\n**CRITIC:** Cu leverage, Stop Loss e OBLIGATORIU!\n\nExemplu leverage 5x:\n- Investe\u0219ti: 1,000 RON\n- Controlezi: 5,000 RON\n- F\u0103r\u0103 SL: O sc\u0103dere de -20% = PIERZI TOT!\n- Cu SL la -5%: Pierdere max = -250 RON (controlabil)\n\n## \ud83d\udca1 Unde Setezi SL?\n\n**Reguli practice:**\n- **Day trading:** -2% p\u00e2n\u0103 -5%\n- **Swing trading:** -5% p\u00e2n\u0103 -10%\n- **Long-term:** -10% p\u00e2n\u0103 -15%\n\n**Cu leverage:** \u00ceNTOTDEAUNA mai strict! (-3% max cu 5x leverage)\n",
+            "quiz": [
+              {
+                "question": "Ai 3,000 RON investi\u021bi \u00een TLV la 30 RON. Setezi SL la 28.5 RON (-5%). Pre\u021bul scade la 27 RON. Ce se \u00eent\u00e2mpl\u0103?",
+                "options": [
+                  "Pierzi tot (3,000 RON)",
+                  "Pozi\u021bia se \u00eenchide la 28.5, pierzi ~150 RON",
+                  "Nu se \u00eent\u00e2mpl\u0103 nimic",
+                  "Trebuie s\u0103 vinzi manual"
+                ],
+                "correct": 1,
+                "explanation": "Corect! SL se activeaz\u0103 automat la 28.5 RON, limit\u00e2nd pierderea la -5% (~150 RON). Te salveaz\u0103 de sc\u0103derea la 27 RON!"
+              },
+              {
+                "question": "Cu leverage 5x, unde e SIGUR s\u0103 setezi Stop Loss?",
+                "options": [
+                  "-20%",
+                  "-10%",
+                  "-3%",
+                  "Nu e nevoie"
+                ],
+                "correct": 2,
+                "explanation": "Corect! Cu 5x leverage, -20% \u00een pre\u021b = -100% pierdere (TOT). SL la -3% te protejeaz\u0103: -3% \u00d7 5 = -15% pierdere (controlabil)."
+              }
+            ]
+          },
+          {
+            "id": "lesson_5",
+            "module": 2,
+            "order": 5,
+            "title": "Diversificarea - Nu Pune Toate Ou\u0103le \u00eentr-un Co\u0219",
+            "subtitle": "Cum s\u0103 reduci riscul",
+            "duration": "6 min",
+            "difficulty": "intermediate",
+            "emoji": "\ud83c\udfaf",
+            "content": "\n# Diversificarea Portofoliului\n\n## \ud83e\udd5a Regula Ou\u0103lor\n\n**\"Nu pune toate ou\u0103le \u00eentr-un singur co\u0219\"**\n\nDac\u0103 scapi co\u0219ul \u2192 TOATE ou\u0103le se sparg! \ud83d\ude31\n\n\u00cen trading:\n- 1 co\u0219 = 1 ac\u021biune = RISC MARE\n- 5-10 co\u0219uri = 5-10 ac\u021biuni = RISC REDUS\n\n## \ud83d\udcca Exemplu Practic\n\n**Portofoliu PROST (nediversificat):**\n- 10,000 RON \u2192 TOT \u00een TLV\n- TLV scade 20% \u2192 Pierzi 2,000 RON (-20%)\n\n**Portofoliu BUN (diversificat):**\n- 2,000 RON \u2192 TLV (banc\u0103)\n- 2,000 RON \u2192 H2O (energie)\n- 2,000 RON \u2192 SNP (petrol)\n- 2,000 RON \u2192 Gold (aur)\n- 2,000 RON \u2192 S&P 500 (indice US)\n\n**Dac\u0103 TLV scade 20%:**\n- TLV: -400 RON\n- Celelalte stabile sau cresc\n- **Pierdere total\u0103: -200 RON (-2%)** \u00een loc de -20%!\n\n## \ud83c\udfaf Reguli de Diversificare\n\n1. **Sectoare diferite:** Banc\u0103 + Energie + Tech\n2. **Geografii diferite:** Rom\u00e2nia + SUA + Europa\n3. **Clase de active:** Ac\u021biuni + Aur + Forex\n4. **5-10 pozi\u021bii** diferite (nu 1, nu 100)\n\n## \u26a0\ufe0f Gre\u0219eal\u0103 Comun\u0103\n\n**\"Diversific \u00een 10 ac\u021biuni din acela\u0219i sector\"**\n\nExemplu: 10 b\u0103nci rom\u00e2ne\u0219ti \u2192 TOATE scad c\u00e2nd sectorul bancar scade!\n\n**Diversificare REAL\u0102:** Banc\u0103 + Energie + Tech + Aur + Forex\n",
+            "quiz": [
+              {
+                "question": "Ai 10,000 RON. Ce portofoliu e mai bine diversificat?",
+                "options": [
+                  "10,000 RON \u00een TLV",
+                  "5,000 TLV + 5,000 BRD (ambele b\u0103nci)",
+                  "2,000 TLV + 2,000 H2O + 2,000 SNP + 2,000 Gold + 2,000 S&P500",
+                  "1,000 RON \u00een 10 ac\u021biuni diferite"
+                ],
+                "correct": 2,
+                "explanation": "Perfect! Op\u021biunea C diversific\u0103 pe sectoare (banc\u0103, energie, petrol, aur, indice global). Celelalte sunt fie concentrate (A,B) fie prea fragmentate (D)."
+              }
+            ]
+          },
+          {
+            "id": "lesson_6",
+            "module": 3,
+            "order": 6,
+            "title": "Psihologia Tradingului - Emo\u021biile Tale",
+            "subtitle": "Cum s\u0103 nu la\u0219i frica \u0219i l\u0103comia s\u0103 decid\u0103",
+            "duration": "12 min",
+            "difficulty": "intermediate",
+            "emoji": "\ud83e\udde0",
+            "tier": "premium",
+            "content": "\n# Psihologia Tradingului\n\n## \ud83e\udde0 Cel Mai Mare Du\u0219man: TU \u00ceNSU\u021aI\n\n**90% din traderi pierd bani NU pentru c\u0103 nu \u0219tiu analiza, ci pentru c\u0103 nu-\u0219i controleaz\u0103 emo\u021biile!**\n\n## \ud83d\ude28 FRICA (Fear)\n\n**Scenariul:**\n- Ai profit de +100 RON (+10%)\n- Frica: \"Dac\u0103 scade? Mai bine v\u00e2nd ACUM!\"\n- Vinzi prea devreme\n- Ac\u021biunea cre\u0219te la +50% f\u0103r\u0103 tine \ud83d\ude22\n\n**Regula:** Seteaz\u0103 Take Profit \u00een avans, nu decide emo\u021bional!\n\n## \ud83e\udd11 L\u0102COMIA (Greed)\n\n**Scenariul:**\n- Ai profit de +500 RON (+50%)\n- L\u0103comia: \"Poate cre\u0219te la +100%!\"\n- A\u0219tep\u021bi prea mult\n- Ac\u021biunea scade la +10% \ud83d\ude31\n- Ai pierdut +400 RON profit!\n\n**Regula:** Respect\u0103-\u021bi planul! Take Profit setat = execut\u0103!\n\n## \ud83c\udfb2 FOMO (Fear of Missing Out)\n\n**Scenariul:**\n- Vezi \u0219tirea: \"Bitcoin +20% azi!\"\n- FOMO: \"Trebuie s\u0103 cump\u0103r ACUM!\"\n- Cumperi la v\u00e2rf (all-time high)\n- Scade 30% a doua zi \ud83d\udc80\n\n**Regula:** NU cump\u0103ra din FOMO! Analizeaz\u0103 \u00eenainte!\n\n## \ud83d\udc94 Revenge Trading\n\n**Scenariul:**\n- Pierzi 500 RON pe Oil\n- Furie: \"Vreau banii \u00eenapoi!\"\n- Intri imediat \u00een alt\u0103 pozi\u021bie (f\u0103r\u0103 analiz\u0103)\n- Pierzi \u00eenc\u0103 500 RON \ud83d\ude2d\n\n**Regula:** Dup\u0103 pierdere \u2192 PAUZ\u0102! Nu trade emo\u021bional!\n\n## \u2705 Reguli de Aur\n\n1. **F\u0103 un PLAN** \u00eenainte de trade\n2. **Respect\u0103-\u021bi Stop Loss** (nu-l mu\u021bi!)\n3. **Nu trade dup\u0103 pierderi mari** (pauz\u0103 24h)\n4. **Seteaz\u0103 limite zilnice** (max 3 trades/zi)\n5. **Jurnal de trading** (noteaz\u0103 de ce ai intrat/ie\u0219it)\n",
+            "quiz": [
+              {
+                "question": "Ai +200 RON profit (+20%). Frica te face s\u0103 vinzi. Ac\u021biunea apoi cre\u0219te la +50%. Ce gre\u0219eal\u0103 ai f\u0103cut?",
+                "options": [
+                  "Ai v\u00e2ndut prea devreme din FRIC\u0102",
+                  "Ai a\u0219teptat prea mult din L\u0102COMIE",
+                  "Ai cump\u0103rat din FOMO",
+                  "Revenge trading"
+                ],
+                "correct": 0,
+                "explanation": "Corect! FRICA te-a f\u0103cut s\u0103 vinzi prea devreme. Dac\u0103 aveai Take Profit setat \u00een avans, nu d\u0103deai emo\u021biilor s\u0103 decid\u0103!"
+              },
+              {
+                "question": "Dup\u0103 ce pierzi 500 RON, ce ar trebui s\u0103 faci?",
+                "options": [
+                  "Intru imediat \u00een alt trade s\u0103 recuperez",
+                  "PAUZ\u0102 24h - nu tradez emo\u021bional",
+                  "Cresc leverage-ul pentru recovery rapid",
+                  "Schimb strategia complet"
+                ],
+                "correct": 1,
+                "explanation": "Perfect! Dup\u0103 pierdere mare, ia o PAUZ\u0102. Revenge trading = calea spre pierderi mai mari. Lini\u0219te\u0219te-te, analizeaz\u0103 ce-a mers prost, apoi revino."
+              }
+            ]
+          },
+          {
+            "id": "lesson_7",
+            "module": 3,
+            "order": 7,
+            "title": "Cum Cite\u0219ti un Grafic - Candlesticks",
+            "subtitle": "Limbajul vizual al pie\u021bei",
+            "duration": "15 min",
+            "difficulty": "intermediate",
+            "emoji": "\ud83d\udcca",
+            "tier": "premium",
+            "content": "\n# Cum Cite\u0219ti Graficele - Candlesticks\n\n## \ud83d\udd6f\ufe0f Ce Este un Candlestick?\n\nUn **candlestick** (lum\u00e2nare) arat\u0103 4 pre\u021buri \u00eentr-o perioad\u0103 (1 min, 5 min, 1 zi):\n\n1. **Open** (deschidere)\n2. **Close** (\u00eenchidere)\n3. **High** (maxim)\n4. **Low** (minim)\n\n## \ud83d\udfe2 Green Candle (Bullish)\n\n```\n      |  \u2190 High (maxim)\n    \u250c\u2500\u2500\u2500\u2510\n    \u2502   \u2502 \u2190 Body (Open \u2192 Close)\n    \u2502   \u2502\n    \u2514\u2500\u2500\u2500\u2518 \u2190 Close (mai sus)\n      |  \u2190 Open\n      |  \u2190 Low (minim)\n```\n\n**\u00censeamn\u0103:** Pre\u021bul a CRESCUT (close > open) \u2192 Cump\u0103r\u0103tori au c\u00e2\u0219tigat!\n\n## \ud83d\udd34 Red Candle (Bearish)\n\n```\n      |  \u2190 High\n      |  \u2190 Open (mai sus)\n    \u250c\u2500\u2500\u2500\u2510\n    \u2502   \u2502 \u2190 Body (Open \u2192 Close)\n    \u2514\u2500\u2500\u2500\u2518 \u2190 Close (mai jos)\n      |  \u2190 Low\n```\n\n**\u00censeamn\u0103:** Pre\u021bul a SC\u0102ZUT (close < open) \u2192 V\u00e2nz\u0103tori au c\u00e2\u0219tigat!\n\n## \ud83d\udcc8 Pattern-uri Importante\n\n**1. Hammer (Ciocan)** \ud83d\udd28\n- Body mic sus\n- Shadow lung jos\n- **Semnifica\u021bie:** V\u00e2nz\u0103torii au \u00eencercat s\u0103 coboare pre\u021bul, dar cump\u0103r\u0103torii l-au \u00eempins \u00eenapoi SUS\n- **Semnal:** Posibil\u0103 CRE\u0218TERE\n\n**2. Shooting Star (Stea C\u0103z\u0103toare)** \u2b50\n- Body mic jos\n- Shadow lung sus\n- **Semnifica\u021bie:** Cump\u0103r\u0103torii au \u00eencercat s\u0103 urce pre\u021bul, dar v\u00e2nz\u0103torii l-au tras \u00eenapoi JOS\n- **Semnal:** Posibil\u0103 SC\u0102DERE\n\n**3. Doji (Cruce)** \u271d\ufe0f\n- Open = Close (aproape)\n- Shadows egale\n- **Semnifica\u021bie:** INDECIS - nimeni nu c\u00e2\u0219tig\u0103\n- **Semnal:** Posibil\u0103 SCHIMBARE de trend\n\n## \ud83d\udca1 Cum Folose\u0219ti \u00een Trading\n\n**Green candles multe la r\u00e2nd** \u2192 Trend UP (bullish)\n**Red candles multe la r\u00e2nd** \u2192 Trend DOWN (bearish)\n**Pattern Hammer la baz\u0103** \u2192 Posibil rebound (cump\u0103r\u0103!)\n**Pattern Shooting Star la v\u00e2rf** \u2192 Posibil\u0103 corec\u021bie (vinde!)\n",
+            "quiz": [
+              {
+                "question": "Un candle VERDE (green) \u00eenseamn\u0103:",
+                "options": [
+                  "Pre\u021bul a sc\u0103zut",
+                  "Pre\u021bul a crescut (close > open)",
+                  "Pre\u021bul e stabil",
+                  "Volumul e mare"
+                ],
+                "correct": 1,
+                "explanation": "Corect! Green candle = Close mai sus dec\u00e2t Open = pre\u021bul a CRESCUT \u00een acea perioad\u0103. Cump\u0103r\u0103torii au c\u00e2\u0219tigat!"
+              },
+              {
+                "question": "Pattern 'Hammer' (ciocan) la baza unui trend de sc\u0103dere semnaleaz\u0103:",
+                "options": [
+                  "Va continua s\u0103 scad\u0103",
+                  "Posibil rebound (cre\u0219tere)",
+                  "Nu \u00eenseamn\u0103 nimic",
+                  "Trebuie s\u0103 vinzi"
+                ],
+                "correct": 1,
+                "explanation": "Perfect! Hammer la baz\u0103 = v\u00e2nz\u0103torii au \u00eencercat s\u0103 coboare dar cump\u0103r\u0103torii i-au oprit. Semnal de posibil\u0103 inversare UP!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_8",
+            "module": 3,
+            "order": 8,
+            "title": "Indicatori Tehnici - RSI",
+            "subtitle": "Cel mai popular indicator pentru \u00eencep\u0103tori",
+            "duration": "10 min",
+            "difficulty": "intermediate",
+            "emoji": "\ud83d\udcc9",
+            "tier": "premium",
+            "content": "\n# RSI - Relative Strength Index\n\n## \ud83d\udcca Ce Este RSI?\n\n**RSI** m\u0103soar\u0103 dac\u0103 o ac\u021biune este:\n- **Supracump\u0103rat\u0103** (overbought) \u2192 Posibil s\u0103 scad\u0103\n- **Suprav\u00e2ndut\u0103** (oversold) \u2192 Posibil s\u0103 creasc\u0103\n\n**Scal\u0103:** 0 - 100\n\n## \ud83c\udfaf Cum Cite\u0219ti RSI\n\n```\n100 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Extrem supracump\u0103rat\n 70 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 ZONA RO\u0218IE (Overbought)\n 50 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Neutru\n 30 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 ZONA VERDE (Oversold)\n  0 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Extrem suprav\u00e2ndut\n```\n\n**Reguli Simple:**\n- \ud83d\udd34 **RSI > 70:** SUPRACUMP\u0102RAT \u2192 Posibil s\u0103 scad\u0103 (ia profit sau nu cump\u0103ra!)\n- \ud83d\udfe2 **RSI < 30:** SUPRAV\u00c2NDUT \u2192 Posibil s\u0103 creasc\u0103 (oportunitate cump\u0103rare!)\n- \ud83d\udfe1 **RSI 30-70:** NEUTRU \u2192 Niciun semnal clar\n\n## \ud83d\udca1 Strategia Simpl\u0103\n\n**Exemplu TLV:**\n\n**Ziua 1:** RSI = 75 (supracump\u0103rat)\n- **NU cump\u0103ra!** E prea sus\n- A\u0219teapt\u0103 corec\u021bie\n\n**Ziua 5:** RSI = 28 (suprav\u00e2ndut)\n- **Oportunitate!** Cump\u0103r\u0103\n- TLV a sc\u0103zut prea mult, probabil rebound\n\n**Ziua 10:** RSI = 72 (supracump\u0103rat din nou)\n- **Vinde!** Ia profit\n- E din nou prea sus\n\n**Profit:** Ai cump\u0103rat jos (RSI 28) \u0219i ai v\u00e2ndut sus (RSI 72)!\n\n## \u26a0\ufe0f Aten\u021bie - RSI Nu E Magic!\n\n**RSI poate r\u0103m\u00e2ne \u00een extrem\u0103 mult timp!**\n\n- RSI > 70 timp de s\u0103pt\u0103m\u00e2ni (trend puternic UP)\n- RSI < 30 timp de s\u0103pt\u0103m\u00e2ni (trend puternic DOWN)\n\n**Regula:** Combin\u0103 RSI cu alte semnale (trend, volume, news)\n\n## \ud83c\udfaf RSI + Stop Loss\n\n**C\u00e2nd cumperi la RSI 28:**\n- Seteaz\u0103 SL la -5% sub entry\n- Dac\u0103 nu cre\u0219te \u00een 2-3 zile \u2192 Ie\u0219i\n- NU a\u0219teptat infinit \"s\u0103 revin\u0103\"\n",
+            "quiz": [
+              {
+                "question": "TLV are RSI = 78. Ce ar trebui s\u0103 faci?",
+                "options": [
+                  "Cump\u0103r - e \u00een cre\u0219tere!",
+                  "NU cump\u0103r - e supracump\u0103rat, risc de corec\u021bie",
+                  "Cump\u0103r cu leverage mare",
+                  "Short - sigur scade"
+                ],
+                "correct": 1,
+                "explanation": "Corect! RSI 78 = SUPRACUMP\u0102RAT. Riscant s\u0103 cumperi acum. Mai bine a\u0219tep\u021bi corec\u021bie la RSI < 50 sau < 30."
+              },
+              {
+                "question": "RSI < 30 \u00eenseamn\u0103 \u00ceNTOTDEAUNA c\u0103 trebuie s\u0103 cumperi?",
+                "options": [
+                  "DA - e semnal sigur!",
+                  "NU - e doar un indicator, combin\u0103 cu al\u021bii",
+                  "DA - dar cu leverage mare",
+                  "NU - e semnal de v\u00e2nzare"
+                ],
+                "correct": 1,
+                "explanation": "Perfect! RSI < 30 e un SEMNAL bun, dar NU garantat. Combin\u0103 cu trend, volume, news. \u0218i \u00ceNTOTDEAUNA folose\u0219te Stop Loss!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_9",
+            "module": 3,
+            "order": 9,
+            "title": "MACD - Moving Average Convergence Divergence",
+            "subtitle": "Indicator de trend \u0219i momentum",
+            "duration": "12 min",
+            "difficulty": "advanced",
+            "emoji": "\ud83d\udcc8",
+            "tier": "premium",
+            "content": "\n# MACD - Indicator de Trend\n\n## \ud83d\udcca Ce Este MACD?\n\n**MACD** arat\u0103:\n1. **Direc\u021bia trendului** (UP sau DOWN)\n2. **Puterea trendului** (puternic sau slab)\n3. **Posibile invers\u0103ri** (c\u00e2nd se schimb\u0103 trendul)\n\n**Componente:**\n- **MACD Line** (linia rapid\u0103)\n- **Signal Line** (linia lent\u0103)\n- **Histogram** (diferen\u021ba dintre ele)\n\n## \ud83c\udfaf Semnale de Trading\n\n### **Semnal CUMP\u0102RARE** \u2705\n- MACD Line trece PESTE Signal Line\n- Histogram devine POZITIV (verde)\n- **\u00censeamn\u0103:** Momentum UP, trend bullish \u00eencepe!\n\n### **Semnal V\u00c2NZARE** \u274c\n- MACD Line trece SUB Signal Line\n- Histogram devine NEGATIV (ro\u0219u)\n- **\u00censeamn\u0103:** Momentum DOWN, trend bearish \u00eencepe!\n\n## \ud83d\udca1 Divergen\u021be (Advanced)\n\n### **Divergen\u021b\u0103 Bullish** (Cump\u0103rare!)\n- Pre\u021b: Face LOW mai jos\n- MACD: Face LOW mai sus\n- **\u00censeamn\u0103:** V\u00e2nz\u0103torii sl\u0103besc, posibil rebound!\n\n### **Divergen\u021b\u0103 Bearish** (V\u00e2nzare!)\n- Pre\u021b: Face HIGH mai sus\n- MACD: Face HIGH mai jos\n- **\u00censeamn\u0103:** Cump\u0103r\u0103torii sl\u0103besc, posibil\u0103 corec\u021bie!\n\n## \ud83c\udfaf Strategia Simpl\u0103\n\n**Exemplu Oil:**\n1. A\u0219teapt\u0103 MACD cross (linia trece peste signal)\n2. Confirm\u0103 cu RSI (nu fie > 70)\n3. Intr\u0103 \u00een pozi\u021bie\n4. Seteaz\u0103 SL la -5%\n5. Ie\u0219i c\u00e2nd MACD cross invers SAU Take Profit\n\n## \u26a0\ufe0f False Signals\n\n**MACD d\u0103 multe false signals \u00een pie\u021be laterale!**\n\n**Best use:** Trending markets (c\u00e2nd e clar UP sau DOWN)\n**Evit\u0103:** Sideways/choppy markets\n",
+            "quiz": [
+              {
+                "question": "MACD Line trece PESTE Signal Line. Ce \u00eenseamn\u0103?",
+                "options": [
+                  "Semnal V\u00c2NZARE",
+                  "Semnal CUMP\u0102RARE",
+                  "Nimic special",
+                  "Trebuie s\u0103 a\u0219tept"
+                ],
+                "correct": 1,
+                "explanation": "Corect! MACD cross UP (peste signal) = semnal BULLISH de cump\u0103rare. Momentum se schimb\u0103 \u00een favoarea cump\u0103r\u0103torilor!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_10",
+            "module": 4,
+            "order": 10,
+            "title": "Strategii de Trading - Day Trading",
+            "subtitle": "Cum s\u0103 c\u00e2\u0219tigi \u00een aceea\u0219i zi",
+            "duration": "15 min",
+            "difficulty": "advanced",
+            "emoji": "\u26a1",
+            "tier": "premium",
+            "content": "\n# Day Trading - Tranzac\u021bii Intraday\n\n## \u23f0 Ce Este Day Trading?\n\n**Cumperi \u0219i vinzi \u00een ACEEA\u0218I ZI!**\n\nCaracteristici:\n- Pozi\u021bii deschise: 5 min - 8 ore\n- \u00cenchizi TOATE pozi\u021biile \u00eenainte de closing\n- Profi\u021bi din mi\u0219c\u0103ri mici (1-3%)\n- Multe tranzac\u021bii (5-20/zi)\n\n## \ud83d\udcb0 Exemplu Realist\n\n**Diminea\u021b\u0103 09:00:**\n- Oil = 75.00 USD\n- RSI = 32 (oversold)\n- MACD = Bullish cross\n- **CUMP\u0102R:** 100 unit\u0103\u021bi cu 2x leverage\n\n**Dup\u0103-mas\u0103 14:00:**\n- Oil = 76.50 USD (+2%)\n- RSI = 68 (aproape overbought)\n- **V\u00c2ND:** Profit = (76.50 - 75.00) \u00d7 100 \u00d7 2 = **+300 USD**\n\n**Timp total:** 5 ore\n**Profit:** +300 USD (+40% cu 2x leverage)\n\n## \ud83c\udfaf Reguli Day Trading\n\n1. **Volatilitate mare** (Oil, Gold, Forex)\n2. **Lichiditate mare** (cumperi/vinzi instant)\n3. **Stop Loss STRICT** (-1% p\u00e2n\u0103 -2%)\n4. **Profit mic dar sigur** (+1% p\u00e2n\u0103 +3%)\n5. **Ratio 2:1** (risc 1% pentru profit 2%)\n\n## \u26a0\ufe0f Riscuri Day Trading\n\n**1. Overtrading**\n- Prea multe trades \u2192 Pierderi din comisioane\n- Oboseal\u0103 \u2192 Decizii proaste\n\n**2. Stress Mare**\n- Monitorizare constant\u0103 (8 ore/zi)\n- Presiune psihologic\u0103\n\n**3. Capital Mare Necesar**\n- Pentru profit decent din +1-2% mi\u0219c\u0103ri\n\n## \u2705 E Day Trading Pentru Tine?\n\n**DA dac\u0103:**\n- \u2705 Ai timp 4-8 ore/zi\n- \u2705 Po\u021bi lua decizii rapide\n- \u2705 Rezist\u0103 la stress\n- \u2705 Ai capital > 10,000 USD\n\n**NU dac\u0103:**\n- \u274c Ai job full-time\n- \u274c Vrei \"bani u\u0219ori\"\n- \u274c Capital mic < 5,000 USD\n- \u274c Nu e\u0219ti disciplinat\n",
+            "quiz": [
+              {
+                "question": "Care e diferen\u021ba principal\u0103 \u00eentre Day Trading \u0219i Swing Trading?",
+                "options": [
+                  "Day trading = \u00eenchizi tot \u00een aceea\u0219i zi",
+                  "Day trading = leverage mai mare",
+                  "Nu exist\u0103 diferen\u021b\u0103",
+                  "Day trading = mai pu\u021bin risc"
+                ],
+                "correct": 0,
+                "explanation": "Corect! Day trading = TOATE pozi\u021biile se \u00eenchid \u00eenainte de closing. Swing trading = \u021bii pozi\u021bii 2-10 zile."
+              }
+            ]
+          },
+          {
+            "id": "lesson_10",
+            "module": 4,
+            "order": 10,
+            "title": "Swing Trading - Tranzac\u021bii pe Zile",
+            "subtitle": "Profituri medii, risc moderat",
+            "duration": "12 min",
+            "difficulty": "intermediate",
+            "emoji": "\ud83c\udf0a",
+            "tier": "premium",
+            "content": "\n# Swing Trading\n\n## \ud83c\udf0a Ce Este?\n\n**Swing Trading** = \u021aii pozi\u021bii **3-10 zile** pentru a profita de \"swing-uri\" (oscila\u021bii) de pre\u021b.\n\n**Diferen\u021b\u0103 fa\u021b\u0103 de:**\n- Day Trading: \u00cenchizi \u00een aceea\u0219i zi\n- Swing: \u021aii 3-10 zile\n- Position: \u021aii s\u0103pt\u0103m\u00e2ni-luni\n\n## \ud83d\udca1 Exemplu Real\n\n**Luni:** TLV = 28 RON, RSI = 25 (oversold)\n- **Cumperi** 100 ac\u021biuni = 2,800 RON\n- Stop Loss: 26.50 RON (-5%)\n- Take Profit: 31 RON (+10%)\n\n**Mar\u021bi-Joi:** Oscileaz\u0103 28-29 RON (a\u0219tep\u021bi...)\n\n**Vineri:** TLV = 31 RON! (+10%)\n- **Take Profit activat!**\n- Profit: +300 RON \u00een 5 zile\n\n## \ud83c\udfaf Avantaje Swing Trading\n\n\u2705 **Nu trebuie s\u0103 monitorizezi 8 ore/zi**\n\u2705 **Profituri mai mari** (5-15% per trade)\n\u2705 **Mai pu\u021bin stress** dec\u00e2t day trading\n\u2705 **Compatibil cu job full-time**\n\n## \u26a0\ufe0f Riscuri\n\n\u274c **Overnight risk** - evenimente peste noapte\n\u274c **Mai mult capital blocat** (3-10 zile)\n\u274c **Gap-uri** (pre\u021b deschide diferit de closing)\n\n## \ud83d\udca1 Strategia Simpl\u0103\n\n1. **Caut\u0103 ac\u021biuni \u00een trend**\n2. **A\u0219teapt\u0103 pullback** (corec\u021bie temporar\u0103)\n3. **Intr\u0103 c\u00e2nd RSI < 35** \u0219i trend UP\n4. **Stop Loss -5%**, Take Profit +10-15%\n5. **\u021aine 3-10 zile** max\n6. **Ie\u0219i la TP sau SL**\n",
+            "quiz": [
+              {
+                "question": "Care e avantajul principal al Swing Trading fa\u021b\u0103 de Day Trading?",
+                "options": [
+                  "Profituri mai mari per trade",
+                  "Nu trebuie s\u0103 monitorizezi tot timpul",
+                  "Mai pu\u021bin risc",
+                  "Toate de mai sus"
+                ],
+                "correct": 3,
+                "explanation": "Corect! Swing trading combin\u0103: profituri mai mari (5-15%), mai pu\u021bin timp de monitorizare (check 2x/zi), \u0219i e compatibil cu job full-time!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_11",
+            "module": 4,
+            "order": 11,
+            "title": "Bollinger Bands - Zone de Volatilitate",
+            "subtitle": "C\u00e2nd pre\u021bul e prea sus sau prea jos",
+            "duration": "10 min",
+            "difficulty": "advanced",
+            "emoji": "\ud83d\udccf",
+            "tier": "premium",
+            "content": "\n# Bollinger Bands\n\n## \ud83d\udccf Ce Sunt?\n\n**Bollinger Bands** = 3 linii pe grafic:\n1. **Upper Band** (sus) - 2 devieri standard peste medie\n2. **Middle Band** (mijloc) - Media mobil\u0103 (20 zile)\n3. **Lower Band** (jos) - 2 devieri standard sub medie\n\n## \ud83c\udfaf Cum Folose\u0219ti\n\n**Pre\u021b atinge Upper Band:**\n- \ud83d\udd34 SUPRACUMP\u0102RAT - posibil s\u0103 scad\u0103\n- **Ac\u021biune:** Ia profit SAU nu cump\u0103ra\n\n**Pre\u021b atinge Lower Band:**\n- \ud83d\udfe2 SUPRAV\u00c2NDUT - posibil s\u0103 creasc\u0103\n- **Ac\u021biune:** Cump\u0103r\u0103 (cu Stop Loss!)\n\n**Pre\u021b \u00een mijloc (Middle Band):**\n- \ud83d\udfe1 NEUTRU - niciun semnal clar\n\n## \u26a1 Squeeze (Str\u00e2ngere)\n\n**C\u00e2nd benzile se STR\u00c2NG:**\n- Volatilitate sc\u0103zut\u0103\n- **ATEN\u021aIE:** Vine o mi\u0219care MARE!\n- Nu \u0219tii direc\u021bia (UP sau DOWN)\n- **A\u0219teapt\u0103 breakout** apoi intr\u0103\n\n## \ud83d\udca1 Strategia Simpl\u0103\n\n**Exemplu TLV:**\n1. Pre\u021b atinge Lower Band (28 RON)\n2. RSI confirma (< 30)\n3. **CUMP\u0102R\u0102!**\n4. Target: Middle Band (30 RON) sau Upper Band (32 RON)\n5. Stop Loss: Sub Lower Band (27 RON)\n",
+            "quiz": [
+              {
+                "question": "Pre\u021bul atinge Lower Bollinger Band. Ce \u00eenseamn\u0103?",
+                "options": [
+                  "E supracump\u0103rat, vinde",
+                  "E suprav\u00e2ndut, posibil rebound - cump\u0103r\u0103",
+                  "Nimic special",
+                  "Schimb\u0103 strategia"
+                ],
+                "correct": 1,
+                "explanation": "Corect! Lower Band = suprav\u00e2ndut (oversold). Istoric, pre\u021bul tinde s\u0103 revin\u0103 c\u0103tre Middle Band. Oportunitate de cump\u0103rare cu SL sub Lower Band!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_12",
+            "module": 4,
+            "order": 12,
+            "title": "Support & Resistance - Zone Cheie",
+            "subtitle": "Unde pre\u021bul se opre\u0219te",
+            "duration": "14 min",
+            "difficulty": "intermediate",
+            "emoji": "\ud83c\udf9a\ufe0f",
+            "tier": "premium",
+            "content": "\n# Support & Resistance\n\n## \ud83c\udf9a\ufe0f Concepte Fundamentale\n\n### **SUPPORT (Suport)** \ud83d\udfe2\n\n**Nivel de pre\u021b unde CUMP\u0102R\u0102TORII intr\u0103 masiv**\n\nExemplu TLV:\n- De 5 ori pre\u021bul a sc\u0103zut la 28 RON\n- De fiecare dat\u0103 a reboundat (cump\u0103r\u0103tori au cump\u0103rat)\n- **28 RON = SUPPORT**\n\n**Ac\u021biune:** Cump\u0103r\u0103 aproape de support cu SL sub el\n\n### **RESISTANCE (Rezisten\u021b\u0103)** \ud83d\udd34\n\n**Nivel de pre\u021b unde V\u00c2NZ\u0102TORII v\u00e2nd masiv**\n\nExemplu TLV:\n- De 3 ori pre\u021bul a urcat la 35 RON\n- De fiecare dat\u0103 a sc\u0103zut (v\u00e2nz\u0103tori au v\u00e2ndut)\n- **35 RON = RESISTANCE**\n\n**Ac\u021biune:** Vinde aproape de resistance SAU a\u0219teapt\u0103 breakout\n\n## \ud83d\ude80 BREAKOUT (Spargere)\n\n**C\u00e2nd pre\u021bul TRECE prin resistance:**\n- **Bullish Breakout** \u2192 Noul target = next resistance\n- **Vechea resistance** devine **support nou**!\n\n**C\u00e2nd pre\u021bul CAD sub support:**\n- **Bearish Breakdown** \u2192 Noul target = next support\n- **Vechiul support** devine **resistance nou**!\n\n## \ud83d\udcca Cum Identifici S&R\n\n1. **Grafic daily** (30-90 zile)\n2. **Caut\u0103 nivele atinse de 2-3+ ori**\n3. **Traseaz\u0103 linii orizontale**\n4. **Acolo sunt S&R**\n\n## \ud83d\udca1 Trading cu S&R\n\n**Buy la Support:**\n- TLV scade la 28 RON (support)\n- RSI < 35 (confirmare)\n- **Cump\u0103r\u0103** la 28.20 RON\n- Stop Loss: 27.50 RON (sub support)\n- Take Profit: 32 RON (resistance)\n\n**Breakout Trade:**\n- Resistance la 35 RON\n- TLV sparge la 35.50 RON (breakout!)\n- Volume mare (confirmare)\n- **Cump\u0103r\u0103** la 35.60 RON\n- Stop Loss: 34.80 RON (sub ex-resistance)\n- Take Profit: 38 RON (next resistance)\n",
+            "quiz": [
+              {
+                "question": "TLV a atins 28 RON de 4 ori \u00een ultima lun\u0103 \u0219i de fiecare dat\u0103 a reboundat. Ce e 28 RON?",
+                "options": [
+                  "Resistance",
+                  "Support",
+                  "Breakout",
+                  "Random"
+                ],
+                "correct": 1,
+                "explanation": "Corect! 28 RON e SUPPORT - nivel unde cump\u0103r\u0103torii intr\u0103 \u0219i \u00eemping pre\u021bul \u00eenapoi SUS!"
+              },
+              {
+                "question": "Pre\u021bul sparge resistance la 35 RON \u0219i merge la 36 RON. Ce devine vechea resistance?",
+                "options": [
+                  "Dispare",
+                  "R\u0103m\u00e2ne resistance",
+                  "Devine SUPPORT nou",
+                  "Nu conteaz\u0103"
+                ],
+                "correct": 2,
+                "explanation": "Perfect! Dup\u0103 breakout, vechea RESISTANCE devine SUPPORT nou. Asta e un concept cheie \u00een analiza tehnic\u0103!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_13",
+            "module": 4,
+            "order": 13,
+            "title": "Volume Analysis - Confirmarea Mi\u0219c\u0103rilor",
+            "subtitle": "Volumul spune adev\u0103rul",
+            "duration": "11 min",
+            "difficulty": "advanced",
+            "emoji": "\ud83d\udcca",
+            "tier": "premium",
+            "content": "\n# Volume Analysis\n\n## \ud83d\udcca De Ce Conteaz\u0103 Volumul?\n\n**Volumul** = C\u00e2te ac\u021biuni au fost tranzac\u021bionate\n\n**Pre\u021b + Volume Mare** = Mi\u0219care REAL\u0102 (convingere)\n**Pre\u021b + Volume Mic** = Mi\u0219care SLAB\u0102 (nesustenabil\u0103)\n\n## \ud83c\udfaf Reguli Fundamentale\n\n### **1. Cre\u0219tere + Volume Mare** \u2705\n- Bullish puternic\n- Cump\u0103r\u0103tori convin\u0219i\n- **Ac\u021biune:** Cump\u0103r\u0103 sau \u021bine\n\n### **2. Cre\u0219tere + Volume Mic** \u26a0\ufe0f\n- Cre\u0219tere slab\u0103\n- Lips\u0103 convingere\n- **Ac\u021biune:** Fii prudent, posibil fals\n\n### **3. Sc\u0103dere + Volume Mare** \u274c\n- Bearish puternic\n- Panic selling\n- **Ac\u021biune:** Ie\u0219i rapid sau nu intra\n\n### **4. Sc\u0103dere + Volume Mic** \ud83d\udca4\n- Sc\u0103dere slab\u0103\n- Lips\u0103 interes\n- **Ac\u021biune:** Posibil bottom, a\u0219teapt\u0103 confirmare\n\n## \ud83d\ude80 Breakout + Volume\n\n**Breakout VALID:**\n- Pre\u021b sparge resistance la 35 RON\n- Volume = **3x media zilnic\u0103**\n- **Trade:** Cump\u0103r\u0103 breakout cu convingere!\n\n**Breakout FALS:**\n- Pre\u021b sparge resistance la 35 RON\n- Volume = sub medie\n- **Trade:** NU cump\u0103ra, probabil fals breakout\n\n## \ud83d\udcc8 Volume Patterns\n\n**Accumulation (Acumulare):**\n- Pre\u021b lateral\n- Volume CRE\u0218TE treptat\n- **\u00censeamn\u0103:** Smart money cump\u0103r\u0103 (institu\u021bii)\n- **Ac\u021biune:** Preg\u0103te\u0219te-te pentru breakout UP\n\n**Distribution (Distribu\u021bie):**\n- Pre\u021b lateral la v\u00e2rf\n- Volume CRE\u0218TE\n- **\u00censeamn\u0103:** Smart money vinde\n- **Ac\u021biune:** Ie\u0219i sau preg\u0103te\u0219te SHORT\n",
+            "quiz": [
+              {
+                "question": "TLV sparge resistance cu volume 5x peste medie. Ce \u00eenseamn\u0103?",
+                "options": [
+                  "Breakout fals, ignore",
+                  "Breakout VALID cu convingere - opportunity!",
+                  "Nimic special",
+                  "Trebuie s\u0103 vinzi"
+                ],
+                "correct": 1,
+                "explanation": "Perfect! Volume mare = convingere. Breakout cu 5x volume = VALID breakout, nu fals. Opportunity de cump\u0103rare!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_14",
+            "module": 4,
+            "order": 14,
+            "title": "Fibonacci Retracements - Nivele Magice",
+            "subtitle": "38.2%, 50%, 61.8% - Unde opre\u0219te corec\u021bia?",
+            "duration": "13 min",
+            "difficulty": "advanced",
+            "emoji": "\ud83d\udd22",
+            "tier": "premium",
+            "content": "\n# Fibonacci Retracements\n\n## \ud83d\udd22 Ce Sunt Fibonacci Levels?\n\n**Nivele matematice** unde pre\u021bul tinde s\u0103 se opreasc\u0103 \u00een timpul corec\u021biilor.\n\n**Nivelele magice:**\n- **23.6%** - Corec\u021bie foarte slab\u0103\n- **38.2%** - Corec\u021bie u\u0219oar\u0103 (popular!)\n- **50%** - Corec\u021bie medie (psihologic)\n- **61.8%** - Corec\u021bie puternic\u0103 (cel mai puternic!)\n- **78.6%** - Corec\u021bie foarte puternic\u0103\n\n## \ud83d\udcc8 Cum Folose\u0219ti\n\n**Exemplu Oil:**\n\n**Trending UP:**\n- Oil: 70 USD \u2192 80 USD (trend puternic)\n- Apoi corec\u021bie (pullback)\n- **Unde se opre\u0219te?**\n\n**Calculul Fibonacci:**\n- Move total: 80 - 70 = 10 USD\n- 38.2% retracement: 80 - (10 \u00d7 0.382) = **76.18 USD**\n- 50% retracement: 80 - 5 = **75 USD**\n- 61.8% retracement: 80 - 6.18 = **73.82 USD**\n\n**Trading:**\n- Oil coboar\u0103 la 76 USD (38.2% fib)\n- **Cump\u0103r\u0103 aici!** (probabil rebound)\n- SL: Sub 73.50 (sub 61.8%)\n- Target: 80 USD (high anterior) sau 82 USD (extensie)\n\n## \ud83c\udfaf Golden Ratio (61.8%)\n\n**Cel mai puternic nivel!**\n\n- 61.8% = \"Golden ratio\" din matematic\u0103\n- Istoric, pre\u021bul respect\u0103 acest nivel cel mai des\n- **Strategie:** Cump\u0103r\u0103 la 61.8% fib cu SL sub el\n\n## \ud83d\udca1 Fibonacci Extensions\n\n**Dup\u0103 breakout, unde merge?**\n\nExtensii comune:\n- **127.2%** - First target\n- **161.8%** - Second target\n- **200%** - Major target\n\n**Exemplu:** Oil break 80 USD \u2192 Next target 85 USD (127.2% extensie)\n",
+            "quiz": [
+              {
+                "question": "Oil urc\u0103 de la 70 la 80 USD, apoi coboar\u0103. Cel mai probabil nivel de suport e:",
+                "options": [
+                  "73.82 USD (61.8% Fibonacci)",
+                  "90 USD",
+                  "65 USD",
+                  "85 USD"
+                ],
+                "correct": 0,
+                "explanation": "Corect! 61.8% Fibonacci = 73.82 USD e cel mai puternic nivel de retracement. Istoric, pre\u021bul respect\u0103 acest 'golden ratio'!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_15",
+            "module": 4,
+            "order": 15,
+            "title": "Analiza Fundamental\u0103 - Cum Alegi Ac\u021biuni",
+            "subtitle": "Nu doar grafice - businessul conteaz\u0103!",
+            "duration": "16 min",
+            "difficulty": "advanced",
+            "emoji": "\ud83d\udd0d",
+            "tier": "premium",
+            "content": "\n# Analiza Fundamental\u0103\n\n## \ud83d\udcbc Ce Este?\n\n**Analiza Fundamental\u0103** = Studiezi BUSINESSUL companiei, nu doar graficele!\n\n**\u00centreb\u0103ri cheie:**\n- Face profit compania?\n- Cre\u0219te veniturile?\n- Are datorii mari?\n- E subevaluat\u0103 sau supraev aluat\u0103?\n\n## \ud83d\udcca Metrici Esen\u021biali\n\n### **1. P/E Ratio (Price to Earnings)**\n\n**Formula:** Pre\u021b ac\u021biune \u00f7 Profit pe ac\u021biune\n\n**Exemplu TLV:**\n- Pre\u021b: 30 RON\n- Profit/ac\u021biune: 3 RON\n- **P/E = 30 \u00f7 3 = 10**\n\n**Interpretare:**\n- P/E < 15: IEFTIN (subevaluat)\n- P/E 15-25: FAIR VALUE\n- P/E > 25: SCUMP (supraevaluat)\n\n### **2. ROE (Return on Equity)**\n\n**C\u00e2t profit face din capitalul propriu?**\n\n- ROE > 15%: EXCELENT\n- ROE 10-15%: BUN\n- ROE < 10%: SLAB\n\n**TLV ROE = 18%** \u2192 Company profitabil\u0103!\n\n### **3. Debt-to-Equity (Datorii)**\n\n**C\u00e2t de \u00eendatorat\u0103 e compania?**\n\n- D/E < 0.5: SIGUR (pu\u021bine datorii)\n- D/E 0.5-1: OK\n- D/E > 2: RISCANT (datorii mari)\n\n## \ud83c\udfaf Cum Combini\n\n**Stock Screening:**\n1. P/E < 20 (nu supraevaluat)\n2. ROE > 12% (profitabil)\n3. Debt < 1 (nu prea \u00eendatorat)\n4. Venituri cresc > 10%/an\n\n**Apoi:**\n- Analiza tehnic\u0103 pentru timing (c\u00e2nd cumperi)\n- Support/Resistance pentru entry\n- RSI pentru confirmare\n\n## \ud83d\udca1 Value Investing\n\n**Warren Buffett style:**\n- Caut\u0103 companii BUNE (ROE mare, datorii mici)\n- Cump\u0103r\u0103 c\u00e2nd sunt IEFTINE (P/E sc\u0103zut)\n- \u021aine pe TERMEN LUNG (ani)\n- Ignor\u0103 volatilitatea pe termen scurt\n",
+            "quiz": [
+              {
+                "question": "Compania A: P/E=8, ROE=20%, Debt=0.3. Compania B: P/E=35, ROE=5%, Debt=2.5. Care e mai atractiv\u0103?",
+                "options": [
+                  "Compania A (P/E sc\u0103zut, ROE mare, datorii mici)",
+                  "Compania B",
+                  "Ambele la fel",
+                  "Niciuna"
+                ],
+                "correct": 0,
+                "explanation": "Corect! Compania A e MULT mai atractiv\u0103: P/E=8 (ieftin!), ROE=20% (foarte profitabil!), Debt=0.3 (pu\u021bine datorii). Compania B e supraevaluat\u0103 \u0219i riscant\u0103!"
+              }
+            ]
+          },
+          {
+            "id": "lesson_16",
+            "module": 5,
+            "order": 16,
+            "title": "Money Management - C\u00e2t Ri\u0219ti per Trade?",
+            "subtitle": "Regula 1-2% care salveaz\u0103 conturi",
+            "duration": "12 min",
+            "difficulty": "intermediate",
+            "emoji": "\ud83d\udcb0",
+            "tier": "premium",
+            "content": "\n# Money Management\n\n## \ud83d\udcb0 Regula de Aur: **NU RISCA MAI MULT DE 2% per Trade!**\n\n### De Ce?\n\n**Exemplu cu 2% risc:**\n- Capital: 10,000 RON\n- Risc per trade: 200 RON (2%)\n- Pierzi 10 trades la r\u00e2nd: -2,000 RON (-20%)\n- **\u00cenc\u0103 ai 8,000 RON** (po\u021bi recupera!)\n\n**Exemplu cu 10% risc:**\n- Capital: 10,000 RON\n- Risc per trade: 1,000 RON (10%)\n- Pierzi 3 trades la r\u00e2nd: -3,000 RON (-30%)\n- Pierzi 5 trades: -5,000 RON (-50%)\n- **GAME OVER** - prea greu de recuperat!\n\n## \ud83c\udfaf Cum Calculezi Position Size\n\n**Formula:**\n```\nPosition Size = (Capital \u00d7 2%) \u00f7 Risc per ac\u021biune\n\nUnde:\nRisc per ac\u021biune = Entry - Stop Loss\n```\n\n**Exemplu:**\n- Capital: 10,000 RON\n- Risc 2%: 200 RON\n- Entry TLV: 30 RON\n- Stop Loss: 28.50 RON\n- Risc/ac\u021biune: 1.50 RON\n\n**Position Size = 200 \u00f7 1.50 = 133 ac\u021biuni**\n\nInvesti\u021bie: 133 \u00d7 30 = **3,990 RON**\n\n## \ud83d\udcca Risk/Reward Ratio\n\n**Minim 1:2** (risc 1 pentru reward 2)\n\n**Exemplu:**\n- Entry: 30 RON\n- Stop Loss: 28.50 RON (risc -1.50)\n- Take Profit: 33 RON (reward +3)\n- **Ratio: 1:2** \u2705 GOOD!\n\n**Nu face trades cu 1:1 sau 1:0.5** (risc = reward sau mai mult)!\n\n## \u26a0\ufe0f Overtrading\n\n**Gre\u0219eal\u0103:** 20 trades/zi \u00d7 2% risc = **40% risc total!**\n\n**Regula:** Max 3-5 trades/zi (risc total 6-10%)\n\n## \ud83d\udca1 Kelly Criterion (Advanced)\n\n**Formula optim\u0103 pentru sizing:**\n```\n% Risc = (Win Rate \u00d7 Avg Win - Loss Rate \u00d7 Avg Loss) \u00f7 Avg Win\n```\n\n**Prea complicat? Folose\u0219te 1-2% regula simpl\u0103!**\n",
+            "quiz": [
+              {
+                "question": "Ai 10,000 RON. Vrei s\u0103 cumperi TLV la 30 RON cu SL la 28.50 RON. C\u00e2te ac\u021biuni (max) bazat pe 2% risc?",
+                "options": [
+                  "666 ac\u021biuni",
+                  "133 ac\u021biuni",
+                  "50 ac\u021biuni",
+                  "333 ac\u021biuni"
+                ],
+                "correct": 1,
+                "explanation": "Corect! Risc 2% = 200 RON. Risc/ac\u021biune = 30-28.50 = 1.50 RON. Position size = 200\u00f71.50 = 133 ac\u021biuni. Investi\u021bie = 3,990 RON dar risc doar 200 RON!"
+              }
+            ]
+          }
+        ],
+        "total": 17,
+        "modules": {
+          "module_1": "Fundamentele (Beginner)",
+          "module_2": "Risk Management (Intermediate)"
+        }
+      }
+    },
+    {
+      "test_name": "GET /api/trading-school/lessons/lesson_1",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-24T23:54:35.684273",
+      "response_sample": {
+        "id": "lesson_1",
+        "title": "Ce Este o Ac\u021biune?",
+        "quiz_count": 2
+      }
+    },
+    {
+      "test_name": "Content Quality - lesson_1",
+      "success": true,
+      "details": "Content: 819 chars, Quiz: 2 questions",
+      "timestamp": "2025-12-24T23:54:35.752818",
+      "response_sample": {
+        "title": "Ce Este o Ac\u021biune?",
+        "has_markdown": true
+      }
+    },
+    {
+      "test_name": "Content Quality - lesson_5",
+      "success": true,
+      "details": "Content: 1087 chars, Quiz: 1 questions",
+      "timestamp": "2025-12-24T23:54:35.819451",
+      "response_sample": {
+        "title": "Diversificarea - Nu Pune Toate Ou\u0103le \u00eentr-un Co\u0219",
+        "has_markdown": true
+      }
+    },
+    {
+      "test_name": "Content Quality - lesson_10",
+      "success": true,
+      "details": "Content: 1386 chars, Quiz: 1 questions",
+      "timestamp": "2025-12-24T23:54:35.891419",
+      "response_sample": {
+        "title": "Strategii de Trading - Day Trading",
+        "has_markdown": true
+      }
+    },
+    {
+      "test_name": "Test User Creation",
+      "success": true,
+      "details": "Test user created: testuser_trading_1766620475.898231@test.com",
+      "timestamp": "2025-12-24T23:54:38.399986",
+      "response_sample": {
+        "has_token": true
+      }
+    },
+    {
+      "test_name": "Quiz Submission - Correct Answers (100%)",
+      "success": true,
+      "details": "Score: 100.0%, Passed: True",
+      "timestamp": "2025-12-24T23:54:38.463064",
+      "response_sample": {
+        "score": 100.0,
+        "passed": true,
+        "correct": 2,
+        "total": 2
+      }
+    },
+    {
+      "test_name": "Quiz Submission - Wrong Answers (0%)",
+      "success": true,
+      "details": "Score: 0.0%, Passed: False",
+      "timestamp": "2025-12-24T23:54:38.535851",
+      "response_sample": {
+        "score": 0.0,
+        "passed": false
+      }
+    },
+    {
+      "test_name": "Progress Tracking",
+      "success": false,
+      "details": "Validation failed: Expected 16 total lessons, got 17",
+      "timestamp": "2025-12-24T23:54:38.604289",
+      "response_sample": {
+        "completed_lessons": [
+          "lesson_1"
+        ],
+        "total_lessons": 17,
+        "progress_percent": 0.0,
+        "lessons_detail": {
+          "lesson_1": {
+            "completed": false,
+            "score": 0.0,
+            "attempts": 1,
+            "completed_at": "2025-12-24T23:54:38.528804+00:00"
+          }
+        },
+        "has_premium": false
+      }
+    },
+    {
+      "test_name": "Premium Check",
+      "success": false,
+      "details": "Validation failed: Expected 11 premium lessons, got 12",
+      "timestamp": "2025-12-24T23:54:38.670701",
+      "response_sample": {
+        "has_premium": false,
+        "total_lessons": 17,
+        "free_lessons": 5,
+        "premium_lessons": 12
+      }
+    }
+  ]
+}
