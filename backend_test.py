@@ -290,7 +290,12 @@ class FinRomaniaAPITester:
         if not isinstance(data, dict):
             return False, "Response should be a dictionary"
         
-        bvb_source = data.get('bvb', {}).get('source', '')
+        # Check for bvb_source field (direct) or nested bvb.source
+        bvb_source = data.get('bvb_source', '') or data.get('bvb', {}).get('source', '')
+        
+        if not bvb_source:
+            return False, "No BVB source information found in response"
+        
         if 'EODHD' not in bvb_source or 'REAL' not in bvb_source:
             return False, f"BVB source should be 'EODHD (REAL)', got: {bvb_source}"
         
