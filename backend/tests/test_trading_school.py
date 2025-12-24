@@ -230,8 +230,8 @@ class TradingSchoolTester:
             return False, "completed_lessons should be a list"
         
         total = data.get('total_lessons', 0)
-        if total != 16:
-            return False, f"Expected 16 total lessons, got {total}"
+        if total != 17:
+            return False, f"Expected 17 total lessons, got {total}"
         
         return True, f"Valid progress: {len(completed)} completed, {data.get('progress_percent')}% progress"
 
