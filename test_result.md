@@ -388,3 +388,30 @@ test_session_4:
   integration:
     - Stripe payment for 5 RON
     - Emergent Universal Key for AI responses
+
+# ===========================================
+# TEST SESSION 5 - Extended Features
+# ===========================================
+
+test_session_5:
+  timestamp: "2024-12-24T14:30:00Z"
+  focus: "Extended Education, Currency Converter, AI Advisor"
+  
+  new_features:
+    education:
+      - "Pachet Starter (5 RON) - 6 lecții"
+      - "Pachet Premium (20 RON) - 12 lecții"
+      - "Quiz-uri la fiecare lecție"
+      - "Glosar 100+ termeni"
+      - "Tier system: free, starter, premium"
+      
+    currency_converter:
+      - "30+ valute suportate"
+      - "Rate live de la exchangerate-api.com"
+      - "Perechi populare pentru România"
+      - "Swap currencies button"
+      
+    ai_advisor:
+      - "Sfatul zilei"
+      - "Întrebări AI (necesită auth)"
+      - "Link-uri rapide către alte funcționalități"
