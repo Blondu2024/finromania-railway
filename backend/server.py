@@ -31,6 +31,7 @@ from routes.analytics import router as analytics_router
 from routes.education import router as education_router
 from routes.risk_assessment import router as risk_assessment_router
 from routes.ai_advisor import router as ai_advisor_router
+from routes.currency_converter import router as currency_converter_router
 
 # Configure logging
 logging.basicConfig(
