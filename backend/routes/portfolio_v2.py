@@ -170,15 +170,23 @@ async def get_portfolio_status(user: dict = Depends(require_auth)):
         current_price = await get_current_price(db, pos["symbol"], pos["market_type"])
         if current_price:
             pos["current_price"] = current_price
+            
+            # Calculate position value
             pos_value = pos["quantity"] * current_price
             
+            # Calculate P&L with LEVERAGE amplification
             if pos["position_type"] == PositionType.LONG:
-                pos["current_value"] = pos_value
-                pos["pnl"] = pos_value - pos["invested"]
+                # LONG: profit when price goes up
+                price_change = current_price - pos["entry_price"]
+                pnl = price_change * pos["quantity"] * pos.get("leverage", 1.0)
+                pos["current_value"] = pos["invested"] + pnl
             else:  # SHORT
-                pos["pnl"] = pos["invested"] - pos_value
-                pos["current_value"] = pos["invested"] + pos["pnl"]
+                # SHORT: profit when price goes down
+                price_change = pos["entry_price"] - current_price
+                pnl = price_change * pos["quantity"] * pos.get("leverage", 1.0)
+                pos["current_value"] = pos["invested"] + pnl
             
+            pos["pnl"] = pnl
             pos["pnl_percent"] = (pos["pnl"] / pos["invested"]) * 100 if pos["invested"] > 0 else 0
             
             total_position_value += pos["current_value"]
