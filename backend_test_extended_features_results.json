@@ -1,0 +1,118 @@
+{
+  "summary": {
+    "total_tests": 18,
+    "passed_tests": 17,
+    "success_rate": "94.4%",
+    "timestamp": "2025-12-24T14:31:27.822697"
+  },
+  "results": [
+    {
+      "test": "Education Starter Package (5 RON)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-24T14:31:27.102010"
+    },
+    {
+      "test": "Education Premium Package (20 RON)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-24T14:31:27.102064"
+    },
+    {
+      "test": "GET /api/education/packages",
+      "success": true,
+      "details": "Found 2 packages",
+      "timestamp": "2025-12-24T14:31:27.102080"
+    },
+    {
+      "test": "Education Lessons Count (12+)",
+      "success": true,
+      "details": "Found 12 lessons",
+      "timestamp": "2025-12-24T14:31:27.214062"
+    },
+    {
+      "test": "Lessons have tier info (free/starter/premium)",
+      "success": true,
+      "details": "Free: True, Starter: True, Premium: True",
+      "timestamp": "2025-12-24T14:31:27.214107"
+    },
+    {
+      "test": "GET /api/education/lessons",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-24T14:31:27.214119"
+    },
+    {
+      "test": "Education Glossary (50+ terms)",
+      "success": false,
+      "details": "Only 48 terms found",
+      "timestamp": "2025-12-24T14:31:27.293513"
+    },
+    {
+      "test": "GET /api/education/glossary",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-24T14:31:27.293543"
+    },
+    {
+      "test": "Currency Converter (30+ currencies)",
+      "success": true,
+      "details": "Found 30 currencies",
+      "timestamp": "2025-12-24T14:31:27.377102"
+    },
+    {
+      "test": "Key currencies present (RON, EUR, USD, GBP)",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-24T14:31:27.377159"
+    },
+    {
+      "test": "GET /api/currency/currencies",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-24T14:31:27.377170"
+    },
+    {
+      "test": "Currency Conversion (100 EUR to RON)",
+      "success": true,
+      "details": "Result: 509.0 RON, Rate: 5.09",
+      "timestamp": "2025-12-24T14:31:27.462744"
+    },
+    {
+      "test": "POST /api/currency/convert",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-24T14:31:27.462769"
+    },
+    {
+      "test": "Popular RON Currency Pairs",
+      "success": true,
+      "details": "Found 7 RON pairs",
+      "timestamp": "2025-12-24T14:31:27.552968"
+    },
+    {
+      "test": "GET /api/currency/popular-pairs",
+      "success": true,
+      "details": "Found 8 pairs",
+      "timestamp": "2025-12-24T14:31:27.552997"
+    },
+    {
+      "test": "AI Advisor Tip of Day",
+      "success": true,
+      "details": "Category: Risc",
+      "timestamp": "2025-12-24T14:31:27.686988"
+    },
+    {
+      "test": "GET /api/advisor/tip-of-the-day",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-24T14:31:27.687010"
+    },
+    {
+      "test": "Homepage API Health",
+      "success": true,
+      "details": "",
+      "timestamp": "2025-12-24T14:31:27.816586"
+    }
+  ]
+}
