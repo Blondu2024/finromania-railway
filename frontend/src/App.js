@@ -27,6 +27,7 @@ import LessonPage from './pages/LessonPage';
 import RiskAssessmentPage from './pages/RiskAssessmentPage';
 import AIAdvisorPage from './pages/AIAdvisorPage';
 import CurrencyConverterPage from './pages/CurrencyConverterPage';
+import GlossaryPage from './pages/GlossaryPage';
 import TickerBar from './components/TickerBar';
 import SearchBar from './components/SearchBar';
 import NewsletterSignup from './components/NewsletterSignup';
