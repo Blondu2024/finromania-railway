@@ -1011,7 +1011,8 @@ async def get_progress(user: dict = Depends(require_auth)):
             "completed_lessons": [],
             "total_lessons": len(TRADING_LESSONS),
             "progress_percent": 0,
-            "current_module": 1
+            "current_module": 1,
+            "has_premium": False
         }
     
     completed = progress.get("lessons", {})
@@ -1021,5 +1022,78 @@ async def get_progress(user: dict = Depends(require_auth)):
         "completed_lessons": list(completed.keys()),
         "total_lessons": len(TRADING_LESSONS),
         "progress_percent": (completed_count / len(TRADING_LESSONS)) * 100,
-        "lessons_detail": completed
+        "lessons_detail": completed,
+        "has_premium": progress.get("has_premium", False)
+    }
+
+@router.post("/purchase-premium")
+async def purchase_premium(user: dict = Depends(require_auth)):
+    """Create Stripe checkout for premium access"""
+    try:
+        from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+        import os
+        
+        api_key = os.environ.get("STRIPE_API_KEY")
+        if not api_key:
+            raise HTTPException(status_code=500, detail="Stripe not configured")
+        
+        stripe_client = StripeCheckout(api_key=api_key)
+        
+        # Create checkout session
+        request = CheckoutSessionRequest(
+            success_url=f"{os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:3000')}/trading-school?success=true",
+            cancel_url=f"{os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:3000')}/trading-school",
+            price=PREMIUM_TIER_PRICE,
+            currency=PREMIUM_TIER_CURRENCY,
+            quantity=1,
+            product_name="Trading School Premium",
+            product_description="Acces complet la toate cele 25 lecții interactive de trading"
+        )
+        
+        response = stripe_client.create_checkout_session(request)
+        
+        # Save pending purchase
+        db = await get_database()
+        await db.premium_purchases.insert_one({
+            "user_id": user["user_id"],
+            "session_id": response.id,
+            "product": "trading_school_premium",
+            "price": PREMIUM_TIER_PRICE,
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        return {"checkout_url": response.url, "session_id": response.id}
+        
+    except Exception as e:
+        logger.error(f"Error creating checkout: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/check-premium")
+async def check_premium_access(user: dict = Depends(require_auth)):
+    """Check if user has premium access"""
+    db = await get_database()
+    
+    # Check if purchased
+    purchase = await db.premium_purchases.find_one({
+        "user_id": user["user_id"],
+        "product": "trading_school_premium",
+        "status": "completed"
+    })
+    
+    has_premium = purchase is not None
+    
+    # Update progress
+    if has_premium:
+        await db.user_progress.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": {"has_premium": True}},
+            upsert=True
+        )
+    
+    return {
+        "has_premium": has_premium,
+        "total_lessons": len(TRADING_LESSONS),
+        "free_lessons": len([l for l in TRADING_LESSONS if l.get("tier") != "premium"]),
+        "premium_lessons": len([l for l in TRADING_LESSONS if l.get("tier") == "premium"])
     }
