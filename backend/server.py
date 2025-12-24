@@ -522,8 +522,8 @@ app.add_middleware(
     allow_credentials=True,
     allow_origins=[
         "http://localhost:3000",
-        "https://finromania.preview.emergentagent.com",
-        "https://*.preview.emergentagent.com"
+        "https://finromania-1.preview.emergentagent.com",
+        "https://finromania-1.preview.emergentagent.com"
     ],
     allow_methods=["*"],
     allow_headers=["*"],
