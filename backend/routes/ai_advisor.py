@@ -14,7 +14,7 @@ router = APIRouter(prefix="/advisor", tags=["ai-advisor"])
 
 # Try to import emergent integrations for AI
 try:
-    from emergentintegrations.llm.chat import Chat, Message
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
     HAS_AI = True
 except ImportError:
     HAS_AI = False
@@ -35,18 +35,17 @@ async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
         return "Configurare AI lipsă."
     
     try:
-        chat = Chat(
+        full_prompt = prompt
+        if system_prompt:
+            full_prompt = f"{system_prompt}\n\n{prompt}"
+        
+        chat = LlmChat(
             api_key=api_key,
             model="gpt-4o-mini"
         )
         
-        messages = []
-        if system_prompt:
-            messages.append(Message(role="system", content=system_prompt))
-        messages.append(Message(role="user", content=prompt))
-        
-        response = await chat.send_async(messages)
-        return response.content
+        response = await chat.send_message_async(full_prompt)
+        return response.message
     except Exception as e:
         logger.error(f"AI error: {e}")
         return "Nu am putut genera răspunsul. Încearcă din nou."
