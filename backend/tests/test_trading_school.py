@@ -180,8 +180,8 @@ class TradingSchoolTester:
             if tier == 'premium':
                 return False, f"Lesson {i+1} should be free but is premium"
         
-        # Verify lessons 6-16 are premium
-        for i in range(5, 16):
+        # Verify lessons 6-17 are premium (12 premium lessons)
+        for i in range(5, 17):
             tier = lessons[i].get('tier', 'free')
             if tier != 'premium':
                 return False, f"Lesson {i+1} should be premium but is {tier}"
