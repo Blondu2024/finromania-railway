@@ -252,11 +252,11 @@ class TradingSchoolTester:
         if free_count != 5:
             return False, f"Expected 5 free lessons, got {free_count}"
         
-        if premium_count != 11:
-            return False, f"Expected 11 premium lessons, got {premium_count}"
+        if premium_count != 12:
+            return False, f"Expected 12 premium lessons, got {premium_count}"
         
-        if total != 16:
-            return False, f"Expected 16 total lessons, got {total}"
+        if total != 17:
+            return False, f"Expected 17 total lessons, got {total}"
         
         return True, f"Valid premium check: {free_count} free, {premium_count} premium"
 
