@@ -222,6 +222,7 @@ function AppRouter() {
       <Route path="/advisor" element={<AIAdvisorPage />} />
       <Route path="/converter" element={<CurrencyConverterPage />} />
       <Route path="/glossary" element={<GlossaryPage />} />
+      <Route path="/learn" element={<LearnTradingPage />} />
     </Routes>
   );
 }
