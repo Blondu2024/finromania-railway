@@ -1,26 +1,26 @@
 {
   "summary": {
-    "total_tests": 15,
-    "passed_tests": 14,
-    "success_rate": "93.3%",
-    "timestamp": "2025-12-23T19:06:15.137706"
+    "total_tests": 20,
+    "passed_tests": 13,
+    "success_rate": "65.0%",
+    "timestamp": "2025-12-24T15:10:20.859470"
   },
   "detailed_results": [
     {
       "test_name": "Health Check",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:04.795429",
+      "timestamp": "2025-12-24T15:10:18.682453",
       "response_sample": {
         "status": "healthy",
-        "timestamp": "2025-12-23T19:06:04.789906+00:00"
+        "timestamp": "2025-12-24T15:10:18.676461+00:00"
       }
     },
     {
       "test_name": "API Root Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:04.864923",
+      "timestamp": "2025-12-24T15:10:18.747445",
       "response_sample": {
         "message": "FinRomania API",
         "version": "1.0.0",
@@ -34,97 +34,199 @@
       }
     },
     {
-      "test_name": "BVB Stocks (MOCK)",
+      "test_name": "BVB Stock Details - TLV (REAL EODHD)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:04.937788",
+      "timestamp": "2025-12-24T15:10:19.191313",
+      "response_sample": {
+        "symbol": "TLV",
+        "history_count": 21,
+        "is_mock": false
+      }
+    },
+    {
+      "test_name": "BVB Stock Details - H2O (REAL EODHD)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-24T15:10:19.561054",
+      "response_sample": {
+        "symbol": "H2O",
+        "history_count": 21,
+        "is_mock": false
+      }
+    },
+    {
+      "test_name": "Data Sources - BVB should be EODHD (REAL)",
+      "success": false,
+      "details": "Validation failed: BVB source should be 'EODHD (REAL)', got: ",
+      "timestamp": "2025-12-24T15:10:20.081602",
+      "response_sample": {
+        "bvb_source": "EODHD (REAL)",
+        "global_source": "Yahoo Finance (REAL)",
+        "eodhd_connected": true
+      }
+    },
+    {
+      "test_name": "BVB Stocks List (REAL data verification)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-24T15:10:20.148686",
       "response_sample": [
         {
           "symbol": "H2O",
           "name": "Hidroelectrica",
-          "price": 150.93,
-          "change": 0.84,
-          "change_percent": 0.56,
-          "volume": 382447,
-          "open": 150.09,
-          "high": 152.44,
-          "low": 148.59,
+          "price": 125.0,
+          "change": 0.0,
+          "change_percent": 0.0,
+          "volume": 17011,
+          "open": 125.0,
+          "high": 125.0,
+          "low": 124.1,
           "currency": "RON",
           "market": "BVB",
           "source": "mock_data",
-          "is_mock": true
+          "is_mock": false
         },
         {
           "symbol": "TLV",
           "name": "Banca Transilvania",
-          "price": 28.84,
-          "change": 0.42,
-          "change_percent": 1.49,
-          "volume": 315859,
-          "open": 28.42,
-          "high": 29.13,
-          "low": 28.13,
+          "price": 30.34,
+          "change": 0.02,
+          "change_percent": 0.066,
+          "volume": 412625,
+          "open": 30.34,
+          "high": 30.4,
+          "low": 30.18,
           "currency": "RON",
           "market": "BVB",
           "source": "mock_data",
-          "is_mock": true
+          "is_mock": false
         }
       ]
+    },
+    {
+      "test_name": "Admin Login",
+      "success": false,
+      "details": "Failed to authenticate admin: Expected 200, got 404",
+      "timestamp": "2025-12-24T15:10:20.214759",
+      "response_sample": "{\"detail\":\"Not Found\"}"
+    },
+    {
+      "test_name": "Admin Stats Endpoint",
+      "success": false,
+      "details": "Skipped - admin login failed",
+      "timestamp": "2025-12-24T15:10:20.214832",
+      "response_sample": null
+    },
+    {
+      "test_name": "Admin Users List",
+      "success": false,
+      "details": "Skipped - admin login failed",
+      "timestamp": "2025-12-24T15:10:20.214848",
+      "response_sample": null
+    },
+    {
+      "test_name": "Admin Analytics",
+      "success": false,
+      "details": "Skipped - admin login failed",
+      "timestamp": "2025-12-24T15:10:20.214860",
+      "response_sample": null
+    },
+    {
+      "test_name": "Regular User Creation",
+      "success": false,
+      "details": "Failed to create test user: Expected 200, got 422",
+      "timestamp": "2025-12-24T15:10:20.278425",
+      "response_sample": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"session_id\"],\"msg\":\"Field required\",\"input\":{\"email\":\"testuser_1766589020.214882@test.com\",\"name\":\"Test User\",\"picture\":\"https://example.com/pic.jpg\"},\"url\""
+    },
+    {
+      "test_name": "Admin Access Control",
+      "success": false,
+      "details": "Skipped - regular user creation failed",
+      "timestamp": "2025-12-24T15:10:20.278506",
+      "response_sample": null
+    },
+    {
+      "test_name": "Glossary - All Terms (~99 terms)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-24T15:10:20.350100",
+      "response_sample": {
+        "total": 99,
+        "sample_terms": [
+          "Ac\u021biune",
+          "Obliga\u021biune",
+          "ETF"
+        ]
+      }
+    },
+    {
+      "test_name": "Glossary - Search (dividend)",
+      "success": true,
+      "details": "Found 2 matching terms",
+      "timestamp": "2025-12-24T15:10:20.418910",
+      "response_sample": {
+        "total": 2,
+        "terms": [
+          "Dividend",
+          "Payout Ratio"
+        ]
+      }
     },
     {
       "test_name": "Global Indices (Yahoo Finance)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:05.013186",
+      "timestamp": "2025-12-24T15:10:20.499720",
       "response_sample": [
         {
           "symbol": "^GSPC",
           "name": "S&P 500",
-          "price": 6905.38,
-          "change": 26.889648,
-          "change_percent": 0.39092538,
-          "previous_close": 6878.49,
-          "open": 6872.41,
-          "high": 6906.32,
-          "low": 6868.81,
-          "volume": 1129785000,
+          "price": 6915.71,
+          "change": 5.919922,
+          "change_percent": 0.08567367,
+          "previous_close": 6909.79,
+          "open": 6904.91,
+          "high": 6916.21,
+          "low": 6904.91,
+          "volume": 220778198,
           "source": "yahoo_finance"
         },
         {
           "symbol": "^IXIC",
           "name": "NASDAQ",
-          "price": 23535.637,
-          "change": 106.80664,
-          "change_percent": 0.45587298,
-          "previous_close": 23428.83,
-          "open": 23407.695,
-          "high": 23537.484,
-          "low": 23377.486,
-          "volume": 4593050000,
+          "price": 23554.2,
+          "change": -7.6445312,
+          "change_percent": -0.03244449,
+          "previous_close": 23561.844,
+          "open": 23555.947,
+          "high": 23565.867,
+          "low": 23527.973,
+          "volume": 1240734000,
           "source": "yahoo_finance"
         }
       ]
     },
     {
-      "test_name": "Financial News (NewsAPI)",
+      "test_name": "Financial News",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:05.117376",
+      "timestamp": "2025-12-24T15:10:20.569465",
       "response_sample": [
         {
-          "id": "b0bc4204-5f59-437d-9a01-396a27250d21",
-          "title": "Reguli stricte pentru posesorii de animale. Risc\u0103 \u00eenchisoarea dac\u0103 le \u00eencalc\u0103",
-          "description": "Condamnare cu executare pentru cruzime fa\u021b\u0103 de un c\u00e2ine \u00een Bucure\u0219ti Un b\u0103rbat de 71 de ani din Sectorul 5 al Capitalei a fost condamnat recent la doi ani de \u00eenchisoare pentru agresarea unui c\u00e2ine de talie mic\u0103, incident petrecut \u00een luna iulie 2025. Instan\u021ba a dispus, totodat\u0103, interzicerea dreptului de a de\u021bine animale pentru [\u2026]",
-          "content": "Condamnare cu executare pentru cruzime fa\u021b\u0103 de un c\u00e2ine \u00een Bucure\u0219ti Un b\u0103rbat de 71 de ani din Sectorul 5 al Capitalei a fost condamnat recent la doi ani de \u00eenchisoare pentru agresarea unui c\u00e2ine de talie mic\u0103, incident petrecut \u00een luna iulie 2025. Instan\u021ba a dispus, totodat\u0103, interzicerea dreptului de a de\u021bine animale pentru [\u2026]",
-          "url": "https://www.capital.ro/reguli-stricte-pentru-posesorii-de-animale-risca-inchisoarea-daca-le-incalca.html",
+          "id": "f6f5da7b-188a-4c6b-b944-a156b7c2b3be",
+          "title": "Demisie la Tarom. Costin Iordache \u0219i-a depus mandatul de director general. Ce motive a invocat",
+          "description": "Costin Iordache \u0219i-a depus mandatul de director general al TAROM Costin Iordache, directorul general al companiei TAROM, \u0219i-a depus mandatul din motive personale, a anun\u021bat compania na\u021bional\u0103 de transport aerian miercuri, 24 decembrie. Potrivit comunicatului oficial, acesta va r\u0103m\u00e2ne \u00een func\u021bie p\u00e2n\u0103 la data de 15 ianuarie 2026, p\u00e2n\u0103 c\u00e2nd Consiliul de Administra\u021bie al TAROM [\u2026]",
+          "content": "Costin Iordache \u0219i-a depus mandatul de director general al TAROM Costin Iordache, directorul general al companiei TAROM, \u0219i-a depus mandatul din motive personale, a anun\u021bat compania na\u021bional\u0103 de transport aerian miercuri, 24 decembrie. Potrivit comunicatului oficial, acesta va r\u0103m\u00e2ne \u00een func\u021bie p\u00e2n\u0103 la data de 15 ianuarie 2026, p\u00e2n\u0103 c\u00e2nd Consiliul de Administra\u021bie al TAROM [\u2026]",
+          "url": "https://www.capital.ro/demisie-la-tarom-costin-iordache-si-a-depus-mandatul-de-director-general-ce-motive-a-invocat.html",
           "image_url": null,
           "source": {
             "name": "Capital.ro",
-            "url": "https://www.capital.ro/reguli-stricte-pentru-posesorii-de-animale-risca-inchisoarea-daca-le-incalca.html",
+            "url": "https://www.capital.ro/demisie-la-tarom-costin-iordache-si-a-depus-mandatul-de-director-general-ce-motive-a-invocat.html",
             "category": "business"
           },
-          "author": "Corina Chiriac",
-          "published_at": "2025-12-23T18:48:18",
+          "author": "Bogdan Ungureanu",
+          "published_at": "2025-12-24T14:50:41",
           "language": "ro",
           "is_rewritten": false,
           "is_translated": false,
@@ -138,7 +240,7 @@
       "test_name": "Currency Rates (BNR)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:05.191932",
+      "timestamp": "2025-12-24T15:10:20.645383",
       "response_sample": {
         "sample_rates": [
           "AED",
@@ -153,101 +255,71 @@
       "test_name": "Market Overview (Combined)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:05.263553",
+      "timestamp": "2025-12-24T15:10:20.721956",
       "response_sample": {
-        "bvb_count": 10,
+        "bvb_count": 20,
         "global_count": 6
       }
     },
     {
-      "test_name": "Manual Refresh BVB",
+      "test_name": "Education Packages",
       "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:05.341206",
+      "details": "Found 2 packages",
+      "timestamp": "2025-12-24T15:10:20.794383",
       "response_sample": {
-        "message": "Updated 10 BVB stocks",
-        "count": 10
+        "packages": [
+          {
+            "id": "edu_starter_pack",
+            "name": "Pachet Starter",
+            "description": "Mini-Curs Online (6 lec\u021bii de baz\u0103)",
+            "price": 5.0,
+            "currency": "ron",
+            "lessons_included": [
+              "lesson_1",
+              "lesson_2",
+              "lesson_3",
+              "lesson_4",
+              "lesson_5",
+              "lesson_6"
+            ],
+            "features": [
+              "6 lec\u021bii fundamentale",
+              "Quiz-uri de verificare",
+              "Acces permanent",
+              "Certificat de completare"
+            ],
+            "lessons_count": 6
+          },
+          {
+            "id": "edu_premium_pack",
+            "name": "Curs Complet Premium",
+            "description": "Curs Complet (12 lec\u021bii) + E-Book + Bonus",
+            "price": 20.0,
+            "currency": "ron",
+            "lessons_included": "all",
+            "features": [
+              "12 lec\u021bii complete (6 extra)",
+              "E-Book PDF desc\u0103rcabil",
+              "Glosar 100+ termeni",
+              "Calculatoare interactive",
+              "Quiz-uri avansate",
+              "Certificat Premium",
+              "Actualiz\u0103ri gratuite 1 an"
+            ],
+            "lessons_count": 12
+          }
+        ]
       }
     },
     {
-      "test_name": "Manual Refresh Currencies",
+      "test_name": "AI Advisor - Tip of the Day",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:06.352831",
+      "timestamp": "2025-12-24T15:10:20.858497",
       "response_sample": {
-        "message": "Currency rates updated",
-        "success": true
-      }
-    },
-    {
-      "test_name": "Manual Refresh News",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:12.596431",
-      "response_sample": {
-        "message": "Fetched 3 new articles",
-        "count": 3
-      }
-    },
-    {
-      "test_name": "Manual Refresh Global Indices",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:13.666185",
-      "response_sample": {
-        "message": "Updated 6 global indices",
-        "count": 6
-      }
-    },
-    {
-      "test_name": "Individual BVB Stock (H2O)",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:13.737955",
-      "response_sample": {
-        "symbol": "H2O",
-        "name": "Hidroelectrica",
-        "price": 152.49,
-        "change": 0.58,
-        "change_percent": 0.38,
-        "volume": 402782,
-        "open": 151.91,
-        "high": 154.01,
-        "low": 150.39,
-        "currency": "RON",
-        "market": "BVB",
-        "source": "mock_data",
-        "is_mock": true
-      }
-    },
-    {
-      "test_name": "BVB Stock Details with 30-day History",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:13.813618",
-      "response_sample": {
-        "history_count": 30,
-        "has_chart_data": true
-      }
-    },
-    {
-      "test_name": "Global Index Details with 30-day History",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-23T19:06:14.287806",
-      "response_sample": {
-        "history_count": 21,
-        "has_chart_data": true
-      }
-    },
-    {
-      "test_name": "Article Translation to Romanian",
-      "success": false,
-      "details": "Validation failed: Article should be translated or have translation attempted",
-      "timestamp": "2025-12-23T19:06:15.136769",
-      "response_sample": {
-        "has_translation": null,
-        "has_romanian_content": false
+        "tip": "Regula 72: \u00cemparte 72 la rata de randament pentru a afla \u00een c\u00e2\u021bi ani se dubleaz\u0103 investi\u021bia. Ex: 72/8% = 9 ani.",
+        "category": "Matematic\u0103 financiar\u0103",
+        "date": "2025-12-24"
       }
     }
   ]
