@@ -350,3 +350,41 @@ test_session_3:
 agent_communication:
   - agent: "main"
     message: "V2 complete! Added: 1) Ticker bar with scrolling indices, 2) Stock detail pages with real 30-day charts, 3) AI translation of articles to Romanian using Emergent Key, 4) Centered layout. Ready for testing."
+# ===========================================
+# TEST SESSION 4 - Education & AI Features
+# ===========================================
+
+test_session_4:
+  timestamp: "2024-12-24T13:50:00Z"
+  focus: "Education Package, Risk Assessment, AI Advisor"
+  
+  new_features_implemented:
+    - Education Package (E-Book + Mini-Course) - 5 RON via Stripe
+    - Risk Assessment Questionnaire (7 questions)
+    - AI-powered Portfolio Advisor
+    - Tip of the Day
+    - 6 educational lessons (first one free)
+    
+  backend_endpoints:
+    - "/api/education/package" - GET package info
+    - "/api/education/lessons" - GET all lessons
+    - "/api/education/lessons/{id}" - GET single lesson
+    - "/api/education/checkout" - POST create payment
+    - "/api/education/checkout/status/{id}" - GET payment status
+    - "/api/risk-assessment/questions" - GET questions
+    - "/api/risk-assessment/submit" - POST answers
+    - "/api/risk-assessment/my-profile" - GET user profile
+    - "/api/advisor/portfolio-advice" - GET AI advice
+    - "/api/advisor/stock-analysis/{symbol}" - GET stock analysis
+    - "/api/advisor/ask" - POST custom question
+    - "/api/advisor/tip-of-the-day" - GET daily tip
+    
+  frontend_pages:
+    - "/education" - Education landing page
+    - "/education/lesson/{id}" - Individual lesson
+    - "/risk-assessment" - Risk questionnaire
+    - "/advisor" - AI Advisor page
+    
+  integration:
+    - Stripe payment for 5 RON
+    - Emergent Universal Key for AI responses
