@@ -14,7 +14,7 @@ router = APIRouter(prefix="/advisor", tags=["ai-advisor"])
 
 # Try to import emergent integrations for AI
 try:
-    from emergentintegrations.llm.chat import LlmChat
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
     HAS_AI = True
 except ImportError:
     HAS_AI = False
@@ -27,8 +27,8 @@ class AdviceRequest(BaseModel):
 
 import uuid
 
-async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
-    """Get AI response using Emergent Universal Key"""
+def get_ai_response_sync(prompt: str, system_prompt: str = None) -> str:
+    """Get AI response using Emergent Universal Key (sync version)"""
     if not HAS_AI:
         return "Serviciul AI nu este disponibil momentan."
     
@@ -37,10 +37,7 @@ async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
         return "Configurare AI lipsă."
     
     try:
-        # Generate unique session ID for each request
         session_id = f"advisor_{uuid.uuid4().hex[:8]}"
-        
-        # Use system prompt for context
         system_msg = system_prompt or "Ești un consilier financiar expert pentru investitori români. Răspunzi în română, ești prietenos și educativ."
         
         chat = LlmChat(
@@ -49,11 +46,19 @@ async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
             system_message=system_msg
         )
         
-        response = await chat.send_message_async(prompt)
-        return response.message
+        user_msg = UserMessage(message=prompt)
+        response = chat.send_message(user_msg)
+        return response
     except Exception as e:
         logger.error(f"AI error: {e}")
-        return f"Nu am putut genera răspunsul. Eroare: {str(e)[:100]}"
+        return f"Nu am putut genera răspunsul. Încearcă din nou."
+
+async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
+    """Async wrapper for AI response"""
+    import asyncio
+    return await asyncio.get_event_loop().run_in_executor(
+        None, get_ai_response_sync, prompt, system_prompt
+    )
 
 @router.get("/portfolio-advice")
 async def get_portfolio_advice(user: dict = Depends(require_auth)):
