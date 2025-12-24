@@ -51,7 +51,7 @@ def get_ai_response_sync(prompt: str, system_prompt: str = None) -> str:
         return response
     except Exception as e:
         logger.error(f"AI error: {e}")
-        return f"Nu am putut genera răspunsul. Încearcă din nou."
+        return "Nu am putut genera răspunsul. Încearcă din nou."
 
 async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
     """Async wrapper for AI response"""
