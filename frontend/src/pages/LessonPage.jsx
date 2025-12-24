@@ -1,192 +1,292 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CheckCircle, BookOpen, Clock, Loader2 } from 'lucide-react';
-import { Card, CardContent } from '../components/ui/card';
+import { useAuth } from '../context/AuthContext';
+import { ArrowLeft, CheckCircle, AlertCircle, Lightbulb, Trophy, ChevronRight } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { Skeleton } from '../components/ui/skeleton';
+import { Alert, AlertDescription } from '../components/ui/alert';
 import ReactMarkdown from 'react-markdown';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function LessonPage() {
   const { lessonId } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
-  const [allLessons, setAllLessons] = useState([]);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState([]);
+  const [quizResult, setQuizResult] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchLesson();
-    fetchAllLessons();
   }, [lessonId]);
 
   const fetchLesson = async () => {
     try {
-      setLoading(true);
-      const res = await fetch(`${API_URL}/api/education/lessons/${lessonId}`, {
-        credentials: 'include'
-      });
-      
+      const res = await fetch(`${API_URL}/api/trading-school/lessons/${lessonId}`);
       if (res.ok) {
-        setLesson(await res.json());
-        setError(null);
-      } else if (res.status === 403) {
-        setError('locked');
-      } else {
-        setError('not_found');
+        const data = await res.json();
+        setLesson(data);
+        setQuizAnswers(new Array(data.quiz?.length || 0).fill(null));
       }
-    } catch (err) {
-      setError('error');
+    } catch (error) {
+      console.error('Error fetching lesson:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchAllLessons = async () => {
+  const handleQuizSubmit = async () => {
+    if (!user) {
+      alert('Conectează-te pentru a salva progresul!');
+      return;
+    }
+
+    if (quizAnswers.includes(null)) {
+      alert('Te rog răspunde la toate întrebările!');
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_URL}/api/education/lessons`, {
-        credentials: 'include'
+      const res = await fetch(`${API_URL}/api/trading-school/quiz/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          lesson_id: lessonId,
+          answers: quizAnswers
+        })
       });
+
       if (res.ok) {
-        const data = await res.json();
-        setAllLessons(data.lessons || []);
+        const result = await res.json();
+        setQuizResult(result);
       }
-    } catch (err) {
-      console.error('Error fetching lessons:', err);
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
     }
   };
 
-  const currentIndex = allLessons.findIndex(l => l.id === lessonId);
-  const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
-  const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
+  const handleRetry = () => {
+    setQuizResult(null);
+    setQuizAnswers(new Array(lesson.quiz?.length || 0).fill(null));
+  };
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6">
-        <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-96" />
-      </div>
-    );
-  }
-
-  if (error === 'locked') {
-    return (
-      <div className="max-w-2xl mx-auto text-center py-12">
-        <div className="p-4 bg-yellow-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-          <BookOpen className="w-8 h-8 text-yellow-600" />
-        </div>
-        <h2 className="text-2xl font-bold mb-2">Lecție Premium</h2>
-        <p className="text-muted-foreground mb-6">
-          Această lecție face parte din pachetul educațional premium.
-        </p>
-        <div className="space-x-4">
-          <Link to="/education">
-            <Button><ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Curs</Button>
-          </Link>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Se încarcă lecția...</p>
         </div>
       </div>
     );
   }
 
-  if (error || !lesson) {
+  if (!lesson) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Lecția nu a fost găsită</p>
-        <Link to="/education">
-          <Button className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> Înapoi</Button>
+        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+        <h2 className="text-xl font-semibold">Lecție negăsită</h2>
+        <Link to="/trading-school">
+          <Button className="mt-4">← Înapoi la Școală</Button>
         </Link>
       </div>
     );
   }
 
+  // Quiz Results Screen
+  if (quizResult) {
+    const passed = quizResult.passed;
+    
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <Card className={`border-2 ${
+          passed ? 'border-green-500 bg-green-50' : 'border-orange-500 bg-orange-50'
+        }`}>
+          <CardContent className="p-8 text-center">
+            <div className={`inline-block p-4 rounded-full mb-4 ${
+              passed ? 'bg-green-200' : 'bg-orange-200'
+            }`}>
+              {passed ? (
+                <Trophy className="w-16 h-16 text-green-600" />
+              ) : (
+                <AlertCircle className="w-16 h-16 text-orange-600" />
+              )}
+            </div>
+            
+            <h2 className="text-3xl font-bold mb-2">
+              {passed ? '🎉 Felicitări!' : '💪 Aproape!'}
+            </h2>
+            <p className="text-xl mb-6">
+              Scor: <span className="font-bold">{quizResult.score.toFixed(0)}%</span> ({quizResult.correct}/{quizResult.total} corecte)
+            </p>
+            
+            {/* Results Detail */}
+            <div className="text-left space-y-4 mb-8">
+              {quizResult.results.map((result, idx) => (
+                <Card key={idx} className={result.correct ? 'border-green-300' : 'border-red-300'}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-2 mb-2">
+                      {result.correct ? (
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                      ) : (
+                        <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                      )}
+                      <div className="flex-1">
+                        <p className="font-medium">{result.question}</p>
+                        <p className="text-sm text-muted-foreground mt-1">Răspuns: {result.your_answer}</p>
+                      </div>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded mt-2">
+                      <div className="flex items-start gap-2">
+                        <Lightbulb className="w-4 h-4 text-blue-600 mt-0.5" />
+                        <p className="text-sm text-blue-900">{result.explanation}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="flex gap-3 justify-center">
+              {!passed && (
+                <Button onClick={handleRetry} size="lg">
+                  🔄 Încearcă Din Nou
+                </Button>
+              )}
+              <Link to="/trading-school">
+                <Button variant="outline" size="lg">
+                  {passed ? 'Continuă la Următoarea Lecție →' : '← Înapoi la Școală'}
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Quiz Screen
+  if (showQuiz) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <Link to="/trading-school">
+          <Button variant="ghost" className="mb-6">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi
+          </Button>
+        </Link>
+
+        <Card className="border-2 border-blue-500">
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+            <CardTitle className="text-2xl">📝 Quiz: {lesson.title}</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-6">
+            {lesson.quiz.map((q, qIdx) => (
+              <Card key={qIdx}>
+                <CardContent className="p-4">
+                  <p className="font-semibold mb-4">Întrebarea {qIdx + 1}: {q.question}</p>
+                  <div className="space-y-2">
+                    {q.options.map((option, oIdx) => (
+                      <div
+                        key={oIdx}
+                        className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          quizAnswers[qIdx] === oIdx
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                        }`}
+                        onClick={() => {
+                          const newAnswers = [...quizAnswers];
+                          newAnswers[qIdx] = oIdx;
+                          setQuizAnswers(newAnswers);
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            quizAnswers[qIdx] === oIdx
+                              ? 'border-blue-500 bg-blue-500'
+                              : 'border-gray-300'
+                          }`}>
+                            {quizAnswers[qIdx] === oIdx && (
+                              <div className="w-2 h-2 bg-white rounded-full" />
+                            )}
+                          </div>
+                          <span>{option}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setShowQuiz(false)} className="flex-1">
+                ← Revizuiește Lecția
+              </Button>
+              <Button 
+                onClick={handleQuizSubmit}
+                disabled={quizAnswers.includes(null)}
+                className="flex-1"
+                size="lg"
+              >
+                Trimite Răspunsurile →
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Lesson Content Screen
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Navigation */}
-      <Link to="/education">
-        <Button variant="ghost" size="sm">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Curs
+    <div className="max-w-4xl mx-auto px-4 py-12">
+      <Link to="/trading-school">
+        <Button variant="ghost" className="mb-6">
+          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Școală
         </Button>
       </Link>
 
-      {/* Lesson Header */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <Badge variant="secondary">Lecția {lesson.order}</Badge>
-          <Badge variant="outline" className="flex items-center gap-1">
-            <Clock className="w-3 h-3" /> {lesson.duration}
-          </Badge>
-          {lesson.is_free && (
-            <Badge className="bg-green-100 text-green-700">GRATUIT</Badge>
-          )}
-        </div>
-        <h1 className="text-3xl font-bold">{lesson.title}</h1>
-        <p className="text-muted-foreground mt-2">{lesson.description}</p>
-      </div>
+      <Card className="border-2 border-blue-200 shadow-xl">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
+          <div className="flex items-center gap-4">
+            <div className="text-6xl">{lesson.emoji}</div>
+            <div className="flex-1">
+              <CardTitle className="text-3xl mb-2">{lesson.title}</CardTitle>
+              <p className="text-blue-100">{lesson.subtitle}</p>
+            </div>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="p-8">
+          {/* Lesson Content */}
+          <div className="prose prose-lg max-w-none mb-8">
+            <ReactMarkdown>{lesson.content}</ReactMarkdown>
+          </div>
 
-      {/* Lesson Content */}
-      <Card>
-        <CardContent className="p-8 prose prose-lg dark:prose-invert max-w-none">
-          <ReactMarkdown
-            components={{
-              h2: ({children}) => <h2 className="text-2xl font-bold mt-8 mb-4 text-foreground">{children}</h2>,
-              h3: ({children}) => <h3 className="text-xl font-semibold mt-6 mb-3 text-foreground">{children}</h3>,
-              p: ({children}) => <p className="mb-4 leading-relaxed text-foreground">{children}</p>,
-              ul: ({children}) => <ul className="list-disc pl-6 mb-4 space-y-2">{children}</ul>,
-              ol: ({children}) => <ol className="list-decimal pl-6 mb-4 space-y-2">{children}</ol>,
-              li: ({children}) => <li className="text-foreground">{children}</li>,
-              strong: ({children}) => <strong className="font-bold text-foreground">{children}</strong>,
-              blockquote: ({children}) => (
-                <blockquote className="border-l-4 border-blue-500 pl-4 italic my-4 text-muted-foreground">
-                  {children}
-                </blockquote>
-              ),
-              table: ({children}) => (
-                <div className="overflow-x-auto my-4">
-                  <table className="min-w-full border border-border">{children}</table>
+          {/* Next Step */}
+          <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-blue-300">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-blue-600 text-white rounded-full p-3">
+                  <CheckCircle className="w-6 h-6" />
                 </div>
-              ),
-              th: ({children}) => <th className="border border-border px-4 py-2 bg-muted font-semibold">{children}</th>,
-              td: ({children}) => <td className="border border-border px-4 py-2">{children}</td>,
-            }}
-          >
-            {lesson.content}
-          </ReactMarkdown>
+                <div className="flex-1">
+                  <h4 className="font-bold text-lg">Gata să testezi cunoștințele?</h4>
+                  <p className="text-muted-foreground">Răspunde la {lesson.quiz?.length || 0} întrebări pentru a finaliza lecția!</p>
+                </div>
+                <Button size="lg" onClick={() => setShowQuiz(true)}>
+                  Începe Quiz →
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
-
-      {/* Navigation Footer */}
-      <div className="flex justify-between items-center pt-6 border-t">
-        {prevLesson && !prevLesson.is_locked ? (
-          <Button variant="outline" onClick={() => navigate(`/education/lesson/${prevLesson.id}`)}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> {prevLesson.title}
-          </Button>
-        ) : (
-          <div />
-        )}
-        
-        {nextLesson ? (
-          nextLesson.is_locked ? (
-            <Link to="/education">
-              <Button>
-                Deblochează Restul Cursului <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          ) : (
-            <Button onClick={() => navigate(`/education/lesson/${nextLesson.id}`)}>
-              {nextLesson.title} <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          )
-        ) : (
-          <Link to="/education">
-            <Button variant="secondary">
-              <CheckCircle className="w-4 h-4 mr-2" /> Curs Finalizat!
-            </Button>
-          </Link>
-        )}
-      </div>
     </div>
   );
 }
