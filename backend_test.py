@@ -90,14 +90,14 @@ class FinRomaniaAPITester:
             return False, f"Error: {str(e)}", None
 
     def validate_bvb_stocks(self, data: List[Dict]) -> tuple:
-        """Validate BVB stocks response"""
+        """Validate BVB stocks response - should be REAL data now"""
         if not isinstance(data, list):
             return False, "Response should be a list"
         
         if len(data) == 0:
             return False, "No BVB stocks returned"
             
-        # Check if we have expected number of stocks (should be around 10)
+        # Check if we have expected number of stocks
         if len(data) < 5:
             return False, f"Too few stocks returned: {len(data)}"
             
@@ -108,11 +108,11 @@ class FinRomaniaAPITester:
             if field not in stock:
                 return False, f"Missing required field: {field}"
                 
-        # Check if it's marked as mock data
-        if not stock.get('is_mock', False):
-            return False, "BVB data should be marked as mock for MVP"
+        # Check if it's REAL data (not mock) - Session 6 requirement
+        if stock.get('is_mock', True):
+            return False, "BVB data should be REAL (is_mock: false), not mock"
             
-        return True, f"Valid BVB stocks: {len(data)} stocks"
+        return True, f"Valid BVB stocks: {len(data)} stocks with REAL data"
 
     def validate_global_indices(self, data: List[Dict]) -> tuple:
         """Validate global indices response"""
