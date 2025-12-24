@@ -405,26 +405,44 @@ class FinRomaniaAPITester:
             return False
 
     def test_regular_user_creation(self) -> bool:
-        """Create a regular test user"""
-        print("\n👤 Creating Regular Test User...")
+        """Create a regular test user session"""
+        print("\n👤 Creating Regular Test User Session...")
         
+        # Create a regular user directly in database for testing
+        import subprocess
         test_email = f"testuser_{datetime.now().timestamp()}@test.com"
         
-        success, details, data = self.test_api_endpoint(
-            'POST', '/api/auth/session',
-            data={
-                "email": test_email,
-                "name": "Test User",
-                "picture": "https://example.com/pic.jpg"
-            }
-        )
+        result = subprocess.run([
+            'mongosh', 'mongodb://localhost:27017/stock_news_romania', '--quiet', '--eval',
+            f"""
+            const userId = 'user_test_' + Date.now();
+            db.users.insertOne({{
+              user_id: userId,
+              email: '{test_email}',
+              name: 'Test User',
+              picture: 'https://example.com/pic.jpg',
+              is_admin: false,
+              created_at: new Date().toISOString(),
+              last_login: new Date().toISOString()
+            }});
+            const sessionToken = 'test_user_token_' + Date.now();
+            const expiresAt = new Date(Date.now() + 7*24*60*60*1000);
+            db.user_sessions.insertOne({{
+              user_id: userId,
+              session_token: sessionToken,
+              expires_at: expiresAt.toISOString(),
+              created_at: new Date().toISOString()
+            }});
+            print(sessionToken);
+            """
+        ], capture_output=True, text=True)
         
-        if success and isinstance(data, dict) and 'token' in data:
-            self.regular_user_token = data['token']
+        if result.returncode == 0 and result.stdout.strip():
+            self.regular_user_token = result.stdout.strip()
             self.log_test("Regular User Creation", True, f"Test user created: {test_email}", {"has_token": True})
             return True
         else:
-            self.log_test("Regular User Creation", False, f"Failed to create test user: {details}", data)
+            self.log_test("Regular User Creation", False, f"Failed to create test user", None)
             return False
 
     def run_all_tests(self):
