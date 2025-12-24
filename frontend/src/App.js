@@ -101,6 +101,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
   
   const navItems = [
     { path: '/', label: 'Acasă', icon: <BarChart3 className="w-4 h-4" /> },
+    { path: '/learn', label: '🎓 Învață', icon: <TrendingUp className="w-4 h-4" /> },
     { path: '/stocks', label: 'Acțiuni BVB', icon: <TrendingUp className="w-4 h-4" /> },
     { path: '/news', label: 'Știri', icon: <Newspaper className="w-4 h-4" /> },
     { path: '/currencies', label: 'Valute', icon: <DollarSign className="w-4 h-4" /> },
