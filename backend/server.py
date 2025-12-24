@@ -482,6 +482,7 @@ app.include_router(education_router, prefix="/api")
 app.include_router(risk_assessment_router, prefix="/api")
 app.include_router(ai_advisor_router, prefix="/api")
 app.include_router(currency_converter_router, prefix="/api")
+app.include_router(curated_router, prefix="/api")
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest
