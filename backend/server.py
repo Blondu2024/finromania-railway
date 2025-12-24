@@ -23,7 +23,7 @@ from jobs.scheduler import start_scheduler, stop_scheduler
 # Import routes
 from routes.auth import router as auth_router
 from routes.watchlist import router as watchlist_router
-from routes.portfolio import router as portfolio_router
+from routes.portfolio_v2 import router as portfolio_router
 from routes.admin import router as admin_router
 from routes.newsletter import router as newsletter_router
 from routes.search import router as search_router
