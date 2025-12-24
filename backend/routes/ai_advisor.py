@@ -46,12 +46,12 @@ def get_ai_response_sync(prompt: str, system_prompt: str = None) -> str:
             system_message=system_msg
         )
         
-        user_msg = UserMessage(message=prompt)
+        user_msg = UserMessage(text=prompt)  # Fixed: use 'text' not 'message'
         response = chat.send_message(user_msg)
         return response
     except Exception as e:
         logger.error(f"AI error: {e}")
-        return "Nu am putut genera răspunsul. Încearcă din nou."
+        return f"Nu am putut genera răspunsul. Încearcă din nou."
 
 async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
     """Async wrapper for AI response"""
