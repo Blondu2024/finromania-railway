@@ -116,6 +116,9 @@ backend:
       - working: true
         agent: "main"
         comment: "GET /api/stocks/bvb returns 10 mock BVB stocks with prices, changes, volumes"
+      - working: true
+        agent: "testing"
+        comment: "Session 6: Verified REAL EODHD data. All stocks have is_mock: false. Returns real-time BVB data."
         
   - task: "Global Indices API"
     implemented: true
@@ -128,6 +131,9 @@ backend:
       - working: true
         agent: "main"
         comment: "GET /api/stocks/global returns 6 indices (S&P 500, NASDAQ, Dow Jones, DAX, FTSE 100, Nikkei)"
+      - working: true
+        agent: "testing"
+        comment: "Session 6: Verified working with Yahoo Finance real data"
 
   - task: "News API with Translation"
     implemented: true
@@ -135,11 +141,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "GET /api/news returns articles, GET /api/news/{id} translates to Romanian via AI"
+      - working: true
+        agent: "testing"
+        comment: "Session 6: News API verified working, returning articles from Romanian RSS feeds"
 
   - task: "Stock/Index Details with History"
     implemented: true
@@ -147,11 +156,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "GET /api/stocks/global/{symbol}/details returns 30-day chart data from Yahoo Finance"
+      - working: true
+        agent: "testing"
+        comment: "Session 6: CRITICAL FIX VERIFIED - BVB stock details now working with await fix. TLV and H2O both return 21 days of REAL EODHD history with is_mock: false"
 
   - task: "AI Translation Service"
     implemented: true
@@ -159,11 +171,50 @@ backend:
     file: "/app/backend/services/ai_service.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Uses Emergent Universal Key with GPT-4o-mini to translate articles to Romanian"
+      - working: true
+        agent: "testing"
+        comment: "Session 6: Not explicitly tested in this session, but AI Advisor tip-of-the-day working"
+  
+  - task: "Admin Dashboard API"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/admin.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 6: NEW FEATURE - All admin endpoints verified: /api/admin/stats (returns platform stats), /api/admin/users (returns user list), /api/admin/analytics/visits (returns 7-day analytics). Access control working - non-admin users get 403."
+  
+  - task: "Glossary API"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/education.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 6: NEW FEATURE - /api/education/glossary returns 99 financial terms. Search functionality verified with ?search=dividend returning 2 matching terms."
+  
+  - task: "Data Sources Verification"
+    implemented: true
+    working: true
+    file: "/app/backend/services/stock_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 6: /api/data-sources verified returning bvb_source: 'EODHD (REAL)', global_source: 'Yahoo Finance (REAL)', eodhd_connected: true"
 
 frontend:
   - task: "Ticker Bar (scrolling indices)"
