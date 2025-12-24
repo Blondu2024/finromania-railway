@@ -29,6 +29,7 @@ import AIAdvisorPage from './pages/AIAdvisorPage';
 import CurrencyConverterPage from './pages/CurrencyConverterPage';
 import GlossaryPage from './pages/GlossaryPage';
 import LearnTradingPage from './pages/LearnTradingPage';
+import TradingSchoolPage from './pages/TradingSchoolPage';
 import TickerBar from './components/TickerBar';
 import SearchBar from './components/SearchBar';
 import NewsletterSignup from './components/NewsletterSignup';
@@ -223,6 +224,8 @@ function AppRouter() {
       <Route path="/converter" element={<CurrencyConverterPage />} />
       <Route path="/glossary" element={<GlossaryPage />} />
       <Route path="/learn" element={<LearnTradingPage />} />
+      <Route path="/trading-school" element={<TradingSchoolPage />} />
+      <Route path="/trading-school/:lessonId" element={<LessonPage />} />
     </Routes>
   );
 }
