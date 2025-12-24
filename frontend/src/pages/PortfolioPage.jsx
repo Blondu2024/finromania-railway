@@ -110,8 +110,48 @@ export default function PortfolioPage() {
         <h2 className="text-xl font-semibold">Portofoliu Virtual</h2>
         <p className="text-muted-foreground mb-4">Trebuie să fii conectat pentru a accesa portofoliul.</p>
         <Link to="/login">
-          <Button>Conectare</Button>
+          <Button size="lg">Conectare</Button>
         </Link>
+      </div>
+    );
+  }
+
+  // BETA MODE - Only admin access
+  if (!user.is_admin) {
+    return (
+      <div className="max-w-2xl mx-auto py-12">
+        <Card className="border-2 border-orange-400">
+          <CardContent className="p-8 text-center space-y-4">
+            <div className="inline-block p-4 bg-orange-100 rounded-full">
+              <DollarSign className="w-12 h-12 text-orange-600" />
+            </div>
+            <Badge variant="destructive" className="text-lg px-4 py-2">
+              🚧 BETA - Coming Soon
+            </Badge>
+            <h2 className="text-2xl font-bold">Portofoliu Virtual în Dezvoltare</h2>
+            <p className="text-muted-foreground">
+              Lucrăm la un portofoliu de trading profesional cu grafice live, leverage realistic și AI guidance.
+            </p>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <p className="text-sm text-blue-900">
+                💡 <strong>Între timp:</strong> Încearcă <Link to="/trading-school" className="text-blue-600 underline font-semibold">Trading School</Link> - 
+                Învață trading prin lecții interactive și quizzes!
+              </p>
+            </div>
+            <div className="flex gap-3 justify-center">
+              <Link to="/trading-school">
+                <Button size="lg">
+                  🎓 Începe Învățarea
+                </Button>
+              </Link>
+              <Link to="/">
+                <Button variant="outline" size="lg">
+                  ← Acasă
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
