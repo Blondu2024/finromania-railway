@@ -427,7 +427,7 @@ async def get_global_index_details(symbol: str, period: str = Query(default="1mo
 async def get_bvb_stock_details(symbol: str):
     """Obține detalii și istoric pentru o acțiune BVB"""
     try:
-        history = stock_service.get_bvb_stock_history(symbol.upper())
+        history = await stock_service.get_bvb_stock_history(symbol.upper())
         
         if not history:
             raise HTTPException(status_code=404, detail=f"Stock {symbol} not found")
