@@ -191,6 +191,17 @@ async def get_bvb_stock(symbol: str):
         stock = await db.stocks_bvb.find_one({"symbol": symbol.upper()}, {"_id": 0})
         
         if not stock:
+            # Try to get real-time data
+            stock = await stock_service.get_bvb_stock_realtime(symbol.upper())
+            if stock:
+                # Save to DB
+                await db.stocks_bvb.update_one(
+                    {"symbol": symbol.upper()},
+                    {"$set": stock},
+                    upsert=True
+                )
+        
+        if not stock:
             raise HTTPException(status_code=404, detail=f"Stock {symbol} not found")
         
         return stock
@@ -199,6 +210,30 @@ async def get_bvb_stock(symbol: str):
     except Exception as e:
         logger.error(f"Error getting BVB stock {symbol}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/stocks/bvb/{symbol}/history")
+async def get_bvb_stock_history(symbol: str, period: str = Query(default="m", enum=["d", "w", "m"])):
+    """Obține istoricul unei acțiuni BVB"""
+    try:
+        history = await stock_service.get_bvb_stock_history(symbol.upper(), period)
+        if not history:
+            raise HTTPException(status_code=404, detail=f"No history for {symbol}")
+        return history
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting BVB history for {symbol}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/data-sources")
+async def get_data_sources():
+    """Verifică sursele de date pentru BVB și Global"""
+    try:
+        sources = await stock_service.is_using_real_data()
+        return sources
+    except Exception as e:
+        logger.error(f"Error checking data sources: {e}")
+        return {"error": str(e)}
 
 # ============================================
 # STOCKS - GLOBAL INDICES
