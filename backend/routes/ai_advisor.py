@@ -52,7 +52,6 @@ async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
     except Exception as e:
         logger.error(f"AI error: {e}")
         return f"Nu am putut genera răspunsul. Eroare: {str(e)[:100]}"
-    )
 
 @router.get("/portfolio-advice")
 async def get_portfolio_advice(user: dict = Depends(require_auth)):
