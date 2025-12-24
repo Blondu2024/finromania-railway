@@ -113,7 +113,8 @@ function Navigation({ darkMode, toggleDarkMode }) {
 
   const userNavItems = user ? [
     { path: '/watchlist', label: 'Watchlist', icon: <Star className="w-4 h-4" /> },
-    { path: '/portfolio', label: 'Portofoliu', icon: <Briefcase className="w-4 h-4" /> },
+    // Portfolio hidden - BETA mode
+    // { path: '/portfolio', label: 'Portofoliu', icon: <Briefcase className="w-4 h-4" /> },
   ] : [];
 
   return (
