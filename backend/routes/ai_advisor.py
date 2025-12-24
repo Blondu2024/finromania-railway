@@ -14,7 +14,7 @@ router = APIRouter(prefix="/advisor", tags=["ai-advisor"])
 
 # Try to import emergent integrations for AI
 try:
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    from emergentintegrations.llm.chat import LlmChat
     HAS_AI = True
 except ImportError:
     HAS_AI = False
@@ -24,6 +24,8 @@ class AdviceRequest(BaseModel):
     symbol: Optional[str] = None
     stock_type: Optional[str] = None  # 'bvb' or 'global'
     question: Optional[str] = None
+
+import uuid
 
 async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
     """Get AI response using Emergent Universal Key"""
@@ -35,20 +37,23 @@ async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
         return "Configurare AI lipsă."
     
     try:
-        full_prompt = prompt
-        if system_prompt:
-            full_prompt = f"{system_prompt}\n\n{prompt}"
+        # Generate unique session ID for each request
+        session_id = f"advisor_{uuid.uuid4().hex[:8]}"
+        
+        # Use system prompt for context
+        system_msg = system_prompt or "Ești un consilier financiar expert pentru investitori români. Răspunzi în română, ești prietenos și educativ."
         
         chat = LlmChat(
             api_key=api_key,
-            model="gpt-4o-mini"
+            session_id=session_id,
+            system_message=system_msg
         )
         
-        response = await chat.send_message_async(full_prompt)
+        response = await chat.send_message_async(prompt)
         return response.message
     except Exception as e:
         logger.error(f"AI error: {e}")
-        return "Nu am putut genera răspunsul. Încearcă din nou."
+        return f"Nu am putut genera răspunsul. Eroare: {str(e)[:100]}"
 
 @router.get("/portfolio-advice")
 async def get_portfolio_advice(user: dict = Depends(require_auth)):
