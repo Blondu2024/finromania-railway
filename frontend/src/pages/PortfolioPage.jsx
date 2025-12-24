@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { AlertTriangle, TrendingUp, TrendingDown, DollarSign, Award, RefreshCw, Info, BookOpen, Bot, X } from 'lucide-react';
+import { AlertTriangle, TrendingUp, TrendingDown, DollarSign, Award, RefreshCw, Info, BookOpen, Bot } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../components/ui/dialog';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Link } from 'react-router-dom';
+import TradeModal from '../components/TradeModal';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -16,7 +16,6 @@ export default function PortfolioPage() {
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showTradeModal, setShowTradeModal] = useState(false);
-  const [selectedStock, setSelectedStock] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -31,7 +30,6 @@ export default function PortfolioPage() {
       });
 
       if (res.status === 404) {
-        // Portfolio not initialized
         setShowOnboarding(true);
         setLoading(false);
         return;
@@ -386,22 +384,13 @@ export default function PortfolioPage() {
         </Card>
       )}
 
-      {/* Trade Modal - Simplified for now */}
-      <Dialog open={showTradeModal} onOpenChange={setShowTradeModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tranzacție Nouă</DialogTitle>
-            <DialogDescription>
-              Funcționalitatea completă de trading cu warnings educaționale va fi adăugată în următoarea etapă.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowTradeModal(false)}>
-              Închide
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Trade Modal */}
+      <TradeModal 
+        open={showTradeModal} 
+        onClose={() => setShowTradeModal(false)}
+        onSuccess={fetchPortfolio}
+        portfolio={portfolio}
+      />
     </div>
   );
 }
