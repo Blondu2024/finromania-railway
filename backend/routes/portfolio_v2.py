@@ -211,7 +211,7 @@ async def get_portfolio_status(user: dict = Depends(require_auth)):
 
 @router.post("/trade")
 async def execute_trade(order: TradeOrder, user: dict = Depends(require_auth)):
-    """Execute a trade with educational checks"""
+    """Execute a trade with educational checks and realistic slippage"""
     db = await get_database()
     
     portfolio = await db.user_portfolios.find_one({"user_id": user["user_id"]})
@@ -226,8 +226,35 @@ async def execute_trade(order: TradeOrder, user: dict = Depends(require_auth)):
             detail=f"Leverage {order.leverage}x exceeds your limit of {max_leverage}x for {portfolio['experience_level']} level"
         )
     
-    # Get current price
-    current_price = await get_current_price(db, order.symbol, order.market_type)
+    # Get current price WITH slippage simulation
+    # Import at function level to avoid circular imports
+    import httpx
+    async with httpx.AsyncClient() as client:
+        # Get live quote with bid/ask
+        import os
+        backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+        response = await client.get(
+            f"{backend_url}/api/live/quote/{order.symbol}?market_type={order.market_type}",
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            quote = response.json()
+            # Use ASK price for LONG (buying), BID price for SHORT (selling to open)
+            if order.position_type == PositionType.LONG:
+                execution_price = quote["ask"]  # Buy at higher price (realistic!)
+            else:
+                execution_price = quote["bid"]  # Sell at lower price
+            
+            current_price = quote["price"]
+            spread = quote["spread"]
+        else:
+            # Fallback to database price
+            current_price = await get_current_price(db, order.symbol, order.market_type)
+            if not current_price:
+                raise HTTPException(status_code=404, detail=f"Symbol {order.symbol} not found")
+            execution_price = current_price
+            spread = 0
     if not current_price:
         raise HTTPException(status_code=404, detail=f"Symbol {order.symbol} not found")
     
