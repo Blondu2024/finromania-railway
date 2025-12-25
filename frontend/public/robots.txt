@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://finromania-1.preview.emergentagent.com/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin
+Disallow: /auth/
+
+# Allow all content
+Allow: /trading-school
+Allow: /stocks
+Allow: /news
+Allow: /faq
+Allow: /glossary
+Allow: /converter
+Allow: /advisor
+
+# Crawl-delay
+Crawl-delay: 1
