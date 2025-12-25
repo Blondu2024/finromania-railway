@@ -895,9 +895,9 @@ Caracteristici:
         ]
     },
     {
-        "id": "lesson_10",
+        "id": "lesson_11",
         "module": 4,
-        "order": 10,
+        "order": 11,
         "title": "Swing Trading - Tranzacții pe Zile",
         "subtitle": "Profituri medii, risc moderat",
         "duration": "12 min",
