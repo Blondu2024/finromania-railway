@@ -373,7 +373,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Hero CTA Section - MOVED FROM TOP - COMPACT */}
+        {/* Hero CTA Section - MOVED FROM TOP - COMPACT WIDTH */}
         <motion.section 
           className="relative overflow-hidden"
           initial={{ opacity: 0, y: 30 }}
@@ -381,8 +381,8 @@ export default function HomePage() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white rounded-2xl p-6 md:p-8">
-            <div className="max-w-3xl mx-auto text-center space-y-4">
+          <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white rounded-2xl p-6 md:p-8 max-w-2xl mx-auto">
+            <div className="text-center space-y-4">
               <motion.div
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
@@ -398,11 +398,11 @@ export default function HomePage() {
               </h2>
               
               <p className="text-lg text-blue-100">
-                Începe de la ZERO și Înțelege Piața în Profunzime
+                Începe de la ZERO și Înțelege Piața
               </p>
               
               <p className="text-sm text-blue-50">
-                17 lecții interactive, quiz-uri și ghidare pas-cu-pas — <strong>100% GRATUIT!</strong>
+                17 lecții interactive + quiz-uri — <strong>100% GRATUIT</strong>
               </p>
               
               <div className="flex gap-3 justify-center flex-wrap pt-2">
