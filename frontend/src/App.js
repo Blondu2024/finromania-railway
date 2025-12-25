@@ -281,6 +281,7 @@ function App() {
                 <div>
                   <h4 className="font-semibold mb-3">Legal</h4>
                   <ul className="space-y-2 text-sm">
+                    <li><Link to="/about" className="text-muted-foreground hover:text-foreground">Despre Noi</Link></li>
                     <li><Link to="/privacy" className="text-muted-foreground hover:text-foreground">Politica de Confidențialitate</Link></li>
                     <li><Link to="/terms" className="text-muted-foreground hover:text-foreground">Termeni și Condiții</Link></li>
                     <li><Link to="/cookies" className="text-muted-foreground hover:text-foreground">Politica de Cookie-uri</Link></li>
