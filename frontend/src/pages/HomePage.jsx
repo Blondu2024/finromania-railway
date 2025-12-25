@@ -7,6 +7,7 @@ import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import NewsletterSignup from '../components/NewsletterSignup';
+import VerticalScroller from '../components/VerticalScroller';
 import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 
@@ -367,29 +368,32 @@ export default function HomePage() {
 
           {/* Sidebar - Right */}
           <div className="space-y-6">
-            {/* Global Indices */}
+            {/* Global Indices - Vertical Scroll */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg">Indici Globali</CardTitle>
+                <p className="text-xs text-muted-foreground">Scroll automat ⬇️</p>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {globalIndices.slice(0, 6).map(index => {
-                  const isPositive = index.change_percent >= 0;
-                  return (
-                    <div key={index.symbol} className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium text-sm">{index.name || index.symbol}</p>
-                        <p className="text-xs text-muted-foreground">{index.symbol}</p>
+              <CardContent>
+                <VerticalScroller speed={30}>
+                  {globalIndices.map(index => {
+                    const isPositive = index.change_percent >= 0;
+                    return (
+                      <div key={index.symbol} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg hover:bg-muted/60 transition-colors">
+                        <div>
+                          <p className="font-medium text-sm">{index.name || index.symbol}</p>
+                          <p className="text-xs text-muted-foreground">{index.symbol}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-sm">{index.price?.toLocaleString('ro-RO')}</p>
+                          <p className={`text-xs font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                            {isPositive ? '+' : ''}{index.change_percent?.toFixed(2)}%
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-sm">{index.price?.toLocaleString('ro-RO')}</p>
-                        <p className={`text-xs ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                          {isPositive ? '+' : ''}{index.change_percent?.toFixed(2)}%
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </VerticalScroller>
               </CardContent>
             </Card>
 
