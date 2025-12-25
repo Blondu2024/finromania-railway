@@ -153,100 +153,26 @@ export default function HomePage() {
       />
       
       <div className="space-y-12">
-        {/* Hero Section - REWRITE COMPLET */}
-        <motion.section 
-          className="relative overflow-hidden"
+        {/* Simple Welcome Header */}
+        <motion.div 
+          className="text-center space-y-3 py-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white rounded-2xl p-8 md:p-12 lg:p-16">
-            <div className="max-w-4xl mx-auto text-center space-y-6">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring" }}
-                className="inline-block p-4 bg-white/20 rounded-full backdrop-blur-sm"
-              >
-                <GraduationCap className="w-12 h-12" />
-              </motion.div>
-              
-              <motion.h1 
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                Învață Trading de la ZERO
-              </motion.h1>
-              
-              <motion.p 
-                className="text-xl sm:text-2xl text-blue-100 max-w-3xl mx-auto"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                Înțelege Piața, Termenii, Graficele și Strategiile
-              </motion.p>
-              
-              <motion.p 
-                className="text-lg text-blue-50 max-w-2xl mx-auto"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                Curs complet cu <strong>17 lecții interactive</strong>, quiz-uri la fiecare capitol, 
-                și portofoliu demo — totul în română, <strong>100% GRATUIT!</strong>
-              </motion.p>
-              
-              <motion.div 
-                className="flex gap-4 justify-center flex-wrap pt-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                <Link to="/trading-school/lesson_1">
-                  <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-6 h-auto">
-                    <GraduationCap className="w-5 h-5 mr-2" />
-                    Începe Lecția 1 GRATUIT
-                  </Button>
-                </Link>
-                <Link to="/trading-school">
-                  <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-6 h-auto">
-                    <BookOpen className="w-5 h-5 mr-2" />
-                    Vezi Programul Complet
-                  </Button>
-                </Link>
-              </motion.div>
-              
-              <motion.div 
-                className="flex items-center justify-center gap-6 pt-6 flex-wrap text-sm text-blue-100"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-              >
-                <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4" />
-                  <span>17 Lecții Complete</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4" />
-                  <span>Quiz Interactive</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4" />
-                  <span>Date Reale BVB</span>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.section>
+          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            FinRomania
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Platformă de date financiare și educație pentru România
+          </p>
+        </motion.div>
 
-        {/* Benefits Section - 3 Coloane */}
+        {/* Benefits Section - Moved to top */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
           className="grid md:grid-cols-3 gap-6"
         >
           <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
