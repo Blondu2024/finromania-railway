@@ -15,7 +15,7 @@ const FAQ_DATA = [
       },
       {
         q: 'Este cu adevărat gratuit?',
-        a: 'DA! Majoritatea features sunt 100% gratuite: știri, date BVB live, convertor valutar, glosar financiar, și primele 5 lecții din Trading School. Oferim și un pachet premium opțional (10 RON) pentru acces complet la toate cele 17 lecții avansate.'
+        a: 'DA! TOATE features-urile sunt 100% gratuite: știri, date BVB live, convertor valutar, glosar financiar, AI Advisor, și TOATE cele 17 lecții din Trading School. Misiunea noastră este să democratizăm educația financiară în România - totul accesibil gratuit!'
       },
       {
         q: 'Datele sunt reale sau simulate?',
@@ -29,7 +29,7 @@ const FAQ_DATA = [
     questions: [
       {
         q: 'Ce este Trading School?',
-        a: 'Trading School este un curs interactiv complet de trading cu 17 lecții, quizzes, și scenarii practice. Înveți concepte de la bază (ce e o acțiune) până la avansat (indicatori tehnici, strategii complexe). Primele 5 lecții sunt GRATUITE pentru toată lumea!'
+        a: 'Trading School este un curs interactiv complet de trading cu 17 lecții, quizzes, și scenarii practice - 100% GRATUIT! Înveți concepte de la bază (ce e o acțiune) până la avansat (indicatori tehnici, strategii complexe). Toate lecțiile sunt disponibile pentru toată lumea!'
       },
       {
         q: 'Cum funcționează lecțiile?',
