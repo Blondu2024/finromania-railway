@@ -895,9 +895,9 @@ Caracteristici:
         ]
     },
     {
-        "id": "lesson_11",
+        "id": "lesson_12",
         "module": 4,
-        "order": 11,
+        "order": 12,
         "title": "Swing Trading - Tranzacții pe Zile",
         "subtitle": "Profituri medii, risc moderat",
         "duration": "12 min",
@@ -966,9 +966,9 @@ Caracteristici:
         ]
     },
     {
-        "id": "lesson_11",
+        "id": "lesson_12",
         "module": 4,
-        "order": 11,
+        "order": 12,
         "title": "Bollinger Bands - Zone de Volatilitate",
         "subtitle": "Când prețul e prea sus sau prea jos",
         "duration": "10 min",
