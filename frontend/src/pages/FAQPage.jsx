@@ -46,28 +46,6 @@ const FAQ_DATA = [
     ]
   },
   {
-    category: 'Plăți & Premium',
-    icon: <DollarSign className="w-5 h-5" />,
-    questions: [
-      {
-        q: 'Cât costă accesul Premium?',
-        a: 'Pachetul Premium costă doar 10 RON (plată unică) și îți dă acces permanent la toate cele 12 lecții avansate. Plătești o singură dată și ai acces pe viață - nu este abonament!'
-      },
-      {
-        q: 'Cum plătesc în siguranță?',
-        a: 'Folosim un procesor de plăți internațional securizat, certificat PCI-DSS. Acceptăm toate cardurile bancare (Visa, Mastercard). Tranzacția este criptată 100% - nu stocăm niciodată informații despre cardul tău. După plată, lecțiile se deblochează instant!'
-      },
-      {
-        q: 'Pot cere refund?',
-        a: 'Deoarece este conținut digital cu acces instant, nu oferim refund după achiziție. DAR poți testa GRATUIT primele 5 lecții înainte de a cumpăra premium, așa că știi exact ce primești! Recomandăm să parcurgi lecțiile gratuite mai întâi.'
-      },
-      {
-        q: 'Primesc factură fiscală?',
-        a: 'Da! Vei primi automat chitanță/invoice pe email după efectuarea plății. Documentul poate fi folosit pentru contabilitate sau decontări fiscale.'
-      }
-    ]
-  },
-  {
     category: 'Date & Securitate',
     icon: <Shield className="w-5 h-5" />,
     questions: [
