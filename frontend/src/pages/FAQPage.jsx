@@ -11,15 +11,15 @@ const FAQ_DATA = [
     questions: [
       {
         q: 'Ce este FinRomania?',
-        a: 'FinRomania este prima platformă educațională de trading și investiții din România. Oferim știri financiare în timp real, date live de pe BVB (Bursa de Valori București), instrumente educaționale interactive și AI Advisor pentru a te ajuta să înveți trading de la 0 la expert - 100% GRATUIT!'
+        a: 'FinRomania este prima platformă educațională de trading și investiții din România. Oferim știri financiare în timp real, date live de pe Bursa de Valori București, instrumente educaționale interactive și asistent AI pentru a te ajuta să înveți trading - totul în limba română!'
       },
       {
         q: 'Este cu adevărat gratuit?',
-        a: 'DA! Majoritatea features sunt 100% gratuite: știri, date BVB live, convertor valutar, watchlist, AI Advisor (cu limite), și primele 5 lecții din Trading School. Oferim și pachete premium opționale (10 RON) pentru acces complet la toate cele 16+ lecții avansate.'
+        a: 'DA! Majoritatea features sunt 100% gratuite: știri, date BVB live, convertor valutar, glosar financiar, și primele 5 lecții din Trading School. Oferim și un pachet premium opțional (10 RON) pentru acces complet la toate cele 17 lecții avansate.'
       },
       {
         q: 'Datele sunt reale sau simulate?',
-        a: 'TOATE datele sunt REALE! Folosim EODHD API (plătit $19.99/lună) pentru date BVB, Yahoo Finance pentru indici globali, și BNR pentru cursuri valutare. Nu folosim date mock sau simulate - vezi prețuri reale în timp real!'
+        a: 'Toate datele sunt REALE! Folosim surse licențiate și de încredere pentru date de pe Bursa de Valori București, indici globali, și cursuri valutare. Nu folosim date mock sau simulate - vezi prețuri reale în timp real!'
       }
     ]
   },
@@ -29,19 +29,19 @@ const FAQ_DATA = [
     questions: [
       {
         q: 'Ce este Trading School?',
-        a: 'Trading School este un curs interactiv de trading cu 16+ lecții, quizzes, și scenarii practice. Înveți concepte de la bază (ce e o acțiune) până la avansat (indicatori tehnici, strategii). Primele 5 lecții sunt GRATUITE, restul 11+ lecții costă 10 RON (pachet complet).'
+        a: 'Trading School este un curs interactiv complet de trading cu 17 lecții, quizzes, și scenarii practice. Înveți concepte de la bază (ce e o acțiune) până la avansat (indicatori tehnici, strategii complexe). Primele 5 lecții sunt GRATUITE pentru toată lumea!'
       },
       {
         q: 'Cum funcționează lecțiile?',
-        a: 'Fiecare lecție include: (1) Conținut educațional cu exemple practice, (2) Quiz cu 2-3 întrebări pentru verificare, (3) Feedback detaliat și explicații. Trebuie să treci quiz-ul cu 80%+ pentru a debloca lecția următoare. Progress-ul tău e salvat automat.'
+        a: 'Fiecare lecție include conținut educațional detaliat cu exemple practice din piața românească, urmat de un quiz interactiv pentru verificarea cunoștințelor. Trebuie să obții minim 80% la quiz pentru a debloca lecția următoare. Progress-ul tău este salvat automat dacă ești autentificat.'
       },
       {
         q: 'Primesc certificat la final?',
-        a: 'Certificatul PDF descărcabil va fi disponibil în curând pentru utilizatorii care completează toate lecțiile cu scor 80%+. Vei putea share certificatul pe LinkedIn sau CV!'
+        a: 'Da! Utilizatorii care completează toate lecțiile cu scor de minim 80% vor primi un certificat digital descărcabil care atestă parcurgerea cursului Trading School. Poți folosi certificatul pentru CV sau LinkedIn!'
       },
       {
         q: 'Pot folosi cunoștințele pentru trading real?',
-        a: 'ABSOLUT! Lecțiile te pregătesc pentru trading real pe orice platformă (XTB, eToro, Interactive Brokers, etc.). Înveți concepte universale: leverage, stop loss, indicatori tehnici, money management - toate aplicabile în viața reală!'
+        a: 'Absolut! Lecțiile te pregătesc pentru trading real pe orice platformă de brokeraj. Înveți concepte universale aplicabile pe toate piețele: analiza tehnică, managementul riscului, psihologia tradingului, și strategii practice.'
       }
     ]
   },
@@ -50,20 +50,20 @@ const FAQ_DATA = [
     icon: <DollarSign className="w-5 h-5" />,
     questions: [
       {
-        q: 'Cât costă Premium?',
-        a: 'Premium costă doar 10 RON (one-time payment) și deblochează TOATE cele 11+ lecții avansate din Trading School. Primești acces permanent - plătești o singură dată, ai acces pe viață!'
+        q: 'Cât costă accesul Premium?',
+        a: 'Pachetul Premium costă doar 10 RON (plată unică) și îți dă acces permanent la toate cele 12 lecții avansate. Plătești o singură dată și ai acces pe viață - nu este abonament!'
       },
       {
-        q: 'Cum plătesc?',
-        a: 'Folosim Stripe (cel mai sigur procesor de plăți din lume). Accepți card bancar (Visa, Mastercard). Tranzacția este securizată 100% - nu stocăm informații despre card. După plată, lecțiile premium se deblochează instant!'
+        q: 'Cum plătesc în siguranță?',
+        a: 'Folosim un procesor de plăți internațional securizat, certificat PCI-DSS. Acceptăm toate cardurile bancare (Visa, Mastercard). Tranzacția este criptată 100% - nu stocăm niciodată informații despre cardul tău. După plată, lecțiile se deblochează instant!'
       },
       {
         q: 'Pot cere refund?',
-        a: 'Deoarece e conținut digital instant access, refund-urile nu sunt disponibile după achiziție. DAR - poți testa GRATUIT primele 5 lecții înainte de a cumpăra premium! Așa știi exact ce primești.'
+        a: 'Deoarece este conținut digital cu acces instant, nu oferim refund după achiziție. DAR poți testa GRATUIT primele 5 lecții înainte de a cumpăra premium, așa că știi exact ce primești! Recomandăm să parcurgi lecțiile gratuite mai întâi.'
       },
       {
-        q: 'Primesc factură?',
-        a: 'DA! Stripe trimite automat chitanța/invoice pe email după plată. Poți folosi pentru contabilitate sau decontare (dacă ești PFA/SRL).'
+        q: 'Primesc factură fiscală?',
+        a: 'Da! Vei primi automat chitanță/invoice pe email după efectuarea plății. Documentul poate fi folosit pentru contabilitate sau decontări fiscale.'
       }
     ]
   },
@@ -72,16 +72,16 @@ const FAQ_DATA = [
     icon: <Shield className="w-5 h-5" />,
     questions: [
       {
-        q: 'Sunt datele BVB actualizate?',
-        a: 'DA! Datele BVB se actualizează automat la fiecare 5 minute prin EODHD API. Vezi prețuri reale pentru TLV, H2O, SNP, și alte 20 acțiuni de pe Bursa de Valori București. Nu sunt simulate!'
+        q: 'Cât de actualizate sunt datele de pe BVB?',
+        a: 'Datele de pe Bursa de Valori București se actualizează automat la fiecare câteva minute. Vezi prețuri reale pentru acțiunile principale: Banca Transilvania, Hidroelectrica, OMV Petrom, și multe altele. Datele provin de la surse oficiale licențiate.'
       },
       {
-        q: 'Datele mele sunt în siguranță?',
-        a: 'ABSOLUT! Folosim autentificare Google OAuth (managed de Emergent), encriptare HTTPS, și MongoDB pentru stocare. NU stocăm parole în plain text. NU vindem datele tale. Respectăm GDPR.'
+        q: 'Sunt datele mele personale în siguranță?',
+        a: 'Absolut! Folosim autentificare securizată prin Google, encriptare HTTPS pentru toate comunicările, și respectăm strict regulamentul GDPR. Nu stocăm parole în format text, nu vindem datele tale nimănui, și poți șterge contul oricând.'
       },
       {
         q: 'Pot face trading efectiv pe platformă?',
-        a: 'NU! FinRomania e o platformă EDUCAȚIONALĂ, nu broker. Nu poți cumpăra/vinde acțiuni reale aici. Portofoliul Virtual (în beta) e doar pentru învățare cu bani virtuali. Pentru trading real, folosește brokeri licențiați (XTB, eToro, etc.).'
+        a: 'NU! FinRomania este o platformă EDUCAȚIONALĂ, nu un broker. Nu poți cumpăra sau vinde acțiuni reale aici. Învățătura noastră te pregătește pentru a folosi platforme de brokeraj licențiate (XTB, eToro, Interactive Brokers, etc.) când ești gata.'
       }
     ]
   },
@@ -91,15 +91,15 @@ const FAQ_DATA = [
     questions: [
       {
         q: 'Cum funcționează AI Advisor?',
-        a: 'AI Advisor folosește GPT-4 (prin Emergent Universal Key) pentru a răspunde la întrebări despre trading, investiții, și piețe financiare. Poți întreba orice: "Ce e un ETF?", "Cum setez Stop Loss?", "Cum analizez o acțiune?". AI răspunde în română cu exemple practice!'
+        a: 'AI Advisor este un asistent inteligent care răspunde la întrebări despre trading, investiții, și piețe financiare în limba română. Poți întreba orice: "Ce este un ETF?", "Cum setez Stop Loss?", "Cum analizez o acțiune?". Primești răspunsuri clare cu exemple practice!'
       },
       {
-        q: 'AI Advisor e gratuit?',
-        a: 'DA! Ai access gratuit la Tip of the Day și întrebări limitate. Pentru utilizatori autentificați, ai mai multe credite. AI folosește Emergent Universal Key (nu plătești separat pentru OpenAI).'
+        q: 'AI Advisor este gratuit?',
+        a: 'Da! Ai acces gratuit la funcțiile de bază ale AI Advisor, inclusiv "Sfatul Zilei". Pentru utilizatorii autentificați, există și mai multe credite disponibile pentru întrebări personalizate.'
       },
       {
-        q: 'Poate AI să-mi recomande acțiuni specifice?',
-        a: 'AI poate analiza acțiuni și explica concepte, DAR nu dă sfaturi financiare personalizate ("cumpără X acum!"). Folosește AI pentru educație, nu ca sfătuitor financiar licențiat. Deciziile de trading sunt RESPONSABILITATEA TA!'
+        q: 'Poate AI să-mi recomande acțiuni specifice de cumpărat?',
+        a: 'AI-ul poate analiza companii și explica concepte financiare, DAR nu oferă sfaturi financiare personalizate de tipul "cumpără acțiunea X acum!". Este un instrument educațional, nu un consilier financiar licențiat. Toate deciziile de investiții rămân responsabilitatea ta!'
       }
     ]
   }
