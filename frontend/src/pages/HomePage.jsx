@@ -352,75 +352,36 @@ export default function HomePage() {
             {/* Newsletter */}
             <NewsletterSignup variant="sidebar" />
 
-            {/* Trading School CTA */}
-            <Card className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-300">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="inline-block p-3 bg-green-600 text-white rounded-full">
+            {/* Trading School CTA - REPLACED WITH HERO */}
+            <Card className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white border-0">
+              <CardContent className="p-6 text-center space-y-3">
+                <div className="inline-block p-3 bg-white/20 rounded-full backdrop-blur-sm">
                   <GraduationCap className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-bold">Învață Trading Gratuit</h3>
-                <p className="text-sm text-muted-foreground">
-                  17 lecții interactive, quiz-uri, și ghidare pas-cu-pas
+                <h3 className="text-2xl font-bold">
+                  Gata Să Înveți Trading?
+                </h3>
+                <p className="text-sm text-blue-100">
+                  17 lecții interactive + quiz-uri
                 </p>
-                <Link to="/trading-school">
-                  <Button className="w-full bg-green-600 hover:bg-green-700">
+                <p className="text-xs text-blue-50">
+                  100% GRATUIT în română
+                </p>
+                <Link to="/trading-school/lesson_1">
+                  <Button className="w-full bg-white text-blue-600 hover:bg-blue-50 font-semibold">
                     <GraduationCap className="w-4 h-4 mr-2" />
-                    Începe Acum
+                    Începe Lecția 1
+                  </Button>
+                </Link>
+                <Link to="/trading-school">
+                  <Button variant="outline" className="w-full border-white text-white hover:bg-white/10">
+                    Vezi Programul →
                   </Button>
                 </Link>
               </CardContent>
             </Card>
           </div>
         </div>
-
-        {/* Hero CTA Section - MOVED FROM TOP - COMPACT WIDTH */}
-        <motion.section 
-          className="relative overflow-hidden"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white rounded-2xl p-6 md:p-8 max-w-2xl mx-auto">
-            <div className="text-center space-y-4">
-              <motion.div
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, type: "spring" }}
-                className="inline-block p-3 bg-white/20 rounded-full backdrop-blur-sm"
-              >
-                <GraduationCap className="w-8 h-8" />
-              </motion.div>
-              
-              <h2 className="text-3xl sm:text-4xl font-bold leading-tight">
-                Gata Să Înveți Trading?
-              </h2>
-              
-              <p className="text-lg text-blue-100">
-                Începe de la ZERO și Înțelege Piața
-              </p>
-              
-              <p className="text-sm text-blue-50">
-                17 lecții interactive + quiz-uri — <strong>100% GRATUIT</strong>
-              </p>
-              
-              <div className="flex gap-3 justify-center flex-wrap pt-2">
-                <Link to="/trading-school/lesson_1">
-                  <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
-                    <GraduationCap className="w-4 h-4 mr-2" />
-                    Începe Lecția 1
-                  </Button>
-                </Link>
-                <Link to="/trading-school">
-                  <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10">
-                    Vezi Programul →
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </motion.section>
       </div>
     </>
   );
