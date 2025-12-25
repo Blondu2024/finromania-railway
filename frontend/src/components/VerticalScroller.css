@@ -1,0 +1,22 @@
+.vertical-scroller {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 5%,
+    black 95%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 5%,
+    black 95%,
+    transparent
+  );
+}
+
+.scroller-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
