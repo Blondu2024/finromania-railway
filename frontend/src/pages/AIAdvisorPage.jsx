@@ -228,14 +228,14 @@ export default function AIAdvisorPage() {
           </Card>
         </Link>
         
-        <Link to="/education">
+        <Link to="/trading-school">
           <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
             <CardContent className="p-6 text-center">
               <div className="p-3 bg-green-100 dark:bg-green-900 rounded-full w-fit mx-auto mb-3">
                 <Lightbulb className="w-6 h-6 text-green-600" />
               </div>
-              <h3 className="font-semibold">Curs Investiții</h3>
-              <p className="text-sm text-muted-foreground">Învață bazele de la zero</p>
+              <h3 className="font-semibold">Trading School</h3>
+              <p className="text-sm text-muted-foreground">17 lecții gratuite - Învață de la zero</p>
             </CardContent>
           </Card>
         </Link>
