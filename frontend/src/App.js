@@ -284,6 +284,7 @@ function App() {
                     <li><Link to="/terms" className="text-muted-foreground hover:text-foreground">Termeni și Condiții</Link></li>
                     <li><Link to="/cookies" className="text-muted-foreground hover:text-foreground">Politica de Cookie-uri</Link></li>
                     <li><Link to="/disclaimer" className="text-muted-foreground hover:text-foreground">Disclaimer</Link></li>
+                    <li><Link to="/faq" className="text-muted-foreground hover:text-foreground">Întrebări Frecvente</Link></li>
                   </ul>
                 </div>
                 <div>
