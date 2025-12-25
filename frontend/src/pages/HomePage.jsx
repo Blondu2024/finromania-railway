@@ -382,6 +382,132 @@ export default function HomePage() {
             </Card>
           </div>
         </div>
+
+        {/* Top Movers Section - NEW! */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-12"
+        >
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">
+            📊 Mișcările Pieței Astăzi
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Top Gainers */}
+            <Card className="border-2 border-green-300">
+              <CardHeader className="bg-green-50">
+                <CardTitle className="flex items-center gap-2 text-green-700">
+                  <TrendingUp className="w-5 h-5" />
+                  Top Gainers (Creșteri)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  {bvbStocks
+                    .filter(s => s.change_percent > 0)
+                    .sort((a, b) => b.change_percent - a.change_percent)
+                    .slice(0, 5)
+                    .map((stock, idx) => (
+                      <Link key={stock.symbol} to={`/stocks/bvb/${stock.symbol}`}>
+                        <div className="flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors cursor-pointer">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                              {idx + 1}
+                            </div>
+                            <div>
+                              <p className="font-bold">{stock.symbol}</p>
+                              <p className="text-xs text-muted-foreground">{stock.name}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold">{stock.price?.toFixed(2)} RON</p>
+                            <p className="text-sm font-bold text-green-600">
+                              +{stock.change_percent?.toFixed(2)}%
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Top Losers */}
+            <Card className="border-2 border-red-300">
+              <CardHeader className="bg-red-50">
+                <CardTitle className="flex items-center gap-2 text-red-700">
+                  <TrendingDown className="w-5 h-5" />
+                  Top Losers (Scăderi)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  {bvbStocks
+                    .filter(s => s.change_percent < 0)
+                    .sort((a, b) => a.change_percent - b.change_percent)
+                    .slice(0, 5)
+                    .map((stock, idx) => (
+                      <Link key={stock.symbol} to={`/stocks/bvb/${stock.symbol}`}>
+                        <div className="flex items-center justify-between p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                              {idx + 1}
+                            </div>
+                            <div>
+                              <p className="font-bold">{stock.symbol}</p>
+                              <p className="text-xs text-muted-foreground">{stock.name}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold">{stock.price?.toFixed(2)} RON</p>
+                            <p className="text-sm font-bold text-red-600">
+                              {stock.change_percent?.toFixed(2)}%
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.section>
+
+        {/* Final CTA - Compact */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-12"
+        >
+          <Card className="bg-gradient-to-br from-blue-600 to-purple-600 text-white border-0 max-w-4xl mx-auto">
+            <CardContent className="p-8 text-center space-y-4">
+              <div className="inline-block p-3 bg-white/20 rounded-full">
+                <GraduationCap className="w-10 h-10" />
+              </div>
+              <h2 className="text-3xl font-bold">
+                Înțelegi Datele? Învață Să Le Folosești!
+              </h2>
+              <p className="text-lg text-blue-100 max-w-2xl mx-auto">
+                17 lecții interactive te învață cum să analizezi piața, să identifici oportunități și să gestionezi riscul — 100% gratuit!
+              </p>
+              <div className="flex gap-4 justify-center flex-wrap">
+                <Link to="/trading-school/lesson_1">
+                  <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
+                    <GraduationCap className="w-5 h-5 mr-2" />
+                    Începe Prima Lecție
+                  </Button>
+                </Link>
+                <Link to="/trading-school">
+                  <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10">
+                    Vezi Tot Programul →
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.section>
       </div>
     </>
   );
