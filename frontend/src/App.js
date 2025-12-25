@@ -106,7 +106,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
     { path: '/trading-school', label: '🎓 Învață Trading', icon: <BookOpen className="w-4 h-4" /> },
     { path: '/stocks', label: 'Acțiuni BVB', icon: <TrendingUp className="w-4 h-4" /> },
     { path: '/news', label: 'Știri', icon: <Newspaper className="w-4 h-4" /> },
-    { path: '/currencies', label: 'Valute', icon: <DollarSign className="w-4 h-4" /> },
+    { path: '/faq', label: '❓ FAQ', icon: <ClipboardCheck className="w-4 h-4" /> },
     { path: '/converter', label: 'Convertor', icon: <DollarSign className="w-4 h-4" /> },
     { path: '/advisor', label: 'Consilier AI', icon: <Bot className="w-4 h-4" /> },
   ];
