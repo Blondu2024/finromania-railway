@@ -298,10 +298,6 @@ function App() {
                 <p className="text-sm text-muted-foreground">
                   © 2025 FinRomania - Toate drepturile rezervate
                 </p>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">Date BVB: REAL (EODHD)</Badge>
-                  <Badge variant="secondary" className="text-xs">MVP v2.0</Badge>
-                </div>
               </div>
             </div>
           </footer>
