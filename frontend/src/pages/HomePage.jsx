@@ -328,19 +328,21 @@ export default function HomePage() {
                   <p className="text-xs text-muted-foreground">Data: {currencies.date} • Scroll automat ⬇️</p>
                 </CardHeader>
                 <CardContent>
-                  <VerticalScroller speed={25}>
-                    <div className="space-y-2">
-                      {Object.entries(currencies.rates).map(([code, data]) => (
-                        <div key={code} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg hover:bg-muted/60 transition-colors">
-                          <span className="font-semibold">{code}</span>
-                          <div className="text-right">
-                            <p className="font-bold">{data.rate?.toFixed(4)}</p>
-                            <p className="text-xs text-muted-foreground">RON</p>
+                  <div style={{ maxHeight: '350px', overflow: 'hidden' }}>
+                    <VerticalScroller speed={20}>
+                      <div className="space-y-2">
+                        {Object.entries(currencies.rates).slice(0, 15).map(([code, data]) => (
+                          <div key={code} className="flex justify-between items-center p-2 bg-muted/30 rounded-lg hover:bg-muted/60 transition-colors">
+                            <span className="font-semibold text-sm">{code}</span>
+                            <div className="text-right">
+                              <p className="font-bold text-sm">{data.rate?.toFixed(4)}</p>
+                              <p className="text-xs text-muted-foreground">RON</p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </VerticalScroller>
+                        ))}
+                      </div>
+                    </VerticalScroller>
+                  </div>
                   <Link to="/converter" className="block mt-3">
                     <Button variant="outline" size="sm" className="w-full">
                       Convertor Valutar <ArrowRight className="w-4 h-4 ml-1" />
