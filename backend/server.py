@@ -526,11 +526,7 @@ async def stripe_webhook(request: FastAPIRequest):
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://finromania-1.preview.emergentagent.com",
-        "https://finromania-1.preview.emergentagent.com"
-    ],
+    allow_origins=["*"],  # Allow all origins for Emergent deployment
     allow_methods=["*"],
     allow_headers=["*"],
 )
