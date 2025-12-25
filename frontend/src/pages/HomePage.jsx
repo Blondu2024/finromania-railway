@@ -325,27 +325,24 @@ export default function HomePage() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg">Curs Valutar BNR</CardTitle>
-                  <p className="text-xs text-muted-foreground">Data: {currencies.date} • Scroll automat ⬇️</p>
+                  <p className="text-xs text-muted-foreground">Top 10 valute</p>
                 </CardHeader>
                 <CardContent>
-                  <div style={{ maxHeight: '350px', overflow: 'hidden' }}>
-                    <VerticalScroller speed={20}>
-                      <div className="space-y-2">
-                        {Object.entries(currencies.rates).slice(0, 15).map(([code, data]) => (
-                          <div key={code} className="flex justify-between items-center p-2 bg-muted/30 rounded-lg hover:bg-muted/60 transition-colors">
+                  <div style={{ maxHeight: '250px', overflow: 'hidden' }}>
+                    <VerticalScroller speed={15}>
+                      <div className="space-y-1.5">
+                        {Object.entries(currencies.rates).slice(0, 10).map(([code, data]) => (
+                          <div key={code} className="flex justify-between items-center p-2 bg-muted/30 rounded hover:bg-muted/60 transition-colors">
                             <span className="font-semibold text-sm">{code}</span>
-                            <div className="text-right">
-                              <p className="font-bold text-sm">{data.rate?.toFixed(4)}</p>
-                              <p className="text-xs text-muted-foreground">RON</p>
-                            </div>
+                            <p className="font-bold text-sm">{data.rate?.toFixed(4)} <span className="text-xs text-muted-foreground">RON</span></p>
                           </div>
                         ))}
                       </div>
                     </VerticalScroller>
                   </div>
                   <Link to="/converter" className="block mt-3">
-                    <Button variant="outline" size="sm" className="w-full">
-                      Convertor Valutar <ArrowRight className="w-4 h-4 ml-1" />
+                    <Button variant="outline" size="sm" className="w-full text-xs">
+                      Vezi Toate Valutele →
                     </Button>
                   </Link>
                 </CardContent>
