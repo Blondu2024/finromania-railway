@@ -168,7 +168,7 @@ export default function HomePage() {
           </p>
         </motion.div>
 
-        {/* Benefits Section - Moved to top */}
+        {/* Platform Identity - 3 Cards */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -178,51 +178,36 @@ export default function HomePage() {
           <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
             <CardContent className="p-6 text-center space-y-3">
               <div className="inline-block p-4 bg-blue-100 rounded-full">
-                <BookOpen className="w-8 h-8 text-blue-600" />
+                <BarChart3 className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-bold">17 Lecții Interactive</h3>
+              <h3 className="text-xl font-bold">Date Reale BVB</h3>
               <p className="text-muted-foreground">
-                Învață concepte de la bază până la avansat: acțiuni, leverage, indicatori tehnici, strategii de trading
+                Prețuri live de pe Bursa de Valori București - actualizate automat la fiecare 5 minute
               </p>
-              <Link to="/trading-school">
-                <Button variant="link" className="text-blue-600">
-                  Vezi Lecțiile <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 border-green-200 hover:border-green-400 transition-colors">
-            <CardContent className="p-6 text-center space-y-3">
-              <div className="inline-block p-4 bg-green-100 rounded-full">
-                <Target className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-bold">Quiz cu Feedback</h3>
-              <p className="text-muted-foreground">
-                Verifică-ți cunoștințele după fiecare lecție și primește explicații detaliate pentru fiecare răspuns
-              </p>
-              <Link to="/trading-school">
-                <Button variant="link" className="text-green-600">
-                  Încearcă un Quiz <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </Link>
             </CardContent>
           </Card>
 
           <Card className="border-2 border-purple-200 hover:border-purple-400 transition-colors">
             <CardContent className="p-6 text-center space-y-3">
               <div className="inline-block p-4 bg-purple-100 rounded-full">
-                <BarChart3 className="w-8 h-8 text-purple-600" />
+                <Newspaper className="w-8 h-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-bold">Date Reale BVB</h3>
+              <h3 className="text-xl font-bold">Știri Financiare</h3>
               <p className="text-muted-foreground">
-                Prețuri live de pe Bursa de Valori București, actualizate automat - vezi piața reală, nu simulări
+                Actualizări automate din surse românești de încredere - fără fake news, doar informații verificate
               </p>
-              <Link to="/stocks">
-                <Button variant="link" className="text-purple-600">
-                  Explorează BVB <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-green-200 hover:border-green-400 transition-colors">
+            <CardContent className="p-6 text-center space-y-3">
+              <div className="inline-block p-4 bg-green-100 rounded-full">
+                <Zap className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-bold">100% Gratuit</h3>
+              <p className="text-muted-foreground">
+                Toate datele, știrile, instrumentele și educația - accesibile gratuit pentru orice român interesat de investiții
+              </p>
             </CardContent>
           </Card>
         </motion.section>
