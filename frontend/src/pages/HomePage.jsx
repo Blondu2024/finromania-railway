@@ -301,7 +301,7 @@ export default function HomePage() {
           </Card>
         </motion.section>
 
-        {/* BVB Stocks */}
+        {/* BVB Stocks - Vertical Auto-Scroll */}
         <section>
           <div className="flex justify-between items-center mb-6">
             <div>
@@ -309,7 +309,7 @@ export default function HomePage() {
                 <TrendingUp className="w-6 h-6 text-blue-600" />
                 Bursa de Valori București
               </h2>
-              <p className="text-muted-foreground mt-1">Acțiuni românești - date live</p>
+              <p className="text-muted-foreground mt-1">Acțiuni românești - scroll automat ⬇️</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={handleRefresh} disabled={refreshing} size="sm">
@@ -323,16 +323,13 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          <motion.div 
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            {bvbStocks.slice(0, 5).map(stock => (
-              <StockCard key={stock.symbol} stock={stock} type="bvb" />
-            ))}
-          </motion.div>
+          <VerticalScroller speed={40}>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {bvbStocks.map(stock => (
+                <StockCard key={stock.symbol} stock={stock} type="bvb" />
+              ))}
+            </div>
+          </VerticalScroller>
         </section>
 
         {/* Main Content Grid */}
