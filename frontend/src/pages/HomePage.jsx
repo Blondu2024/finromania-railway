@@ -394,22 +394,27 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Currencies Widget */}
+            {/* Currencies Widget - Vertical Scroll */}
             {currencies?.rates && (
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg">Curs Valutar BNR</CardTitle>
-                  <p className="text-xs text-muted-foreground">Data: {currencies.date}</p>
+                  <p className="text-xs text-muted-foreground">Data: {currencies.date} • Scroll automat ⬇️</p>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-3">
-                    {['EUR', 'USD', 'GBP', 'CHF'].map(code => currencies.rates[code] && (
-                      <div key={code} className="text-center p-3 bg-muted/50 rounded-lg">
-                        <p className="text-lg font-bold">{currencies.rates[code].rate?.toFixed(4)}</p>
-                        <p className="text-xs text-muted-foreground">{code}/RON</p>
-                      </div>
-                    ))}
-                  </div>
+                  <VerticalScroller speed={25}>
+                    <div className="space-y-2">
+                      {Object.entries(currencies.rates).map(([code, data]) => (
+                        <div key={code} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg hover:bg-muted/60 transition-colors">
+                          <span className="font-semibold">{code}</span>
+                          <div className="text-right">
+                            <p className="font-bold">{data.rate?.toFixed(4)}</p>
+                            <p className="text-xs text-muted-foreground">RON</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </VerticalScroller>
                   <Link to="/converter" className="block mt-3">
                     <Button variant="outline" size="sm" className="w-full">
                       Convertor Valutar <ArrowRight className="w-4 h-4 ml-1" />
