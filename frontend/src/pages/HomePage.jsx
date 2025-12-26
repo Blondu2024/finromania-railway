@@ -99,7 +99,7 @@ export default function HomePage() {
       const [bvbRes, globalRes, newsRes, currRes] = await Promise.all([
         fetch(`${API_URL}/api/stocks/bvb`),
         fetch(`${API_URL}/api/stocks/global`),
-        fetch(`${API_URL}/api/news?limit=6`),
+        fetch(`${API_URL}/api/news?limit=12`),
         fetch(`${API_URL}/api/currencies`)
       ]);
       
@@ -268,7 +268,7 @@ export default function HomePage() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              {news.slice(0, 6).map(article => (
+              {news.slice(0, 12).map(article => (
                 <NewsCard key={article.id} article={article} />
               ))}
             </motion.div>
