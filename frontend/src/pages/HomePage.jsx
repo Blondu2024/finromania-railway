@@ -368,7 +368,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Top Movers Section - NEW! */}
+        {/* Top Movers Section - WITH VERTICAL SCROLL! */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -379,7 +379,7 @@ export default function HomePage() {
             📊 Mișcările Pieței Astăzi
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Top Gainers */}
+            {/* Top Gainers - Vertical Scroll */}
             <Card className="border-2 border-green-300">
               <CardHeader className="bg-green-50">
                 <CardTitle className="flex items-center gap-2 text-green-700">
@@ -388,37 +388,40 @@ export default function HomePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <div className="space-y-2">
-                  {bvbStocks
-                    .filter(s => s.change_percent > 0)
-                    .sort((a, b) => b.change_percent - a.change_percent)
-                    .slice(0, 5)
-                    .map((stock, idx) => (
-                      <Link key={stock.symbol} to={`/stocks/bvb/${stock.symbol}`}>
-                        <div className="flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors cursor-pointer">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                              {idx + 1}
+                <div style={{ maxHeight: '400px', overflow: 'hidden' }}>
+                  <VerticalScroller speed={20}>
+                    <div className="space-y-2">
+                      {bvbStocks
+                        .filter(s => s.change_percent > 0)
+                        .sort((a, b) => b.change_percent - a.change_percent)
+                        .map((stock, idx) => (
+                          <Link key={stock.symbol} to={`/stocks/bvb/${stock.symbol}`}>
+                            <div className="flex items-center justify-between p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors cursor-pointer">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                                  {idx + 1}
+                                </div>
+                                <div>
+                                  <p className="font-bold">{stock.symbol}</p>
+                                  <p className="text-xs text-muted-foreground">{stock.name}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-sm">{stock.price?.toFixed(2)} RON</p>
+                                <p className="text-sm font-bold text-green-600">
+                                  +{stock.change_percent?.toFixed(2)}%
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-bold">{stock.symbol}</p>
-                              <p className="text-xs text-muted-foreground">{stock.name}</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold">{stock.price?.toFixed(2)} RON</p>
-                            <p className="text-sm font-bold text-green-600">
-                              +{stock.change_percent?.toFixed(2)}%
-                            </p>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
+                          </Link>
+                        ))}
+                    </div>
+                  </VerticalScroller>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Top Losers */}
+            {/* Top Losers - Vertical Scroll */}
             <Card className="border-2 border-red-300">
               <CardHeader className="bg-red-50">
                 <CardTitle className="flex items-center gap-2 text-red-700">
@@ -427,33 +430,83 @@ export default function HomePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <div className="space-y-2">
-                  {bvbStocks
-                    .filter(s => s.change_percent < 0)
-                    .sort((a, b) => a.change_percent - b.change_percent)
-                    .slice(0, 5)
-                    .map((stock, idx) => (
-                      <Link key={stock.symbol} to={`/stocks/bvb/${stock.symbol}`}>
-                        <div className="flex items-center justify-between p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                              {idx + 1}
+                <div style={{ maxHeight: '400px', overflow: 'hidden' }}>
+                  <VerticalScroller speed={20}>
+                    <div className="space-y-2">
+                      {bvbStocks
+                        .filter(s => s.change_percent < 0)
+                        .sort((a, b) => a.change_percent - b.change_percent)
+                        .map((stock, idx) => (
+                          <Link key={stock.symbol} to={`/stocks/bvb/${stock.symbol}`}>
+                            <div className="flex items-center justify-between p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                                  {idx + 1}
+                                </div>
+                                <div>
+                                  <p className="font-bold">{stock.symbol}</p>
+                                  <p className="text-xs text-muted-foreground">{stock.name}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-bold text-sm">{stock.price?.toFixed(2)} RON</p>
+                                <p className="text-sm font-bold text-red-600">
+                                  {stock.change_percent?.toFixed(2)}%
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-bold">{stock.symbol}</p>
-                              <p className="text-xs text-muted-foreground">{stock.name}</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold">{stock.price?.toFixed(2)} RON</p>
-                            <p className="text-sm font-bold text-red-600">
-                              {stock.change_percent?.toFixed(2)}%
-                            </p>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
+                          </Link>
+                        ))}
+                    </div>
+                  </VerticalScroller>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.section>
+
+        {/* Educational Benefits - MOVED HERE */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-12"
+        >
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">
+            🎓 Vrei Să Înveți Trading?
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
+              <CardContent className="p-6 text-center space-y-3">
+                <div className="inline-block p-4 bg-blue-100 rounded-full">
+                  <BookOpen className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold">17 Lecții Interactive</h3>
+                <p className="text-muted-foreground">
+                  Învață de la bază până avansat: acțiuni, leverage, indicatori tehnici, strategii
+                </p>
+                <Link to="/trading-school">
+                  <Button className="w-full">
+                    Vezi Lecțiile <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-green-200 hover:border-green-400 transition-colors">
+              <CardContent className="p-6 text-center space-y-3">
+                <div className="inline-block p-4 bg-green-100 rounded-full">
+                  <Target className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold">Quiz cu Feedback</h3>
+                <p className="text-muted-foreground">
+                  Verifică-ți cunoștințele și primește explicații detaliate
+                </p>
+                <Link to="/trading-school">
+                  <Button className="w-full">
+                    Încearcă un Quiz <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
