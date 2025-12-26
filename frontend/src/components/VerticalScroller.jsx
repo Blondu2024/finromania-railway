@@ -16,27 +16,33 @@ export default function VerticalScroller({ children, speed = 30, pauseOnHover = 
     const scrollerContentClone = scrollerContent.cloneNode(true);
     scroller.appendChild(scrollerContentClone);
 
-    let animationId;
     let scrollPosition = 0;
-    const contentHeight = scrollerContent.offsetHeight;
+    let lastTime = Date.now();
 
     const scroll = () => {
+      const now = Date.now();
+      const deltaTime = (now - lastTime) / 1000; // Convert to seconds
+      lastTime = now;
+
       if (!isPaused) {
-        scrollPosition += 0.5;
+        scrollPosition += speed * deltaTime;
+        const contentHeight = scrollerContent.offsetHeight;
+        
         if (scrollPosition >= contentHeight) {
           scrollPosition = 0;
         }
+        
         scroller.scrollTop = scrollPosition;
       }
-      animationId = requestAnimationFrame(scroll);
+      
+      requestAnimationFrame(scroll);
     };
 
-    animationId = requestAnimationFrame(scroll);
+    // Start scroll immediately
+    requestAnimationFrame(scroll);
 
     return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-      }
+      // Cleanup handled by RAF loop ending
     };
   }, [isPaused, speed]);
 
