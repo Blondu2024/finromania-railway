@@ -785,6 +785,69 @@ class FinRomaniaAPITester:
         self.log_test("AI Advisor - Tip of the Day", success, details, data)
         
         # ============================================
+        # SESSION 9: FINANCIAL EDUCATION MODULE
+        # ============================================
+        print("\n🎓 SECTION 8: Financial Education Module (NEW)")
+        print("-" * 80)
+        
+        # Test 20: Financial Education Lessons - All 15 lessons
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/financial-education/lessons',
+            validate_response=self.validate_financial_lessons
+        )
+        self.log_test("Financial Education - All Lessons (15 total)", success, details,
+                     {"total": data.get('total'), "modules": len(data.get('modules', {})), 
+                      "sample_lessons": [l.get('title') for l in data.get('lessons', [])][:3]} if isinstance(data, dict) else data)
+        
+        # Test 21: Individual Lesson - fin_lesson_1
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/financial-education/lessons/fin_lesson_1',
+            validate_response=self.validate_financial_lesson_detail
+        )
+        self.log_test("Financial Education - Lesson 1 Detail", success, details,
+                     {"title": data.get('title'), "module": data.get('module'), "quiz_count": len(data.get('quiz', [])),
+                      "content_length": len(data.get('content', ''))} if isinstance(data, dict) else data)
+        
+        # Test 22: Quiz Submission (requires auth)
+        if self.regular_user_token:
+            # Test with correct answers for fin_lesson_1 (answers: [1, 2] based on quiz structure)
+            success, details, data = self.test_api_endpoint(
+                'POST', '/api/financial-education/quiz/submit',
+                auth_token=self.regular_user_token,
+                data={"lesson_id": "fin_lesson_1", "answers": [1, 2]},
+                validate_response=self.validate_quiz_submission
+            )
+            self.log_test("Financial Education - Quiz Submit (Correct)", success, details,
+                         {"score": data.get('score'), "passed": data.get('passed'), 
+                          "correct": data.get('correct'), "total": data.get('total')} if isinstance(data, dict) else data)
+            
+            # Test 23: Progress Tracking
+            success, details, data = self.test_api_endpoint(
+                'GET', '/api/financial-education/progress',
+                auth_token=self.regular_user_token,
+                validate_response=self.validate_financial_progress
+            )
+            self.log_test("Financial Education - Progress Tracking", success, details,
+                         {"completed": len(data.get('completed_lessons', [])), 
+                          "total": data.get('total_lessons'), "progress": data.get('progress_percent')} if isinstance(data, dict) else data)
+        else:
+            self.log_test("Financial Education - Quiz Submit", False, "Skipped - no user token")
+            self.log_test("Financial Education - Progress Tracking", False, "Skipped - no user token")
+        
+        # Test 24: Quiz with wrong answers
+        if self.regular_user_token:
+            success, details, data = self.test_api_endpoint(
+                'POST', '/api/financial-education/quiz/submit',
+                auth_token=self.regular_user_token,
+                data={"lesson_id": "fin_lesson_1", "answers": [0, 0]},  # Wrong answers
+                validate_response=self.validate_quiz_submission
+            )
+            self.log_test("Financial Education - Quiz Submit (Wrong)", success, details,
+                         {"score": data.get('score'), "passed": data.get('passed')} if isinstance(data, dict) else data)
+        else:
+            self.log_test("Financial Education - Quiz Submit (Wrong)", False, "Skipped - no user token")
+
+        # ============================================
         # FINAL SUMMARY
         # ============================================
         print("\n" + "=" * 80)
