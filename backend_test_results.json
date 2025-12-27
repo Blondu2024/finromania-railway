@@ -1,26 +1,26 @@
 {
   "summary": {
-    "total_tests": 20,
-    "passed_tests": 20,
-    "success_rate": "100.0%",
-    "timestamp": "2025-12-24T15:11:58.094254"
+    "total_tests": 25,
+    "passed_tests": 23,
+    "success_rate": "92.0%",
+    "timestamp": "2025-12-27T06:22:30.273423"
   },
   "detailed_results": [
     {
       "test_name": "Health Check",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:52.751684",
+      "timestamp": "2025-12-27T06:22:24.229677",
       "response_sample": {
         "status": "healthy",
-        "timestamp": "2025-12-24T15:11:52.745455+00:00"
+        "timestamp": "2025-12-27T06:22:24.223411+00:00"
       }
     },
     {
       "test_name": "API Root Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:52.819727",
+      "timestamp": "2025-12-27T06:22:24.285604",
       "response_sample": {
         "message": "FinRomania API",
         "version": "1.0.0",
@@ -35,23 +35,23 @@
     },
     {
       "test_name": "BVB Stock Details - TLV (REAL EODHD)",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:53.298454",
+      "success": false,
+      "details": "Validation failed: Too few history entries: 18, expected around 30",
+      "timestamp": "2025-12-27T06:22:24.718997",
       "response_sample": {
         "symbol": "TLV",
-        "history_count": 21,
+        "history_count": 18,
         "is_mock": false
       }
     },
     {
       "test_name": "BVB Stock Details - H2O (REAL EODHD)",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:53.689239",
+      "success": false,
+      "details": "Validation failed: Too few history entries: 18, expected around 30",
+      "timestamp": "2025-12-27T06:22:25.024450",
       "response_sample": {
         "symbol": "H2O",
-        "history_count": 21,
+        "history_count": 18,
         "is_mock": false
       }
     },
@@ -59,7 +59,7 @@
       "test_name": "Data Sources - BVB should be EODHD (REAL)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:54.505688",
+      "timestamp": "2025-12-27T06:22:26.224014",
       "response_sample": {
         "bvb_source": "EODHD (REAL)",
         "global_source": "Yahoo Finance (REAL)",
@@ -70,7 +70,7 @@
       "test_name": "BVB Stocks List (REAL data verification)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:54.576403",
+      "timestamp": "2025-12-27T06:22:26.282056",
       "response_sample": [
         {
           "symbol": "H2O",
@@ -108,7 +108,7 @@
       "test_name": "Admin Authentication Setup",
       "success": true,
       "details": "Admin session token created",
-      "timestamp": "2025-12-24T15:11:56.212870",
+      "timestamp": "2025-12-27T06:22:28.211082",
       "response_sample": {
         "has_token": true
       }
@@ -117,21 +117,21 @@
       "test_name": "Admin Stats Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:56.341494",
+      "timestamp": "2025-12-27T06:22:28.331066",
       "response_sample": {
         "totals": {
-          "users": 2,
-          "articles": 277,
+          "users": 8,
+          "articles": 550,
           "watchlist_items": 1,
-          "portfolio_transactions": 1,
+          "portfolio_transactions": 5,
           "newsletter_subscribers": 2
         },
         "today": {
-          "logins": 2,
+          "logins": 0,
           "page_visits": 0
         },
         "last_7_days": {
-          "new_users": 2
+          "new_users": 8
         }
       }
     },
@@ -139,17 +139,17 @@
       "test_name": "Admin Users List (limit=5)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:56.418355",
+      "timestamp": "2025-12-27T06:22:28.389590",
       "response_sample": {
-        "users_count": 2,
-        "total": 2
+        "users_count": 5,
+        "total": 8
       }
     },
     {
       "test_name": "Admin Analytics (7 days)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:56.500060",
+      "timestamp": "2025-12-27T06:22:28.476453",
       "response_sample": {
         "days_count": 7
       }
@@ -157,8 +157,8 @@
     {
       "test_name": "Regular User Creation",
       "success": true,
-      "details": "Test user created: testuser_1766589116.500144@test.com",
-      "timestamp": "2025-12-24T15:11:57.457693",
+      "details": "Test user created: testuser_1766816548.47655@test.com",
+      "timestamp": "2025-12-27T06:22:29.437001",
       "response_sample": {
         "has_token": true
       }
@@ -167,7 +167,7 @@
       "test_name": "Admin Access Control (403 for non-admin)",
       "success": true,
       "details": "Correctly denied access to non-admin user",
-      "timestamp": "2025-12-24T15:11:57.526137",
+      "timestamp": "2025-12-27T06:22:29.525730",
       "response_sample": {
         "detail": "Admin access required"
       }
@@ -176,7 +176,7 @@
       "test_name": "Glossary - All Terms (~99 terms)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:57.589919",
+      "timestamp": "2025-12-27T06:22:29.583913",
       "response_sample": {
         "total": 99,
         "sample_terms": [
@@ -190,7 +190,7 @@
       "test_name": "Glossary - Search (dividend)",
       "success": true,
       "details": "Found 2 matching terms",
-      "timestamp": "2025-12-24T15:11:57.654864",
+      "timestamp": "2025-12-27T06:22:29.633447",
       "response_sample": {
         "total": 2,
         "terms": [
@@ -203,32 +203,32 @@
       "test_name": "Global Indices (Yahoo Finance)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:57.757673",
+      "timestamp": "2025-12-27T06:22:29.687839",
       "response_sample": [
         {
           "symbol": "^GSPC",
           "name": "S&P 500",
-          "price": 6918.03,
-          "change": 8.239746,
-          "change_percent": 0.11924844,
-          "previous_close": 6909.79,
-          "open": 6904.91,
-          "high": 6918.03,
-          "low": 6904.91,
-          "volume": 240633651,
+          "price": 6929.94,
+          "change": -2.1098633,
+          "change_percent": -0.030436356,
+          "previous_close": 6932.05,
+          "open": 6936.02,
+          "high": 6945.77,
+          "low": 6921.6,
+          "volume": 1439287000,
           "source": "yahoo_finance"
         },
         {
           "symbol": "^IXIC",
           "name": "NASDAQ",
-          "price": 23559.158,
-          "change": -2.6855469,
-          "change_percent": -0.011397916,
-          "previous_close": 23561.844,
-          "open": 23555.947,
-          "high": 23565.867,
-          "low": 23527.973,
-          "volume": 1315865000,
+          "price": 23593.096,
+          "change": -20.210938,
+          "change_percent": -0.08559131,
+          "previous_close": 23613.307,
+          "open": 23645.908,
+          "high": 23665.15,
+          "low": 23567.855,
+          "volume": 4434886000,
           "source": "yahoo_finance"
         }
       ]
@@ -237,22 +237,22 @@
       "test_name": "Financial News",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:57.826673",
+      "timestamp": "2025-12-27T06:22:29.741697",
       "response_sample": [
         {
-          "id": "f6f5da7b-188a-4c6b-b944-a156b7c2b3be",
-          "title": "Demisie la Tarom. Costin Iordache \u0219i-a depus mandatul de director general. Ce motive a invocat",
-          "description": "Costin Iordache \u0219i-a depus mandatul de director general al TAROM Costin Iordache, directorul general al companiei TAROM, \u0219i-a depus mandatul din motive personale, a anun\u021bat compania na\u021bional\u0103 de transport aerian miercuri, 24 decembrie. Potrivit comunicatului oficial, acesta va r\u0103m\u00e2ne \u00een func\u021bie p\u00e2n\u0103 la data de 15 ianuarie 2026, p\u00e2n\u0103 c\u00e2nd Consiliul de Administra\u021bie al TAROM [\u2026]",
-          "content": "Costin Iordache \u0219i-a depus mandatul de director general al TAROM Costin Iordache, directorul general al companiei TAROM, \u0219i-a depus mandatul din motive personale, a anun\u021bat compania na\u021bional\u0103 de transport aerian miercuri, 24 decembrie. Potrivit comunicatului oficial, acesta va r\u0103m\u00e2ne \u00een func\u021bie p\u00e2n\u0103 la data de 15 ianuarie 2026, p\u00e2n\u0103 c\u00e2nd Consiliul de Administra\u021bie al TAROM [\u2026]",
-          "url": "https://www.capital.ro/demisie-la-tarom-costin-iordache-si-a-depus-mandatul-de-director-general-ce-motive-a-invocat.html",
+          "id": "e6ddad38-ad74-45b7-b26b-3a48d5af46dc",
+          "title": "Anul 2026 \u00een Rom\u00e2nia. Ministrul Economiei: Va fi \u00een continuare greu, dar va a\u0219terne o foaie alb\u0103 \u0219i curat\u0103 pentru 2027 \u0219i dezvoltare",
+          "description": "Ce \u00eei a\u0219teapt\u0103 pe rom\u00e2ni \u00een 2026? Ministrul Economiei, Irineu Dar\u0103u: 2026 va fi un an greu, dar esen\u021bial pentru dezvoltarea viitoare Ministrul Economiei abia a depus jur\u0103m\u00e2ntul s\u0103pt\u0103m\u00e2na aceasta, \u00eens\u0103 a fost luat deja la \u021bint\u0103 de jurnali\u0219ti cu \u00eentreb\u0103ri grele. Irineu Dar\u0103u a explicat vineri c\u0103 anul 2026 va r\u0103m\u00e2ne unul dificil, pe [\u2026]",
+          "content": "Ce \u00eei a\u0219teapt\u0103 pe rom\u00e2ni \u00een 2026? Ministrul Economiei, Irineu Dar\u0103u: 2026 va fi un an greu, dar esen\u021bial pentru dezvoltarea viitoare Ministrul Economiei abia a depus jur\u0103m\u00e2ntul s\u0103pt\u0103m\u00e2na aceasta, \u00eens\u0103 a fost luat deja la \u021bint\u0103 de jurnali\u0219ti cu \u00eentreb\u0103ri grele. Irineu Dar\u0103u a explicat vineri c\u0103 anul 2026 va r\u0103m\u00e2ne unul dificil, pe [\u2026]",
+          "url": "https://www.capital.ro/anul-2026-in-romania-ministrul-economiei-va-fi-in-continuare-greu-dar-va-asterne-o-foaie-alba-si-curata-pentru-2027-si-dezvoltare.html",
           "image_url": null,
           "source": {
             "name": "Capital.ro",
-            "url": "https://www.capital.ro/demisie-la-tarom-costin-iordache-si-a-depus-mandatul-de-director-general-ce-motive-a-invocat.html",
+            "url": "https://www.capital.ro/anul-2026-in-romania-ministrul-economiei-va-fi-in-continuare-greu-dar-va-asterne-o-foaie-alba-si-curata-pentru-2027-si-dezvoltare.html",
             "category": "business"
           },
           "author": "Bogdan Ungureanu",
-          "published_at": "2025-12-24T14:50:41",
+          "published_at": "2025-12-27T06:13:48",
           "language": "ro",
           "is_rewritten": false,
           "is_translated": false,
@@ -266,7 +266,7 @@
       "test_name": "Currency Rates (BNR)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:57.891873",
+      "timestamp": "2025-12-27T06:22:29.797694",
       "response_sample": {
         "sample_rates": [
           "AED",
@@ -281,7 +281,7 @@
       "test_name": "Market Overview (Combined)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:57.959600",
+      "timestamp": "2025-12-27T06:22:29.857666",
       "response_sample": {
         "bvb_count": 20,
         "global_count": 6
@@ -291,7 +291,7 @@
       "test_name": "Education Packages",
       "success": true,
       "details": "Found 2 packages",
-      "timestamp": "2025-12-24T15:11:58.024969",
+      "timestamp": "2025-12-27T06:22:29.906440",
       "response_sample": {
         "packages": [
           {
@@ -341,11 +341,71 @@
       "test_name": "AI Advisor - Tip of the Day",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-24T15:11:58.093366",
+      "timestamp": "2025-12-27T06:22:29.957409",
       "response_sample": {
-        "tip": "Regula 72: \u00cemparte 72 la rata de randament pentru a afla \u00een c\u00e2\u021bi ani se dubleaz\u0103 investi\u021bia. Ex: 72/8% = 9 ani.",
-        "category": "Matematic\u0103 financiar\u0103",
-        "date": "2025-12-24"
+        "tip": "Emo\u021biile sunt du\u0219manul investitorului. C\u00e2nd al\u021bii sunt frico\u0219i, fii lacom. C\u00e2nd al\u021bii sunt lacomi, fii precaut.",
+        "category": "Psihologie",
+        "date": "2025-12-27"
+      }
+    },
+    {
+      "test_name": "Financial Education - All Lessons (15 total)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:22:30.009363",
+      "response_sample": {
+        "total": 15,
+        "modules": 3,
+        "sample_lessons": [
+          "Ce Este Educa\u021bia Financiar\u0103 \u0219i De Ce Conteaz\u0103",
+          "Bugetul Personal - Funda\u021bia Succesului Financiar",
+          "Fondul de Urgen\u021b\u0103 - Perna Ta de Siguran\u021b\u0103"
+        ]
+      }
+    },
+    {
+      "test_name": "Financial Education - Lesson 1 Detail",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:22:30.068105",
+      "response_sample": {
+        "title": "Ce Este Educa\u021bia Financiar\u0103 \u0219i De Ce Conteaz\u0103",
+        "module": 1,
+        "quiz_count": 2,
+        "content_length": 1473
+      }
+    },
+    {
+      "test_name": "Financial Education - Quiz Submit (Correct)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:22:30.158092",
+      "response_sample": {
+        "score": 100.0,
+        "passed": true,
+        "correct": 2,
+        "total": 2
+      }
+    },
+    {
+      "test_name": "Financial Education - Progress Tracking",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:22:30.217589",
+      "response_sample": {
+        "completed": 1,
+        "total": 15,
+        "progress": 6.666666666666667
+      }
+    },
+    {
+      "test_name": "Financial Education - Quiz Submit (Wrong)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T06:22:30.272950",
+      "response_sample": {
+        "score": 0.0,
+        "passed": false
       }
     }
   ]
