@@ -20,6 +20,10 @@ export default function FinLessonPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Reset states when lesson changes
+    setShowQuiz(false);
+    setQuizResult(null);
+    setLoading(true);
     fetchLesson();
     fetchAllLessons();
   }, [lessonId]);
