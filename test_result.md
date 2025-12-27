@@ -1397,6 +1397,66 @@ frontend:
         agent: "testing"
         comment: "Session 12: Enhanced Stocks Table fully functional - sortable columns (Symbol, Price, Change, Volume), search functionality tested with 'TLV', clickable stock symbols with navigation to detail pages"
 
+  - task: "Dividend Calendar Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/DividendCalendarPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 13: Dividend Calendar fully functional - page loads with correct title, 4 statistics cards (Total: 10, Viitoare: 4, Evenimente: 0, Top Randament: 7.2%), 3 working tabs (Toate, Viitoare, Evenimente), dividend cards with proper data display, Dividend Kings sidebar with top yielding stocks, navigation links working"
+
+  - task: "Stock Screener Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/StockScreenerPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 13: Stock Screener fully functional - page loads correctly, 4 market stats cards (Total: 20, Creșteri: 16, Scăderi: 2, Sentiment: Bullish), 8 predefined screeners working, Top Creșteri tested successfully with results table, custom filter panel with price/change sliders functional"
+
+  - task: "Notification Settings Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/NotificationSettingsPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 13: Notification Settings working correctly for non-logged users - displays login prompt card with bell icon, clear messaging, and both 'Conectare' and 'Înregistrare' buttons functional"
+
+  - task: "Watchlist Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/WatchlistPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 13: Watchlist page working correctly for non-logged users - displays login prompt card with star icon, clear messaging about creating account for watchlist functionality, and both 'Conectare' and 'Înregistrare' buttons functional"
+
+  - task: "Navigation Links - Phase 2 & 3"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 13: Navigation links verified - '🔍 Screener' and '📅 Dividende' links found in navbar with correct hrefs (/screener, /calendar), properly styled and functional"
+
 # ===========================================
 # TEST SESSION 8 - Trading School Testing
 # ===========================================
