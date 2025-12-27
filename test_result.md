@@ -1549,17 +1549,41 @@ frontend:
         agent: "testing"
         comment: "Session 13: Watchlist page working correctly for non-logged users - displays login prompt card with star icon, clear messaging about creating account for watchlist functionality, and both 'Conectare' and 'Înregistrare' buttons functional"
 
-  - task: "Navigation Links - Phase 2 & 3"
+  - task: "Authentication Flow - CORS Fix"
     implemented: true
     working: true
-    file: "/app/frontend/src/App.js"
+    file: "/app/frontend/src/context/AuthContext.jsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
         agent: "testing"
-        comment: "Session 13: Navigation links verified - '🔍 Screener' and '📅 Dividende' links found in navbar with correct hrefs (/screener, /calendar), properly styled and functional"
+        comment: "Session 14: CORS fix verified working perfectly. All API endpoints (/api/stocks/bvb, /api/stocks/global, /api/news, /api/currencies, /api/auth/me) return correct responses without any CORS errors. Browser console shows NO 'Access-Control-Allow-Origin' errors. Authentication flow ready for user testing."
+
+  - task: "Login Page UI"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LoginPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 14: Login page fully functional. Shows correct 'Bine ai venit la FinRomania' title, 'Continuă cu Google' button present, login card with description displayed, all feature descriptions listed (Watchlist, Portfolio, Alerts). UI matches requirements exactly."
+
+  - task: "Homepage Data Loading"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/HomePage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 14: Homepage loads all data successfully without CORS errors. BVB stocks section displays 20+ stocks, News section shows 12+ articles, Currencies section displays BNR rates, Global indices in ticker bar working. All API calls successful."
 
 # ===========================================
 # TEST SESSION 8 - Trading School Testing
