@@ -503,6 +503,7 @@ export default function GlobalMarketsPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
+  const [selectedAsset, setSelectedAsset] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -529,6 +530,14 @@ export default function GlobalMarketsPage() {
     setRefreshing(true);
     fetchData();
   };
+
+  const handleAssetClick = useCallback((asset) => {
+    setSelectedAsset(asset);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setSelectedAsset(null);
+  }, []);
 
   const allAssets = useMemo(() => {
     if (!data) return [];
@@ -558,6 +567,11 @@ export default function GlobalMarketsPage() {
         description="Date în timp real de pe piețele globale. Indici S&P 500, NASDAQ, DAX, comodități, crypto și forex."
         keywords="indici globali, S&P 500, NASDAQ, DAX, bitcoin, petrol, aur, forex"
       />
+
+      {/* Asset Detail Modal */}
+      {selectedAsset && (
+        <AssetDetailModal asset={selectedAsset} onClose={handleCloseModal} />
+      )}
 
       <div className="space-y-6">
         {/* Hero */}
