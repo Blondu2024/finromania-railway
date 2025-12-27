@@ -238,6 +238,9 @@ function AppRouter() {
       <Route path="/financial-education/:lessonId" element={<FinLessonPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/about" element={<AboutPage />} />
+      <Route path="/calendar" element={<DividendCalendarPage />} />
+      <Route path="/screener" element={<StockScreenerPage />} />
+      <Route path="/notifications" element={<NotificationSettingsPage />} />
     </Routes>
   );
 }
