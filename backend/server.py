@@ -429,10 +429,13 @@ async def get_global_index_details(symbol: str, period: str = Query(default="1mo
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/stocks/bvb/{symbol}/details")
-async def get_bvb_stock_details(symbol: str):
-    """Obține detalii și istoric pentru o acțiune BVB"""
+async def get_bvb_stock_details(symbol: str, period: str = Query(default="1m"), days: int = Query(default=None)):
+    """Obține detalii și istoric pentru o acțiune BVB
+    period: 1d, 1w, 1m, 3m, 6m, 1y, 5y
+    days: optional - exact number of days
+    """
     try:
-        history = await stock_service.get_bvb_stock_history(symbol.upper())
+        history = await stock_service.get_bvb_stock_history(symbol.upper(), period=period, days=days)
         
         if not history:
             raise HTTPException(status_code=404, detail=f"Stock {symbol} not found")
