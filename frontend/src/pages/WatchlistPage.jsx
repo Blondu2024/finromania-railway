@@ -395,12 +395,6 @@ export default function WatchlistPage() {
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Actualizează
             </Button>
-            <Link to="/notifications">
-              <Button variant="outline">
-                <Bell className="w-4 h-4 mr-2" />
-                Setări Notificări
-              </Button>
-            </Link>
             <AddStockDialog 
               onAdd={handleAdd} 
               existingSymbols={watchlist.map(w => w.symbol)} 
