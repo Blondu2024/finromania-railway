@@ -447,7 +447,7 @@ const GlobalHeatmap = ({ assets, onAssetClick }) => {
 // ============================================
 // TOP MOVERS COMPONENT
 // ============================================
-const TopMovers = ({ assets }) => {
+const TopMovers = ({ assets, onAssetClick }) => {
   const sorted = [...assets].sort((a, b) => Math.abs(b.change_percent) - Math.abs(a.change_percent));
   const topMovers = sorted.slice(0, 5);
 
@@ -468,8 +468,9 @@ const TopMovers = ({ assets }) => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className={`flex items-center justify-between p-3 rounded-lg ${
-                isPositive ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'
+              onClick={() => onAssetClick && onAssetClick(asset)}
+              className={`flex items-center justify-between p-3 rounded-lg cursor-pointer hover:scale-[1.02] transition-transform ${
+                isPositive ? 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30' : 'bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30'
               }`}
             >
               <div className="flex items-center gap-3">
@@ -479,13 +480,16 @@ const TopMovers = ({ assets }) => {
                   <p className="text-xs text-muted-foreground">{asset.country || asset.category}</p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className={`font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                  {isPositive ? '+' : ''}{asset.change_percent?.toFixed(2)}%
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {asset.price?.toLocaleString('ro-RO', { maximumFractionDigits: 2 })}
-                </p>
+              <div className="text-right flex items-center gap-2">
+                <div>
+                  <p className={`font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                    {isPositive ? '+' : ''}{asset.change_percent?.toFixed(2)}%
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {asset.price?.toLocaleString('ro-RO', { maximumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </div>
             </motion.div>
           );
