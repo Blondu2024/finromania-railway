@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Star, Plus, Trash2, Bell, BellOff, TrendingUp, TrendingDown,
-  AlertTriangle, Settings, Eye, Edit2, X, Save, RefreshCw
+  AlertTriangle, Settings, Eye, Edit2, X, Save, RefreshCw,
+  Globe, Newspaper, GraduationCap, Loader2
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import { Skeleton } from '../components/ui/skeleton';
+import { Switch } from '../components/ui/switch';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +24,199 @@ import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+// Notification Settings Dialog
+const NotificationSettingsDialog = ({ token }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [preferences, setPreferences] = useState({
+    market_open_close: false,
+    market_big_moves: false,
+    daily_summary: false,
+    watchlist_price_alerts: true,
+    watchlist_big_moves: true,
+    dividend_announcements: false,
+    important_news: false,
+    watchlist_news: false,
+    lesson_reminders: false
+  });
+
+  useEffect(() => {
+    if (isOpen && token) {
+      fetchPreferences();
+    }
+  }, [isOpen, token]);
+
+  const fetchPreferences = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/watchlist/notifications/preferences`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPreferences(prev => ({ ...prev, ...data }));
+      }
+    } catch (err) {
+      console.error('Error fetching preferences:', err);
+    }
+  };
+
+  const savePreferences = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_URL}/api/watchlist/notifications/preferences`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(preferences)
+      });
+      setIsOpen(false);
+    } catch (err) {
+      console.error('Error saving preferences:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const Toggle = ({ label, description, checked, onChange, icon: Icon }) => (
+    <div className="flex items-center justify-between py-3 border-b last:border-0">
+      <div className="flex items-center gap-3">
+        {Icon && <Icon className="w-4 h-4 text-muted-foreground" />}
+        <div>
+          <p className="font-medium text-sm">{label}</p>
+          <p className="text-xs text-muted-foreground">{description}</p>
+        </div>
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </div>
+  );
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          <Bell className="w-4 h-4 mr-2" />
+          Setări Notificări
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Bell className="w-5 h-5 text-blue-500" />
+            Ce notificări vrei să primești?
+          </DialogTitle>
+          <DialogDescription>
+            Alege ce alerte și actualizări vrei să primești
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          {/* Piață */}
+          <div>
+            <h4 className="font-semibold text-sm text-blue-600 mb-2 flex items-center gap-2">
+              <Globe className="w-4 h-4" /> Piață
+            </h4>
+            <div className="bg-muted/30 rounded-lg px-3">
+              <Toggle
+                label="Deschidere/Închidere Bursă"
+                description="La 10:00 și 18:00"
+                checked={preferences.market_open_close}
+                onChange={(v) => setPreferences(p => ({ ...p, market_open_close: v }))}
+              />
+              <Toggle
+                label="Variații Mari (>2%)"
+                description="Când indicele BET variază mult"
+                checked={preferences.market_big_moves}
+                onChange={(v) => setPreferences(p => ({ ...p, market_big_moves: v }))}
+              />
+              <Toggle
+                label="Rezumat Zilnic"
+                description="Seara la 18:30"
+                checked={preferences.daily_summary}
+                onChange={(v) => setPreferences(p => ({ ...p, daily_summary: v }))}
+              />
+            </div>
+          </div>
+
+          {/* Watchlist */}
+          <div>
+            <h4 className="font-semibold text-sm text-yellow-600 mb-2 flex items-center gap-2">
+              <Star className="w-4 h-4" /> Watchlist
+            </h4>
+            <div className="bg-muted/30 rounded-lg px-3">
+              <Toggle
+                label="Alerte de Preț"
+                description="Când prețul atinge valorile setate"
+                checked={preferences.watchlist_price_alerts}
+                onChange={(v) => setPreferences(p => ({ ...p, watchlist_price_alerts: v }))}
+              />
+              <Toggle
+                label="Variații Mari (>5%)"
+                description="Acțiunile tale variază mult"
+                checked={preferences.watchlist_big_moves}
+                onChange={(v) => setPreferences(p => ({ ...p, watchlist_big_moves: v }))}
+              />
+              <Toggle
+                label="Anunțuri Dividende"
+                description="Companiile anunță dividende"
+                checked={preferences.dividend_announcements}
+                onChange={(v) => setPreferences(p => ({ ...p, dividend_announcements: v }))}
+              />
+            </div>
+          </div>
+
+          {/* Știri */}
+          <div>
+            <h4 className="font-semibold text-sm text-purple-600 mb-2 flex items-center gap-2">
+              <Newspaper className="w-4 h-4" /> Știri
+            </h4>
+            <div className="bg-muted/30 rounded-lg px-3">
+              <Toggle
+                label="Știri Importante"
+                description="Breaking news financiar"
+                checked={preferences.important_news}
+                onChange={(v) => setPreferences(p => ({ ...p, important_news: v }))}
+              />
+              <Toggle
+                label="Știri Watchlist"
+                description="Despre companiile tale"
+                checked={preferences.watchlist_news}
+                onChange={(v) => setPreferences(p => ({ ...p, watchlist_news: v }))}
+              />
+            </div>
+          </div>
+
+          {/* Educație */}
+          <div>
+            <h4 className="font-semibold text-sm text-green-600 mb-2 flex items-center gap-2">
+              <GraduationCap className="w-4 h-4" /> Educație
+            </h4>
+            <div className="bg-muted/30 rounded-lg px-3">
+              <Toggle
+                label="Reminder Lecții"
+                description="Continuă cursurile începute"
+                checked={preferences.lesson_reminders}
+                onChange={(v) => setPreferences(p => ({ ...p, lesson_reminders: v }))}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Button onClick={savePreferences} disabled={saving}>
+            {saving ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Se salvează...</>
+            ) : (
+              <><Save className="w-4 h-4 mr-2" /> Salvează</>
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 // Add Stock Dialog
 const AddStockDialog = ({ onAdd, existingSymbols }) => {
