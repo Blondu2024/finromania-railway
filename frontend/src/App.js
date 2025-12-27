@@ -128,10 +128,15 @@ function Navigation({ darkMode, toggleDarkMode }) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-7xl mx-auto px-4 flex h-14 items-center">
-        <Link to="/" className="flex items-center space-x-2 mr-6">
+        <Link to="/" className="flex items-center space-x-2 mr-4">
           <BarChart3 className="h-6 w-6 text-blue-600" />
           <span className="font-bold text-xl hidden sm:inline">FinRomania</span>
         </Link>
+        
+        {/* Search Bar - lângă logo */}
+        <div className="hidden md:block mr-4">
+          <SearchBar />
+        </div>
         
         <nav className="hidden lg:flex items-center space-x-1 flex-1">
           {navItems.map((item) => (
