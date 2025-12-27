@@ -473,17 +473,17 @@ export default function HomePage() {
           className="mt-12"
         >
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">
-            🎓 Vrei Să Înveți Trading?
+            🎓 Învață Să Investești Inteligent
           </h2>
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
               <CardContent className="p-6 text-center space-y-3">
                 <div className="inline-block p-4 bg-blue-100 rounded-full">
                   <BookOpen className="w-8 h-8 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-bold">17 Lecții Interactive</h3>
+                <h3 className="text-xl font-bold">Școala de Trading</h3>
                 <p className="text-muted-foreground">
-                  Învață de la bază până avansat: acțiuni, leverage, indicatori tehnici, strategii
+                  17 lecții: acțiuni, leverage, indicatori tehnici, strategii
                 </p>
                 <Link to="/trading-school">
                   <Button className="w-full">
@@ -498,12 +498,29 @@ export default function HomePage() {
                 <div className="inline-block p-4 bg-green-100 rounded-full">
                   <Target className="w-8 h-8 text-green-600" />
                 </div>
-                <h3 className="text-xl font-bold">Quiz cu Feedback</h3>
+                <h3 className="text-xl font-bold">💰 Educație Financiară</h3>
                 <p className="text-muted-foreground">
-                  Verifică-ți cunoștințele și primește explicații detaliate
+                  15 lecții: bugete, economii, pensii, investiții de bază
+                </p>
+                <Link to="/financial-education">
+                  <Button className="w-full bg-green-600 hover:bg-green-700">
+                    Începe Gratuit <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-purple-200 hover:border-purple-400 transition-colors">
+              <CardContent className="p-6 text-center space-y-3">
+                <div className="inline-block p-4 bg-purple-100 rounded-full">
+                  <Award className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-bold">Quiz-uri Interactive</h3>
+                <p className="text-muted-foreground">
+                  Verifică-ți cunoștințele și primește feedback instant
                 </p>
                 <Link to="/trading-school">
-                  <Button className="w-full">
+                  <Button className="w-full" variant="outline">
                     Încearcă un Quiz <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
