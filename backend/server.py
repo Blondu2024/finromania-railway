@@ -38,6 +38,8 @@ from routes.trading_school import router as trading_school_router
 from routes.financial_education import router as financial_education_router
 from routes.bvb_market import router as bvb_market_router
 from routes.smart_analysis import router as smart_analysis_router
+from routes.dividend_calendar import router as dividend_calendar_router
+from routes.stock_screener import router as stock_screener_router
 
 # Configure logging
 logging.basicConfig(
