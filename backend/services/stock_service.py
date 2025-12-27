@@ -147,12 +147,12 @@ class StockService:
             logger.error(f"Error getting history for {symbol}: {e}")
             return None
     
-    async def get_bvb_stock_history(self, symbol: str, period: str = "m") -> Optional[Dict]:
+    async def get_bvb_stock_history(self, symbol: str, period: str = "1m", days: int = None) -> Optional[Dict]:
         """Obține istoricul pentru o acțiune BVB"""
         try:
             if self._use_real_bvb:
                 # Get REAL historical data from EODHD
-                history_data = await self.eodhd_client.get_historical_data(symbol, period)
+                history_data = await self.eodhd_client.get_historical_data(symbol, period, days)
                 
                 if not history_data:
                     logger.warning(f"No historical data for {symbol}")
