@@ -1659,6 +1659,18 @@ frontend:
         agent: "testing"
         comment: "Session 14: Homepage loads all data successfully without CORS errors. BVB stocks section displays 20+ stocks, News section shows 12+ articles, Currencies section displays BNR rates, Global indices in ticker bar working. All API calls successful."
 
+  - task: "Global Markets Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/GlobalMarketsPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 16: COMPLETE SUCCESS - All expected features verified: Hero section with '🌍 Piețe Globale' gradient title and subtitle, Market status bar with 4 regions showing open/closed status, Global heatmap with 25+ color-coded tiles and legend, Sentiment gauge (58% UȘOR BULLISH), Top movers section, 5-tab navigation working perfectly, Refresh functionality, Asset cards with sparklines (66 SVG charts), Educational banner with navigation to /stocks, Educational info box, Navbar highlighting, Responsive layout, Real-time data (25 price values, 79 percentage indicators), Proper color coding (31 green/21 red tiles). Fully functional and production-ready."
+
 # ===========================================
 # TEST SESSION 8 - Trading School Testing
 # ===========================================
