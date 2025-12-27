@@ -594,12 +594,12 @@ export default function GlobalMarketsPage() {
         {/* Top Section */}
         <div className="grid lg:grid-cols-[1fr,300px] gap-6">
           {/* Heatmap */}
-          <GlobalHeatmap assets={allAssets} />
+          <GlobalHeatmap assets={allAssets} onAssetClick={handleAssetClick} />
           
           {/* Sidebar */}
           <div className="space-y-6">
             <GlobalSentimentGauge sentiment={data?.sentiment} />
-            <TopMovers assets={allAssets} />
+            <TopMovers assets={allAssets} onAssetClick={handleAssetClick} />
           </div>
         </div>
 
@@ -623,7 +623,7 @@ export default function GlobalMarketsPage() {
           <TabsContent value="all" className="mt-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {allAssets.map((asset, idx) => (
-                <AssetCard key={asset.symbol} asset={asset} index={idx} />
+                <AssetCard key={asset.symbol} asset={asset} index={idx} onClick={handleAssetClick} />
               ))}
             </div>
           </TabsContent>
@@ -631,7 +631,7 @@ export default function GlobalMarketsPage() {
           <TabsContent value="indices" className="mt-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {data?.indices?.map((asset, idx) => (
-                <AssetCard key={asset.symbol} asset={asset} index={idx} />
+                <AssetCard key={asset.symbol} asset={asset} index={idx} onClick={handleAssetClick} />
               ))}
             </div>
           </TabsContent>
@@ -639,7 +639,7 @@ export default function GlobalMarketsPage() {
           <TabsContent value="commodities" className="mt-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {data?.commodities?.map((asset, idx) => (
-                <AssetCard key={asset.symbol} asset={asset} index={idx} />
+                <AssetCard key={asset.symbol} asset={asset} index={idx} onClick={handleAssetClick} />
               ))}
             </div>
           </TabsContent>
@@ -647,7 +647,7 @@ export default function GlobalMarketsPage() {
           <TabsContent value="crypto" className="mt-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {data?.crypto?.map((asset, idx) => (
-                <AssetCard key={asset.symbol} asset={asset} index={idx} />
+                <AssetCard key={asset.symbol} asset={asset} index={idx} onClick={handleAssetClick} />
               ))}
             </div>
           </TabsContent>
