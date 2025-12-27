@@ -173,6 +173,8 @@ function Navigation({ darkMode, toggleDarkMode }) {
         </nav>
 
         <div className="flex items-center space-x-2 ml-auto">
+          <WatchlistButton />
+          
           <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
             {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
