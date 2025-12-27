@@ -172,19 +172,23 @@ export default function FinLessonPage() {
               ))}
             </div>
 
-            <div className="flex gap-3 justify-center">
+            <div className="flex gap-3 justify-center flex-wrap">
               {!passed && (
                 <Button onClick={handleRetry} size="lg">
                   🔄 Încearcă Din Nou
                 </Button>
               )}
-              {passed && getNextLesson() ? (
+              {passed && nextLesson ? (
                 <Button 
                   size="lg" 
                   className="bg-green-600 hover:bg-green-700"
-                  onClick={() => navigate(`/financial-education/${getNextLesson().id}`)}
+                  onClick={() => {
+                    setQuizResult(null);
+                    setShowQuiz(false);
+                    navigate(`/financial-education/${nextLesson.id}`);
+                  }}
                 >
-                  Următoarea Lecție: {getNextLesson().title.substring(0, 25)}... <ChevronRight className="w-4 h-4 ml-2" />
+                  Următoarea Lecție: {nextLesson.title.length > 25 ? nextLesson.title.substring(0, 25) + '...' : nextLesson.title} <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               ) : passed ? (
                 <Link to="/financial-education">
