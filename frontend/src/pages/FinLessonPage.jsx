@@ -120,6 +120,7 @@ export default function FinLessonPage() {
   // Quiz Results Screen
   if (quizResult) {
     const passed = quizResult.passed;
+    const nextLesson = getNextLesson();
     
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
