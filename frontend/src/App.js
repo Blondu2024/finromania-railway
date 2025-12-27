@@ -37,6 +37,7 @@ import AboutPage from './pages/AboutPage';
 import DividendCalendarPage from './pages/DividendCalendarPage';
 import StockScreenerPage from './pages/StockScreenerPage';
 import NotificationSettingsPage from './pages/NotificationSettingsPage';
+import GlobalMarketsPage from './pages/GlobalMarketsPage';
 import TickerBar from './components/TickerBar';
 import SearchBar from './components/SearchBar';
 import NewsletterSignup from './components/NewsletterSignup';
