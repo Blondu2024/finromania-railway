@@ -105,6 +105,7 @@ class EODHDClient:
         """Get historical data for a stock
         period: d=day, w=week, m=month, 3m=3months, 6m=6months, 1y=1year, 5y=5years
         days: optional - exact number of days to fetch
+        Note: EODHD only provides end-of-day data, so minimum is ~7 days to get meaningful data
         """
         if not self.api_key:
             return []
@@ -114,24 +115,28 @@ class EODHDClient:
                 # Calculate date range
                 end_date = datetime.now()
                 
+                # Minimum 10 days to ensure we have data (accounting for weekends/holidays)
                 if days:
-                    start_date = end_date - timedelta(days=days)
+                    actual_days = max(days, 10)
+                    start_date = end_date - timedelta(days=actual_days)
                 elif period == "1d" or period == "d":
-                    start_date = end_date - timedelta(days=1)
+                    # For "1 day" view, show last 10 calendar days (about 5-7 trading days)
+                    start_date = end_date - timedelta(days=10)
                 elif period == "1w" or period == "w":
-                    start_date = end_date - timedelta(weeks=1)
+                    # For 1 week, get 14 days to ensure we have ~7 trading days
+                    start_date = end_date - timedelta(days=14)
                 elif period == "1m" or period == "m":
-                    start_date = end_date - timedelta(days=30)
+                    start_date = end_date - timedelta(days=35)
                 elif period == "3m":
-                    start_date = end_date - timedelta(days=90)
+                    start_date = end_date - timedelta(days=100)
                 elif period == "6m":
-                    start_date = end_date - timedelta(days=180)
+                    start_date = end_date - timedelta(days=190)
                 elif period == "1y":
-                    start_date = end_date - timedelta(days=365)
+                    start_date = end_date - timedelta(days=380)
                 elif period == "5y":
-                    start_date = end_date - timedelta(days=1825)
+                    start_date = end_date - timedelta(days=1900)
                 else:
-                    start_date = end_date - timedelta(days=30)
+                    start_date = end_date - timedelta(days=35)
                 
                 url = f"{self.BASE_URL}/eod/{symbol}.RO"
                 params = {
