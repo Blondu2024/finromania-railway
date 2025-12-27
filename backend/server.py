@@ -546,7 +546,7 @@ app.add_middleware(
         "https://localhost:3000",
         "https://finromania.ro",
         "https://www.finromania.ro",
-        "https://finromania-2.preview.emergentagent.com",
+        "https://finromania-3.preview.emergentagent.com",
     ],
     allow_methods=["*"],
     allow_headers=["*"],
