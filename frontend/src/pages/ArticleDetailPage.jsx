@@ -223,6 +223,23 @@ export default function ArticleDetailPage() {
         <div className="border-t pt-4 mt-4">
           <SocialShare title={article.title} url={window.location.href} />
         </div>
+
+        {/* Financial Education CTA */}
+        <Card className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 mt-6">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="text-center md:text-left">
+                <h3 className="text-lg font-bold mb-1">💰 Vrei Să Înțelegi Mai Bine Știrile Financiare?</h3>
+                <p className="text-green-100 text-sm">Învață bazele finanțelor personale și investițiilor în 15 lecții gratuite</p>
+              </div>
+              <Link to="/financial-education">
+                <Button className="bg-white text-green-600 hover:bg-green-50 whitespace-nowrap">
+                  Începe Educația Financiară →
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </article>
     </div>
   );
