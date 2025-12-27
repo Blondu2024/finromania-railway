@@ -31,6 +31,7 @@ import GlossaryPage from './pages/GlossaryPage';
 import LearnTradingPage from './pages/LearnTradingPage';
 import TradingSchoolPage from './pages/TradingSchoolPage';
 import FinancialEducationPage from './pages/FinancialEducationPage';
+import FinLessonPage from './pages/FinLessonPage';
 import FAQPage from './pages/FAQPage';
 import AboutPage from './pages/AboutPage';
 import TickerBar from './components/TickerBar';
@@ -231,7 +232,7 @@ function AppRouter() {
       <Route path="/trading-school" element={<TradingSchoolPage />} />
       <Route path="/trading-school/:lessonId" element={<LessonPage />} />
       <Route path="/financial-education" element={<FinancialEducationPage />} />
-      <Route path="/financial-education/:lessonId" element={<LessonPage />} />
+      <Route path="/financial-education/:lessonId" element={<FinLessonPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/about" element={<AboutPage />} />
     </Routes>
