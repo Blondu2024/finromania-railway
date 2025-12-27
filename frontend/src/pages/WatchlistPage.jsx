@@ -590,6 +590,7 @@ export default function WatchlistPage() {
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Actualizează
             </Button>
+            <NotificationSettingsDialog token={token} />
             <AddStockDialog 
               onAdd={handleAdd} 
               existingSymbols={watchlist.map(w => w.symbol)} 
