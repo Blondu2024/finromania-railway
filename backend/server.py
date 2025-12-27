@@ -37,6 +37,7 @@ from routes.live_market import router as live_market_router
 from routes.trading_school import router as trading_school_router
 from routes.financial_education import router as financial_education_router
 from routes.bvb_market import router as bvb_market_router
+from routes.smart_analysis import router as smart_analysis_router
 
 # Configure logging
 logging.basicConfig(
