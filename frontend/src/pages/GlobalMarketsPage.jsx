@@ -379,7 +379,7 @@ const AssetCard = ({ asset, index, onClick }) => {
 // ============================================
 // GLOBAL HEATMAP
 // ============================================
-const GlobalHeatmap = ({ assets }) => {
+const GlobalHeatmap = ({ assets, onAssetClick }) => {
   const getColor = (changePercent) => {
     if (changePercent >= 3) return 'from-green-500 to-green-600';
     if (changePercent >= 1) return 'from-green-400 to-green-500';
@@ -396,6 +396,7 @@ const GlobalHeatmap = ({ assets }) => {
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="w-5 h-5" />
           🗺️ Heatmap Global
+          <span className="text-xs font-normal ml-2 opacity-80">Click pe orice activ pentru grafic</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 bg-slate-900">
@@ -410,7 +411,8 @@ const GlobalHeatmap = ({ assets }) => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.03 }}
                 whileHover={{ scale: 1.1, zIndex: 10 }}
-                className={`relative cursor-pointer rounded-lg bg-gradient-to-br ${colorClass} shadow-lg flex flex-col items-center justify-center text-white p-3 min-w-[100px]`}
+                onClick={() => onAssetClick && onAssetClick(asset)}
+                className={`relative cursor-pointer rounded-lg bg-gradient-to-br ${colorClass} shadow-lg flex flex-col items-center justify-center text-white p-3 min-w-[100px] hover:ring-2 hover:ring-white/50`}
               >
                 <span className="text-xl mb-1">{asset.flag}</span>
                 <span className="font-bold text-sm">{asset.name}</span>
