@@ -156,7 +156,11 @@ async def create_session(data: SessionRequest, response: Response):
             "timestamp": datetime.now(timezone.utc).isoformat()
         })
         
-        return user
+        # Return user with session token for localStorage persistence
+        return {
+            **user,
+            "session_token": session_token
+        }
         
     except httpx.RequestError as e:
         logger.error(f"Auth request error: {e}")
