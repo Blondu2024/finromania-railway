@@ -498,6 +498,8 @@ app.include_router(trading_school_router, prefix="/api")
 app.include_router(financial_education_router, prefix="/api")
 app.include_router(bvb_market_router)
 app.include_router(smart_analysis_router)
+app.include_router(dividend_calendar_router)
+app.include_router(stock_screener_router)
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest
