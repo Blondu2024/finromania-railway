@@ -30,6 +30,7 @@ import CurrencyConverterPage from './pages/CurrencyConverterPage';
 import GlossaryPage from './pages/GlossaryPage';
 import LearnTradingPage from './pages/LearnTradingPage';
 import TradingSchoolPage from './pages/TradingSchoolPage';
+import FinancialEducationPage from './pages/FinancialEducationPage';
 import FAQPage from './pages/FAQPage';
 import AboutPage from './pages/AboutPage';
 import TickerBar from './components/TickerBar';
@@ -105,6 +106,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
   const navItems = [
     { path: '/', label: 'Acasă', icon: <BarChart3 className="w-4 h-4" /> },
     { path: '/trading-school', label: '🎓 Învață Trading', icon: <BookOpen className="w-4 h-4" /> },
+    { path: '/financial-education', label: '💰 Educație Financiară', icon: <DollarSign className="w-4 h-4" /> },
     { path: '/stocks', label: 'Acțiuni BVB', icon: <TrendingUp className="w-4 h-4" /> },
     { path: '/news', label: 'Știri', icon: <Newspaper className="w-4 h-4" /> },
     { path: '/faq', label: '❓ FAQ', icon: <ClipboardCheck className="w-4 h-4" /> },
@@ -228,6 +230,8 @@ function AppRouter() {
       <Route path="/learn" element={<LearnTradingPage />} />
       <Route path="/trading-school" element={<TradingSchoolPage />} />
       <Route path="/trading-school/:lessonId" element={<LessonPage />} />
+      <Route path="/financial-education" element={<FinancialEducationPage />} />
+      <Route path="/financial-education/:lessonId" element={<LessonPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/about" element={<AboutPage />} />
     </Routes>
