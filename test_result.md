@@ -278,6 +278,78 @@ backend:
         agent: "testing"
         comment: "Session 14: Authentication security working correctly. Protected endpoints properly return 401 when no authentication provided. Session validation includes expiry checks and proper user lookup."
 
+  - task: "Global Markets Overview API"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/global_markets.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 15: GET /api/global/overview endpoint fully functional. Returns all global market data: 10 indices, 6 commodities, 5 crypto, 4 forex with sentiment data (14 gainers, 10 losers, avg_change: 0.66%, status: bullish) and market status for all regions (US, Europe, Asia, Crypto)."
+
+  - task: "Global Markets Indices API"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/global_markets.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 15: GET /api/global/indices endpoint working correctly. Returns 10 global stock indices (S&P 500, NASDAQ, Dow Jones, DAX, FTSE 100, CAC 40, Euro Stoxx 50, Nikkei 225, Hang Seng, Shanghai) with real-time data from Yahoo Finance."
+
+  - task: "Global Markets Commodities API"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/global_markets.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 15: GET /api/global/commodities endpoint working correctly. Returns 6 commodity prices (Petrol WTI, Petrol Brent, Aur, Argint, Gaze Naturale, Cupru) with proper structure including units and flags."
+
+  - task: "Global Markets Crypto API"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/global_markets.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 15: GET /api/global/crypto endpoint working correctly. Returns 5 cryptocurrency prices (Bitcoin, Ethereum, Binance Coin, Solana, XRP) sorted by price with real-time data and proper structure."
+
+  - task: "Global Markets Forex API"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/global_markets.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 15: GET /api/global/forex endpoint working correctly. Returns 4 currency pairs (EUR/USD, GBP/USD, USD/JPY, USD/CHF) with real-time exchange rates and proper structure."
+
+  - task: "Global Markets Chart API"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/global_markets.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Session 15: GET /api/global/chart/{symbol} endpoint working correctly. Tested with S&P 500 (^GSPC) returning 20 data points at $6,929.94 and Bitcoin (BTC-USD) returning 31 data points at $87,600.61. Historical OHLCV data structure validated."
+
 frontend:
   - task: "Ticker Bar (scrolling indices)"
     implemented: true
