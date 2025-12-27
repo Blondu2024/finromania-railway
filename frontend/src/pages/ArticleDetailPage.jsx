@@ -8,6 +8,9 @@ import { Skeleton } from '../components/ui/skeleton';
 import SocialShare from '../components/SocialShare';
 import NewsStockAnalysis from '../components/NewsStockAnalysis';
 
+// Rename import to use smart analysis
+const SmartNewsAnalysis = NewsStockAnalysis;
+
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function ArticleDetailPage() {
