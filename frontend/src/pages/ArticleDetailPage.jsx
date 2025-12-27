@@ -225,6 +225,9 @@ export default function ArticleDetailPage() {
           <SocialShare title={article.title} url={window.location.href} />
         </div>
 
+        {/* Stock Analysis for mentioned companies */}
+        <NewsStockAnalysis article={article} />
+
         {/* Financial Education CTA */}
         <Card className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 mt-6">
           <CardContent className="p-6">
