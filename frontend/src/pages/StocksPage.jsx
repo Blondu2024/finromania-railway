@@ -206,6 +206,25 @@ export default function StocksPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Financial Education CTA */}
+      <Card className="bg-gradient-to-r from-green-600 to-blue-600 text-white border-0 mt-6">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-center md:text-left">
+              <h3 className="text-xl font-bold mb-1">💰 Nu Înțelegi Bine Cifrele?</h3>
+              <p className="text-green-100">Învață bazele investițiilor în 15 lecții gratuite - de la bugete la ETF-uri</p>
+            </div>
+            <div className="flex gap-3">
+              <Link to="/financial-education">
+                <Button className="bg-white text-green-600 hover:bg-green-50">
+                  Începe Educația Financiară →
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
