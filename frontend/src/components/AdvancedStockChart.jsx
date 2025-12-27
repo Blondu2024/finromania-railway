@@ -1,17 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { createChart, ColorType, CrosshairMode } from 'lightweight-charts';
+import React, { useState, useMemo } from 'react';
+import {
+  ComposedChart,
+  Line,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Area,
+  ReferenceLine,
+  Legend
+} from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { 
-  Settings, 
-  TrendingUp, 
   BarChart3, 
+  TrendingUp, 
   Layers, 
   Eye, 
   EyeOff,
   Maximize2,
-  ChevronDown 
+  ChevronDown,
+  X
 } from 'lucide-react';
 
 // Timeframe options
@@ -27,9 +39,8 @@ const TIMEFRAMES = [
 
 // Chart type options
 const CHART_TYPES = [
-  { label: 'Candlestick', value: 'candlestick', icon: '📊' },
   { label: 'Linie', value: 'line', icon: '📈' },
-  { label: 'Area', value: 'area', icon: '📉' },
+  { label: 'Area', value: 'area', icon: '📊' },
   { label: 'Bare', value: 'bar', icon: '📶' },
 ];
 
@@ -44,39 +55,112 @@ const INDICATORS = [
 
 // Calculate SMA
 const calculateSMA = (data, period) => {
-  const result = [];
-  for (let i = period - 1; i < data.length; i++) {
+  return data.map((item, index) => {
+    if (index < period - 1) return null;
     let sum = 0;
-    for (let j = 0; j < period; j++) {
-      sum += data[i - j].close;
+    for (let i = 0; i < period; i++) {
+      sum += data[index - i].close;
     }
-    result.push({
-      time: data[i].time,
-      value: sum / period
-    });
-  }
-  return result;
+    return sum / period;
+  });
 };
 
 // Calculate EMA
 const calculateEMA = (data, period) => {
-  const result = [];
   const multiplier = 2 / (period + 1);
+  const result = [];
   
   // First EMA is SMA
   let sum = 0;
-  for (let i = 0; i < period; i++) {
+  for (let i = 0; i < period && i < data.length; i++) {
     sum += data[i].close;
   }
-  let ema = sum / period;
-  result.push({ time: data[period - 1].time, value: ema });
+  let ema = sum / Math.min(period, data.length);
   
-  // Calculate rest of EMAs
-  for (let i = period; i < data.length; i++) {
-    ema = (data[i].close - ema) * multiplier + ema;
-    result.push({ time: data[i].time, value: ema });
+  for (let i = 0; i < data.length; i++) {
+    if (i < period - 1) {
+      result.push(null);
+    } else if (i === period - 1) {
+      result.push(ema);
+    } else {
+      ema = (data[i].close - ema) * multiplier + ema;
+      result.push(ema);
+    }
   }
   return result;
+};
+
+// Custom Candlestick component
+const CandlestickBar = (props) => {
+  const { x, y, width, height, payload } = props;
+  if (!payload) return null;
+  
+  const { open, close, high, low } = payload;
+  const isGreen = close >= open;
+  const color = isGreen ? '#26a69a' : '#ef5350';
+  
+  const bodyTop = Math.max(open, close);
+  const bodyBottom = Math.min(open, close);
+  const yScale = height / (high - low || 1);
+  
+  const candleWidth = Math.max(width * 0.6, 4);
+  const wickX = x + width / 2;
+  
+  return (
+    <g>
+      {/* Wick */}
+      <line
+        x1={wickX}
+        y1={y + (high - Math.max(open, close)) * yScale}
+        x2={wickX}
+        y2={y + (high - Math.min(open, close)) * yScale}
+        stroke={color}
+        strokeWidth={1}
+      />
+      {/* Body */}
+      <rect
+        x={x + (width - candleWidth) / 2}
+        y={y + (high - bodyTop) * yScale}
+        width={candleWidth}
+        height={Math.max((bodyTop - bodyBottom) * yScale, 1)}
+        fill={isGreen ? color : color}
+        stroke={color}
+      />
+    </g>
+  );
+};
+
+// Custom tooltip
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload || !payload.length) return null;
+  
+  const data = payload[0]?.payload;
+  if (!data) return null;
+  
+  return (
+    <div className="bg-white border rounded-lg shadow-lg p-3 text-sm">
+      <p className="font-bold mb-2">{data.date}</p>
+      <div className="space-y-1">
+        <p>Deschidere: <span className="font-semibold">{data.open?.toFixed(2)}</span></p>
+        <p>Maxim: <span className="font-semibold text-green-600">{data.high?.toFixed(2)}</span></p>
+        <p>Minim: <span className="font-semibold text-red-600">{data.low?.toFixed(2)}</span></p>
+        <p>Închidere: <span className="font-semibold">{data.close?.toFixed(2)}</span></p>
+        {data.volume && (
+          <p>Volum: <span className="font-semibold">{data.volume.toLocaleString('ro-RO')}</span></p>
+        )}
+        {payload.map((entry, idx) => {
+          if (entry.name && !['close', 'volume', 'high', 'low', 'open'].includes(entry.name)) {
+            return (
+              <p key={idx} style={{ color: entry.color }}>
+                {entry.name}: <span className="font-semibold">{entry.value?.toFixed(2)}</span>
+              </p>
+            );
+          }
+          return null;
+        })}
+      </div>
+    </div>
+  );
 };
 
 export default function AdvancedStockChart({ 
@@ -86,177 +170,35 @@ export default function AdvancedStockChart({
   onTimeframeChange,
   currentTimeframe = '1m'
 }) {
-  const chartContainerRef = useRef();
-  const chartRef = useRef();
-  const mainSeriesRef = useRef();
-  const volumeSeriesRef = useRef();
-  const indicatorSeriesRef = useRef({});
-  
-  const [chartType, setChartType] = useState('candlestick');
+  const [chartType, setChartType] = useState('area');
   const [showVolume, setShowVolume] = useState(true);
   const [activeIndicators, setActiveIndicators] = useState(['sma20']);
   const [showSettings, setShowSettings] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Format data for the chart
-  const formatChartData = (rawData) => {
-    return rawData.map(item => ({
-      time: item.date,
-      open: item.open,
-      high: item.high,
-      low: item.low,
-      close: item.close,
-      value: item.close, // For line/area charts
-    })).sort((a, b) => new Date(a.time) - new Date(b.time));
-  };
-
-  const formatVolumeData = (rawData) => {
-    return rawData.map(item => ({
-      time: item.date,
-      value: item.volume || 0,
-      color: item.close >= item.open ? 'rgba(38, 166, 154, 0.5)' : 'rgba(239, 83, 80, 0.5)'
-    })).sort((a, b) => new Date(a.time) - new Date(b.time));
-  };
-
-  useEffect(() => {
-    if (!chartContainerRef.current || !data.length) return;
-
-    // Clear previous chart
-    if (chartRef.current) {
-      chartRef.current.remove();
-    }
-
-    // Create chart
-    const chart = createChart(chartContainerRef.current, {
-      layout: {
-        background: { type: ColorType.Solid, color: 'white' },
-        textColor: '#333',
-      },
-      grid: {
-        vertLines: { color: '#e1e3e6' },
-        horzLines: { color: '#e1e3e6' },
-      },
-      crosshair: {
-        mode: CrosshairMode.Normal,
-      },
-      rightPriceScale: {
-        borderColor: '#e1e3e6',
-        scaleMargins: {
-          top: 0.1,
-          bottom: 0.2,
-        },
-      },
-      timeScale: {
-        borderColor: '#e1e3e6',
-        timeVisible: true,
-        secondsVisible: false,
-      },
-      width: chartContainerRef.current.clientWidth,
-      height: isFullscreen ? 600 : 400,
-    });
-
-    chartRef.current = chart;
-    const formattedData = formatChartData(data);
-
-    // Create main series based on chart type
-    let mainSeries;
-    switch (chartType) {
-      case 'line':
-        mainSeries = chart.addLineSeries({
-          color: '#2196F3',
-          lineWidth: 2,
-        });
-        mainSeries.setData(formattedData.map(d => ({ time: d.time, value: d.close })));
-        break;
-      case 'area':
-        mainSeries = chart.addAreaSeries({
-          topColor: 'rgba(33, 150, 243, 0.4)',
-          bottomColor: 'rgba(33, 150, 243, 0.0)',
-          lineColor: '#2196F3',
-          lineWidth: 2,
-        });
-        mainSeries.setData(formattedData.map(d => ({ time: d.time, value: d.close })));
-        break;
-      case 'bar':
-        mainSeries = chart.addBarSeries({
-          upColor: '#26a69a',
-          downColor: '#ef5350',
-        });
-        mainSeries.setData(formattedData);
-        break;
-      default: // candlestick
-        mainSeries = chart.addCandlestickSeries({
-          upColor: '#26a69a',
-          downColor: '#ef5350',
-          borderUpColor: '#26a69a',
-          borderDownColor: '#ef5350',
-          wickUpColor: '#26a69a',
-          wickDownColor: '#ef5350',
-        });
-        mainSeries.setData(formattedData);
-    }
-    mainSeriesRef.current = mainSeries;
-
-    // Add volume
-    if (showVolume) {
-      const volumeSeries = chart.addHistogramSeries({
-        priceFormat: {
-          type: 'volume',
-        },
-        priceScaleId: '',
-        scaleMargins: {
-          top: 0.8,
-          bottom: 0,
-        },
-      });
-      volumeSeries.setData(formatVolumeData(data));
-      volumeSeriesRef.current = volumeSeries;
-    }
-
-    // Add indicators
-    indicatorSeriesRef.current = {};
-    activeIndicators.forEach(indicatorId => {
-      const indicator = INDICATORS.find(i => i.value === indicatorId);
-      if (!indicator) return;
-
-      let indicatorData;
-      if (indicatorId.startsWith('sma')) {
-        indicatorData = calculateSMA(formattedData, indicator.period);
-      } else if (indicatorId.startsWith('ema')) {
-        indicatorData = calculateEMA(formattedData, indicator.period);
-      }
-
-      if (indicatorData && indicatorData.length > 0) {
-        const lineSeries = chart.addLineSeries({
-          color: indicator.color,
-          lineWidth: 1,
-          title: indicator.label,
-        });
-        lineSeries.setData(indicatorData);
-        indicatorSeriesRef.current[indicatorId] = lineSeries;
-      }
-    });
-
-    // Fit content
-    chart.timeScale().fitContent();
-
-    // Handle resize
-    const handleResize = () => {
-      if (chartContainerRef.current) {
-        chart.applyOptions({ 
-          width: chartContainerRef.current.clientWidth,
-          height: isFullscreen ? 600 : 400,
-        });
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      chart.remove();
-    };
-  }, [data, chartType, showVolume, activeIndicators, isFullscreen]);
+  // Process data with indicators
+  const processedData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    
+    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    // Calculate indicators
+    const sma20 = calculateSMA(sortedData, 20);
+    const sma50 = calculateSMA(sortedData, 50);
+    const sma200 = calculateSMA(sortedData, 200);
+    const ema12 = calculateEMA(sortedData, 12);
+    const ema26 = calculateEMA(sortedData, 26);
+    
+    return sortedData.map((item, index) => ({
+      ...item,
+      sma20: sma20[index],
+      sma50: sma50[index],
+      sma200: sma200[index],
+      ema12: ema12[index],
+      ema26: ema26[index],
+      volumeColor: item.close >= item.open ? 'rgba(38, 166, 154, 0.6)' : 'rgba(239, 83, 80, 0.6)'
+    }));
+  }, [data]);
 
   const toggleIndicator = (indicatorId) => {
     setActiveIndicators(prev => 
@@ -266,21 +208,60 @@ export default function AdvancedStockChart({
     );
   };
 
-  const stats = data.length > 0 ? {
-    high: Math.max(...data.map(d => d.high)),
-    low: Math.min(...data.map(d => d.low)),
-    avgVolume: Math.round(data.reduce((acc, d) => acc + (d.volume || 0), 0) / data.length),
-    change: ((data[data.length - 1]?.close - data[0]?.close) / data[0]?.close * 100).toFixed(2)
+  // Calculate min/max for Y axis
+  const { minPrice, maxPrice, minVolume, maxVolume } = useMemo(() => {
+    if (processedData.length === 0) return { minPrice: 0, maxPrice: 100, minVolume: 0, maxVolume: 1000 };
+    
+    const prices = processedData.flatMap(d => [d.high, d.low].filter(Boolean));
+    const volumes = processedData.map(d => d.volume || 0);
+    
+    return {
+      minPrice: Math.min(...prices) * 0.98,
+      maxPrice: Math.max(...prices) * 1.02,
+      minVolume: 0,
+      maxVolume: Math.max(...volumes) * 1.2
+    };
+  }, [processedData]);
+
+  const stats = processedData.length > 0 ? {
+    high: Math.max(...processedData.map(d => d.high)),
+    low: Math.min(...processedData.map(d => d.low)),
+    avgVolume: Math.round(processedData.reduce((acc, d) => acc + (d.volume || 0), 0) / processedData.length),
+    change: ((processedData[processedData.length - 1]?.close - processedData[0]?.close) / processedData[0]?.close * 100).toFixed(2)
   } : {};
 
+  if (processedData.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <p className="text-muted-foreground">Nu există date pentru grafic</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className={`${isFullscreen ? 'fixed inset-4 z-50 overflow-auto' : ''}`}>
+    <Card className={`${isFullscreen ? 'fixed inset-4 z-50 overflow-auto bg-white' : ''}`}>
+      {isFullscreen && (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="absolute top-2 right-2 z-10"
+          onClick={() => setIsFullscreen(false)}
+        >
+          <X className="w-4 h-4" />
+        </Button>
+      )}
+      
       <CardHeader className="pb-2">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-2">
-            <CardTitle className="text-lg">Grafic {symbol}</CardTitle>
+            <CardTitle className="text-lg">📈 Grafic {symbol}</CardTitle>
             <Badge variant="outline" className="text-xs">
               {TIMEFRAMES.find(t => t.value === currentTimeframe)?.label || '1L'}
+            </Badge>
+            <Badge className="text-xs bg-green-100 text-green-800">
+              {processedData.length} puncte date
             </Badge>
           </div>
           
@@ -313,7 +294,7 @@ export default function AdvancedStockChart({
                 onClick={() => setChartType(type.value)}
                 title={type.label}
               >
-                {type.icon}
+                {type.icon} {type.label}
               </Button>
             ))}
           </div>
@@ -343,7 +324,7 @@ export default function AdvancedStockChart({
             </Button>
             
             {showSettings && (
-              <div className="absolute top-full left-0 mt-1 bg-white border rounded-lg shadow-lg p-2 z-10 min-w-[160px]">
+              <div className="absolute top-full left-0 mt-1 bg-white border rounded-lg shadow-lg p-2 z-20 min-w-[160px]">
                 {INDICATORS.map((indicator) => (
                   <button
                     key={indicator.value}
@@ -382,35 +363,173 @@ export default function AdvancedStockChart({
       </CardHeader>
       
       <CardContent className="pt-0">
-        {/* Chart Container */}
-        <div 
-          ref={chartContainerRef} 
-          className={`w-full ${isFullscreen ? 'h-[600px]' : 'h-[400px]'}`}
-        />
+        {/* Main Chart */}
+        <div className={`w-full ${isFullscreen ? 'h-[500px]' : 'h-[350px]'}`}>
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={processedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fontSize: 10 }}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return `${date.getDate()}/${date.getMonth() + 1}`;
+                }}
+              />
+              <YAxis 
+                yAxisId="price"
+                domain={[minPrice, maxPrice]} 
+                tick={{ fontSize: 10 }}
+                tickFormatter={(value) => value.toFixed(0)}
+                orientation="right"
+              />
+              {showVolume && (
+                <YAxis 
+                  yAxisId="volume"
+                  domain={[0, maxVolume * 4]}
+                  orientation="left"
+                  tick={{ fontSize: 10 }}
+                  tickFormatter={(value) => value >= 1000000 ? `${(value/1000000).toFixed(1)}M` : value >= 1000 ? `${(value/1000).toFixed(0)}K` : value}
+                />
+              )}
+              <Tooltip content={<CustomTooltip />} />
+              
+              {/* Volume Bars */}
+              {showVolume && (
+                <Bar 
+                  yAxisId="volume"
+                  dataKey="volume" 
+                  fill="#93c5fd"
+                  opacity={0.4}
+                />
+              )}
+              
+              {/* Main Price Chart */}
+              {chartType === 'line' && (
+                <Line 
+                  yAxisId="price"
+                  type="monotone" 
+                  dataKey="close" 
+                  stroke="#2196F3" 
+                  strokeWidth={2}
+                  dot={false}
+                  name="Preț"
+                />
+              )}
+              
+              {chartType === 'area' && (
+                <Area 
+                  yAxisId="price"
+                  type="monotone" 
+                  dataKey="close" 
+                  stroke="#2196F3" 
+                  fill="url(#colorPrice)"
+                  strokeWidth={2}
+                  name="Preț"
+                />
+              )}
+              
+              {chartType === 'bar' && (
+                <Bar 
+                  yAxisId="price"
+                  dataKey="close" 
+                  fill="#2196F3"
+                  name="Preț"
+                />
+              )}
+              
+              {/* Indicators */}
+              {activeIndicators.includes('sma20') && (
+                <Line 
+                  yAxisId="price"
+                  type="monotone" 
+                  dataKey="sma20" 
+                  stroke="#2196F3" 
+                  strokeWidth={1}
+                  dot={false}
+                  name="SMA 20"
+                  strokeDasharray="5 5"
+                />
+              )}
+              {activeIndicators.includes('sma50') && (
+                <Line 
+                  yAxisId="price"
+                  type="monotone" 
+                  dataKey="sma50" 
+                  stroke="#FF9800" 
+                  strokeWidth={1}
+                  dot={false}
+                  name="SMA 50"
+                  strokeDasharray="5 5"
+                />
+              )}
+              {activeIndicators.includes('sma200') && (
+                <Line 
+                  yAxisId="price"
+                  type="monotone" 
+                  dataKey="sma200" 
+                  stroke="#9C27B0" 
+                  strokeWidth={1}
+                  dot={false}
+                  name="SMA 200"
+                  strokeDasharray="5 5"
+                />
+              )}
+              {activeIndicators.includes('ema12') && (
+                <Line 
+                  yAxisId="price"
+                  type="monotone" 
+                  dataKey="ema12" 
+                  stroke="#4CAF50" 
+                  strokeWidth={1}
+                  dot={false}
+                  name="EMA 12"
+                />
+              )}
+              {activeIndicators.includes('ema26') && (
+                <Line 
+                  yAxisId="price"
+                  type="monotone" 
+                  dataKey="ema26" 
+                  stroke="#F44336" 
+                  strokeWidth={1}
+                  dot={false}
+                  name="EMA 26"
+                />
+              )}
+              
+              {/* Gradient Definition */}
+              <defs>
+                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#2196F3" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#2196F3" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
         
         {/* Stats Bar */}
-        {data.length > 0 && (
-          <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t text-sm">
-            <div>
-              <span className="text-muted-foreground">Maxim: </span>
-              <span className="font-semibold text-green-600">{stats.high?.toFixed(2)} {currency}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Minim: </span>
-              <span className="font-semibold text-red-600">{stats.low?.toFixed(2)} {currency}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Vol. Mediu: </span>
-              <span className="font-semibold">{stats.avgVolume?.toLocaleString('ro-RO')}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Variație: </span>
-              <span className={`font-semibold ${parseFloat(stats.change) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {parseFloat(stats.change) >= 0 ? '+' : ''}{stats.change}%
-              </span>
-            </div>
+        <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t text-sm">
+          <div>
+            <span className="text-muted-foreground">Maxim: </span>
+            <span className="font-semibold text-green-600">{stats.high?.toFixed(2)} {currency}</span>
           </div>
-        )}
+          <div>
+            <span className="text-muted-foreground">Minim: </span>
+            <span className="font-semibold text-red-600">{stats.low?.toFixed(2)} {currency}</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Vol. Mediu: </span>
+            <span className="font-semibold">{stats.avgVolume?.toLocaleString('ro-RO')}</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Variație: </span>
+            <span className={`font-semibold ${parseFloat(stats.change) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {parseFloat(stats.change) >= 0 ? '+' : ''}{stats.change}%
+            </span>
+          </div>
+        </div>
         
         {/* Indicator Legend */}
         {activeIndicators.length > 0 && (
