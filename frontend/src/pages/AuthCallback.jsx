@@ -19,22 +19,30 @@ export default function AuthCallback() {
       
       if (sessionIdMatch) {
         const sessionId = sessionIdMatch[1];
-        const user = await processSession(sessionId);
+        console.log('Processing session:', sessionId);
         
-        if (user) {
+        const result = await processSession(sessionId);
+        
+        if (result) {
+          console.log('Auth successful, redirecting to home');
           // Clear the hash and redirect to home
           window.history.replaceState(null, '', '/');
-          navigate('/', { replace: true, state: { user } });
+          // Small delay to ensure state is updated
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 100);
         } else {
+          console.log('Auth failed, redirecting to login');
           navigate('/login', { replace: true });
         }
       } else {
+        console.log('No session_id found in hash');
         navigate('/', { replace: true });
       }
     };
 
     processAuth();
-  }, []);
+  }, [location.hash, processSession, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
