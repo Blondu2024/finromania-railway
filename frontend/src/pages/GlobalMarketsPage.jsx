@@ -655,7 +655,7 @@ export default function GlobalMarketsPage() {
           <TabsContent value="forex" className="mt-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {data?.forex?.map((asset, idx) => (
-                <AssetCard key={asset.symbol} asset={asset} index={idx} />
+                <AssetCard key={asset.symbol} asset={asset} index={idx} onClick={handleAssetClick} />
               ))}
             </div>
           </TabsContent>
