@@ -588,11 +588,130 @@ class FinRomaniaAPITester:
             self.log_test("Regular User Creation", False, f"Failed to create test user", None)
             return False
 
+    def test_auth_session_endpoint(self):
+        """Test /api/auth/session endpoint - should return user data WITH session_token"""
+        print("\n🔐 Testing Authentication Session Endpoint...")
+        
+        # Test with a mock session_id
+        test_session_data = {"session_id": "test-session-id-123"}
+        
+        success, details, data = self.test_api_endpoint(
+            'POST', '/api/auth/session',
+            data=test_session_data,
+            expected_status=401  # Expected to fail with mock data
+        )
+        
+        # Since we're using mock data, we expect 401, but we want to verify the endpoint exists
+        if success and details.startswith("Status: 401"):
+            self.log_test("Auth Session Endpoint Structure", True, 
+                         "Endpoint exists and properly rejects invalid session_id", 
+                         {"endpoint": "/api/auth/session", "expected_behavior": "401 for invalid session"})
+            return True
+        else:
+            self.log_test("Auth Session Endpoint Structure", False, 
+                         f"Unexpected response: {details}", data)
+            return False
+
+    def test_auth_me_endpoint(self):
+        """Test /api/auth/me endpoint with Bearer token"""
+        print("\n👤 Testing Authentication Me Endpoint...")
+        
+        # First, create a test session in the database
+        import subprocess
+        test_email = f"auth_test_{datetime.now().timestamp()}@test.com"
+        
+        result = subprocess.run([
+            'mongosh', 'mongodb://localhost:27017/stock_news_romania', '--quiet', '--eval',
+            f"""
+            const userId = 'auth_test_' + Date.now();
+            db.users.insertOne({{
+              user_id: userId,
+              email: '{test_email}',
+              name: 'Auth Test User',
+              picture: 'https://example.com/pic.jpg',
+              is_admin: false,
+              created_at: new Date().toISOString(),
+              last_login: new Date().toISOString()
+            }});
+            const sessionToken = 'auth_test_token_' + Date.now();
+            const expiresAt = new Date(Date.now() + 7*24*60*60*1000);
+            db.user_sessions.insertOne({{
+              user_id: userId,
+              session_token: sessionToken,
+              expires_at: expiresAt.toISOString(),
+              created_at: new Date().toISOString()
+            }});
+            print(sessionToken);
+            """
+        ], capture_output=True, text=True)
+        
+        if result.returncode == 0 and result.stdout.strip():
+            test_token = result.stdout.strip()
+            
+            # Test /api/auth/me with Bearer token
+            success, details, data = self.test_api_endpoint(
+                'GET', '/api/auth/me',
+                auth_token=test_token
+            )
+            
+            if success and isinstance(data, dict) and 'user_id' in data and 'email' in data:
+                self.log_test("Auth Me Endpoint with Bearer Token", True, 
+                             f"Successfully authenticated and returned user data", 
+                             {"user_id": data.get('user_id'), "email": data.get('email')})
+                return True
+            else:
+                self.log_test("Auth Me Endpoint with Bearer Token", False, 
+                             f"Failed to authenticate or return proper user data: {details}", data)
+                return False
+        else:
+            self.log_test("Auth Me Endpoint with Bearer Token", False, 
+                         "Failed to create test session in database", None)
+            return False
+
+    def test_auth_me_without_token(self):
+        """Test /api/auth/me endpoint without token - should return 401"""
+        print("\n🚫 Testing Authentication Me Endpoint without token...")
+        
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/auth/me',
+            expected_status=401
+        )
+        
+        if success:
+            self.log_test("Auth Me Endpoint - No Token (401)", True, 
+                         "Correctly returns 401 when no authentication provided", data)
+            return True
+        else:
+            self.log_test("Auth Me Endpoint - No Token (401)", False, 
+                         f"Should return 401 but got: {details}", data)
+            return False
+
     def run_all_tests(self):
-        """Run comprehensive test suite including Session 6 features"""
-        print("🚀 Starting FinRomania API Testing - Session 6...")
+        """Run comprehensive test suite focusing on authentication flow"""
+        print("🚀 Starting FinRomania API Testing - Authentication Flow Focus...")
         print(f"📍 Testing against: {self.base_url}")
         print("=" * 80)
+        
+        # ============================================
+        # AUTHENTICATION FLOW TESTING (PRIMARY FOCUS)
+        # ============================================
+        print("\n🔐 SECTION 1: Authentication Flow Testing")
+        print("-" * 80)
+        
+        # Test 1: /api/auth/session endpoint
+        self.test_auth_session_endpoint()
+        
+        # Test 2: /api/auth/me endpoint with Bearer token
+        self.test_auth_me_endpoint()
+        
+        # Test 3: /api/auth/me endpoint without token
+        self.test_auth_me_without_token()
+        
+        # ============================================
+        # BASIC HEALTH CHECKS
+        # ============================================
+        print("\n📋 SECTION 2: Basic Health Checks")
+        print("-" * 80)
         
         # ============================================
         # BASIC HEALTH CHECKS
