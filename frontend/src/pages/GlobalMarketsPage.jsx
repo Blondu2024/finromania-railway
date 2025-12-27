@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   Globe, TrendingUp, TrendingDown, RefreshCw, Clock, Flame,
   DollarSign, Coins, BarChart3, Zap, Building2, Timer,
-  ChevronRight, Sparkles, Activity
+  ChevronRight, Sparkles, Activity, X, Calendar, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -12,7 +12,8 @@ import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Skeleton } from '../components/ui/skeleton';
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart
+  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart,
+  CartesianGrid, ReferenceLine
 } from 'recharts';
 import SEO from '../components/SEO';
 
