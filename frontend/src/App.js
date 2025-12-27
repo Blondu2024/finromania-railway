@@ -257,6 +257,7 @@ function AppRouter() {
       <Route path="/calendar" element={<DividendCalendarPage />} />
       <Route path="/screener" element={<StockScreenerPage />} />
       <Route path="/notifications" element={<NotificationSettingsPage />} />
+      <Route path="/global" element={<GlobalMarketsPage />} />
     </Routes>
   );
 }
