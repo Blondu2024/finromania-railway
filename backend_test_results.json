@@ -1,16 +1,16 @@
 {
   "summary": {
-    "total_tests": 28,
-    "passed_tests": 28,
+    "total_tests": 35,
+    "passed_tests": 35,
     "success_rate": "100.0%",
-    "timestamp": "2025-12-27T20:00:13.753580"
+    "timestamp": "2025-12-27T23:32:33.774622"
   },
   "detailed_results": [
     {
       "test_name": "Auth Session Endpoint Structure",
       "success": true,
       "details": "Endpoint exists and properly rejects invalid session_id",
-      "timestamp": "2025-12-27T20:00:04.691902",
+      "timestamp": "2025-12-27T23:32:24.027088",
       "response_sample": {
         "endpoint": "/api/auth/session",
         "expected_behavior": "401 for invalid session"
@@ -20,17 +20,17 @@
       "test_name": "Auth Me Endpoint with Bearer Token",
       "success": true,
       "details": "Successfully authenticated and returned user data",
-      "timestamp": "2025-12-27T20:00:08.455727",
+      "timestamp": "2025-12-27T23:32:26.262377",
       "response_sample": {
-        "user_id": "auth_test_1766865608025",
-        "email": "auth_test_1766865604.70018@test.com"
+        "user_id": "auth_test_1766878346123",
+        "email": "auth_test_1766878344.033349@test.com"
       }
     },
     {
       "test_name": "Auth Me Endpoint - No Token (401)",
       "success": true,
       "details": "Correctly returns 401 when no authentication provided",
-      "timestamp": "2025-12-27T20:00:08.526538",
+      "timestamp": "2025-12-27T23:32:26.314619",
       "response_sample": {
         "detail": "Not authenticated"
       }
@@ -39,17 +39,17 @@
       "test_name": "Health Check",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:08.643669",
+      "timestamp": "2025-12-27T23:32:26.364938",
       "response_sample": {
         "status": "healthy",
-        "timestamp": "2025-12-27T20:00:08.596119+00:00"
+        "timestamp": "2025-12-27T23:32:26.359739+00:00"
       }
     },
     {
       "test_name": "API Root Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:08.730234",
+      "timestamp": "2025-12-27T23:32:26.430442",
       "response_sample": {
         "message": "FinRomania API",
         "version": "1.0.0",
@@ -66,7 +66,7 @@
       "test_name": "BVB Stock Details - TLV (REAL EODHD)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:09.168375",
+      "timestamp": "2025-12-27T23:32:26.811421",
       "response_sample": {
         "symbol": "TLV",
         "history_count": 21,
@@ -77,7 +77,7 @@
       "test_name": "BVB Stock Details - H2O (REAL EODHD)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:09.506950",
+      "timestamp": "2025-12-27T23:32:27.108501",
       "response_sample": {
         "symbol": "H2O",
         "history_count": 21,
@@ -88,7 +88,7 @@
       "test_name": "Data Sources - BVB should be EODHD (REAL)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:10.099739",
+      "timestamp": "2025-12-27T23:32:27.750897",
       "response_sample": {
         "bvb_source": "EODHD (REAL)",
         "global_source": "Yahoo Finance (REAL)",
@@ -99,7 +99,7 @@
       "test_name": "BVB Stocks List (REAL data verification)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:10.172851",
+      "timestamp": "2025-12-27T23:32:27.805170",
       "response_sample": [
         {
           "symbol": "H2O",
@@ -137,7 +137,7 @@
       "test_name": "Admin Authentication Setup",
       "success": true,
       "details": "Admin session token created",
-      "timestamp": "2025-12-27T20:00:11.219135",
+      "timestamp": "2025-12-27T23:32:28.864303",
       "response_sample": {
         "has_token": true
       }
@@ -146,21 +146,21 @@
       "test_name": "Admin Stats Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:11.327628",
+      "timestamp": "2025-12-27T23:32:28.957326",
       "response_sample": {
         "totals": {
-          "users": 11,
-          "articles": 660,
+          "users": 13,
+          "articles": 676,
           "watchlist_items": 1,
           "portfolio_transactions": 5,
           "newsletter_subscribers": 2
         },
         "today": {
-          "logins": 4,
+          "logins": 6,
           "page_visits": 0
         },
         "last_7_days": {
-          "new_users": 11
+          "new_users": 13
         }
       }
     },
@@ -168,17 +168,17 @@
       "test_name": "Admin Users List (limit=5)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:11.404513",
+      "timestamp": "2025-12-27T23:32:29.006402",
       "response_sample": {
         "users_count": 5,
-        "total": 11
+        "total": 13
       }
     },
     {
       "test_name": "Admin Analytics (7 days)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:11.509651",
+      "timestamp": "2025-12-27T23:32:29.070314",
       "response_sample": {
         "days_count": 7
       }
@@ -186,8 +186,8 @@
     {
       "test_name": "Regular User Creation",
       "success": true,
-      "details": "Test user created: testuser_1766865611.509737@test.com",
-      "timestamp": "2025-12-27T20:00:12.603088",
+      "details": "Test user created: testuser_1766878349.070374@test.com",
+      "timestamp": "2025-12-27T23:32:29.867740",
       "response_sample": {
         "has_token": true
       }
@@ -196,7 +196,7 @@
       "test_name": "Admin Access Control (403 for non-admin)",
       "success": true,
       "details": "Correctly denied access to non-admin user",
-      "timestamp": "2025-12-27T20:00:12.685501",
+      "timestamp": "2025-12-27T23:32:29.915441",
       "response_sample": {
         "detail": "Admin access required"
       }
@@ -205,7 +205,7 @@
       "test_name": "Glossary - All Terms (~99 terms)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:12.769975",
+      "timestamp": "2025-12-27T23:32:29.967967",
       "response_sample": {
         "total": 99,
         "sample_terms": [
@@ -219,7 +219,7 @@
       "test_name": "Glossary - Search (dividend)",
       "success": true,
       "details": "Found 2 matching terms",
-      "timestamp": "2025-12-27T20:00:12.841247",
+      "timestamp": "2025-12-27T23:32:30.011163",
       "response_sample": {
         "total": 2,
         "terms": [
@@ -232,7 +232,7 @@
       "test_name": "Global Indices (Yahoo Finance)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:12.924901",
+      "timestamp": "2025-12-27T23:32:30.060650",
       "response_sample": [
         {
           "symbol": "^GSPC",
@@ -266,22 +266,22 @@
       "test_name": "Financial News",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:13.000389",
+      "timestamp": "2025-12-27T23:32:30.115096",
       "response_sample": [
         {
-          "id": "f49dd66c-d1dd-4f0a-bc1b-e9b6abd55071",
-          "title": "Sute de bucure\u0219teni au r\u0103mas f\u0103r\u0103 gaze",
-          "description": "Peste 220 de bucure\u0219teni, din Sectorul 3, au r\u0103mas f\u0103r\u0103 gaze.",
-          "content": "Peste 220 de bucure\u0219teni, din Sectorul 3, au r\u0103mas f\u0103r\u0103 gaze.",
-          "url": "https://www.profit.ro/stiri/social/sute-de-bucuresteni-au-ramas-fara-gaze-22288414?utm_source=Rss&utm_medium=Referral&utm_campaign=Cross",
-          "image_url": "https://i0.1616.ro/media/2/2621/33239/22288414/2/flame-580342-1280.jpg",
+          "id": "b6a5e3d1-64a0-44cf-ac68-6c1efbc25a52",
+          "title": "Grupul indian Coforge achizi\u0163ioneaz\u0103 compania american\u0103 Encora pentru 2,35 miliarde de dolari. Encora cump\u0103rase din Rom\u00e2nia \u00een 2023 compania Softelligence",
+          "description": "Furnizorul indian de servicii IT Coforge a anun\u0163at vineri achizi\u0163ia companiei americane Encora, specializat\u0103 \u00een solu\u0163ii de inteligen\u0163\u0103 artificial\u0103, la o valoare de 2,35 miliarde de dolari. Tranzac\u0163ia include \u015fi opera\u0163iunile din Rom\u00e2nia ale fostei companii Softelligence, preluat\u0103 de Encora \u00een mai 2023.",
+          "content": "Furnizorul indian de servicii IT Coforge a anun\u0163at vineri achizi\u0163ia companiei americane Encora, specializat\u0103 \u00een solu\u0163ii de inteligen\u0163\u0103 artificial\u0103, la o valoare de 2,35 miliarde de dolari. Tranzac\u0163ia include \u015fi opera\u0163iunile din Rom\u00e2nia ale fostei companii Softelligence, preluat\u0103 de Encora \u00een mai 2023.",
+          "url": "https://www.zf.ro/business-hi-tech/grupul-indian-coforge-achizitioneaza-compania-americana-encora-22994014",
+          "image_url": "https://storage0.dms.mpinteractiv.ro/media/1/1481/21332/22994014/1/coforge.png?width=700",
           "source": {
-            "name": "Profit.ro",
-            "url": "https://www.profit.ro/stiri/social/sute-de-bucuresteni-au-ramas-fara-gaze-22288414?utm_source=Rss&utm_medium=Referral&utm_campaign=Cross",
+            "name": "Ziarul Financiar",
+            "url": "https://www.zf.ro/business-hi-tech/grupul-indian-coforge-achizitioneaza-compania-americana-encora-22994014",
             "category": "business"
           },
-          "author": "Profit.ro",
-          "published_at": "2025-12-27T19:40:00",
+          "author": "Ziarul Financiar",
+          "published_at": "2025-12-27T22:58:00",
           "language": "ro",
           "is_rewritten": false,
           "is_translated": false,
@@ -295,7 +295,7 @@
       "test_name": "Currency Rates (BNR)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:13.092593",
+      "timestamp": "2025-12-27T23:32:30.165215",
       "response_sample": {
         "sample_rates": [
           "AED",
@@ -310,7 +310,7 @@
       "test_name": "Market Overview (Combined)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:13.174236",
+      "timestamp": "2025-12-27T23:32:30.215786",
       "response_sample": {
         "bvb_count": 20,
         "global_count": 6
@@ -320,7 +320,7 @@
       "test_name": "Education Packages",
       "success": true,
       "details": "Found 2 packages",
-      "timestamp": "2025-12-27T20:00:13.247810",
+      "timestamp": "2025-12-27T23:32:30.257760",
       "response_sample": {
         "packages": [
           {
@@ -370,10 +370,10 @@
       "test_name": "AI Advisor - Tip of the Day",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:13.321138",
+      "timestamp": "2025-12-27T23:32:30.303078",
       "response_sample": {
-        "tip": "Emo\u021biile sunt du\u0219manul investitorului. C\u00e2nd al\u021bii sunt frico\u0219i, fii lacom. C\u00e2nd al\u021bii sunt lacomi, fii precaut.",
-        "category": "Psihologie",
+        "tip": "Rebalanseaz\u0103-\u021bi portofoliul o dat\u0103 pe an pentru a men\u021bine alocarea \u021bint\u0103 \u0219i a reduce riscul.",
+        "category": "Management portofoliu",
         "date": "2025-12-27"
       }
     },
@@ -381,7 +381,7 @@
       "test_name": "Financial Education - All Lessons (15 total)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:13.407592",
+      "timestamp": "2025-12-27T23:32:30.356236",
       "response_sample": {
         "total": 15,
         "modules": 3,
@@ -396,7 +396,7 @@
       "test_name": "Financial Education - Lesson 1 Detail",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:13.487117",
+      "timestamp": "2025-12-27T23:32:30.397701",
       "response_sample": {
         "title": "Ce Este Educa\u021bia Financiar\u0103 \u0219i De Ce Conteaz\u0103",
         "module": 1,
@@ -408,7 +408,7 @@
       "test_name": "Financial Education - Quiz Submit (Correct)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:13.588951",
+      "timestamp": "2025-12-27T23:32:30.461154",
       "response_sample": {
         "score": 100.0,
         "passed": true,
@@ -420,7 +420,7 @@
       "test_name": "Financial Education - Progress Tracking",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:13.665129",
+      "timestamp": "2025-12-27T23:32:30.508039",
       "response_sample": {
         "completed": 1,
         "total": 15,
@@ -431,10 +431,106 @@
       "test_name": "Financial Education - Quiz Submit (Wrong)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T20:00:13.752799",
+      "timestamp": "2025-12-27T23:32:30.559157",
       "response_sample": {
         "score": 0.0,
         "passed": false
+      }
+    },
+    {
+      "test_name": "Global Markets - Overview (Main Endpoint)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T23:32:32.661428",
+      "response_sample": {
+        "indices_count": 10,
+        "commodities_count": 6,
+        "crypto_count": 5,
+        "forex_count": 4,
+        "sentiment": {
+          "gainers": 14,
+          "losers": 10,
+          "avg_change": 0.66,
+          "status": "bullish"
+        }
+      }
+    },
+    {
+      "test_name": "Global Markets - Indices",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T23:32:32.957560",
+      "response_sample": {
+        "count": 10,
+        "sample_indices": [
+          "Nikkei 225",
+          "DAX",
+          "Hang Seng"
+        ]
+      }
+    },
+    {
+      "test_name": "Global Markets - Commodities",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T23:32:33.143534",
+      "response_sample": {
+        "count": 6,
+        "sample_commodities": [
+          "Petrol WTI",
+          "Petrol Brent",
+          "Aur"
+        ]
+      }
+    },
+    {
+      "test_name": "Global Markets - Cryptocurrency",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T23:32:33.318957",
+      "response_sample": {
+        "count": 5,
+        "sample_crypto": [
+          "Bitcoin",
+          "Ethereum",
+          "Binance Coin"
+        ]
+      }
+    },
+    {
+      "test_name": "Global Markets - Forex",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T23:32:33.475070",
+      "response_sample": {
+        "count": 4,
+        "sample_forex": [
+          "EUR/USD",
+          "GBP/USD",
+          "USD/JPY"
+        ]
+      }
+    },
+    {
+      "test_name": "Global Markets - Chart Data (S&P 500)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T23:32:33.600413",
+      "response_sample": {
+        "symbol": "^GSPC",
+        "data_points": 20,
+        "current_price": 6929.94
+      }
+    },
+    {
+      "test_name": "Global Markets - Chart Data (Bitcoin)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T23:32:33.774148",
+      "response_sample": {
+        "symbol": "BTC-USD",
+        "data_points": 31,
+        "current_price": 87600.61
       }
     }
   ]
