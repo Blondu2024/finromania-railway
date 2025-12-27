@@ -183,17 +183,14 @@ export default function FinLessonPage() {
                 </Button>
               )}
               {passed && nextLesson ? (
-                <Button 
-                  size="lg" 
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={() => {
-                    setQuizResult(null);
-                    setShowQuiz(false);
-                    navigate(`/financial-education/${nextLesson.id}`);
-                  }}
-                >
-                  Următoarea Lecție: {nextLesson.title.length > 25 ? nextLesson.title.substring(0, 25) + '...' : nextLesson.title} <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
+                <Link to={`/financial-education/${nextLesson.id}`}>
+                  <Button 
+                    size="lg" 
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Următoarea Lecție: {nextLesson.title.length > 25 ? nextLesson.title.substring(0, 25) + '...' : nextLesson.title} <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
               ) : passed ? (
                 <Link to="/financial-education">
                   <Button size="lg" className="bg-green-600 hover:bg-green-700">
