@@ -280,6 +280,7 @@ function App() {
                     <li><Link to="/news" className="text-muted-foreground hover:text-foreground">Știri</Link></li>
                     <li><Link to="/currencies" className="text-muted-foreground hover:text-foreground">Valute</Link></li>
                     <li><Link to="/trading-school" className="text-muted-foreground hover:text-foreground">Trading School</Link></li>
+                    <li><Link to="/financial-education" className="text-muted-foreground hover:text-foreground">💰 Educație Financiară</Link></li>
                     <li><Link to="/glossary" className="text-muted-foreground hover:text-foreground">Glosar</Link></li>
                   </ul>
                 </div>
