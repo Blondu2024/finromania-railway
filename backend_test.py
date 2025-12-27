@@ -716,7 +716,7 @@ class FinRomaniaAPITester:
         # ============================================
         # BASIC HEALTH CHECKS
         # ============================================
-        print("\n📋 SECTION 1: Basic Health Checks")
+        print("\n📋 SECTION 2: Basic Health Checks")
         print("-" * 80)
         
         # Test 1: Health Check
