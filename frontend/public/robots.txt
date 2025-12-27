@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://finromania-1.preview.emergentagent.com/sitemap.xml
+Sitemap: https://finedromania.preview.emergentagent.com/sitemap.xml
 
 # Disallow admin and API routes
 Disallow: /api/
