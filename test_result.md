@@ -48,6 +48,32 @@
 ##   run_ui: false
 ##
 ## test_plan:
+  current_focus: "BVB Stocks Page - Complete Redesign Phase 1"
+  
+  features_to_test:
+    - name: "Market Pulse Gauge"
+      description: "Fear & Greed style indicator showing market sentiment"
+      expected: "Should display sentiment score 0-100 with labels FRICĂ/LĂCOMIE"
+      
+    - name: "Market Countdown Timer"
+      description: "Shows time until market opens/closes"
+      expected: "Should show BURSA DESCHISĂ/ÎNCHISĂ with countdown timer"
+      
+    - name: "BVB Heatmap"
+      description: "Visual heatmap of all stocks colored by performance"
+      expected: "Should display stock blocks sized by volume, colored green/red by change %"
+      
+    - name: "Top Movers Animated"
+      description: "Tabbed component showing gainers, losers, volume leaders"
+      expected: "Should have 3 tabs, each showing top 5 stocks with animations"
+      
+    - name: "Sector Performance Bars"
+      description: "Animated progress bars showing sector performance"
+      expected: "Should show all sectors with their average change %"
+      
+    - name: "Stock Detail Navigation"
+      description: "Clicking on stock in heatmap or table navigates to detail page"
+      expected: "Should navigate to /stocks/bvb/{symbol} page"
 ##   current_focus:
 ##     - "Task name 1"
 ##     - "Task name 2"
