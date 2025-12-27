@@ -204,6 +204,13 @@ export default function FinLessonPage() {
                   </Button>
                 </Link>
               )}
+              
+              {/* Always show back button */}
+              <Link to="/financial-education">
+                <Button variant="outline" size="lg">
+                  Vezi Toate Lecțiile
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
