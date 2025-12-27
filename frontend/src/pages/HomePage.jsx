@@ -536,27 +536,27 @@ export default function HomePage() {
           viewport={{ once: true }}
           className="mt-12"
         >
-          <Card className="bg-gradient-to-br from-blue-600 to-purple-600 text-white border-0 max-w-4xl mx-auto">
+          <Card className="bg-gradient-to-br from-green-600 to-blue-600 text-white border-0 max-w-4xl mx-auto">
             <CardContent className="p-8 text-center space-y-4">
               <div className="inline-block p-3 bg-white/20 rounded-full">
                 <GraduationCap className="w-10 h-10" />
               </div>
               <h2 className="text-3xl font-bold">
-                Înțelegi Datele? Învață Să Le Folosești!
+                Nu Știi De Unde Să Începi? Hai Să Te Ajutăm!
               </h2>
-              <p className="text-lg text-blue-100 max-w-2xl mx-auto">
-                17 lecții interactive te învață cum să analizezi piața, să identifici oportunități și să gestionezi riscul — 100% gratuit!
+              <p className="text-lg text-green-100 max-w-2xl mx-auto">
+                De la bazele finanțelor personale până la strategii avansate de trading — totul gratuit, în română, pentru tine!
               </p>
               <div className="flex gap-4 justify-center flex-wrap">
-                <Link to="/trading-school/lesson_1">
-                  <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
-                    <GraduationCap className="w-5 h-5 mr-2" />
-                    Începe Prima Lecție
+                <Link to="/financial-education/fin_lesson_1">
+                  <Button size="lg" className="bg-white text-green-600 hover:bg-green-50">
+                    <Target className="w-5 h-5 mr-2" />
+                    Începe cu Bazele
                   </Button>
                 </Link>
                 <Link to="/trading-school">
                   <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10">
-                    Vezi Tot Programul →
+                    Școala de Trading →
                   </Button>
                 </Link>
               </div>
