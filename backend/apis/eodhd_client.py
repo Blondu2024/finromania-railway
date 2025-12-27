@@ -101,9 +101,10 @@ class EODHDClient:
         
         return stocks
     
-    async def get_historical_data(self, symbol: str, period: str = "m") -> List[Dict]:
+    async def get_historical_data(self, symbol: str, period: str = "m", days: int = None) -> List[Dict]:
         """Get historical data for a stock
-        period: d=day, w=week, m=month
+        period: d=day, w=week, m=month, 3m=3months, 6m=6months, 1y=1year, 5y=5years
+        days: optional - exact number of days to fetch
         """
         if not self.api_key:
             return []
@@ -112,11 +113,24 @@ class EODHDClient:
             async with httpx.AsyncClient() as client:
                 # Calculate date range
                 end_date = datetime.now()
-                if period == "d":
+                
+                if days:
+                    start_date = end_date - timedelta(days=days)
+                elif period == "1d" or period == "d":
                     start_date = end_date - timedelta(days=1)
-                elif period == "w":
+                elif period == "1w" or period == "w":
                     start_date = end_date - timedelta(weeks=1)
-                else:  # month
+                elif period == "1m" or period == "m":
+                    start_date = end_date - timedelta(days=30)
+                elif period == "3m":
+                    start_date = end_date - timedelta(days=90)
+                elif period == "6m":
+                    start_date = end_date - timedelta(days=180)
+                elif period == "1y":
+                    start_date = end_date - timedelta(days=365)
+                elif period == "5y":
+                    start_date = end_date - timedelta(days=1825)
+                else:
                     start_date = end_date - timedelta(days=30)
                 
                 url = f"{self.BASE_URL}/eod/{symbol}.RO"
@@ -127,7 +141,7 @@ class EODHDClient:
                     "to": end_date.strftime("%Y-%m-%d")
                 }
                 
-                response = await client.get(url, params=params, timeout=15)
+                response = await client.get(url, params=params, timeout=30)
                 
                 if response.status_code == 200:
                     data = response.json()
