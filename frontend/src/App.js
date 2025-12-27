@@ -119,11 +119,22 @@ function Navigation({ darkMode, toggleDarkMode }) {
   ];
 
   const userNavItems = user ? [
-    { path: '/watchlist', label: 'Watchlist', icon: <Star className="w-4 h-4" /> },
-    { path: '/notifications', label: '🔔', icon: <Bell className="w-4 h-4" /> },
-    // Portfolio hidden - BETA mode
-    // { path: '/portfolio', label: 'Portofoliu', icon: <Briefcase className="w-4 h-4" /> },
+    // Watchlist va fi afișat separat lângă user menu
   ] : [];
+
+  // Watchlist button pentru useri logați
+  const WatchlistButton = () => {
+    if (!user) return null;
+    return (
+      <Link 
+        to="/watchlist" 
+        className="relative p-2 rounded-md hover:bg-accent transition-colors"
+        title="Watchlist - Acțiunile tale preferate"
+      >
+        <Star className={`w-5 h-5 ${location.pathname === '/watchlist' ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground'}`} />
+      </Link>
+    );
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
