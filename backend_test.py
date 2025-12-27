@@ -1159,6 +1159,78 @@ class FinRomaniaAPITester:
             self.log_test("Financial Education - Quiz Submit (Wrong)", False, "Skipped - no user token")
 
         # ============================================
+        # GLOBAL MARKETS TESTING (NEW FEATURE)
+        # ============================================
+        print("\n🌍 SECTION 9: Global Markets Feature (NEW)")
+        print("-" * 80)
+        
+        # Test 25: Global Markets Overview - Main endpoint
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/global/overview',
+            validate_response=self.validate_global_overview
+        )
+        self.log_test("Global Markets - Overview (Main Endpoint)", success, details,
+                     {"indices_count": len(data.get('indices', [])), 
+                      "commodities_count": len(data.get('commodities', [])),
+                      "crypto_count": len(data.get('crypto', [])),
+                      "forex_count": len(data.get('forex', [])),
+                      "sentiment": data.get('sentiment', {})} if isinstance(data, dict) else data)
+        
+        # Test 26: Global Indices
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/global/indices',
+            validate_response=self.validate_global_indices_only
+        )
+        self.log_test("Global Markets - Indices", success, details,
+                     {"count": data.get('count'), 
+                      "sample_indices": [idx.get('name') for idx in data.get('indices', [])][:3]} if isinstance(data, dict) else data)
+        
+        # Test 27: Commodities
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/global/commodities',
+            validate_response=self.validate_commodities_only
+        )
+        self.log_test("Global Markets - Commodities", success, details,
+                     {"count": data.get('count'),
+                      "sample_commodities": [c.get('name') for c in data.get('commodities', [])][:3]} if isinstance(data, dict) else data)
+        
+        # Test 28: Cryptocurrency
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/global/crypto',
+            validate_response=self.validate_crypto_only
+        )
+        self.log_test("Global Markets - Cryptocurrency", success, details,
+                     {"count": data.get('count'),
+                      "sample_crypto": [c.get('name') for c in data.get('crypto', [])][:3]} if isinstance(data, dict) else data)
+        
+        # Test 29: Forex
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/global/forex',
+            validate_response=self.validate_forex_only
+        )
+        self.log_test("Global Markets - Forex", success, details,
+                     {"count": data.get('count'),
+                      "sample_forex": [f.get('name') for f in data.get('forex', [])][:3]} if isinstance(data, dict) else data)
+        
+        # Test 30: Chart Data - S&P 500
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/global/chart/^GSPC',
+            validate_response=self.validate_chart_data
+        )
+        self.log_test("Global Markets - Chart Data (S&P 500)", success, details,
+                     {"symbol": data.get('symbol'), "data_points": len(data.get('data', [])),
+                      "current_price": data.get('current_price')} if isinstance(data, dict) else data)
+        
+        # Test 31: Chart Data - Bitcoin
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/global/chart/BTC-USD',
+            validate_response=self.validate_chart_data
+        )
+        self.log_test("Global Markets - Chart Data (Bitcoin)", success, details,
+                     {"symbol": data.get('symbol'), "data_points": len(data.get('data', [])),
+                      "current_price": data.get('current_price')} if isinstance(data, dict) else data)
+
+        # ============================================
         # FINAL SUMMARY
         # ============================================
         print("\n" + "=" * 80)
