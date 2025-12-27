@@ -168,46 +168,55 @@ export default function HomePage() {
           </p>
         </motion.div>
 
-        {/* Platform Identity - 3 Cards */}
+        {/* Platform Identity - 3 Cards with Better Design */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
           className="grid md:grid-cols-3 gap-6"
         >
-          <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
-            <CardContent className="p-6 text-center space-y-3">
-              <div className="inline-block p-4 bg-blue-100 rounded-full">
-                <BarChart3 className="w-8 h-8 text-blue-600" />
+          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-105">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+            <CardContent className="p-6 text-center space-y-3 relative z-10">
+              <div className="inline-block p-4 bg-white/20 rounded-full backdrop-blur-sm">
+                <BarChart3 className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold">Date Reale BVB</h3>
-              <p className="text-muted-foreground">
-                Prețuri live de pe Bursa de Valori București - actualizate automat la fiecare 5 minute
+              <h3 className="text-xl font-bold">📈 Date Live BVB</h3>
+              <p className="text-blue-100">
+                Prețuri reale de pe Bursa de Valori București - actualizate automat
               </p>
+              <div className="pt-2 text-3xl font-bold">{bvbStocks.length}+</div>
+              <p className="text-sm text-blue-200">Acțiuni monitorizate</p>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-purple-200 hover:border-purple-400 transition-colors">
-            <CardContent className="p-6 text-center space-y-3">
-              <div className="inline-block p-4 bg-purple-100 rounded-full">
-                <Newspaper className="w-8 h-8 text-purple-600" />
+          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-purple-500 to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-105">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+            <CardContent className="p-6 text-center space-y-3 relative z-10">
+              <div className="inline-block p-4 bg-white/20 rounded-full backdrop-blur-sm">
+                <Newspaper className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold">Știri Financiare</h3>
-              <p className="text-muted-foreground">
-                Actualizări automate din surse românești de încredere - fără fake news, doar informații verificate
+              <h3 className="text-xl font-bold">📰 Știri Financiare</h3>
+              <p className="text-purple-100">
+                Actualizări din surse românești verificate - ZF, Profit.ro, Bursa
               </p>
+              <div className="pt-2 text-3xl font-bold">{news.length}+</div>
+              <p className="text-sm text-purple-200">Articole recente</p>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-green-200 hover:border-green-400 transition-colors">
-            <CardContent className="p-6 text-center space-y-3">
-              <div className="inline-block p-4 bg-green-100 rounded-full">
-                <Zap className="w-8 h-8 text-green-600" />
+          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-105">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+            <CardContent className="p-6 text-center space-y-3 relative z-10">
+              <div className="inline-block p-4 bg-white/20 rounded-full backdrop-blur-sm">
+                <GraduationCap className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold">100% Gratuit</h3>
-              <p className="text-muted-foreground">
-                Toate datele, știrile, instrumentele și educația - accesibile gratuit pentru orice român interesat de investiții
+              <h3 className="text-xl font-bold">🎓 100% Gratuit</h3>
+              <p className="text-green-100">
+                32 lecții de trading și educație financiară - totul gratuit, în română
               </p>
+              <div className="pt-2 text-3xl font-bold">32</div>
+              <p className="text-sm text-green-200">Lecții interactive</p>
             </CardContent>
           </Card>
         </motion.section>
