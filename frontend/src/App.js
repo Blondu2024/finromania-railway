@@ -182,7 +182,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
                 <div className="mb-4">
                   <SearchBar />
                 </div>
-                {[...navItems, ...userNavItems].map((item) => (
+                {navItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
@@ -193,6 +193,16 @@ function Navigation({ darkMode, toggleDarkMode }) {
                     <span>{item.label}</span>
                   </Link>
                 ))}
+                {user && (
+                  <Link
+                    to="/watchlist"
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/watchlist' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}
+                  >
+                    <Star className="w-4 h-4" />
+                    <span>⭐ Watchlist</span>
+                  </Link>
+                )}
               </div>
             </SheetContent>
           </Sheet>
