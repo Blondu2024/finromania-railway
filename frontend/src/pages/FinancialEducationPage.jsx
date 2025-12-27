@@ -195,7 +195,7 @@ export default function FinancialEducationPage() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="h-1 w-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded" />
-              <h2 className="text-2xl font-bold">Modul 2: Risk Management</h2>
+              <h2 className="text-2xl font-bold">Modul 2: Instrumente Financiare</h2>
               <Badge variant="secondary">Intermediate</Badge>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -211,6 +211,71 @@ export default function FinancialEducationPage() {
                       completed ? 'border-2 border-green-500 bg-green-50' :
                       locked ? 'opacity-60 cursor-not-allowed' :
                       'hover:scale-105 border-2 border-transparent hover:border-orange-400'
+                    }`}
+                    onClick={() => !locked && navigate(`/financial-education/${lesson.id}`)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="text-5xl">{lesson.emoji}</div>
+                        {completed && (
+                          <div className="bg-green-500 text-white rounded-full p-2">
+                            <CheckCircle className="w-5 h-5" />
+                          </div>
+                        )}
+                        {locked && (
+                          <div className="bg-gray-400 text-white rounded-full p-2">
+                            <Lock className="w-5 h-5" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      <h3 className="font-bold text-lg mb-2">{lesson.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">{lesson.subtitle}</p>
+                      
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {lesson.duration}
+                        </div>
+                        <Badge className={getDifficultyColor(lesson.difficulty)} variant="outline">
+                          {lesson.difficulty}
+                        </Badge>
+                      </div>
+                      
+                      <Button 
+                        className="w-full" 
+                        variant={completed ? 'outline' : 'default'}
+                        disabled={locked}
+                      >
+                        {completed ? '✓ Revizuiește' : locked ? '🔒 Locked' : 'Începe Lecția →'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Module 3 */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-1 w-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded" />
+              <h2 className="text-2xl font-bold">Modul 3: Introducere în Investiții</h2>
+              <Badge variant="secondary">Advanced</Badge>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {lessons.filter(l => l.module === 3).map((lesson) => {
+                const completed = isLessonCompleted(lesson.id);
+                const canAccess = canAccessLesson(lesson.order);
+                const locked = !canAccess;
+
+                return (
+                  <Card
+                    key={lesson.id}
+                    className={`group cursor-pointer transition-all duration-300 hover:shadow-xl ${
+                      completed ? 'border-2 border-green-500 bg-green-50' :
+                      locked ? 'opacity-60 cursor-not-allowed' :
+                      'hover:scale-105 border-2 border-transparent hover:border-purple-400'
                     }`}
                     onClick={() => !locked && navigate(`/financial-education/${lesson.id}`)}
                   >
