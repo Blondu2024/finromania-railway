@@ -75,12 +75,12 @@ def fetch_ticker_data(symbol: str, info: dict) -> dict:
             "country": info.get("country", ""),
             "category": info.get("category", ""),
             "unit": info.get("unit", ""),
-            "price": round(current_price, 2),
-            "change": round(change, 2),
-            "change_percent": round(change_percent, 2),
-            "prev_close": round(prev_close, 2),
-            "sparkline": [round(p, 2) for p in week_data],
-            "is_positive": change_percent >= 0
+            "price": float(round(current_price, 2)),
+            "change": float(round(change, 2)),
+            "change_percent": float(round(change_percent, 2)),
+            "prev_close": float(round(prev_close, 2)),
+            "sparkline": [float(round(p, 2)) for p in week_data],
+            "is_positive": bool(change_percent >= 0)
         }
     except Exception as e:
         logger.error(f"Error fetching {symbol}: {e}")
