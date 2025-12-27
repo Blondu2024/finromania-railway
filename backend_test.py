@@ -371,6 +371,149 @@ class FinRomaniaAPITester:
         
         return True, f"Valid glossary: {total} financial terms"
 
+    def validate_financial_lessons(self, data: Dict) -> tuple:
+        """Validate financial education lessons response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        if 'lessons' not in data or 'total' not in data:
+            return False, "Missing 'lessons' or 'total' field"
+        
+        lessons = data.get('lessons', [])
+        total = data.get('total', 0)
+        
+        if not isinstance(lessons, list):
+            return False, "Lessons should be a list"
+        
+        # Should have 15 lessons
+        if total != 15:
+            return False, f"Expected 15 lessons, got {total}"
+        
+        if len(lessons) != 15:
+            return False, f"Expected 15 lessons in array, got {len(lessons)}"
+        
+        # Validate lesson structure
+        for lesson in lessons[:3]:  # Check first 3 lessons
+            required_fields = ['id', 'title', 'subtitle', 'content', 'quiz', 'module', 'order', 'difficulty', 'emoji']
+            for field in required_fields:
+                if field not in lesson:
+                    return False, f"Missing required field in lesson: {field}"
+        
+        # Check modules distribution
+        module_1 = [l for l in lessons if l.get('module') == 1]
+        module_2 = [l for l in lessons if l.get('module') == 2]
+        module_3 = [l for l in lessons if l.get('module') == 3]
+        
+        if len(module_1) != 5:
+            return False, f"Module 1 should have 5 lessons, got {len(module_1)}"
+        if len(module_2) != 5:
+            return False, f"Module 2 should have 5 lessons, got {len(module_2)}"
+        if len(module_3) != 5:
+            return False, f"Module 3 should have 5 lessons, got {len(module_3)}"
+        
+        return True, f"Valid financial lessons: {total} lessons across 3 modules"
+
+    def validate_financial_lesson_detail(self, data: Dict) -> tuple:
+        """Validate individual financial lesson response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['id', 'title', 'subtitle', 'content', 'quiz', 'module', 'order', 'difficulty', 'emoji']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        # Validate content is in Romanian and substantial
+        content = data.get('content', '')
+        if len(content) < 500:
+            return False, f"Content too short: {len(content)} chars, expected 500+"
+        
+        # Check for Romanian content indicators
+        romanian_indicators = ['RON', 'România', 'BNR', 'BVB', 'lei', 'lună']
+        if not any(indicator in content for indicator in romanian_indicators):
+            return False, "Content doesn't appear to be Romanian-focused"
+        
+        # Validate quiz structure
+        quiz = data.get('quiz', [])
+        if not isinstance(quiz, list) or len(quiz) == 0:
+            return False, "Quiz should be a non-empty list"
+        
+        for q in quiz:
+            quiz_fields = ['question', 'options', 'correct', 'explanation']
+            for field in quiz_fields:
+                if field not in q:
+                    return False, f"Missing quiz field: {field}"
+            
+            if not isinstance(q['options'], list) or len(q['options']) < 2:
+                return False, "Quiz options should be a list with at least 2 options"
+            
+            if not isinstance(q['correct'], int) or q['correct'] >= len(q['options']):
+                return False, "Quiz correct answer index is invalid"
+        
+        return True, f"Valid lesson: {data['title']} with {len(quiz)} quiz questions"
+
+    def validate_quiz_submission(self, data: Dict) -> tuple:
+        """Validate quiz submission response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['lesson_id', 'score', 'correct', 'total', 'passed', 'results', 'message']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        # Validate score calculation
+        score = data.get('score', 0)
+        correct = data.get('correct', 0)
+        total = data.get('total', 0)
+        
+        if total == 0:
+            return False, "Total questions should be > 0"
+        
+        expected_score = (correct / total) * 100
+        if abs(score - expected_score) > 0.1:
+            return False, f"Score calculation error: expected {expected_score}, got {score}"
+        
+        # Validate pass threshold (80%)
+        passed = data.get('passed', False)
+        expected_passed = score >= 80
+        if passed != expected_passed:
+            return False, f"Pass status error: score {score}%, passed={passed}, expected={expected_passed}"
+        
+        # Validate results structure
+        results = data.get('results', [])
+        if len(results) != total:
+            return False, f"Results count mismatch: expected {total}, got {len(results)}"
+        
+        return True, f"Valid quiz result: {score}% ({correct}/{total}), passed={passed}"
+
+    def validate_financial_progress(self, data: Dict) -> tuple:
+        """Validate financial education progress response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['completed_lessons', 'total_lessons', 'progress_percent']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        completed = data.get('completed_lessons', [])
+        total = data.get('total_lessons', 0)
+        progress = data.get('progress_percent', 0)
+        
+        if not isinstance(completed, list):
+            return False, "completed_lessons should be a list"
+        
+        if total != 15:
+            return False, f"Expected 15 total lessons, got {total}"
+        
+        # Validate progress calculation
+        expected_progress = (len(completed) / total) * 100 if total > 0 else 0
+        if abs(progress - expected_progress) > 0.1:
+            return False, f"Progress calculation error: expected {expected_progress}, got {progress}"
+        
+        return True, f"Valid progress: {len(completed)}/{total} lessons ({progress}%)"
+
     def test_admin_login(self) -> bool:
         """Test admin authentication - use pre-created session token"""
         print("\n🔐 Setting up Admin Authentication...")
