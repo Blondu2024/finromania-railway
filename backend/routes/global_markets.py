@@ -237,10 +237,10 @@ async def get_asset_chart(symbol: str, period: str = "1mo"):
         chart_data = [
             {
                 "date": index.strftime("%Y-%m-%d"),
-                "open": round(row["Open"], 2),
-                "high": round(row["High"], 2),
-                "low": round(row["Low"], 2),
-                "close": round(row["Close"], 2),
+                "open": float(round(row["Open"], 2)),
+                "high": float(round(row["High"], 2)),
+                "low": float(round(row["Low"], 2)),
+                "close": float(round(row["Close"], 2)),
                 "volume": int(row["Volume"])
             }
             for index, row in hist.iterrows()
