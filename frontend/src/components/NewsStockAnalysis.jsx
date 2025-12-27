@@ -22,29 +22,39 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const BVB_STOCKS = {
   // Banks
   'banca transilvania': 'TLV',
-  'tlv': 'TLV',
-  'brd': 'BRD',
-  'brd groupe': 'BRD',
+  'bancatransilvania': 'TLV',
+  'brd groupe societe': 'BRD',
+  'brd-groupe': 'BRD',
   // Energy
-  'electrica': 'EL',
+  'electrica sa': 'EL',
+  'electrica s.a': 'EL',
   'hidroelectrica': 'H2O',
   'omv petrom': 'SNP',
-  'petrom': 'SNP',
-  'snp': 'SNP',
+  'petrom sa': 'SNP',
   'romgaz': 'SNG',
   'transgaz': 'TGN',
   'nuclearelectrica': 'SNN',
   // Telecom
-  'digi': 'DIGI',
   'digi communications': 'DIGI',
+  'digi romania': 'DIGI',
+  'rcs & rds': 'DIGI',
   // Others
   'fondul proprietatea': 'FP',
-  'purcari': 'WINE',
+  'purcari wineries': 'WINE',
   'medlife': 'M',
-  'sphera': 'SFG',
+  'sphera franchise': 'SFG',
   'conpet': 'COTE',
   'transelectrica': 'TEL',
-  'aquila': 'AQ',
+  'aquila part prod': 'AQ',
+  // Direct symbols (more reliable)
+  ' tlv ': 'TLV',
+  ' brd ': 'BRD',
+  ' snp ': 'SNP',
+  ' sng ': 'SNG',
+  ' tgn ': 'TGN',
+  ' snn ': 'SNN',
+  ' digi ': 'DIGI',
+  ' fp ': 'FP',
 };
 
 // Detect stocks mentioned in article
