@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { GraduationCap, Trophy, Lock, CheckCircle, Clock, ChevronRight, Star, TrendingUp, Award } from 'lucide-react';
+import { GraduationCap, Trophy, Lock, CheckCircle, Clock, ChevronRight, Star, TrendingUp, Award, DollarSign } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
