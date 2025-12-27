@@ -28,8 +28,8 @@ import {
 
 // Timeframe options
 const TIMEFRAMES = [
-  { label: '1Z', value: '1d', days: 1 },
-  { label: '1S', value: '1w', days: 7 },
+  { label: '7Z', value: '1d', days: 7 },
+  { label: '2S', value: '1w', days: 14 },
   { label: '1L', value: '1m', days: 30 },
   { label: '3L', value: '3m', days: 90 },
   { label: '6L', value: '6m', days: 180 },
