@@ -428,6 +428,29 @@ export default function WatchlistPage() {
                 onAdd={handleAdd} 
                 existingSymbols={[]} 
               />
+              
+              {/* Explicație cum funcționează */}
+              <div className="mt-8 pt-8 border-t text-left max-w-lg mx-auto">
+                <h4 className="font-bold text-lg mb-4">📖 Cum funcționează Watchlist-ul?</h4>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">1️⃣</span>
+                    <p><strong>Adaugă acțiuni</strong> - Caută simbolul (ex: TLV, SNP) și adaugă în listă</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">2️⃣</span>
+                    <p><strong>Setează alerte</strong> - Primești notificare când prețul depășește/scade sub o valoare</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">3️⃣</span>
+                    <p><strong>Urmărește live</strong> - Vezi prețurile actualizate la fiecare 30 secunde</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">4️⃣</span>
+                    <p><strong>Adaugă note</strong> - Notează prețul la care ai cumpărat sau alte detalii</p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         )}
