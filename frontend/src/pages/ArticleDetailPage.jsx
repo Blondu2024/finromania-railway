@@ -228,8 +228,8 @@ export default function ArticleDetailPage() {
           <SocialShare title={article.title} url={window.location.href} />
         </div>
 
-        {/* Stock Analysis for mentioned companies */}
-        <NewsStockAnalysis article={article} />
+        {/* Smart AI Analysis for the news */}
+        <SmartNewsAnalysis article={article} />
 
         {/* Financial Education CTA */}
         <Card className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 mt-6">
