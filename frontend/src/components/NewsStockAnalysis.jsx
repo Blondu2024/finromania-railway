@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Sparkles, BarChart3, AlertTriangle, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { 
+  TrendingUp, TrendingDown, Sparkles, BarChart3, AlertTriangle, 
+  Loader2, ChevronDown, ChevronUp, Globe, Zap, RefreshCw 
+} from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -8,7 +11,6 @@ import {
   ComposedChart,
   Line,
   Area,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -18,72 +20,40 @@ import {
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// BVB stocks mapping for detection
-const BVB_STOCKS = {
-  // Banks
-  'banca transilvania': 'TLV',
-  'bancatransilvania': 'TLV',
-  'brd groupe societe': 'BRD',
-  'brd-groupe': 'BRD',
-  // Energy
-  'electrica sa': 'EL',
-  'electrica s.a': 'EL',
-  'hidroelectrica': 'H2O',
-  'omv petrom': 'SNP',
-  'petrom sa': 'SNP',
-  'romgaz': 'SNG',
-  'transgaz': 'TGN',
-  'nuclearelectrica': 'SNN',
-  // Telecom
-  'digi communications': 'DIGI',
-  'digi romania': 'DIGI',
-  'rcs & rds': 'DIGI',
-  // Others
-  'fondul proprietatea': 'FP',
-  'purcari wineries': 'WINE',
-  'medlife': 'M',
-  'sphera franchise': 'SFG',
-  'conpet': 'COTE',
-  'transelectrica': 'TEL',
-  'aquila part prod': 'AQ',
-  // Direct symbols (more reliable)
-  ' tlv ': 'TLV',
-  ' brd ': 'BRD',
-  ' snp ': 'SNP',
-  ' sng ': 'SNG',
-  ' tgn ': 'TGN',
-  ' snn ': 'SNN',
-  ' digi ': 'DIGI',
-  ' fp ': 'FP',
+// Category icons
+const CATEGORY_ICONS = {
+  indices: '📊',
+  commodities: '🛢️',
+  currencies: '💱',
+  sectors_etf: '🏭',
+  popular_stocks: '📈',
+  bonds_rates: '📉',
+  other: '📌'
 };
 
-// Detect stocks mentioned in article
-const detectMentionedStocks = (title, content, description) => {
-  const fullText = `${title} ${content || ''} ${description || ''}`.toLowerCase();
-  const detected = new Set();
-  
-  for (const [keyword, symbol] of Object.entries(BVB_STOCKS)) {
-    if (fullText.includes(keyword)) {
-      detected.add(symbol);
-    }
-  }
-  
-  return Array.from(detected);
+// Category colors
+const CATEGORY_COLORS = {
+  indices: 'bg-blue-100 text-blue-800',
+  commodities: 'bg-amber-100 text-amber-800',
+  currencies: 'bg-green-100 text-green-800',
+  sectors_etf: 'bg-purple-100 text-purple-800',
+  popular_stocks: 'bg-pink-100 text-pink-800',
+  bonds_rates: 'bg-gray-100 text-gray-800',
+  other: 'bg-slate-100 text-slate-800'
 };
 
 // Mini Chart component
-const MiniStockChart = ({ data }) => {
+const MiniChart = ({ data, positive }) => {
   if (!data || data.length === 0) return null;
   
-  const isPositive = data[data.length - 1]?.close >= data[0]?.close;
-  const color = isPositive ? '#22c55e' : '#ef4444';
+  const color = positive ? '#22c55e' : '#ef4444';
   
   return (
-    <div className="h-[120px] w-full">
+    <div className="h-[100px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
           <defs>
-            <linearGradient id={`gradient-${isPositive ? 'green' : 'red'}`} x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={`mini-gradient-${positive ? 'up' : 'down'}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={color} stopOpacity={0.3}/>
               <stop offset="95%" stopColor={color} stopOpacity={0}/>
             </linearGradient>
@@ -92,7 +62,7 @@ const MiniStockChart = ({ data }) => {
             type="monotone" 
             dataKey="close" 
             stroke={color} 
-            fill={`url(#gradient-${isPositive ? 'green' : 'red'})`}
+            fill={`url(#mini-gradient-${positive ? 'up' : 'down'})`}
             strokeWidth={2}
           />
         </ComposedChart>
@@ -101,10 +71,25 @@ const MiniStockChart = ({ data }) => {
   );
 };
 
-export default function NewsStockAnalysis({ article }) {
-  const [detectedStocks, setDetectedStocks] = useState([]);
-  const [stocksData, setStocksData] = useState({});
+// Custom tooltip
+const ChartTooltip = ({ active, payload }) => {
+  if (!active || !payload || !payload.length) return null;
+  const data = payload[0]?.payload;
+  if (!data) return null;
+  
+  return (
+    <div className="bg-white border rounded shadow-lg p-2 text-xs">
+      <p className="font-semibold">{data.date}</p>
+      <p>Preț: <span className="font-bold">{data.close?.toFixed(2)}</span></p>
+    </div>
+  );
+};
+
+export default function SmartNewsAnalysis({ article }) {
+  const [recommendations, setRecommendations] = useState([]);
+  const [assetsData, setAssetsData] = useState({});
   const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [keywords, setKeywords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
   const [expanded, setExpanded] = useState(true);
@@ -112,88 +97,88 @@ export default function NewsStockAnalysis({ article }) {
 
   useEffect(() => {
     if (!article) return;
-    
-    // Detect mentioned stocks
-    const stocks = detectMentionedStocks(article.title, article.content, article.description);
-    setDetectedStocks(stocks);
-    
-    if (stocks.length > 0) {
-      fetchStocksData(stocks);
-    } else {
-      setLoading(false);
-    }
+    analyzeNews();
   }, [article]);
 
-  const fetchStocksData = async (symbols) => {
+  const analyzeNews = async () => {
+    setLoading(true);
     try {
-      const dataPromises = symbols.map(async (symbol) => {
-        const res = await fetch(`${API_URL}/api/stocks/bvb/${symbol}/details?period=1m`);
-        if (res.ok) {
-          const data = await res.json();
-          return { symbol, data };
-        }
-        return null;
+      // Get AI recommendations for relevant assets
+      const recRes = await fetch(`${API_URL}/api/smart-analysis/recommend-assets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: article.title,
+          description: article.description,
+          content: article.content
+        })
       });
       
-      const results = await Promise.all(dataPromises);
-      const stocksMap = {};
-      
-      results.forEach(result => {
-        if (result) {
-          stocksMap[result.symbol] = result.data;
+      if (recRes.ok) {
+        const recData = await recRes.json();
+        setRecommendations(recData.recommendations || []);
+        setKeywords(recData.keywords_found || []);
+        
+        // Fetch data for each recommended asset
+        if (recData.recommendations?.length > 0) {
+          await fetchAssetsData(recData.recommendations);
         }
-      });
-      
-      setStocksData(stocksMap);
+      }
     } catch (error) {
-      console.error('Error fetching stocks data:', error);
+      console.error('Error analyzing news:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchAssetsData = async (assets) => {
+    try {
+      const dataPromises = assets.map(async (asset) => {
+        try {
+          const res = await fetch(`${API_URL}/api/smart-analysis/asset/${encodeURIComponent(asset.symbol)}?period=1m`);
+          if (res.ok) {
+            const data = await res.json();
+            return { symbol: asset.symbol, data };
+          }
+        } catch (e) {
+          console.error(`Error fetching ${asset.symbol}:`, e);
+        }
+        return null;
+      });
+      
+      const results = await Promise.all(dataPromises);
+      const dataMap = {};
+      
+      results.forEach(result => {
+        if (result) {
+          dataMap[result.symbol] = result.data;
+        }
+      });
+      
+      setAssetsData(dataMap);
+    } catch (error) {
+      console.error('Error fetching assets data:', error);
+    }
+  };
+
   const generateAiAnalysis = async () => {
-    if (detectedStocks.length === 0 || aiLoading) return;
+    if (aiLoading) return;
     
     setAiLoading(true);
     try {
-      // Build context about the stocks
-      const stocksInfo = detectedStocks.map(symbol => {
-        const data = stocksData[symbol];
-        if (!data) return null;
-        
-        const history = data.history || [];
-        const lastPrice = history[history.length - 1]?.close || 0;
-        const firstPrice = history[0]?.close || lastPrice;
-        const change = ((lastPrice - firstPrice) / firstPrice * 100).toFixed(2);
-        
-        return `${symbol} (${data.name}): preț ${lastPrice.toFixed(2)} RON, variație 30 zile: ${change}%`;
-      }).filter(Boolean).join('; ');
-
-      const prompt = `Analizează această știre financiară și oferă o perspectivă scurtă (max 150 cuvinte) despre potențialul impact asupra acțiunilor menționate.
-
-ȘTIRE: "${article.title}"
-${article.description ? `DESCRIERE: "${article.description}"` : ''}
-
-ACȚIUNI MENȚIONATE: ${stocksInfo}
-
-Răspunde în română cu:
-1. 📊 Sentiment general (Bullish/Bearish/Neutru)
-2. 📈 Impact potențial pe termen scurt
-3. ⚠️ Riscuri de luat în considerare
-4. 💡 Concluzie pentru investitori
-
-IMPORTANT: Aceasta este doar o analiză educațională, NU sfat de investiții.`;
-
-      const res = await fetch(`${API_URL}/api/ai-advisor/ask`, {
+      const res = await fetch(`${API_URL}/api/smart-analysis/generate-analysis`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: prompt })
+        body: JSON.stringify({
+          title: article.title,
+          description: article.description,
+          content: article.content
+        })
       });
 
       if (res.ok) {
         const data = await res.json();
-        setAiAnalysis(data.response);
+        setAiAnalysis(data.analysis);
       }
     } catch (error) {
       console.error('Error generating AI analysis:', error);
@@ -203,17 +188,13 @@ IMPORTANT: Aceasta este doar o analiză educațională, NU sfat de investiții.`
     }
   };
 
-  // Don't render if no stocks detected
-  if (!loading && detectedStocks.length === 0) {
-    return null;
-  }
-
   if (loading) {
     return (
-      <Card className="border-2 border-blue-200">
+      <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
         <CardContent className="p-6 text-center">
-          <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Se analizează știrea...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-purple-600" />
+          <p className="font-medium">🔍 AI analizează știrea...</p>
+          <p className="text-sm text-muted-foreground mt-1">Identificăm activele financiare relevante</p>
         </CardContent>
       </Card>
     );
@@ -228,76 +209,87 @@ IMPORTANT: Aceasta este doar o analiză educațională, NU sfat de investiții.`
         >
           <CardTitle className="text-lg flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-purple-600" />
-            🔍 Analiză Acțiuni Menționate
+            🤖 Analiză Inteligentă AI
           </CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-              {detectedStocks.length} {detectedStocks.length === 1 ? 'acțiune' : 'acțiuni'} detectată
+              <Globe className="w-3 h-3 mr-1" />
+              {recommendations.length} active relevante
             </Badge>
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         </div>
+        
+        {/* Keywords found */}
+        {keywords.length > 0 && expanded && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            <span className="text-xs text-muted-foreground">Cuvinte cheie:</span>
+            {keywords.map((kw, idx) => (
+              <Badge key={idx} variant="outline" className="text-xs">
+                {kw}
+              </Badge>
+            ))}
+          </div>
+        )}
       </CardHeader>
       
       {expanded && (
         <CardContent className="space-y-4">
-          {/* Detected Stocks Cards */}
-          <div className="grid gap-4">
-            {detectedStocks.map(symbol => {
-              const data = stocksData[symbol];
-              if (!data) return null;
-              
-              const history = data.history || [];
-              const lastPrice = history[history.length - 1]?.close || 0;
-              const firstPrice = history[0]?.close || lastPrice;
-              const change = lastPrice - firstPrice;
-              const changePercent = firstPrice > 0 ? ((change / firstPrice) * 100) : 0;
-              const isPositive = changePercent >= 0;
+          {/* Recommended Assets Grid */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {recommendations.map((rec) => {
+              const data = assetsData[rec.symbol];
+              const isPositive = data?.change_percent >= 0;
               
               return (
-                <Card key={symbol} className="overflow-hidden">
-                  <div className="flex flex-col md:flex-row">
-                    {/* Stock Info */}
-                    <div className="flex-1 p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <Link 
-                            to={`/stocks/bvb/${symbol}`}
-                            className="font-bold text-lg hover:text-blue-600 transition-colors"
-                          >
-                            {symbol}
-                          </Link>
-                          <p className="text-sm text-muted-foreground">{data.name}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold">{lastPrice.toFixed(2)} RON</p>
-                          <p className={`flex items-center justify-end ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                            {isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
-                            {isPositive ? '+' : ''}{changePercent.toFixed(2)}% (30 zile)
-                          </p>
+                <Card key={rec.symbol} className="overflow-hidden bg-white">
+                  <CardContent className="p-4">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{CATEGORY_ICONS[rec.category] || '📌'}</span>
+                          <div>
+                            <p className="font-bold">{data?.name || rec.name}</p>
+                            <p className="text-xs text-muted-foreground">{rec.symbol}</p>
+                          </div>
                         </div>
                       </div>
-                      
-                      {/* Quick Stats */}
-                      <div className="flex gap-4 text-xs text-muted-foreground mt-3">
-                        <span>Max: <span className="text-green-600 font-medium">{Math.max(...history.map(h => h.high)).toFixed(2)}</span></span>
-                        <span>Min: <span className="text-red-600 font-medium">{Math.min(...history.map(h => h.low)).toFixed(2)}</span></span>
-                        <span>Vol: <span className="font-medium">{(history.reduce((a, h) => a + (h.volume || 0), 0) / 1000000).toFixed(1)}M</span></span>
-                      </div>
-                      
-                      <Link to={`/stocks/bvb/${symbol}`}>
-                        <Button size="sm" variant="outline" className="mt-3">
-                          <BarChart3 className="w-3 h-3 mr-1" />
-                          Vezi Grafic Complet
-                        </Button>
-                      </Link>
+                      <Badge className={`text-xs ${CATEGORY_COLORS[rec.category] || CATEGORY_COLORS.other}`}>
+                        {rec.category}
+                      </Badge>
                     </div>
                     
+                    {/* Price & Change */}
+                    {data && (
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl font-bold">
+                          {data.current_price?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          <span className="text-sm font-normal text-muted-foreground ml-1">{data.currency}</span>
+                        </span>
+                        <span className={`flex items-center font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                          {isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+                          {isPositive ? '+' : ''}{data.change_percent?.toFixed(2)}%
+                        </span>
+                      </div>
+                    )}
+                    
                     {/* Mini Chart */}
-                    <div className="w-full md:w-48 bg-white/50 p-2">
-                      <MiniStockChart data={history} />
+                    {data?.history && (
+                      <MiniChart data={data.history} positive={isPositive} />
+                    )}
+                    
+                    {/* Matched keyword */}
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t">
+                      <span className="text-xs text-muted-foreground">
+                        <Zap className="w-3 h-3 inline mr-1" />
+                        Detectat: "{rec.matched_keyword}"
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {data?.data_points} zile
+                      </span>
                     </div>
-                  </div>
+                  </CardContent>
                 </Card>
               );
             })}
@@ -306,16 +298,33 @@ IMPORTANT: Aceasta este doar o analiză educațională, NU sfat de investiții.`
           {/* AI Analysis Section */}
           <Card className="bg-white/80">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-yellow-500" />
-                🤖 Analiză AI a Știrii
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-yellow-500" />
+                  📝 Analiză Detaliată AI
+                </CardTitle>
+                {aiAnalysis && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={generateAiAnalysis}
+                    disabled={aiLoading}
+                  >
+                    <RefreshCw className={`w-3 h-3 mr-1 ${aiLoading ? 'animate-spin' : ''}`} />
+                    Regenerează
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               {!aiAnalysis && !aiLoading && (
-                <div className="text-center py-4">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Generează o analiză AI despre impactul potențial al acestei știri asupra acțiunilor menționate
+                <div className="text-center py-6">
+                  <div className="inline-block p-4 bg-purple-100 rounded-full mb-4">
+                    <Sparkles className="w-8 h-8 text-purple-600" />
+                  </div>
+                  <p className="font-medium mb-2">Obține o analiză AI detaliată</p>
+                  <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
+                    AI-ul va analiza știrea și va oferi perspective despre impactul potențial asupra piețelor financiare
                   </p>
                   <Button onClick={generateAiAnalysis} className="bg-purple-600 hover:bg-purple-700">
                     <Sparkles className="w-4 h-4 mr-2" />
@@ -325,43 +334,44 @@ IMPORTANT: Aceasta este doar o analiză educațională, NU sfat de investiții.`
               )}
               
               {aiLoading && (
-                <div className="text-center py-6">
-                  <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-purple-600" />
-                  <p className="text-sm text-muted-foreground">AI-ul analizează știrea...</p>
+                <div className="text-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-purple-600" />
+                  <p className="font-medium">AI-ul analizează știrea...</p>
+                  <p className="text-sm text-muted-foreground">Acest proces poate dura câteva secunde</p>
                 </div>
               )}
               
               {aiAnalysis && (
                 <div className="space-y-3">
-                  <div className={`prose prose-sm max-w-none ${!showFullAnalysis && aiAnalysis.length > 500 ? 'line-clamp-6' : ''}`}>
+                  <div className={`prose prose-sm max-w-none ${!showFullAnalysis && aiAnalysis.length > 600 ? 'line-clamp-8' : ''}`}>
                     {aiAnalysis.split('\n').map((line, idx) => (
-                      <p key={idx} className="mb-2 text-sm">{line}</p>
+                      <p key={idx} className="mb-2 text-sm leading-relaxed">{line}</p>
                     ))}
                   </div>
                   
-                  {aiAnalysis.length > 500 && (
+                  {aiAnalysis.length > 600 && (
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setShowFullAnalysis(!showFullAnalysis)}
                     >
-                      {showFullAnalysis ? 'Arată mai puțin' : 'Arată mai mult'}
+                      {showFullAnalysis ? '↑ Arată mai puțin' : '↓ Arată mai mult'}
                     </Button>
                   )}
-                  
-                  {/* Disclaimer */}
-                  <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                    <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-yellow-800">
-                      <strong>Disclaimer:</strong> Aceasta este o analiză generată de AI în scop educațional. 
-                      NU reprezintă sfat de investiții. Deciziile de investiții sunt responsabilitatea ta. 
-                      Consultă un consilier financiar autorizat înainte de a investi.
-                    </p>
-                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
+          
+          {/* Disclaimer */}
+          <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+            <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-yellow-800">
+              <strong>Disclaimer:</strong> Această analiză este generată automat de AI în scop educațional și informativ. 
+              NU reprezintă sfat de investiții sau recomandare de tranzacționare. 
+              Deciziile financiare sunt responsabilitatea ta. Consultă un consilier financiar autorizat.
+            </p>
+          </div>
         </CardContent>
       )}
     </Card>
