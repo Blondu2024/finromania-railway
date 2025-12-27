@@ -112,11 +112,13 @@ export default function DisclaimerPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">8. Date BVB - Mențiune specială</h2>
-            <p className="bg-yellow-100 dark:bg-yellow-900 p-4 rounded-lg">
-              <strong>Atenție:</strong> Datele despre acțiunile de pe Bursa de Valori București (BVB) 
-              prezentate pe această platformă sunt în prezent <strong>date simulate</strong> în scopuri 
-              demonstrative. Nu le utilizați pentru decizii de investiții.
+            <h2 className="text-xl font-semibold">8. Date BVB</h2>
+            <p className="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg">
+              <strong>Informație:</strong> Datele despre acțiunile de pe Bursa de Valori București (BVB) 
+              sunt furnizate de EODHD API, un furnizor licențiat de date financiare. Datele sunt reale și 
+              se actualizează automat la fiecare 5 minute. Cu toate acestea, pot exista întârzieri sau 
+              discrepanțe față de datele oficiale BVB. Verificați întotdeauna cu surse oficiale înainte 
+              de a lua decizii de investiții.
             </p>
           </section>
 
