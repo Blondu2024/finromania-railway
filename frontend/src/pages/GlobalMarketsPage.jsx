@@ -307,7 +307,7 @@ const MarketStatusBar = ({ marketStatus }) => {
 // ============================================
 // ASSET CARD COMPONENT
 // ============================================
-const AssetCard = ({ asset, index }) => {
+const AssetCard = ({ asset, index, onClick }) => {
   const isPositive = asset.change_percent >= 0;
   
   return (
@@ -317,6 +317,7 @@ const AssetCard = ({ asset, index }) => {
       transition={{ delay: index * 0.05 }}
       whileHover={{ scale: 1.02, y: -5 }}
       className="cursor-pointer"
+      onClick={() => onClick && onClick(asset)}
     >
       <Card className={`overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all ${
         isPositive 
@@ -326,9 +327,12 @@ const AssetCard = ({ asset, index }) => {
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-2xl">{asset.flag}</span>
-            <Badge variant={isPositive ? "default" : "destructive"} className="text-xs">
-              {isPositive ? '+' : ''}{asset.change_percent?.toFixed(2)}%
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant={isPositive ? "default" : "destructive"} className="text-xs">
+                {isPositive ? '+' : ''}{asset.change_percent?.toFixed(2)}%
+              </Badge>
+              <BarChart3 className="w-4 h-4 text-muted-foreground opacity-50" />
+            </div>
           </div>
           
           <p className="font-bold text-lg">{asset.name}</p>
@@ -361,6 +365,11 @@ const AssetCard = ({ asset, index }) => {
               </div>
             )}
           </div>
+          
+          {/* Click hint */}
+          <p className="text-xs text-center text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            Click pentru grafic detaliat
+          </p>
         </CardContent>
       </Card>
     </motion.div>
