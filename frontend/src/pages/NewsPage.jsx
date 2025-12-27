@@ -138,6 +138,23 @@ export default function NewsPage() {
         </CardContent>
       </Card>
 
+      {/* Financial Education CTA */}
+      <Card className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0">
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="text-center sm:text-left">
+              <h3 className="font-bold">💰 Vrei Să Înțelegi Mai Bine Ce Citești?</h3>
+              <p className="text-green-100 text-sm">15 lecții gratuite de educație financiară - de la bazele bugetării la investiții</p>
+            </div>
+            <Link to="/financial-education">
+              <Button className="bg-white text-green-600 hover:bg-green-50 whitespace-nowrap">
+                Începe Gratuit →
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* News List */}
       <div className="space-y-4">
         {news.length === 0 ? (
