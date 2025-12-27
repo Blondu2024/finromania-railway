@@ -162,14 +162,14 @@ export default function AdvancedStockChart({
     let mainSeries;
     switch (chartType) {
       case 'line':
-        mainSeries = chart.addSeries('Line', {
+        mainSeries = chart.addLineSeries({
           color: '#2196F3',
           lineWidth: 2,
         });
         mainSeries.setData(formattedData.map(d => ({ time: d.time, value: d.close })));
         break;
       case 'area':
-        mainSeries = chart.addSeries('Area', {
+        mainSeries = chart.addAreaSeries({
           topColor: 'rgba(33, 150, 243, 0.4)',
           bottomColor: 'rgba(33, 150, 243, 0.0)',
           lineColor: '#2196F3',
@@ -178,14 +178,14 @@ export default function AdvancedStockChart({
         mainSeries.setData(formattedData.map(d => ({ time: d.time, value: d.close })));
         break;
       case 'bar':
-        mainSeries = chart.addSeries('Bar', {
+        mainSeries = chart.addBarSeries({
           upColor: '#26a69a',
           downColor: '#ef5350',
         });
         mainSeries.setData(formattedData);
         break;
       default: // candlestick
-        mainSeries = chart.addSeries('Candlestick', {
+        mainSeries = chart.addCandlestickSeries({
           upColor: '#26a69a',
           downColor: '#ef5350',
           borderUpColor: '#26a69a',
@@ -199,13 +199,11 @@ export default function AdvancedStockChart({
 
     // Add volume
     if (showVolume) {
-      const volumeSeries = chart.addSeries('Histogram', {
+      const volumeSeries = chart.addHistogramSeries({
         priceFormat: {
           type: 'volume',
         },
         priceScaleId: '',
-      });
-      volumeSeries.priceScale().applyOptions({
         scaleMargins: {
           top: 0.8,
           bottom: 0,
@@ -229,7 +227,7 @@ export default function AdvancedStockChart({
       }
 
       if (indicatorData && indicatorData.length > 0) {
-        const lineSeries = chart.addSeries('Line', {
+        const lineSeries = chart.addLineSeries({
           color: indicator.color,
           lineWidth: 1,
           title: indicator.label,
