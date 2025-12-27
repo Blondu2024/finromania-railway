@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, TrendingUp, TrendingDown, RefreshCw, ExternalLink } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, RefreshCw, Building2, Calendar, DollarSign, BarChart3, Activity } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import AddToWatchlistButton from '../components/AddToWatchlistButton';
 import SocialShare from '../components/SocialShare';
+import AdvancedStockChart from '../components/AdvancedStockChart';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -16,36 +16,50 @@ export default function StockDetailPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPeriod, setCurrentPeriod] = useState('1m');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchDetails = useCallback(async (period = '1m', days = null) => {
+    try {
+      setRefreshing(true);
+      const endpoint = type === 'global' 
+        ? `${API_URL}/api/stocks/global/${encodeURIComponent(symbol)}/details?period=${period}`
+        : `${API_URL}/api/stocks/bvb/${symbol}/details?period=${period}${days ? `&days=${days}` : ''}`;
+      
+      const res = await fetch(endpoint);
+      if (!res.ok) throw new Error('Failed to fetch');
+      
+      const result = await res.json();
+      setData(result);
+      setCurrentPeriod(period);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [type, symbol]);
 
   useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        setLoading(true);
-        const endpoint = type === 'global' 
-          ? `${API_URL}/api/stocks/global/${encodeURIComponent(symbol)}/details`
-          : `${API_URL}/api/stocks/bvb/${symbol}/details`;
-        
-        const res = await fetch(endpoint);
-        if (!res.ok) throw new Error('Failed to fetch');
-        
-        const result = await res.json();
-        setData(result);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    fetchDetails('1m');
+  }, [fetchDetails]);
 
-    fetchDetails();
-  }, [type, symbol]);
+  const handleTimeframeChange = (period, days) => {
+    fetchDetails(period, days);
+  };
+
+  const handleRefresh = () => {
+    fetchDetails(currentPeriod);
+  };
 
   if (loading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-96" />
-        <Skeleton className="h-48" />
+        <div className="grid md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24" />)}
+        </div>
+        <Skeleton className="h-[500px]" />
       </div>
     );
   }
@@ -54,47 +68,72 @@ export default function StockDetailPage() {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">Nu s-au putut încărca datele pentru {symbol}</p>
-        <Link to="/">
+        <Link to="/stocks">
           <Button className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> Înapoi</Button>
         </Link>
       </div>
     );
   }
 
-  const lastPrice = data.history?.[data.history.length - 1]?.close || 0;
-  const firstPrice = data.history?.[0]?.close || lastPrice;
+  const history = data.history || [];
+  const lastPrice = history[history.length - 1]?.close || 0;
+  const firstPrice = history[0]?.close || lastPrice;
   const priceChange = lastPrice - firstPrice;
   const percentChange = firstPrice > 0 ? ((priceChange / firstPrice) * 100) : 0;
   const isPositive = percentChange >= 0;
 
+  // Calculate additional stats
+  const highPrice = history.length > 0 ? Math.max(...history.map(h => h.high)) : 0;
+  const lowPrice = history.length > 0 ? Math.min(...history.map(h => h.low)) : 0;
+  const avgVolume = history.length > 0 ? Math.round(history.reduce((acc, h) => acc + (h.volume || 0), 0) / history.length) : 0;
+  const totalVolume = history.reduce((acc, h) => acc + (h.volume || 0), 0);
+
   return (
     <div className="space-y-6">
       {/* Back Button */}
-      <Link to={type === 'bvb' ? '/stocks' : '/'}>
+      <Link to="/stocks">
         <Button variant="ghost" size="sm">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi
+          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la BVB
         </Button>
       </Link>
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-3xl font-bold">{data.name}</h1>
-            <Badge variant="secondary">{data.symbol}</Badge>
-            {data.is_mock && <Badge variant="outline">MOCK</Badge>}
+            <Badge variant="secondary" className="text-lg">{data.symbol}</Badge>
+            {data.is_mock && <Badge variant="outline" className="bg-yellow-100">Demo</Badge>}
+            {!data.is_mock && <Badge className="bg-green-100 text-green-800">Date Reale</Badge>}
           </div>
-          <p className="text-muted-foreground">{data.exchange} • {data.currency}</p>
+          <div className="flex items-center gap-4 text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Building2 className="w-4 h-4" />
+              {data.exchange || 'BVB'}
+            </span>
+            <span className="flex items-center gap-1">
+              <DollarSign className="w-4 h-4" />
+              {data.currency || 'RON'}
+            </span>
+          </div>
         </div>
-        <div className="text-right">
+        
+        <div className="text-left lg:text-right space-y-1">
           <p className="text-4xl font-bold">
-            {lastPrice.toLocaleString('ro-RO', { maximumFractionDigits: 2 })}
-            <span className="text-lg font-normal text-muted-foreground ml-2">{data.currency}</span>
+            {lastPrice.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <span className="text-lg font-normal text-muted-foreground ml-2">{data.currency || 'RON'}</span>
           </p>
-          <p className={`flex items-center justify-end text-lg ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`flex items-center lg:justify-end text-lg ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
             {isPositive ? <TrendingUp className="w-5 h-5 mr-1" /> : <TrendingDown className="w-5 h-5 mr-1" />}
             {isPositive ? '+' : ''}{priceChange.toFixed(2)} ({isPositive ? '+' : ''}{percentChange.toFixed(2)}%)
-            <span className="text-muted-foreground text-sm ml-2">30 zile</span>
+            <span className="text-muted-foreground text-sm ml-2">
+              ({currentPeriod === '1d' ? '1 zi' : 
+                currentPeriod === '1w' ? '1 săptămână' :
+                currentPeriod === '1m' ? '30 zile' :
+                currentPeriod === '3m' ? '3 luni' :
+                currentPeriod === '6m' ? '6 luni' :
+                currentPeriod === '1y' ? '1 an' : '5 ani'})
+            </span>
           </p>
         </div>
       </div>
@@ -103,44 +142,100 @@ export default function StockDetailPage() {
       <div className="flex items-center gap-4 flex-wrap">
         <AddToWatchlistButton symbol={data.symbol} type={type} name={data.name} />
         <SocialShare title={`${data.name} (${data.symbol})`} />
+        <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
+          <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+          Actualizează
+        </Button>
       </div>
 
-      {/* Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Grafic Preț - Ultimele 30 Zile</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data.history}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="date" 
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(val) => new Date(val).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' })}
-                />
-                <YAxis 
-                  domain={['auto', 'auto']}
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(val) => val.toLocaleString('ro-RO')}
-                />
-                <Tooltip 
-                  formatter={(val) => [val.toLocaleString('ro-RO', { maximumFractionDigits: 2 }) + ' ' + data.currency, 'Preț']}
-                  labelFormatter={(label) => new Date(label).toLocaleDateString('ro-RO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="close" 
-                  stroke={isPositive ? '#16a34a' : '#dc2626'}
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <TrendingUp className="w-4 h-4 text-green-600" />
+              <span className="text-sm">Maxim Perioadă</span>
+            </div>
+            <p className="text-2xl font-bold text-green-600">
+              {highPrice.toLocaleString('ro-RO', { minimumFractionDigits: 2 })} {data.currency}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <TrendingDown className="w-4 h-4 text-red-600" />
+              <span className="text-sm">Minim Perioadă</span>
+            </div>
+            <p className="text-2xl font-bold text-red-600">
+              {lowPrice.toLocaleString('ro-RO', { minimumFractionDigits: 2 })} {data.currency}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <BarChart3 className="w-4 h-4 text-blue-600" />
+              <span className="text-sm">Volum Mediu</span>
+            </div>
+            <p className="text-2xl font-bold">
+              {avgVolume.toLocaleString('ro-RO')}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <Activity className="w-4 h-4 text-purple-600" />
+              <span className="text-sm">Volum Total</span>
+            </div>
+            <p className="text-2xl font-bold">
+              {totalVolume.toLocaleString('ro-RO')}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Advanced Chart */}
+      <AdvancedStockChart 
+        symbol={data.symbol}
+        data={history}
+        currency={data.currency || 'RON'}
+        onTimeframeChange={handleTimeframeChange}
+        currentTimeframe={currentPeriod}
+      />
+
+      {/* Price Info */}
+      {history.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              Informații Preț
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div>
+                <p className="text-sm text-muted-foreground">Deschidere</p>
+                <p className="text-xl font-bold">{history[history.length - 1]?.open?.toFixed(2)} {data.currency}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Închidere</p>
+                <p className="text-xl font-bold">{history[history.length - 1]?.close?.toFixed(2)} {data.currency}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Max Zi</p>
+                <p className="text-xl font-bold text-green-600">{history[history.length - 1]?.high?.toFixed(2)} {data.currency}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Min Zi</p>
+                <p className="text-xl font-bold text-red-600">{history[history.length - 1]?.low?.toFixed(2)} {data.currency}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Description */}
       {data.description && (
@@ -158,7 +253,7 @@ export default function StockDetailPage() {
       {data.related_news && data.related_news.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Știri Legate</CardTitle>
+            <CardTitle>Știri Legate de {data.symbol}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -166,7 +261,7 @@ export default function StockDetailPage() {
                 <Link 
                   key={article.id || idx} 
                   to={`/news/${article.id}`}
-                  className="block p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                  className="block p-3 rounded-lg hover:bg-muted/50 transition-colors border"
                 >
                   <h4 className="font-semibold line-clamp-2">{article.title}</h4>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -184,18 +279,18 @@ export default function StockDetailPage() {
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
-              <h3 className="text-lg font-bold mb-1">💰 Vrei Să Înțelegi Mai Bine Acțiunile?</h3>
-              <p className="text-green-100 text-sm">Învață de la zero: bugete, economii, investiții și ETF-uri - 15 lecții gratuite</p>
+              <h3 className="text-lg font-bold mb-1">💰 Vrei Să Înveți Analiza Tehnică?</h3>
+              <p className="text-green-100 text-sm">Află cum să citești graficele și indicatorii în cursul nostru gratuit de trading</p>
             </div>
             <div className="flex gap-3">
-              <Link to="/financial-education">
+              <Link to="/trading-school">
                 <Button className="bg-white text-green-600 hover:bg-green-50">
-                  Educație Financiară →
+                  Școala de Trading →
                 </Button>
               </Link>
-              <Link to="/trading-school">
+              <Link to="/financial-education">
                 <Button variant="outline" className="border-white text-white hover:bg-white/10">
-                  Școala Trading
+                  Educație Financiară
                 </Button>
               </Link>
             </div>
