@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, CheckCircle, AlertCircle, Lightbulb, Trophy } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertCircle, Lightbulb, Trophy, ChevronRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import ReactMarkdown from 'react-markdown';
@@ -13,6 +13,7 @@ export default function FinLessonPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
+  const [allLessons, setAllLessons] = useState([]);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState([]);
   const [quizResult, setQuizResult] = useState(null);
@@ -20,6 +21,7 @@ export default function FinLessonPage() {
 
   useEffect(() => {
     fetchLesson();
+    fetchAllLessons();
   }, [lessonId]);
 
   const fetchLesson = async () => {
@@ -35,6 +37,25 @@ export default function FinLessonPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchAllLessons = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/financial-education/lessons`);
+      if (res.ok) {
+        const data = await res.json();
+        setAllLessons(data.lessons || []);
+      }
+    } catch (error) {
+      console.error('Error fetching lessons:', error);
+    }
+  };
+
+  const getNextLesson = () => {
+    if (!lesson || allLessons.length === 0) return null;
+    const currentOrder = lesson.order;
+    const nextLesson = allLessons.find(l => l.order === currentOrder + 1);
+    return nextLesson;
   };
 
   const handleQuizSubmit = async () => {
