@@ -1,26 +1,55 @@
 {
   "summary": {
-    "total_tests": 25,
-    "passed_tests": 23,
-    "success_rate": "92.0%",
-    "timestamp": "2025-12-27T06:22:30.273423"
+    "total_tests": 28,
+    "passed_tests": 28,
+    "success_rate": "100.0%",
+    "timestamp": "2025-12-27T20:00:13.753580"
   },
   "detailed_results": [
+    {
+      "test_name": "Auth Session Endpoint Structure",
+      "success": true,
+      "details": "Endpoint exists and properly rejects invalid session_id",
+      "timestamp": "2025-12-27T20:00:04.691902",
+      "response_sample": {
+        "endpoint": "/api/auth/session",
+        "expected_behavior": "401 for invalid session"
+      }
+    },
+    {
+      "test_name": "Auth Me Endpoint with Bearer Token",
+      "success": true,
+      "details": "Successfully authenticated and returned user data",
+      "timestamp": "2025-12-27T20:00:08.455727",
+      "response_sample": {
+        "user_id": "auth_test_1766865608025",
+        "email": "auth_test_1766865604.70018@test.com"
+      }
+    },
+    {
+      "test_name": "Auth Me Endpoint - No Token (401)",
+      "success": true,
+      "details": "Correctly returns 401 when no authentication provided",
+      "timestamp": "2025-12-27T20:00:08.526538",
+      "response_sample": {
+        "detail": "Not authenticated"
+      }
+    },
     {
       "test_name": "Health Check",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:24.229677",
+      "timestamp": "2025-12-27T20:00:08.643669",
       "response_sample": {
         "status": "healthy",
-        "timestamp": "2025-12-27T06:22:24.223411+00:00"
+        "timestamp": "2025-12-27T20:00:08.596119+00:00"
       }
     },
     {
       "test_name": "API Root Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:24.285604",
+      "timestamp": "2025-12-27T20:00:08.730234",
       "response_sample": {
         "message": "FinRomania API",
         "version": "1.0.0",
@@ -35,23 +64,23 @@
     },
     {
       "test_name": "BVB Stock Details - TLV (REAL EODHD)",
-      "success": false,
-      "details": "Validation failed: Too few history entries: 18, expected around 30",
-      "timestamp": "2025-12-27T06:22:24.718997",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T20:00:09.168375",
       "response_sample": {
         "symbol": "TLV",
-        "history_count": 18,
+        "history_count": 21,
         "is_mock": false
       }
     },
     {
       "test_name": "BVB Stock Details - H2O (REAL EODHD)",
-      "success": false,
-      "details": "Validation failed: Too few history entries: 18, expected around 30",
-      "timestamp": "2025-12-27T06:22:25.024450",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-27T20:00:09.506950",
       "response_sample": {
         "symbol": "H2O",
-        "history_count": 18,
+        "history_count": 21,
         "is_mock": false
       }
     },
@@ -59,7 +88,7 @@
       "test_name": "Data Sources - BVB should be EODHD (REAL)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:26.224014",
+      "timestamp": "2025-12-27T20:00:10.099739",
       "response_sample": {
         "bvb_source": "EODHD (REAL)",
         "global_source": "Yahoo Finance (REAL)",
@@ -70,7 +99,7 @@
       "test_name": "BVB Stocks List (REAL data verification)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:26.282056",
+      "timestamp": "2025-12-27T20:00:10.172851",
       "response_sample": [
         {
           "symbol": "H2O",
@@ -108,7 +137,7 @@
       "test_name": "Admin Authentication Setup",
       "success": true,
       "details": "Admin session token created",
-      "timestamp": "2025-12-27T06:22:28.211082",
+      "timestamp": "2025-12-27T20:00:11.219135",
       "response_sample": {
         "has_token": true
       }
@@ -117,21 +146,21 @@
       "test_name": "Admin Stats Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:28.331066",
+      "timestamp": "2025-12-27T20:00:11.327628",
       "response_sample": {
         "totals": {
-          "users": 8,
-          "articles": 550,
+          "users": 11,
+          "articles": 660,
           "watchlist_items": 1,
           "portfolio_transactions": 5,
           "newsletter_subscribers": 2
         },
         "today": {
-          "logins": 0,
+          "logins": 4,
           "page_visits": 0
         },
         "last_7_days": {
-          "new_users": 8
+          "new_users": 11
         }
       }
     },
@@ -139,17 +168,17 @@
       "test_name": "Admin Users List (limit=5)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:28.389590",
+      "timestamp": "2025-12-27T20:00:11.404513",
       "response_sample": {
         "users_count": 5,
-        "total": 8
+        "total": 11
       }
     },
     {
       "test_name": "Admin Analytics (7 days)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:28.476453",
+      "timestamp": "2025-12-27T20:00:11.509651",
       "response_sample": {
         "days_count": 7
       }
@@ -157,8 +186,8 @@
     {
       "test_name": "Regular User Creation",
       "success": true,
-      "details": "Test user created: testuser_1766816548.47655@test.com",
-      "timestamp": "2025-12-27T06:22:29.437001",
+      "details": "Test user created: testuser_1766865611.509737@test.com",
+      "timestamp": "2025-12-27T20:00:12.603088",
       "response_sample": {
         "has_token": true
       }
@@ -167,7 +196,7 @@
       "test_name": "Admin Access Control (403 for non-admin)",
       "success": true,
       "details": "Correctly denied access to non-admin user",
-      "timestamp": "2025-12-27T06:22:29.525730",
+      "timestamp": "2025-12-27T20:00:12.685501",
       "response_sample": {
         "detail": "Admin access required"
       }
@@ -176,7 +205,7 @@
       "test_name": "Glossary - All Terms (~99 terms)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:29.583913",
+      "timestamp": "2025-12-27T20:00:12.769975",
       "response_sample": {
         "total": 99,
         "sample_terms": [
@@ -190,7 +219,7 @@
       "test_name": "Glossary - Search (dividend)",
       "success": true,
       "details": "Found 2 matching terms",
-      "timestamp": "2025-12-27T06:22:29.633447",
+      "timestamp": "2025-12-27T20:00:12.841247",
       "response_sample": {
         "total": 2,
         "terms": [
@@ -203,7 +232,7 @@
       "test_name": "Global Indices (Yahoo Finance)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:29.687839",
+      "timestamp": "2025-12-27T20:00:12.924901",
       "response_sample": [
         {
           "symbol": "^GSPC",
@@ -237,22 +266,22 @@
       "test_name": "Financial News",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:29.741697",
+      "timestamp": "2025-12-27T20:00:13.000389",
       "response_sample": [
         {
-          "id": "e6ddad38-ad74-45b7-b26b-3a48d5af46dc",
-          "title": "Anul 2026 \u00een Rom\u00e2nia. Ministrul Economiei: Va fi \u00een continuare greu, dar va a\u0219terne o foaie alb\u0103 \u0219i curat\u0103 pentru 2027 \u0219i dezvoltare",
-          "description": "Ce \u00eei a\u0219teapt\u0103 pe rom\u00e2ni \u00een 2026? Ministrul Economiei, Irineu Dar\u0103u: 2026 va fi un an greu, dar esen\u021bial pentru dezvoltarea viitoare Ministrul Economiei abia a depus jur\u0103m\u00e2ntul s\u0103pt\u0103m\u00e2na aceasta, \u00eens\u0103 a fost luat deja la \u021bint\u0103 de jurnali\u0219ti cu \u00eentreb\u0103ri grele. Irineu Dar\u0103u a explicat vineri c\u0103 anul 2026 va r\u0103m\u00e2ne unul dificil, pe [\u2026]",
-          "content": "Ce \u00eei a\u0219teapt\u0103 pe rom\u00e2ni \u00een 2026? Ministrul Economiei, Irineu Dar\u0103u: 2026 va fi un an greu, dar esen\u021bial pentru dezvoltarea viitoare Ministrul Economiei abia a depus jur\u0103m\u00e2ntul s\u0103pt\u0103m\u00e2na aceasta, \u00eens\u0103 a fost luat deja la \u021bint\u0103 de jurnali\u0219ti cu \u00eentreb\u0103ri grele. Irineu Dar\u0103u a explicat vineri c\u0103 anul 2026 va r\u0103m\u00e2ne unul dificil, pe [\u2026]",
-          "url": "https://www.capital.ro/anul-2026-in-romania-ministrul-economiei-va-fi-in-continuare-greu-dar-va-asterne-o-foaie-alba-si-curata-pentru-2027-si-dezvoltare.html",
-          "image_url": null,
+          "id": "f49dd66c-d1dd-4f0a-bc1b-e9b6abd55071",
+          "title": "Sute de bucure\u0219teni au r\u0103mas f\u0103r\u0103 gaze",
+          "description": "Peste 220 de bucure\u0219teni, din Sectorul 3, au r\u0103mas f\u0103r\u0103 gaze.",
+          "content": "Peste 220 de bucure\u0219teni, din Sectorul 3, au r\u0103mas f\u0103r\u0103 gaze.",
+          "url": "https://www.profit.ro/stiri/social/sute-de-bucuresteni-au-ramas-fara-gaze-22288414?utm_source=Rss&utm_medium=Referral&utm_campaign=Cross",
+          "image_url": "https://i0.1616.ro/media/2/2621/33239/22288414/2/flame-580342-1280.jpg",
           "source": {
-            "name": "Capital.ro",
-            "url": "https://www.capital.ro/anul-2026-in-romania-ministrul-economiei-va-fi-in-continuare-greu-dar-va-asterne-o-foaie-alba-si-curata-pentru-2027-si-dezvoltare.html",
+            "name": "Profit.ro",
+            "url": "https://www.profit.ro/stiri/social/sute-de-bucuresteni-au-ramas-fara-gaze-22288414?utm_source=Rss&utm_medium=Referral&utm_campaign=Cross",
             "category": "business"
           },
-          "author": "Bogdan Ungureanu",
-          "published_at": "2025-12-27T06:13:48",
+          "author": "Profit.ro",
+          "published_at": "2025-12-27T19:40:00",
           "language": "ro",
           "is_rewritten": false,
           "is_translated": false,
@@ -266,7 +295,7 @@
       "test_name": "Currency Rates (BNR)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:29.797694",
+      "timestamp": "2025-12-27T20:00:13.092593",
       "response_sample": {
         "sample_rates": [
           "AED",
@@ -281,7 +310,7 @@
       "test_name": "Market Overview (Combined)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:29.857666",
+      "timestamp": "2025-12-27T20:00:13.174236",
       "response_sample": {
         "bvb_count": 20,
         "global_count": 6
@@ -291,7 +320,7 @@
       "test_name": "Education Packages",
       "success": true,
       "details": "Found 2 packages",
-      "timestamp": "2025-12-27T06:22:29.906440",
+      "timestamp": "2025-12-27T20:00:13.247810",
       "response_sample": {
         "packages": [
           {
@@ -341,7 +370,7 @@
       "test_name": "AI Advisor - Tip of the Day",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:29.957409",
+      "timestamp": "2025-12-27T20:00:13.321138",
       "response_sample": {
         "tip": "Emo\u021biile sunt du\u0219manul investitorului. C\u00e2nd al\u021bii sunt frico\u0219i, fii lacom. C\u00e2nd al\u021bii sunt lacomi, fii precaut.",
         "category": "Psihologie",
@@ -352,7 +381,7 @@
       "test_name": "Financial Education - All Lessons (15 total)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:30.009363",
+      "timestamp": "2025-12-27T20:00:13.407592",
       "response_sample": {
         "total": 15,
         "modules": 3,
@@ -367,7 +396,7 @@
       "test_name": "Financial Education - Lesson 1 Detail",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:30.068105",
+      "timestamp": "2025-12-27T20:00:13.487117",
       "response_sample": {
         "title": "Ce Este Educa\u021bia Financiar\u0103 \u0219i De Ce Conteaz\u0103",
         "module": 1,
@@ -379,7 +408,7 @@
       "test_name": "Financial Education - Quiz Submit (Correct)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:30.158092",
+      "timestamp": "2025-12-27T20:00:13.588951",
       "response_sample": {
         "score": 100.0,
         "passed": true,
@@ -391,7 +420,7 @@
       "test_name": "Financial Education - Progress Tracking",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:30.217589",
+      "timestamp": "2025-12-27T20:00:13.665129",
       "response_sample": {
         "completed": 1,
         "total": 15,
@@ -402,7 +431,7 @@
       "test_name": "Financial Education - Quiz Submit (Wrong)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T06:22:30.272950",
+      "timestamp": "2025-12-27T20:00:13.752799",
       "response_sample": {
         "score": 0.0,
         "passed": false
