@@ -514,6 +514,198 @@ class FinRomaniaAPITester:
         
         return True, f"Valid progress: {len(completed)}/{total} lessons ({progress}%)"
 
+    def validate_global_overview(self, data: Dict) -> tuple:
+        """Validate global markets overview response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['indices', 'commodities', 'crypto', 'forex', 'sentiment', 'market_status', 'updated_at']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        # Validate indices (should have 10)
+        indices = data.get('indices', [])
+        if not isinstance(indices, list):
+            return False, "Indices should be a list"
+        if len(indices) < 8:  # Allow some flexibility for market hours
+            return False, f"Expected at least 8 indices, got {len(indices)}"
+        
+        # Validate commodities (should have 6)
+        commodities = data.get('commodities', [])
+        if not isinstance(commodities, list):
+            return False, "Commodities should be a list"
+        if len(commodities) < 5:  # Allow some flexibility
+            return False, f"Expected at least 5 commodities, got {len(commodities)}"
+        
+        # Validate crypto (should have 5)
+        crypto = data.get('crypto', [])
+        if not isinstance(crypto, list):
+            return False, "Crypto should be a list"
+        if len(crypto) < 4:  # Allow some flexibility
+            return False, f"Expected at least 4 crypto assets, got {len(crypto)}"
+        
+        # Validate forex (should have 4)
+        forex = data.get('forex', [])
+        if not isinstance(forex, list):
+            return False, "Forex should be a list"
+        if len(forex) < 3:  # Allow some flexibility
+            return False, f"Expected at least 3 forex pairs, got {len(forex)}"
+        
+        # Validate sentiment data
+        sentiment = data.get('sentiment', {})
+        sentiment_fields = ['gainers', 'losers', 'avg_change', 'status']
+        for field in sentiment_fields:
+            if field not in sentiment:
+                return False, f"Missing sentiment field: {field}"
+        
+        # Validate market status
+        market_status = data.get('market_status', {})
+        expected_markets = ['us', 'europe', 'asia', 'crypto']
+        for market in expected_markets:
+            if market not in market_status:
+                return False, f"Missing market status for: {market}"
+            market_data = market_status[market]
+            if 'name' not in market_data or 'open' not in market_data:
+                return False, f"Invalid market status structure for {market}"
+        
+        return True, f"Valid global overview: {len(indices)} indices, {len(commodities)} commodities, {len(crypto)} crypto, {len(forex)} forex"
+
+    def validate_global_indices_only(self, data: Dict) -> tuple:
+        """Validate global indices endpoint response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['indices', 'count', 'updated_at']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        indices = data.get('indices', [])
+        if not isinstance(indices, list):
+            return False, "Indices should be a list"
+        
+        if len(indices) < 8:  # Should have 10 but allow some flexibility
+            return False, f"Expected at least 8 indices, got {len(indices)}"
+        
+        # Validate structure of first index
+        if indices:
+            index = indices[0]
+            required_index_fields = ['symbol', 'name', 'price', 'change', 'change_percent', 'flag', 'country']
+            for field in required_index_fields:
+                if field not in index:
+                    return False, f"Missing index field: {field}"
+        
+        return True, f"Valid global indices: {len(indices)} indices"
+
+    def validate_commodities_only(self, data: Dict) -> tuple:
+        """Validate commodities endpoint response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['commodities', 'count', 'updated_at']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        commodities = data.get('commodities', [])
+        if not isinstance(commodities, list):
+            return False, "Commodities should be a list"
+        
+        if len(commodities) < 5:  # Should have 6 but allow some flexibility
+            return False, f"Expected at least 5 commodities, got {len(commodities)}"
+        
+        # Validate structure of first commodity
+        if commodities:
+            commodity = commodities[0]
+            required_fields = ['symbol', 'name', 'price', 'change', 'change_percent', 'flag', 'unit']
+            for field in required_fields:
+                if field not in commodity:
+                    return False, f"Missing commodity field: {field}"
+        
+        return True, f"Valid commodities: {len(commodities)} commodities"
+
+    def validate_crypto_only(self, data: Dict) -> tuple:
+        """Validate crypto endpoint response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['crypto', 'count', 'updated_at']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        crypto = data.get('crypto', [])
+        if not isinstance(crypto, list):
+            return False, "Crypto should be a list"
+        
+        if len(crypto) < 4:  # Should have 5 but allow some flexibility
+            return False, f"Expected at least 4 crypto assets, got {len(crypto)}"
+        
+        # Validate structure of first crypto
+        if crypto:
+            crypto_asset = crypto[0]
+            required_fields = ['symbol', 'name', 'price', 'change', 'change_percent', 'flag']
+            for field in required_fields:
+                if field not in crypto_asset:
+                    return False, f"Missing crypto field: {field}"
+        
+        return True, f"Valid crypto: {len(crypto)} crypto assets"
+
+    def validate_forex_only(self, data: Dict) -> tuple:
+        """Validate forex endpoint response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['forex', 'count', 'updated_at']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        forex = data.get('forex', [])
+        if not isinstance(forex, list):
+            return False, "Forex should be a list"
+        
+        if len(forex) < 3:  # Should have 4 but allow some flexibility
+            return False, f"Expected at least 3 forex pairs, got {len(forex)}"
+        
+        # Validate structure of first forex pair
+        if forex:
+            forex_pair = forex[0]
+            required_fields = ['symbol', 'name', 'price', 'change', 'change_percent', 'flag']
+            for field in required_fields:
+                if field not in forex_pair:
+                    return False, f"Missing forex field: {field}"
+        
+        return True, f"Valid forex: {len(forex)} forex pairs"
+
+    def validate_chart_data(self, data: Dict) -> tuple:
+        """Validate chart data response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['symbol', 'name', 'period', 'data', 'current_price']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        chart_data = data.get('data', [])
+        if not isinstance(chart_data, list):
+            return False, "Chart data should be a list"
+        
+        if len(chart_data) < 10:  # Should have around 30 days but allow flexibility
+            return False, f"Expected at least 10 data points, got {len(chart_data)}"
+        
+        # Validate structure of first data point
+        if chart_data:
+            point = chart_data[0]
+            required_point_fields = ['date', 'open', 'high', 'low', 'close', 'volume']
+            for field in required_point_fields:
+                if field not in point:
+                    return False, f"Missing chart data field: {field}"
+        
+        return True, f"Valid chart data: {len(chart_data)} data points for {data.get('symbol')}"
+
     def test_admin_login(self) -> bool:
         """Test admin authentication - use pre-created session token"""
         print("\n🔐 Setting up Admin Authentication...")
