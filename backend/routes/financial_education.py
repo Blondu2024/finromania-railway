@@ -687,7 +687,3 @@ async def get_financial_progress(user: dict = Depends(require_auth)):
         "progress_percent": (completed_count / len(FINANCIAL_LESSONS)) * 100,
         "lessons_detail": completed
     }
-    # Lecția 6-10 vor fi adăugate aici...
-]
-
-# Placeholder for remaining lessons - will be added
