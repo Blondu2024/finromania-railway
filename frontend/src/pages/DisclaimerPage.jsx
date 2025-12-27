@@ -123,7 +123,22 @@ export default function DisclaimerPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">9. Contact</h2>
+            <h2 className="text-xl font-semibold">9. Surse de date</h2>
+            <p>Platforma FinRomania agregă date din următoarele surse:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>Acțiuni BVB:</strong> EODHD API (furnizor licențiat de date financiare)</li>
+              <li><strong>Indici globali:</strong> Yahoo Finance (yfinance)</li>
+              <li><strong>Cursuri valutare:</strong> Banca Națională a României (BNR)</li>
+              <li><strong>Știri:</strong> Agregate din surse românești (Ziarul Financiar, Profit.ro, Bursa, Wall-Street)</li>
+            </ul>
+            <p className="mt-2">
+              Fiecare sursă poate avea politici proprii de actualizare și acuratețe. 
+              FinRomania nu garantează datele furnizate de terți.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold">10. Contact</h2>
             <p>
               Pentru clarificări: <strong>contact@finromania.ro</strong>
             </p>
