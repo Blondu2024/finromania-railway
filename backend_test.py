@@ -723,7 +723,7 @@ class FinRomaniaAPITester:
         success, details, data = self.test_api_endpoint('GET', '/api/health')
         self.log_test("Health Check", success, details, data)
         
-        # Test 2: API Root
+        # Test 5: API Root
         success, details, data = self.test_api_endpoint('GET', '/api/')
         self.log_test("API Root Endpoint", success, details, data)
         
