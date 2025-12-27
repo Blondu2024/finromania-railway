@@ -11,15 +11,41 @@ const FAQ_DATA = [
     questions: [
       {
         q: 'Ce este FinRomania?',
-        a: 'FinRomania este prima platformă educațională de trading și investiții din România. Oferim știri financiare în timp real, date live de pe Bursa de Valori București, instrumente educaționale interactive și asistent AI pentru a te ajuta să înveți trading - totul în limba română!'
+        a: 'FinRomania este prima platformă de date financiare și educație din România. Oferim date live de pe Bursa de Valori București, știri financiare agregate, cursuri valutare BNR, două programe educaționale complete (Trading School + Educație Financiară), asistent AI și mult mai multe - totul în limba română!'
       },
       {
         q: 'Este cu adevărat gratuit?',
-        a: 'DA! TOATE features-urile sunt 100% gratuite: știri, date BVB live, convertor valutar, glosar financiar, AI Advisor, și TOATE cele 17 lecții din Trading School. Misiunea noastră este să democratizăm educația financiară în România - totul accesibil gratuit!'
+        a: 'DA! TOTUL pe FinRomania este 100% gratuit: date BVB live, știri, convertor valutar, glosar, AI Advisor, cele 17 lecții Trading School, și cele 15 lecții de Educație Financiară. Misiunea noastră e să oferim românilor acces gratuit la educație financiară de calitate!'
       },
       {
         q: 'Datele sunt reale sau simulate?',
-        a: 'Toate datele sunt REALE! Folosim surse licențiate și de încredere pentru date de pe Bursa de Valori București, indici globali, și cursuri valutare. Nu folosim date mock sau simulate - vezi prețuri reale în timp real!'
+        a: 'Toate datele sunt REALE! Folosim EODHD API pentru date BVB, yfinance pentru indici globali, și BNR pentru cursuri valutare. Știrile sunt agregate din surse românești de încredere (ZF, Profit.ro, Bursa, Wall-Street). Nu folosim date simulate!'
+      },
+      {
+        q: 'Pentru cine este platforma?',
+        a: 'Pentru ORICINE vrea să învețe despre finanțe personale și investiții! De la complet începători (care vor să învețe bazele bugetării și economisirii) până la cei interesați de trading pe bursa. Nu ai nevoie de cunoștințe prealabile.'
+      }
+    ]
+  },
+  {
+    category: 'Educație Financiară',
+    icon: <DollarSign className="w-5 h-5" />,
+    questions: [
+      {
+        q: 'Ce este cursul de Educație Financiară?',
+        a: 'Este un program complet cu 15 lecții care te învață bazele finanțelor personale: cum să faci un buget (regula 50/30/20), să construiești un fond de urgență, să înțelegi inflația, conturile bancare, creditele, pensiile, taxele din România, și chiar bazele investițiilor în ETF-uri.'
+      },
+      {
+        q: 'Care e diferența între Educație Financiară și Trading School?',
+        a: 'Educația Financiară (15 lecții) te învață BAZELE: bugete, economii, pensii, taxe, investiții simple. Trading School (17 lecții) e pentru cei care vor să facă trading activ: analiză tehnică, indicatori, leverage, strategii. Recomandare: Începe cu Educația Financiară dacă ești începător!'
+      },
+      {
+        q: 'Am nevoie de cunoștințe anterioare?',
+        a: 'NU! Cursul de Educație Financiară e conceput de la ZERO. Prima lecție explică de ce educația financiară e importantă și ce vei învăța. Nu presupunem nicio cunoștință anterioară - totul e explicat pas cu pas, cu exemple din România.'
+      },
+      {
+        q: 'Ce voi ști după ce termin cursul?',
+        a: 'Vei ști să: faci un buget eficient, economisești inteligent, înțelegi inflația și dobânzile, alegi conturi bancare și asigurări potrivite, planifici pentru pensie, declari taxele corect, și să începi să investești în ETF-uri. Practic: vei avea controlul finanțelor tale!'
       }
     ]
   },
@@ -29,19 +55,15 @@ const FAQ_DATA = [
     questions: [
       {
         q: 'Ce este Trading School?',
-        a: 'Trading School este un curs interactiv complet de trading cu 17 lecții, quizzes, și scenarii practice - 100% GRATUIT! Înveți concepte de la bază (ce e o acțiune) până la avansat (indicatori tehnici, strategii complexe). Toate lecțiile sunt disponibile pentru toată lumea!'
+        a: 'Trading School este un curs complet de trading cu 17 lecții interactive - 100% GRATUIT! Înveți de la bază (ce e o acțiune, cum funcționează bursa) până la avansat (indicatori tehnici, strategii de trading, managementul riscului). Toate lecțiile sunt disponibile pentru toată lumea!'
       },
       {
         q: 'Cum funcționează lecțiile?',
-        a: 'Fiecare lecție include conținut educațional detaliat cu exemple practice din piața românească, urmat de un quiz interactiv pentru verificarea cunoștințelor. Trebuie să obții minim 80% la quiz pentru a debloca lecția următoare. Progress-ul tău este salvat automat dacă ești autentificat.'
-      },
-      {
-        q: 'Primesc certificat la final?',
-        a: 'Da! Utilizatorii care completează toate lecțiile cu scor de minim 80% vor primi un certificat digital descărcabil care atestă parcurgerea cursului Trading School. Poți folosi certificatul pentru CV sau LinkedIn!'
+        a: 'Fiecare lecție include conținut detaliat cu exemple practice din piața românească, urmat de un quiz interactiv. Trebuie să obții minim 80% la quiz pentru a debloca lecția următoare. Progress-ul e salvat automat dacă ești autentificat.'
       },
       {
         q: 'Pot folosi cunoștințele pentru trading real?',
-        a: 'Absolut! Lecțiile te pregătesc pentru trading real pe orice platformă de brokeraj. Înveți concepte universale aplicabile pe toate piețele: analiza tehnică, managementul riscului, psihologia tradingului, și strategii practice.'
+        a: 'Absolut! Lecțiile te pregătesc pentru trading real pe orice platformă de brokeraj (XTB, eToro, Interactive Brokers, etc.). Înveți concepte universale: analiză tehnică și fundamentală, managementul riscului, psihologia tradingului.'
       }
     ]
   },
@@ -51,15 +73,15 @@ const FAQ_DATA = [
     questions: [
       {
         q: 'Cât de actualizate sunt datele de pe BVB?',
-        a: 'Datele de pe Bursa de Valori București se actualizează automat la fiecare câteva minute. Vezi prețuri reale pentru acțiunile principale: Banca Transilvania, Hidroelectrica, OMV Petrom, și multe altele. Datele provin de la surse oficiale licențiate.'
+        a: 'Datele BVB se actualizează automat la fiecare 5 minute în timpul programului bursei. Datele provin de la EODHD, un furnizor licențiat de date financiare. Vezi prețuri reale pentru: Banca Transilvania, Hidroelectrica, OMV Petrom, și alte 20+ acțiuni.'
       },
       {
         q: 'Sunt datele mele personale în siguranță?',
-        a: 'Absolut! Folosim autentificare securizată prin Google, encriptare HTTPS pentru toate comunicările, și respectăm strict regulamentul GDPR. Nu stocăm parole în format text, nu vindem datele tale nimănui, și poți șterge contul oricând.'
+        a: 'Da! Folosim autentificare securizată prin Google, encriptare HTTPS pentru toate comunicările, și respectăm GDPR. Nu stocăm parole, nu vindem datele tale, și poți șterge contul oricând.'
       },
       {
         q: 'Pot face trading efectiv pe platformă?',
-        a: 'NU! FinRomania este o platformă EDUCAȚIONALĂ, nu un broker. Nu poți cumpăra sau vinde acțiuni reale aici. Învățătura noastră te pregătește pentru a folosi platforme de brokeraj licențiate (XTB, eToro, Interactive Brokers, etc.) când ești gata.'
+        a: 'NU! FinRomania este o platformă EDUCAȚIONALĂ și de DATE, nu un broker. Nu poți cumpăra sau vinde acțiuni aici. Te pregătim să folosești platforme de brokeraj licențiate când ești gata.'
       }
     ]
   },
@@ -69,15 +91,11 @@ const FAQ_DATA = [
     questions: [
       {
         q: 'Cum funcționează AI Advisor?',
-        a: 'AI Advisor este un asistent inteligent care răspunde la întrebări despre trading, investiții, și piețe financiare în limba română. Poți întreba orice: "Ce este un ETF?", "Cum setez Stop Loss?", "Cum analizez o acțiune?". Primești răspunsuri clare cu exemple practice!'
+        a: 'AI Advisor răspunde la întrebări despre trading, investiții și finanțe personale în română. Poți întreba orice: "Ce este un ETF?", "Cum funcționează Pilonul II de pensii?", "Ce înseamnă P/E ratio?". Primești răspunsuri clare cu exemple practice!'
       },
       {
-        q: 'AI Advisor este gratuit?',
-        a: 'Da! Ai acces gratuit la funcțiile de bază ale AI Advisor, inclusiv "Sfatul Zilei". Pentru utilizatorii autentificați, există și mai multe credite disponibile pentru întrebări personalizate.'
-      },
-      {
-        q: 'Poate AI să-mi recomande acțiuni specifice de cumpărat?',
-        a: 'AI-ul poate analiza companii și explica concepte financiare, DAR nu oferă sfaturi financiare personalizate de tipul "cumpără acțiunea X acum!". Este un instrument educațional, nu un consilier financiar licențiat. Toate deciziile de investiții rămân responsabilitatea ta!'
+        q: 'Poate AI să-mi recomande acțiuni de cumpărat?',
+        a: 'NU! AI-ul explică concepte și analizează general, dar NU oferă sfaturi de investiții personalizate. Este un instrument educațional, nu un consilier financiar licențiat. Toate deciziile de investiții sunt responsabilitatea ta!'
       }
     ]
   }
