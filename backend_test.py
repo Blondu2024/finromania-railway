@@ -719,7 +719,7 @@ class FinRomaniaAPITester:
         print("\n📋 SECTION 2: Basic Health Checks")
         print("-" * 80)
         
-        # Test 1: Health Check
+        # Test 4: Health Check
         success, details, data = self.test_api_endpoint('GET', '/api/health')
         self.log_test("Health Check", success, details, data)
         
