@@ -177,11 +177,27 @@ export default function FinLessonPage() {
                   🔄 Încearcă Din Nou
                 </Button>
               )}
-              <Link to="/financial-education">
-                <Button variant="outline" size="lg">
-                  {passed ? 'Continuă la Următoarea Lecție →' : '← Înapoi'}
+              {passed && getNextLesson() ? (
+                <Button 
+                  size="lg" 
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={() => navigate(`/financial-education/${getNextLesson().id}`)}
+                >
+                  Următoarea Lecție: {getNextLesson().title.substring(0, 25)}... <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
-              </Link>
+              ) : passed ? (
+                <Link to="/financial-education">
+                  <Button size="lg" className="bg-green-600 hover:bg-green-700">
+                    🎉 Ai Terminat Cursul! Înapoi la Pagină
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/financial-education">
+                  <Button variant="outline" size="lg">
+                    ← Înapoi la Lecții
+                  </Button>
+                </Link>
+              )}
             </div>
           </CardContent>
         </Card>
