@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, Target, Award, BookOpen, BarChart3, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, BarChart3, Globe, BookOpen, Calculator, Search, PieChart } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -13,7 +12,8 @@ import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-function StockCard({ stock, type = 'bvb' }) {
+// Memoized Stock Card - no animations for performance
+const StockCard = memo(function StockCard({ stock, type = 'bvb' }) {
   const isPositive = stock.change_percent >= 0;
   const linkPath = type === 'global' 
     ? `/stocks/global/${encodeURIComponent(stock.symbol)}`
@@ -21,63 +21,153 @@ function StockCard({ stock, type = 'bvb' }) {
   
   return (
     <Link to={linkPath}>
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        transition={{ duration: 0.2 }}
-      >
-        <Card className="hover:shadow-lg transition-all cursor-pointer h-full">
-          <CardContent className="p-4">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <p className="font-bold text-lg">{stock.symbol || stock.name}</p>
-                <p className="text-sm text-muted-foreground truncate max-w-[120px]">{stock.name}</p>
-              </div>
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+        <CardContent className="p-4">
+          <div className="flex justify-between items-start mb-2">
+            <div>
+              <p className="font-bold text-lg">{stock.symbol || stock.name}</p>
+              <p className="text-sm text-muted-foreground truncate max-w-[120px]">{stock.name}</p>
             </div>
-            <div className="flex justify-between items-end">
-              <p className="text-2xl font-bold">
-                {stock.price?.toLocaleString('ro-RO', { maximumFractionDigits: 2 })}
-                <span className="text-sm font-normal text-muted-foreground ml-1">{stock.currency || ''}</span>
-              </p>
-              <div className={`flex items-center ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                {isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
-                <span className="font-medium">{isPositive ? '+' : ''}{stock.change_percent?.toFixed(2)}%</span>
-              </div>
+          </div>
+          <div className="flex justify-between items-end">
+            <p className="text-2xl font-bold">
+              {stock.price?.toLocaleString('ro-RO', { maximumFractionDigits: 2 })}
+              <span className="text-sm font-normal text-muted-foreground ml-1">{stock.currency || ''}</span>
+            </p>
+            <div className={`flex items-center ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+              {isPositive ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+              <span className="font-medium">{isPositive ? '+' : ''}{stock.change_percent?.toFixed(2)}%</span>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+          </div>
+        </CardContent>
+      </Card>
     </Link>
   );
-}
+});
 
-function NewsCard({ article }) {
+// Memoized News Card
+const NewsCard = memo(function NewsCard({ article }) {
   return (
     <Link to={`/news/${article.id}`}>
-      <motion.div
-        whileHover={{ scale: 1.01 }}
-        transition={{ duration: 0.2 }}
-      >
-        <Card className="hover:shadow-lg transition-all cursor-pointer h-full">
-          <CardContent className="p-4">
-            <div className="flex gap-4">
-              {article.image_url && (
-                <img 
-                  src={article.image_url} 
-                  alt="" 
-                  className="w-20 h-20 object-cover rounded-md flex-shrink-0"
-                  onError={(e) => e.target.style.display = 'none'}
-                />
-              )}
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold line-clamp-2 mb-1">{article.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2">{article.description}</p>
-                <div className="flex items-center mt-2 text-xs text-muted-foreground">
-                  <span>{article.source?.name}</span>
-                  <span className="mx-2">•</span>
-                  <span>{new Date(article.published_at).toLocaleDateString('ro-RO')}</span>
-                </div>
+      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+        <CardContent className="p-4">
+          <div className="flex gap-4">
+            {article.image_url && (
+              <img 
+                src={article.image_url} 
+                alt="" 
+                className="w-20 h-20 object-cover rounded-md flex-shrink-0"
+                loading="lazy"
+                onError={(e) => e.target.style.display = 'none'}
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold line-clamp-2 mb-1">{article.title}</h3>
+              <p className="text-sm text-muted-foreground line-clamp-2">{article.description}</p>
+              <div className="flex items-center mt-2 text-xs text-muted-foreground">
+                <span>{article.source?.name}</span>
+                <span className="mx-2">•</span>
+                <span>{new Date(article.published_at).toLocaleDateString('ro-RO')}</span>
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+});
+
+// ============================================
+// HERO SECTION - What is FinRomania?
+// ============================================
+const HeroSection = memo(function HeroSection() {
+  return (
+    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-6 md:p-10">
+      {/* Background decorations */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -mr-32 -mt-32" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl -ml-24 -mb-24" />
+      
+      <div className="relative z-10">
+        {/* Main Title */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-5xl font-bold mb-3">
+            🇷🇴 Bine ai venit pe <span className="text-blue-400">FinRomania</span>
+          </h1>
+          <p className="text-lg md:text-xl text-blue-200 max-w-2xl mx-auto">
+            Prima platformă din România care combină <strong>educația financiară gratuită</strong> cu <strong>date live de pe bursă</strong>
+          </p>
+        </div>
+
+        {/* 4 Pillars Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {/* Pillar 1: Education */}
+          <Link to="/trading-school" className="group">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-lg mb-1">🎓 Educație</h3>
+              <p className="text-sm text-blue-200">32 lecții gratuite de trading și finanțe</p>
+              <Badge className="mt-2 bg-green-500/20 text-green-300">100% GRATUIT</Badge>
+            </div>
+          </Link>
+
+          {/* Pillar 2: BVB Data */}
+          <Link to="/stocks" className="group">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
+              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                <BarChart3 className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-lg mb-1">📈 Date BVB</h3>
+              <p className="text-sm text-blue-200">Prețuri live de pe Bursa București</p>
+              <Badge className="mt-2 bg-blue-500/20 text-blue-300">LIVE</Badge>
+            </div>
+          </Link>
+
+          {/* Pillar 3: Global Markets */}
+          <Link to="/global" className="group">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
+              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Globe className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-lg mb-1">🌍 Piețe Globale</h3>
+              <p className="text-sm text-blue-200">S&P 500, Bitcoin, Aur, Forex</p>
+              <Badge className="mt-2 bg-purple-500/20 text-purple-300">24/7</Badge>
+            </div>
+          </Link>
+
+          {/* Pillar 4: Tools */}
+          <Link to="/screener" className="group">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
+              <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Search className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-lg mb-1">🔧 Instrumente</h3>
+              <p className="text-sm text-blue-200">Screener, Calendar, Convertor</p>
+              <Badge className="mt-2 bg-orange-500/20 text-orange-300">PRO</Badge>
+            </div>
+          </Link>
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link to="/trading-school">
+            <Button size="lg" className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
+              <BookOpen className="w-5 h-5 mr-2" />
+              Începe să Înveți Gratuit
+            </Button>
+          </Link>
+          <Link to="/stocks">
+            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
+              <TrendingUp className="w-5 h-5 mr-2" />
+              Vezi Bursa BVB
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+});
           </CardContent>
         </Card>
       </motion.div>
