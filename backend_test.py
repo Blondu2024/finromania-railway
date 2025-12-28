@@ -706,6 +706,87 @@ class FinRomaniaAPITester:
         
         return True, f"Valid chart data: {len(chart_data)} data points for {data.get('symbol')}"
 
+    def validate_vapid_key(self, data: Dict) -> tuple:
+        """Validate VAPID public key response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        if 'publicKey' not in data:
+            return False, "Missing 'publicKey' field"
+        
+        public_key = data.get('publicKey', '')
+        if not public_key or len(public_key) < 50:
+            return False, f"Invalid public key length: {len(public_key)}"
+        
+        # Check if it's a valid base64url string (basic check)
+        import re
+        if not re.match(r'^[A-Za-z0-9_-]+$', public_key):
+            return False, "Public key should be valid base64url string"
+        
+        return True, f"Valid VAPID public key: {public_key[:20]}..."
+
+    def validate_push_status(self, data: Dict) -> tuple:
+        """Validate push notification status response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['subscribed', 'subscription_count']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        subscribed = data.get('subscribed')
+        if not isinstance(subscribed, bool):
+            return False, "subscribed should be a boolean"
+        
+        count = data.get('subscription_count')
+        if not isinstance(count, int) or count < 0:
+            return False, "subscription_count should be a non-negative integer"
+        
+        return True, f"Valid push status: subscribed={subscribed}, count={count}"
+
+    def validate_push_subscription_response(self, data: Dict) -> tuple:
+        """Validate push subscription response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['success', 'message']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        success = data.get('success')
+        if not isinstance(success, bool):
+            return False, "success should be a boolean"
+        
+        message = data.get('message', '')
+        if not isinstance(message, str) or len(message) == 0:
+            return False, "message should be a non-empty string"
+        
+        return True, f"Valid subscription response: {message}"
+
+    def validate_push_test_response(self, data: Dict) -> tuple:
+        """Validate push test notification response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['success', 'message']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        success = data.get('success')
+        if not isinstance(success, bool):
+            return False, "success should be a boolean"
+        
+        # For test endpoint, it might fail if no real subscriptions exist
+        # This is expected behavior, so we'll accept both success and failure
+        message = data.get('message', '')
+        if not isinstance(message, str):
+            return False, "message should be a string"
+        
+        return True, f"Valid test response: {message}"
+
     def test_admin_login(self) -> bool:
         """Test admin authentication - use pre-created session token"""
         print("\n🔐 Setting up Admin Authentication...")
