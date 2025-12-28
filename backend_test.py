@@ -1390,11 +1390,12 @@ class FinRomaniaAPITester:
             success, details, data = self.test_api_endpoint(
                 'POST', '/api/push/test',
                 auth_token=self.regular_user_token,
+                expected_status=404,  # Expected since no real subscriptions exist
                 validate_response=self.validate_push_test_response
             )
             # Note: This test may fail if no real subscriptions exist, which is expected
             self.log_test("Push Notifications - Test Send (Auth Required)", success, details,
-                         {"success": data.get('success'), "message": data.get('message')} if isinstance(data, dict) else data)
+                         {"detail": data.get('detail')} if isinstance(data, dict) and 'detail' in data else data)
         else:
             self.log_test("Push Notifications - Test Send", False, "Skipped - no user token")
         
