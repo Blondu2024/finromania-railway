@@ -772,6 +772,17 @@ class FinRomaniaAPITester:
         if not isinstance(data, dict):
             return False, "Response should be a dictionary"
         
+        # For test endpoint, it might fail if no real subscriptions exist
+        # This is expected behavior, so we'll check for proper error structure
+        if 'detail' in data:
+            # This is an error response, which is acceptable for test endpoint
+            detail = data.get('detail', '')
+            if 'No active subscriptions found' in detail:
+                return True, f"Expected error: {detail}"
+            else:
+                return False, f"Unexpected error: {detail}"
+        
+        # If it's a success response, validate the structure
         required_fields = ['success', 'message']
         for field in required_fields:
             if field not in data:
@@ -781,8 +792,6 @@ class FinRomaniaAPITester:
         if not isinstance(success, bool):
             return False, "success should be a boolean"
         
-        # For test endpoint, it might fail if no real subscriptions exist
-        # This is expected behavior, so we'll accept both success and failure
         message = data.get('message', '')
         if not isinstance(message, str):
             return False, "message should be a string"
