@@ -1172,17 +1172,17 @@ class FinRomaniaAPITester:
         # ============================================
         # SESSION 6 PRIORITY 2: DATA SOURCES VERIFICATION
         # ============================================
-        print("\n📊 SECTION 3: Data Sources Verification")
+        print("\n📊 SECTION 4: Data Sources Verification")
         print("-" * 80)
         
-        # Test 5: Data Sources
+        # Test 13: Data Sources
         success, details, data = self.test_api_endpoint(
             'GET', '/api/data-sources',
             validate_response=self.validate_data_sources
         )
         self.log_test("Data Sources - BVB should be EODHD (REAL)", success, details, data)
         
-        # Test 6: BVB Stocks List (verify is_mock: false)
+        # Test 14: BVB Stocks List (verify is_mock: false)
         success, details, data = self.test_api_endpoint(
             'GET', '/api/stocks/bvb',
             validate_response=self.validate_bvb_stocks
