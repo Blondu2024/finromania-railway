@@ -1,24 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html lang="ro">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="FinRomania - Prima platformă de date financiare și educație trading din România" />
-        <!--
-        manifest.json provides metadata used when your web app is installed on a
-        user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-        -->
-        <!--
-        Notice the use of %PUBLIC_URL% in the tags above.
-        It will be replaced with the URL of the `public` folder during the build.
-        Only files inside the `public` folder can be referenced from the HTML.
-
-        Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-        work correctly both with client-side routing and a non-root public URL.
-        Learn how to configure a non-root public URL by running `npm run build`.
-        -->
-        <title>FinRomania - Date BVB Live, Știri, Învață Trading</title>
+        <meta name="theme-color" content="#2563eb" />
+        <meta name="description" content="FinRomania - Prima platformă din România cu educație financiară gratuită și date live BVB. 32 lecții gratuite, prețuri bursă în timp real, screener acțiuni." />
+        <meta name="keywords" content="educatie financiara gratuita, cursuri trading romania, bursa bucuresti live, bvb actiuni, investitii romania" />
+        <meta name="author" content="FinRomania" />
+        <meta name="robots" content="index, follow" />
+        
+        <!-- Preconnect to external resources for faster loading -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="dns-prefetch" href="https://finromania-3.preview.emergentagent.com" />
+        
+        <!-- Favicon -->
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json" />
+        
+        <title>FinRomania - Educație Financiară Gratuită + Date Live BVB</title>
+        
+        <!-- Critical CSS inline for faster FCP -->
+        <style>
+            body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; }
+            #root { min-height: 100vh; }
+            .loader { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+            .loader-spinner { width: 48px; height: 48px; border: 4px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 1s linear infinite; }
+            @keyframes spin { to { transform: rotate(360deg); } }
+        </style>
+        
         <!-- Emergent badge script removed for clean branding -->
         <!--
         These two scripts have been added for the Visual Edits, please do not edit or remove them
@@ -45,8 +58,13 @@
         </script>
     </head>
     <body>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
-        <div id="root"></div>
+        <noscript>Trebuie să activezi JavaScript pentru a folosi FinRomania.</noscript>
+        <div id="root">
+            <!-- Initial loader shown before React hydrates -->
+            <div class="loader">
+                <div class="loader-spinner"></div>
+            </div>
+        </div>
         <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
