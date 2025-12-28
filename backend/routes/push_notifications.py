@@ -145,7 +145,7 @@ async def get_push_status(current_user: dict = Depends(require_auth)):
 
 
 @router.post("/test")
-async def send_test_notification(current_user: dict = Depends(get_current_user)):
+async def send_test_notification(current_user: dict = Depends(require_auth)):
     """Send a test push notification to the user"""
     if not WEBPUSH_AVAILABLE:
         raise HTTPException(status_code=500, detail="WebPush not available")
