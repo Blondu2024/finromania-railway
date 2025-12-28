@@ -11,10 +11,104 @@ export const SEO = ({
   publishedTime,
   modifiedTime,
   section,
-  tags = []
+  tags = [],
+  structuredData = null
 }) => {
   const siteTitle = 'FinRomania';
   const fullTitle = title.includes(siteTitle) ? title : `${title} | ${siteTitle}`;
+  
+  // Default Website Schema
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "FinRomania",
+    "alternateName": "FinRomania - Educație Financiară Gratuită",
+    "url": "https://finromania-3.preview.emergentagent.com",
+    "description": "Prima platformă din România cu educație financiară gratuită și date live de pe bursă",
+    "inLanguage": "ro-RO",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://finromania-3.preview.emergentagent.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  // Organization Schema
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "FinRomania",
+    "url": "https://finromania-3.preview.emergentagent.com",
+    "logo": "https://finromania-3.preview.emergentagent.com/logo.png",
+    "description": "Platformă de educație financiară și date bursiere pentru România",
+    "areaServed": "RO",
+    "knowsLanguage": "ro",
+    "sameAs": []
+  };
+
+  // Educational Course Schema (for education pages)
+  const courseSchema = type === 'course' ? {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": title,
+    "description": description,
+    "provider": {
+      "@type": "Organization",
+      "name": "FinRomania"
+    },
+    "isAccessibleForFree": true,
+    "inLanguage": "ro",
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "Beginners"
+    }
+  } : null;
+
+  // Article Schema (for news/blog)
+  const articleSchema = type === 'article' ? {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": title,
+    "description": description,
+    "image": image,
+    "author": {
+      "@type": "Organization",
+      "name": "FinRomania"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "FinRomania",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://finromania-3.preview.emergentagent.com/logo.png"
+      }
+    },
+    "datePublished": publishedTime,
+    "dateModified": modifiedTime || publishedTime,
+    "mainEntityOfPage": url
+  } : null;
+
+  // Finance Data Schema
+  const financeSchema = type === 'finance' ? {
+    "@context": "https://schema.org",
+    "@type": "FinancialProduct",
+    "name": title,
+    "description": description,
+    "provider": {
+      "@type": "Organization",
+      "name": "FinRomania"
+    },
+    "areaServed": "Romania"
+  } : null;
+
+  const schemas = [
+    websiteSchema,
+    organizationSchema,
+    courseSchema,
+    articleSchema,
+    financeSchema,
+    structuredData
+  ].filter(Boolean);
   
   return (
     <Helmet>
@@ -33,7 +127,7 @@ export const SEO = ({
       <meta property="og:locale" content="ro_RO" />
       
       {/* Open Graph / Facebook */}
-      <meta property="og:type" content={type} />
+      <meta property="og:type" content={type === 'article' ? 'article' : type === 'course' ? 'website' : type} />
       <meta property="og:url" content={url} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
@@ -83,6 +177,13 @@ export const SEO = ({
       <meta name="geo.placename" content="Romania" />
       <meta name="geo.position" content="45.9432;24.9668" />
       <meta name="ICBM" content="45.9432, 24.9668" />
+
+      {/* Structured Data JSON-LD */}
+      {schemas.map((schema, idx) => (
+        <script key={idx} type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      ))}
     </Helmet>
   );
 };
