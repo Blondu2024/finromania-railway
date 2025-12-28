@@ -1,16 +1,16 @@
 {
   "summary": {
-    "total_tests": 35,
-    "passed_tests": 35,
-    "success_rate": "100.0%",
-    "timestamp": "2025-12-27T23:32:33.774622"
+    "total_tests": 42,
+    "passed_tests": 36,
+    "success_rate": "85.7%",
+    "timestamp": "2025-12-28T19:32:01.222244"
   },
   "detailed_results": [
     {
       "test_name": "Auth Session Endpoint Structure",
       "success": true,
       "details": "Endpoint exists and properly rejects invalid session_id",
-      "timestamp": "2025-12-27T23:32:24.027088",
+      "timestamp": "2025-12-28T19:31:40.126436",
       "response_sample": {
         "endpoint": "/api/auth/session",
         "expected_behavior": "401 for invalid session"
@@ -20,17 +20,17 @@
       "test_name": "Auth Me Endpoint with Bearer Token",
       "success": true,
       "details": "Successfully authenticated and returned user data",
-      "timestamp": "2025-12-27T23:32:26.262377",
+      "timestamp": "2025-12-28T19:31:44.933026",
       "response_sample": {
-        "user_id": "auth_test_1766878346123",
-        "email": "auth_test_1766878344.033349@test.com"
+        "user_id": "auth_test_1766950304682",
+        "email": "auth_test_1766950300.131659@test.com"
       }
     },
     {
       "test_name": "Auth Me Endpoint - No Token (401)",
       "success": true,
       "details": "Correctly returns 401 when no authentication provided",
-      "timestamp": "2025-12-27T23:32:26.314619",
+      "timestamp": "2025-12-28T19:31:45.001994",
       "response_sample": {
         "detail": "Not authenticated"
       }
@@ -39,17 +39,17 @@
       "test_name": "Health Check",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:26.364938",
+      "timestamp": "2025-12-28T19:31:45.170307",
       "response_sample": {
         "status": "healthy",
-        "timestamp": "2025-12-27T23:32:26.359739+00:00"
+        "timestamp": "2025-12-28T19:31:45.164375+00:00"
       }
     },
     {
       "test_name": "API Root Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:26.430442",
+      "timestamp": "2025-12-28T19:31:45.236386",
       "response_sample": {
         "message": "FinRomania API",
         "version": "1.0.0",
@@ -66,7 +66,7 @@
       "test_name": "BVB Stock Details - TLV (REAL EODHD)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:26.811421",
+      "timestamp": "2025-12-28T19:31:45.882683",
       "response_sample": {
         "symbol": "TLV",
         "history_count": 21,
@@ -77,7 +77,7 @@
       "test_name": "BVB Stock Details - H2O (REAL EODHD)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:27.108501",
+      "timestamp": "2025-12-28T19:31:46.448223",
       "response_sample": {
         "symbol": "H2O",
         "history_count": 21,
@@ -88,7 +88,7 @@
       "test_name": "Data Sources - BVB should be EODHD (REAL)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:27.750897",
+      "timestamp": "2025-12-28T19:31:47.619757",
       "response_sample": {
         "bvb_source": "EODHD (REAL)",
         "global_source": "Yahoo Finance (REAL)",
@@ -99,7 +99,7 @@
       "test_name": "BVB Stocks List (REAL data verification)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:27.805170",
+      "timestamp": "2025-12-28T19:31:47.694592",
       "response_sample": [
         {
           "symbol": "H2O",
@@ -107,7 +107,7 @@
           "price": 125.0,
           "change": 0.0,
           "change_percent": 0.0,
-          "volume": 17011,
+          "volume": 21535,
           "open": 125.0,
           "high": 125.0,
           "low": 124.1,
@@ -137,7 +137,7 @@
       "test_name": "Admin Authentication Setup",
       "success": true,
       "details": "Admin session token created",
-      "timestamp": "2025-12-27T23:32:28.864303",
+      "timestamp": "2025-12-28T19:31:49.472566",
       "response_sample": {
         "has_token": true
       }
@@ -146,21 +146,21 @@
       "test_name": "Admin Stats Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:28.957326",
+      "timestamp": "2025-12-28T19:31:49.697581",
       "response_sample": {
         "totals": {
-          "users": 13,
-          "articles": 676,
+          "users": 16,
+          "articles": 717,
           "watchlist_items": 1,
           "portfolio_transactions": 5,
           "newsletter_subscribers": 2
         },
         "today": {
-          "logins": 6,
+          "logins": 1,
           "page_visits": 0
         },
         "last_7_days": {
-          "new_users": 13
+          "new_users": 16
         }
       }
     },
@@ -168,17 +168,17 @@
       "test_name": "Admin Users List (limit=5)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:29.006402",
+      "timestamp": "2025-12-28T19:31:49.774449",
       "response_sample": {
         "users_count": 5,
-        "total": 13
+        "total": 16
       }
     },
     {
       "test_name": "Admin Analytics (7 days)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:29.070314",
+      "timestamp": "2025-12-28T19:31:50.176749",
       "response_sample": {
         "days_count": 7
       }
@@ -186,8 +186,8 @@
     {
       "test_name": "Regular User Creation",
       "success": true,
-      "details": "Test user created: testuser_1766878349.070374@test.com",
-      "timestamp": "2025-12-27T23:32:29.867740",
+      "details": "Test user created: testuser_1766950310.176808@test.com",
+      "timestamp": "2025-12-28T19:31:51.934943",
       "response_sample": {
         "has_token": true
       }
@@ -196,7 +196,7 @@
       "test_name": "Admin Access Control (403 for non-admin)",
       "success": true,
       "details": "Correctly denied access to non-admin user",
-      "timestamp": "2025-12-27T23:32:29.915441",
+      "timestamp": "2025-12-28T19:31:52.147926",
       "response_sample": {
         "detail": "Admin access required"
       }
@@ -205,7 +205,7 @@
       "test_name": "Glossary - All Terms (~99 terms)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:29.967967",
+      "timestamp": "2025-12-28T19:31:52.222669",
       "response_sample": {
         "total": 99,
         "sample_terms": [
@@ -219,7 +219,7 @@
       "test_name": "Glossary - Search (dividend)",
       "success": true,
       "details": "Found 2 matching terms",
-      "timestamp": "2025-12-27T23:32:30.011163",
+      "timestamp": "2025-12-28T19:31:52.378883",
       "response_sample": {
         "total": 2,
         "terms": [
@@ -232,7 +232,7 @@
       "test_name": "Global Indices (Yahoo Finance)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.060650",
+      "timestamp": "2025-12-28T19:31:52.440581",
       "response_sample": [
         {
           "symbol": "^GSPC",
@@ -251,9 +251,9 @@
           "symbol": "^IXIC",
           "name": "NASDAQ",
           "price": 23593.096,
-          "change": -20.210938,
-          "change_percent": -0.08559131,
-          "previous_close": 23613.307,
+          "change": -20.205078,
+          "change_percent": -0.08556651,
+          "previous_close": 23613.3,
           "open": 23645.908,
           "high": 23665.15,
           "low": 23567.855,
@@ -266,22 +266,22 @@
       "test_name": "Financial News",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.115096",
+      "timestamp": "2025-12-28T19:31:52.628042",
       "response_sample": [
         {
-          "id": "b6a5e3d1-64a0-44cf-ac68-6c1efbc25a52",
-          "title": "Grupul indian Coforge achizi\u0163ioneaz\u0103 compania american\u0103 Encora pentru 2,35 miliarde de dolari. Encora cump\u0103rase din Rom\u00e2nia \u00een 2023 compania Softelligence",
-          "description": "Furnizorul indian de servicii IT Coforge a anun\u0163at vineri achizi\u0163ia companiei americane Encora, specializat\u0103 \u00een solu\u0163ii de inteligen\u0163\u0103 artificial\u0103, la o valoare de 2,35 miliarde de dolari. Tranzac\u0163ia include \u015fi opera\u0163iunile din Rom\u00e2nia ale fostei companii Softelligence, preluat\u0103 de Encora \u00een mai 2023.",
-          "content": "Furnizorul indian de servicii IT Coforge a anun\u0163at vineri achizi\u0163ia companiei americane Encora, specializat\u0103 \u00een solu\u0163ii de inteligen\u0163\u0103 artificial\u0103, la o valoare de 2,35 miliarde de dolari. Tranzac\u0163ia include \u015fi opera\u0163iunile din Rom\u00e2nia ale fostei companii Softelligence, preluat\u0103 de Encora \u00een mai 2023.",
-          "url": "https://www.zf.ro/business-hi-tech/grupul-indian-coforge-achizitioneaza-compania-americana-encora-22994014",
-          "image_url": "https://storage0.dms.mpinteractiv.ro/media/1/1481/21332/22994014/1/coforge.png?width=700",
+          "id": "4d18f86a-15bd-4310-a722-de49453b1233",
+          "title": "Cum au preluat vechii nomenclaturi\u0219ti puterea \u00een decembrie 1989. Lavinia Betea, despre rolul jucat de Ion Iliescu",
+          "description": "Mai multe grup\u0103ri comuniste au ac\u021bionat \u00eenainte de 1989, dar f\u0103r\u0103 o ac\u021biune direct\u0103 \u00cenainte de 22 decembrie 1989, \u00een anii \u201980 au existat mai multe grup\u0103ri disidente \u00een interiorul sistemului comunist. Lavinia Betea a amintit de fac\u021biunea Iliescu-M\u0103gureanu, de gruparea condus\u0103 de generalul Ioni\u021b\u0103, fost \u0219ef al Armatei, de grupul generalului Nicolae Militaru, despre [\u2026]",
+          "content": "Mai multe grup\u0103ri comuniste au ac\u021bionat \u00eenainte de 1989, dar f\u0103r\u0103 o ac\u021biune direct\u0103 \u00cenainte de 22 decembrie 1989, \u00een anii \u201980 au existat mai multe grup\u0103ri disidente \u00een interiorul sistemului comunist. Lavinia Betea a amintit de fac\u021biunea Iliescu-M\u0103gureanu, de gruparea condus\u0103 de generalul Ioni\u021b\u0103, fost \u0219ef al Armatei, de grupul generalului Nicolae Militaru, despre [\u2026]",
+          "url": "https://www.capital.ro/cum-au-preluat-vechii-nomenclaturisti-puterea-in-decembrie-1989-lavinia-betea-despre-rolul-jucat-de-ion-iliescu.html",
+          "image_url": null,
           "source": {
-            "name": "Ziarul Financiar",
-            "url": "https://www.zf.ro/business-hi-tech/grupul-indian-coforge-achizitioneaza-compania-americana-encora-22994014",
+            "name": "Capital.ro",
+            "url": "https://www.capital.ro/cum-au-preluat-vechii-nomenclaturisti-puterea-in-decembrie-1989-lavinia-betea-despre-rolul-jucat-de-ion-iliescu.html",
             "category": "business"
           },
-          "author": "Ziarul Financiar",
-          "published_at": "2025-12-27T22:58:00",
+          "author": "Iulian Luca",
+          "published_at": "2025-12-28T19:12:22",
           "language": "ro",
           "is_rewritten": false,
           "is_translated": false,
@@ -295,7 +295,7 @@
       "test_name": "Currency Rates (BNR)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.165215",
+      "timestamp": "2025-12-28T19:31:52.714951",
       "response_sample": {
         "sample_rates": [
           "AED",
@@ -310,7 +310,7 @@
       "test_name": "Market Overview (Combined)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.215786",
+      "timestamp": "2025-12-28T19:31:52.888545",
       "response_sample": {
         "bvb_count": 20,
         "global_count": 6
@@ -320,7 +320,7 @@
       "test_name": "Education Packages",
       "success": true,
       "details": "Found 2 packages",
-      "timestamp": "2025-12-27T23:32:30.257760",
+      "timestamp": "2025-12-28T19:31:52.941825",
       "response_sample": {
         "packages": [
           {
@@ -370,18 +370,18 @@
       "test_name": "AI Advisor - Tip of the Day",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.303078",
+      "timestamp": "2025-12-28T19:31:53.167954",
       "response_sample": {
-        "tip": "Rebalanseaz\u0103-\u021bi portofoliul o dat\u0103 pe an pentru a men\u021bine alocarea \u021bint\u0103 \u0219i a reduce riscul.",
-        "category": "Management portofoliu",
-        "date": "2025-12-27"
+        "tip": "Nu \u00eencerca s\u0103 'prinzi' minimul sau maximul pie\u021bei. Chiar \u0219i profesioni\u0219tii e\u0219ueaz\u0103 la timing. DCA este prietenul t\u0103u.",
+        "category": "Strategie",
+        "date": "2025-12-28"
       }
     },
     {
       "test_name": "Financial Education - All Lessons (15 total)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.356236",
+      "timestamp": "2025-12-28T19:31:53.226904",
       "response_sample": {
         "total": 15,
         "modules": 3,
@@ -396,7 +396,7 @@
       "test_name": "Financial Education - Lesson 1 Detail",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.397701",
+      "timestamp": "2025-12-28T19:31:53.388574",
       "response_sample": {
         "title": "Ce Este Educa\u021bia Financiar\u0103 \u0219i De Ce Conteaz\u0103",
         "module": 1,
@@ -408,7 +408,7 @@
       "test_name": "Financial Education - Quiz Submit (Correct)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.461154",
+      "timestamp": "2025-12-28T19:31:53.461746",
       "response_sample": {
         "score": 100.0,
         "passed": true,
@@ -420,7 +420,7 @@
       "test_name": "Financial Education - Progress Tracking",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.508039",
+      "timestamp": "2025-12-28T19:31:53.675275",
       "response_sample": {
         "completed": 1,
         "total": 15,
@@ -431,7 +431,7 @@
       "test_name": "Financial Education - Quiz Submit (Wrong)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:30.559157",
+      "timestamp": "2025-12-28T19:31:53.892090",
       "response_sample": {
         "score": 0.0,
         "passed": false
@@ -441,16 +441,16 @@
       "test_name": "Global Markets - Overview (Main Endpoint)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:32.661428",
+      "timestamp": "2025-12-28T19:31:57.221725",
       "response_sample": {
         "indices_count": 10,
         "commodities_count": 6,
         "crypto_count": 5,
         "forex_count": 4,
         "sentiment": {
-          "gainers": 14,
-          "losers": 10,
-          "avg_change": 0.66,
+          "gainers": 9,
+          "losers": 15,
+          "avg_change": 0.05,
           "status": "bullish"
         }
       }
@@ -459,7 +459,7 @@
       "test_name": "Global Markets - Indices",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:32.957560",
+      "timestamp": "2025-12-28T19:31:57.878145",
       "response_sample": {
         "count": 10,
         "sample_indices": [
@@ -473,7 +473,7 @@
       "test_name": "Global Markets - Commodities",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:33.143534",
+      "timestamp": "2025-12-28T19:31:58.377934",
       "response_sample": {
         "count": 6,
         "sample_commodities": [
@@ -487,7 +487,7 @@
       "test_name": "Global Markets - Cryptocurrency",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:33.318957",
+      "timestamp": "2025-12-28T19:31:58.887880",
       "response_sample": {
         "count": 5,
         "sample_crypto": [
@@ -501,7 +501,7 @@
       "test_name": "Global Markets - Forex",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:33.475070",
+      "timestamp": "2025-12-28T19:31:59.363685",
       "response_sample": {
         "count": 4,
         "sample_forex": [
@@ -515,7 +515,7 @@
       "test_name": "Global Markets - Chart Data (S&P 500)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:33.600413",
+      "timestamp": "2025-12-28T19:31:59.636642",
       "response_sample": {
         "symbol": "^GSPC",
         "data_points": 20,
@@ -526,12 +526,63 @@
       "test_name": "Global Markets - Chart Data (Bitcoin)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-27T23:32:33.774148",
+      "timestamp": "2025-12-28T19:31:59.897715",
       "response_sample": {
         "symbol": "BTC-USD",
         "data_points": 31,
-        "current_price": 87600.61
+        "current_price": 87444.39
       }
+    },
+    {
+      "test_name": "Push Notifications - VAPID Public Key",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-28T19:32:00.124477",
+      "response_sample": {
+        "publicKey": "BGvVP9Pb2PrUIt5zIexi..."
+      }
+    },
+    {
+      "test_name": "Push Notifications - Status (Auth Required)",
+      "success": false,
+      "details": "Expected 200, got 520",
+      "timestamp": "2025-12-28T19:32:00.431389",
+      "response_sample": "{\"detail\":\"'id'\"}"
+    },
+    {
+      "test_name": "Push Notifications - Subscribe (Auth Required)",
+      "success": false,
+      "details": "Expected 200, got 520",
+      "timestamp": "2025-12-28T19:32:00.616912",
+      "response_sample": "{\"detail\":\"'id'\"}"
+    },
+    {
+      "test_name": "Push Notifications - Unsubscribe (Auth Required)",
+      "success": false,
+      "details": "Expected 200, got 520",
+      "timestamp": "2025-12-28T19:32:00.693047",
+      "response_sample": "{\"detail\":\"'id'\"}"
+    },
+    {
+      "test_name": "Push Notifications - Test Send (Auth Required)",
+      "success": false,
+      "details": "Expected 200, got 520",
+      "timestamp": "2025-12-28T19:32:00.975651",
+      "response_sample": "{\"detail\":\"'id'\"}"
+    },
+    {
+      "test_name": "Push Notifications - Status Without Auth (401)",
+      "success": false,
+      "details": "Expected 401, got 520",
+      "timestamp": "2025-12-28T19:32:01.151769",
+      "response_sample": "{\"detail\":\"'NoneType' object is not subscriptable\"}"
+    },
+    {
+      "test_name": "Push Notifications - Subscribe Without Auth (401)",
+      "success": false,
+      "details": "Expected 401, got 520",
+      "timestamp": "2025-12-28T19:32:01.219681",
+      "response_sample": "{\"detail\":\"'NoneType' object is not subscriptable\"}"
     }
   ]
 }
