@@ -1312,6 +1312,98 @@ class FinRomaniaAPITester:
                       "current_price": data.get('current_price')} if isinstance(data, dict) else data)
 
         # ============================================
+        # PUSH NOTIFICATIONS TESTING (NEW FEATURE)
+        # ============================================
+        print("\n🔔 SECTION 10: Push Notifications API (NEW)")
+        print("-" * 80)
+        
+        # Test 32: VAPID Public Key (no auth required)
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/push/vapid-key',
+            validate_response=self.validate_vapid_key
+        )
+        self.log_test("Push Notifications - VAPID Public Key", success, details,
+                     {"publicKey": data.get('publicKey', '')[:20] + "..." if isinstance(data, dict) else None})
+        
+        # Test 33: Push Status (requires auth)
+        if self.regular_user_token:
+            success, details, data = self.test_api_endpoint(
+                'GET', '/api/push/status',
+                auth_token=self.regular_user_token,
+                validate_response=self.validate_push_status
+            )
+            self.log_test("Push Notifications - Status (Auth Required)", success, details,
+                         {"subscribed": data.get('subscribed'), "count": data.get('subscription_count')} if isinstance(data, dict) else data)
+        else:
+            self.log_test("Push Notifications - Status", False, "Skipped - no user token")
+        
+        # Test 34: Push Subscribe (requires auth)
+        if self.regular_user_token:
+            test_subscription = {
+                "endpoint": "https://fcm.googleapis.com/fcm/send/test-endpoint-123",
+                "keys": {
+                    "p256dh": "test-p256dh-key",
+                    "auth": "test-auth-key"
+                }
+            }
+            success, details, data = self.test_api_endpoint(
+                'POST', '/api/push/subscribe',
+                auth_token=self.regular_user_token,
+                data=test_subscription,
+                validate_response=self.validate_push_subscription_response
+            )
+            self.log_test("Push Notifications - Subscribe (Auth Required)", success, details,
+                         {"success": data.get('success'), "message": data.get('message')} if isinstance(data, dict) else data)
+        else:
+            self.log_test("Push Notifications - Subscribe", False, "Skipped - no user token")
+        
+        # Test 35: Push Unsubscribe (requires auth)
+        if self.regular_user_token:
+            test_unsubscription = {
+                "endpoint": "https://fcm.googleapis.com/fcm/send/test-endpoint-123",
+                "keys": {}
+            }
+            success, details, data = self.test_api_endpoint(
+                'DELETE', '/api/push/unsubscribe',
+                auth_token=self.regular_user_token,
+                data=test_unsubscription,
+                validate_response=self.validate_push_subscription_response
+            )
+            self.log_test("Push Notifications - Unsubscribe (Auth Required)", success, details,
+                         {"success": data.get('success'), "message": data.get('message')} if isinstance(data, dict) else data)
+        else:
+            self.log_test("Push Notifications - Unsubscribe", False, "Skipped - no user token")
+        
+        # Test 36: Push Test Notification (requires auth)
+        if self.regular_user_token:
+            success, details, data = self.test_api_endpoint(
+                'POST', '/api/push/test',
+                auth_token=self.regular_user_token,
+                validate_response=self.validate_push_test_response
+            )
+            # Note: This test may fail if no real subscriptions exist, which is expected
+            self.log_test("Push Notifications - Test Send (Auth Required)", success, details,
+                         {"success": data.get('success'), "message": data.get('message')} if isinstance(data, dict) else data)
+        else:
+            self.log_test("Push Notifications - Test Send", False, "Skipped - no user token")
+        
+        # Test 37: Push endpoints without auth (should return 401)
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/push/status',
+            expected_status=401
+        )
+        self.log_test("Push Notifications - Status Without Auth (401)", success, 
+                     "Correctly returns 401 when no authentication provided" if success else details, data)
+        
+        success, details, data = self.test_api_endpoint(
+            'POST', '/api/push/subscribe',
+            data={"endpoint": "test", "keys": {}},
+            expected_status=401
+        )
+        self.log_test("Push Notifications - Subscribe Without Auth (401)", success,
+                     "Correctly returns 401 when no authentication provided" if success else details, data)
+
+        # ============================================
         # FINAL SUMMARY
         # ============================================
         print("\n" + "=" * 80)
