@@ -1137,17 +1137,11 @@ class FinRomaniaAPITester:
         print("\n📋 SECTION 2: Basic Health Checks")
         print("-" * 80)
         
-        # ============================================
-        # BASIC HEALTH CHECKS
-        # ============================================
-        print("\n📋 SECTION 2: Basic Health Checks")
-        print("-" * 80)
-        
-        # Test 4: Health Check
+        # Test 9: Health Check
         success, details, data = self.test_api_endpoint('GET', '/api/health')
         self.log_test("Health Check", success, details, data)
         
-        # Test 5: API Root
+        # Test 10: API Root
         success, details, data = self.test_api_endpoint('GET', '/api/')
         self.log_test("API Root Endpoint", success, details, data)
         
