@@ -67,10 +67,10 @@ async def subscribe_to_push(
         
         # Store subscription
         await db.push_subscriptions.update_one(
-            {"user_id": current_user["id"], "endpoint": subscription.endpoint},
+            {"user_id": current_user["user_id"], "endpoint": subscription.endpoint},
             {
                 "$set": {
-                    "user_id": current_user["id"],
+                    "user_id": current_user["user_id"],
                     "endpoint": subscription.endpoint,
                     "keys": subscription.keys,
                     "created_at": datetime.now(timezone.utc).isoformat(),
@@ -80,7 +80,7 @@ async def subscribe_to_push(
             upsert=True
         )
         
-        logger.info(f"Push subscription added for user {current_user['id']}")
+        logger.info(f"Push subscription added for user {current_user['user_id']}")
         
         return {
             "success": True,
