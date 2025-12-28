@@ -130,7 +130,7 @@ async def get_push_status(current_user: dict = Depends(get_current_user)):
         db = await get_database()
         
         count = await db.push_subscriptions.count_documents({
-            "user_id": current_user["id"],
+            "user_id": current_user["user_id"],
             "active": True
         })
         
