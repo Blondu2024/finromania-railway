@@ -6,7 +6,11 @@ import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './components/ui/dropdown-menu';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Skeleton } from './components/ui/skeleton';
+import { initializePushNotifications } from './utils/pushNotifications';
 import './App.css';
+
+// Initialize Service Worker for Push Notifications
+initializePushNotifications();
 
 // ============================================
 // LAZY LOADED PAGES - Code Splitting
