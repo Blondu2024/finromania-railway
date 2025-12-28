@@ -158,7 +158,7 @@ async def send_test_notification(current_user: dict = Depends(get_current_user))
         
         # Get user's subscriptions
         subscriptions = await db.push_subscriptions.find({
-            "user_id": current_user["id"],
+            "user_id": current_user["user_id"],
             "active": True
         }).to_list(10)
         
