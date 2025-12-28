@@ -563,7 +563,11 @@ export default function GlobalMarketsPage() {
     setShowReminder(false);
     setSelectedAsset(null); // Clear selected asset so modal doesn't open
     setCompanionOpen(true);
-  }, []);
+    // Mark as shown when user opens companion
+    if (user) {
+      markReminderShown();
+    }
+  }, [user]);
 
   const handleCloseModal = useCallback(() => {
     setSelectedAsset(null);
