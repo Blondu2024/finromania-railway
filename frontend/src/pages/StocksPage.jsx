@@ -860,6 +860,15 @@ export default function StocksPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Trading Companion - Verifică Înainte */}
+      <TradingCompanion 
+        stockSymbol="BVB"
+        stockName="Bursa de Valori București"
+        currentPrice={null}
+        changePercent={marketStats.avgChange}
+        stockType="bvb"
+      />
     </>
   );
 }
