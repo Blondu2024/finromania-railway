@@ -389,14 +389,14 @@ function Footer() {
 // MAIN APP COMPONENT
 // ============================================
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('darkMode');
-    if (saved) {
-      setDarkMode(JSON.parse(saved));
+  // Initialize dark mode from localStorage synchronously
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('darkMode');
+      return saved ? JSON.parse(saved) : false;
     }
-  }, []);
+    return false;
+  });
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
