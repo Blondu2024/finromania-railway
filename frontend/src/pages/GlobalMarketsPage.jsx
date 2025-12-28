@@ -557,7 +557,7 @@ export default function GlobalMarketsPage() {
     if (user) {
       markReminderShown();
     }
-  }, []);
+  }, [user]);
 
   const handleOpenCompanion = useCallback(() => {
     setShowReminder(false);
