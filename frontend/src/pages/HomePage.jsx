@@ -568,7 +568,7 @@ export default function HomePage() {
               </div>
             </CardContent>
           </Card>
-        </motion.section>
+        </section>
       </div>
     </>
   );
