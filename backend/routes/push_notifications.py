@@ -95,7 +95,7 @@ async def subscribe_to_push(
 @router.delete("/unsubscribe")
 async def unsubscribe_from_push(
     subscription: PushSubscription,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_auth)
 ):
     """Unsubscribe user from push notifications"""
     try:
