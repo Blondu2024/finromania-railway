@@ -479,15 +479,10 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-        </motion.section>
+        </section>
 
         {/* Educational Benefits - MOVED HERE */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-12"
-        >
+        <section className="mt-12">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">
             🎓 Învață Să Investești Inteligent
           </h2>
