@@ -305,7 +305,7 @@ async def send_notification_to_all(notification: dict, user_filter: dict = None)
                     vapid_claims={"sub": f"mailto:{VAPID_EMAIL}"}
                 )
                 sent += 1
-            except Exception as e:
+            except Exception:
                 failed += 1
         
         logger.info(f"Broadcast notification: {sent} sent, {failed} failed")
