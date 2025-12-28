@@ -124,7 +124,7 @@ async def unsubscribe_from_push(
 
 
 @router.get("/status")
-async def get_push_status(current_user: dict = Depends(get_current_user)):
+async def get_push_status(current_user: dict = Depends(require_auth)):
     """Check if user has active push subscriptions"""
     try:
         db = await get_database()
