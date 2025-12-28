@@ -1193,14 +1193,14 @@ class FinRomaniaAPITester:
         # ============================================
         # SESSION 6 PRIORITY 3: ADMIN DASHBOARD
         # ============================================
-        print("\n👑 SECTION 4: Admin Dashboard (NEW)")
+        print("\n👑 SECTION 5: Admin Dashboard (NEW)")
         print("-" * 80)
         
-        # Test 7: Admin Login
+        # Test 15: Admin Login
         admin_login_success = self.test_admin_login()
         
         if admin_login_success and self.admin_token:
-            # Test 8: Admin Stats
+            # Test 16: Admin Stats
             success, details, data = self.test_api_endpoint(
                 'GET', '/api/admin/stats',
                 auth_token=self.admin_token,
@@ -1208,7 +1208,7 @@ class FinRomaniaAPITester:
             )
             self.log_test("Admin Stats Endpoint", success, details, data)
             
-            # Test 9: Admin Users List
+            # Test 17: Admin Users List
             success, details, data = self.test_api_endpoint(
                 'GET', '/api/admin/users?limit=5',
                 auth_token=self.admin_token,
@@ -1217,7 +1217,7 @@ class FinRomaniaAPITester:
             self.log_test("Admin Users List (limit=5)", success, details,
                          {"users_count": len(data.get('users', [])), "total": data.get('total')} if isinstance(data, dict) else data)
             
-            # Test 10: Admin Analytics
+            # Test 18: Admin Analytics
             success, details, data = self.test_api_endpoint(
                 'GET', '/api/admin/analytics/visits?days=7',
                 auth_token=self.admin_token,
@@ -1230,11 +1230,10 @@ class FinRomaniaAPITester:
             self.log_test("Admin Users List", False, "Skipped - admin login failed")
             self.log_test("Admin Analytics", False, "Skipped - admin login failed")
         
-        # Test 11: Admin endpoint with non-admin user (should fail with 403)
+        # Test 19: Admin endpoint with non-admin user (should fail with 403)
         print("\n🔒 Testing Admin Access Control...")
-        regular_user_created = self.test_regular_user_creation()
         
-        if regular_user_created and self.regular_user_token:
+        if self.regular_user_token:
             success, details, data = self.test_api_endpoint(
                 'GET', '/api/admin/stats',
                 auth_token=self.regular_user_token,
