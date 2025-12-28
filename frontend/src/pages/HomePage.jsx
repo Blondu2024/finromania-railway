@@ -390,12 +390,7 @@ export default function HomePage() {
         </div>
 
         {/* Top Movers Section - WITH VERTICAL SCROLL! */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-12"
-        >
+        <section className="mt-12">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">
             📊 Mișcările Pieței Astăzi
           </h2>
