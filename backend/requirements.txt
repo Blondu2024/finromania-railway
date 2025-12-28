@@ -28,3 +28,4 @@ yfinance
 apscheduler
 feedparser
 beautifulsoup4
+pywebpush==2.1.2
