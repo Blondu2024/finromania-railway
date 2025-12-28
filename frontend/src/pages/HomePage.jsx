@@ -296,16 +296,11 @@ export default function HomePage() {
               </Link>
             </div>
             
-            <motion.div 
-              className="space-y-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
+            <div className="space-y-4">
               {news.slice(0, 12).map(article => (
                 <NewsCard key={article.id} article={article} />
               ))}
-            </motion.div>
+            </div>
           </div>
 
           {/* Sidebar - Right */}
