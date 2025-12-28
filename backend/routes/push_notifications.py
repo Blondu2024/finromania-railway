@@ -59,7 +59,7 @@ async def get_vapid_public_key():
 @router.post("/subscribe")
 async def subscribe_to_push(
     subscription: PushSubscription,
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_auth)
 ):
     """Subscribe user to push notifications"""
     try:
