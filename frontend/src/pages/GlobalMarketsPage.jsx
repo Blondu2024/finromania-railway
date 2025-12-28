@@ -545,9 +545,7 @@ export default function GlobalMarketsPage() {
     if (shouldShowReminder(!!user)) {
       setSelectedAsset(asset);
       setShowReminder(true);
-      if (user) {
-        markReminderShown(); // Mark as shown for today (logged users)
-      }
+      // Don't mark as shown here - wait for user to actually close it
     } else {
       setSelectedAsset(asset);
     }
@@ -555,7 +553,10 @@ export default function GlobalMarketsPage() {
 
   const handleCloseReminder = useCallback(() => {
     setShowReminder(false);
-    // Don't open asset modal when closing reminder via "Am înțeles"
+    // Mark as shown when user actually closes the reminder
+    if (user) {
+      markReminderShown();
+    }
   }, []);
 
   const handleOpenCompanion = useCallback(() => {
