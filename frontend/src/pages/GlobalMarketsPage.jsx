@@ -510,6 +510,9 @@ export default function GlobalMarketsPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [showReminder, setShowReminder] = useState(false);
+  const [companionOpen, setCompanionOpen] = useState(false);
+  const { user } = useAuth();
 
   const fetchData = async () => {
     try {
@@ -538,7 +541,24 @@ export default function GlobalMarketsPage() {
   };
 
   const handleAssetClick = useCallback((asset) => {
-    setSelectedAsset(asset);
+    // Check if we should show reminder
+    if (shouldShowReminder(!!user)) {
+      setSelectedAsset(asset);
+      setShowReminder(true);
+      if (user) {
+        markReminderShown(); // Mark as shown for today (logged users)
+      }
+    } else {
+      setSelectedAsset(asset);
+    }
+  }, [user]);
+
+  const handleCloseReminder = useCallback(() => {
+    setShowReminder(false);
+  }, []);
+
+  const handleOpenCompanion = useCallback(() => {
+    setCompanionOpen(true);
   }, []);
 
   const handleCloseModal = useCallback(() => {
@@ -574,8 +594,15 @@ export default function GlobalMarketsPage() {
         keywords="indici globali, S&P 500, NASDAQ, DAX, bitcoin, petrol, aur, forex"
       />
 
+      {/* Trading Reminder Modal */}
+      <TradingReminder 
+        isOpen={showReminder}
+        onClose={handleCloseReminder}
+        onOpenCompanion={handleOpenCompanion}
+      />
+
       {/* Asset Detail Modal */}
-      {selectedAsset && (
+      {selectedAsset && !showReminder && (
         <AssetDetailModal asset={selectedAsset} onClose={handleCloseModal} />
       )}
 
