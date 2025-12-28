@@ -102,14 +102,14 @@ async def unsubscribe_from_push(
         db = await get_database()
         
         result = await db.push_subscriptions.delete_one({
-            "user_id": current_user["id"],
+            "user_id": current_user["user_id"],
             "endpoint": subscription.endpoint
         })
         
         if result.deleted_count == 0:
             # Try to mark as inactive instead
             await db.push_subscriptions.update_one(
-                {"user_id": current_user["id"], "endpoint": subscription.endpoint},
+                {"user_id": current_user["user_id"], "endpoint": subscription.endpoint},
                 {"$set": {"active": False}}
             )
         
