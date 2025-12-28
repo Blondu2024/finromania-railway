@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, BarChart3, Globe, BookOpen, Calculator, Search, PieChart } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, BarChart3, Globe, BookOpen, Calculator, Search, PieChart, Target, Award } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -8,7 +8,6 @@ import { Skeleton } from '../components/ui/skeleton';
 import NewsletterSignup from '../components/NewsletterSignup';
 import VerticalScroller from '../components/VerticalScroller';
 import SEO from '../components/SEO';
-import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
