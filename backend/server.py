@@ -503,6 +503,7 @@ app.include_router(smart_analysis_router)
 app.include_router(dividend_calendar_router)
 app.include_router(stock_screener_router)
 app.include_router(global_markets_router)
+app.include_router(push_notifications_router)
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest
