@@ -16,6 +16,8 @@ import {
   CartesianGrid, ReferenceLine
 } from 'recharts';
 import SEO from '../components/SEO';
+import TradingCompanion, { TradingReminder, shouldShowReminder, markReminderShown } from '../components/TradingCompanion';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
