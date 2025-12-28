@@ -321,6 +321,24 @@ export default function StockDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Trading Reminder Modal */}
+      <TradingReminder 
+        isOpen={showReminder}
+        onClose={handleCloseReminder}
+        onOpenCompanion={handleOpenCompanion}
+      />
+
+      {/* Trading Companion */}
+      <TradingCompanion 
+        stockSymbol={symbol}
+        stockName={data?.name || symbol}
+        currentPrice={data?.price}
+        changePercent={data?.change_percent}
+        stockType={type}
+        forceOpen={companionOpen}
+        onOpenChange={setCompanionOpen}
+      />
     </div>
   );
 }
