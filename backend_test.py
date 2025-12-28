@@ -1043,19 +1043,93 @@ class FinRomaniaAPITester:
         print("=" * 80)
         
         # ============================================
-        # AUTHENTICATION FLOW TESTING (PRIMARY FOCUS)
+        # AI TRADING COMPANION TESTING (PRIMARY FOCUS)
         # ============================================
-        print("\n🔐 SECTION 1: Authentication Flow Testing")
+        print("\n🤖 SECTION 1: AI Trading Companion Testing")
         print("-" * 80)
         
-        # Test 1: /api/auth/session endpoint
-        self.test_auth_session_endpoint()
+        # Test 1: Companion Tips - TLV with negative change
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/companion/tips/TLV?stock_type=bvb&change_percent=-5',
+            validate_response=self.validate_companion_tips
+        )
+        self.log_test("Companion Tips - TLV (-5%)", success, details, data)
         
-        # Test 2: /api/auth/me endpoint with Bearer token
-        self.test_auth_me_endpoint()
+        # Test 2: Companion Tips - TLV with positive change
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/companion/tips/TLV?stock_type=bvb&change_percent=5',
+            validate_response=self.validate_companion_tips
+        )
+        self.log_test("Companion Tips - TLV (+5%)", success, details, data)
         
-        # Test 3: /api/auth/me endpoint without token
-        self.test_auth_me_without_token()
+        # Test 3: Companion Tips - TLV with neutral change
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/companion/tips/TLV?stock_type=bvb&change_percent=0',
+            validate_response=self.validate_companion_tips
+        )
+        self.log_test("Companion Tips - TLV (0%)", success, details, data)
+        
+        # Test 4: Companion Tips - Large negative change
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/companion/tips/TLV?stock_type=bvb&change_percent=-10',
+            validate_response=self.validate_companion_tips
+        )
+        self.log_test("Companion Tips - TLV (-10%)", success, details, data)
+        
+        # Test 5: Companion Ask - Without authentication
+        ask_request = {
+            "symbol": "TLV",
+            "stock_name": "Banca Transilvania",
+            "current_price": 30.5,
+            "change_percent": -3.2,
+            "user_question": "E un moment bun să cumpăr?",
+            "stock_type": "bvb"
+        }
+        success, details, data = self.test_api_endpoint(
+            'POST', '/api/companion/ask',
+            data=ask_request,
+            validate_response=self.validate_companion_ask
+        )
+        self.log_test("Companion Ask - No Auth", success, details, 
+                     {"response_length": len(data.get('response', '')) if isinstance(data, dict) else 0,
+                      "has_disclaimer": bool(data.get('disclaimer')) if isinstance(data, dict) else False})
+        
+        # Test 6: Create test user for authenticated companion testing
+        regular_user_created = self.test_regular_user_creation()
+        
+        # Test 7: Companion Ask - With authentication
+        if regular_user_created and self.regular_user_token:
+            success, details, data = self.test_api_endpoint(
+                'POST', '/api/companion/ask',
+                auth_token=self.regular_user_token,
+                data=ask_request,
+                validate_response=self.validate_companion_ask
+            )
+            self.log_test("Companion Ask - With Auth", success, details,
+                         {"response_length": len(data.get('response', '')) if isinstance(data, dict) else 0,
+                          "has_disclaimer": bool(data.get('disclaimer')) if isinstance(data, dict) else False})
+        else:
+            self.log_test("Companion Ask - With Auth", False, "Skipped - user creation failed")
+        
+        # Test 8: Companion Ask - Different user levels
+        if regular_user_created and self.regular_user_token:
+            # Test with different user levels
+            for level in ["incepator", "intermediar", "expert"]:
+                ask_request_level = ask_request.copy()
+                ask_request_level["user_level"] = level
+                ask_request_level["user_question"] = f"Sunt {level}. Ce părere ai despre TLV?"
+                
+                success, details, data = self.test_api_endpoint(
+                    'POST', '/api/companion/ask',
+                    auth_token=self.regular_user_token,
+                    data=ask_request_level,
+                    validate_response=self.validate_companion_ask
+                )
+                self.log_test(f"Companion Ask - Level {level}", success, details,
+                             {"user_level": level, "response_length": len(data.get('response', '')) if isinstance(data, dict) else 0})
+        else:
+            for level in ["incepator", "intermediar", "expert"]:
+                self.log_test(f"Companion Ask - Level {level}", False, "Skipped - user creation failed")
         
         # ============================================
         # BASIC HEALTH CHECKS
