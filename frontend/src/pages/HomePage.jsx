@@ -538,15 +538,10 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-        </motion.section>
+        </section>
 
         {/* Final CTA - Compact */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-12"
-        >
+        <section className="mt-12">
           <Card className="bg-gradient-to-br from-green-600 to-blue-600 text-white border-0 max-w-4xl mx-auto">
             <CardContent className="p-8 text-center space-y-4">
               <div className="inline-block p-3 bg-white/20 rounded-full">
