@@ -59,7 +59,7 @@ export const TradingReminder = ({ isOpen, onClose, onOpenCompanion }) => {
             </div>
 
             <p className="text-sm text-muted-foreground">
-              💡 Poți discuta cu <strong>"Verifică Înainte"</strong> - asistentul AI care te ajută să gândești clar.
+              💡 Poți discuta cu <strong>&quot;Verifică Înainte&quot;</strong> - asistentul AI care te ajută să gândești clar.
             </p>
           </div>
 
