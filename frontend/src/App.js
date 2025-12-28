@@ -1,48 +1,91 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Newspaper, BarChart3, DollarSign, Menu, Moon, Sun, User, LogOut, Star, Briefcase, Shield, BookOpen, Bot, ClipboardCheck, Calendar, Filter, Bell } from 'lucide-react';
+import { BarChart3, Menu, Moon, Sun, User, LogOut, Star, Briefcase, Shield } from 'lucide-react';
 import { Button } from './components/ui/button';
-import { Badge } from './components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from './components/ui/dropdown-menu';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import HomePage from './pages/HomePage';
-import StocksPage from './pages/StocksPage';
-import NewsPage from './pages/NewsPage';
-import CurrenciesPage from './pages/CurrenciesPage';
-import StockDetailPage from './pages/StockDetailPage';
-import ArticleDetailPage from './pages/ArticleDetailPage';
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
-import TermsOfServicePage from './pages/TermsOfServicePage';
-import CookiePolicyPage from './pages/CookiePolicyPage';
-import DisclaimerPage from './pages/DisclaimerPage';
-import ContactPage from './pages/ContactPage';
-import LoginPage from './pages/LoginPage';
-import AuthCallback from './pages/AuthCallback';
-import WatchlistPage from './pages/WatchlistPage';
-import PortfolioPage from './pages/PortfolioPage';
-import AdminDashboard from './pages/AdminDashboard';
-import EducationPage from './pages/EducationPage';
-import LessonPage from './pages/LessonPage';
-import RiskAssessmentPage from './pages/RiskAssessmentPage';
-import AIAdvisorPage from './pages/AIAdvisorPage';
-import CurrencyConverterPage from './pages/CurrencyConverterPage';
-import GlossaryPage from './pages/GlossaryPage';
-import LearnTradingPage from './pages/LearnTradingPage';
-import TradingSchoolPage from './pages/TradingSchoolPage';
-import FinancialEducationPage from './pages/FinancialEducationPage';
-import FinLessonPage from './pages/FinLessonPage';
-import FAQPage from './pages/FAQPage';
-import AboutPage from './pages/AboutPage';
-import DividendCalendarPage from './pages/DividendCalendarPage';
-import StockScreenerPage from './pages/StockScreenerPage';
-import NotificationSettingsPage from './pages/NotificationSettingsPage';
-import GlobalMarketsPage from './pages/GlobalMarketsPage';
-import TickerBar from './components/TickerBar';
-import SearchBar from './components/SearchBar';
-import NewsletterSignup from './components/NewsletterSignup';
+import { Skeleton } from './components/ui/skeleton';
 import './App.css';
 
+// ============================================
+// LAZY LOADED PAGES - Code Splitting
+// ============================================
+
+// Core pages (most visited)
+const HomePage = lazy(() => import('./pages/HomePage'));
+const StocksPage = lazy(() => import('./pages/StocksPage'));
+const NewsPage = lazy(() => import('./pages/NewsPage'));
+const GlobalMarketsPage = lazy(() => import('./pages/GlobalMarketsPage'));
+
+// Education pages
+const TradingSchoolPage = lazy(() => import('./pages/TradingSchoolPage'));
+const FinancialEducationPage = lazy(() => import('./pages/FinancialEducationPage'));
+const LessonPage = lazy(() => import('./pages/LessonPage'));
+const FinLessonPage = lazy(() => import('./pages/FinLessonPage'));
+const EducationPage = lazy(() => import('./pages/EducationPage'));
+
+// Tools pages
+const CurrencyConverterPage = lazy(() => import('./pages/CurrencyConverterPage'));
+const DividendCalendarPage = lazy(() => import('./pages/DividendCalendarPage'));
+const StockScreenerPage = lazy(() => import('./pages/StockScreenerPage'));
+const GlossaryPage = lazy(() => import('./pages/GlossaryPage'));
+
+// Detail pages
+const StockDetailPage = lazy(() => import('./pages/StockDetailPage'));
+const ArticleDetailPage = lazy(() => import('./pages/ArticleDetailPage'));
+
+// User pages
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const AuthCallback = lazy(() => import('./pages/AuthCallback'));
+const WatchlistPage = lazy(() => import('./pages/WatchlistPage'));
+const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
+const NotificationSettingsPage = lazy(() => import('./pages/NotificationSettingsPage'));
+
+// Other pages
+const CurrenciesPage = lazy(() => import('./pages/CurrenciesPage'));
+const AIAdvisorPage = lazy(() => import('./pages/AIAdvisorPage'));
+const RiskAssessmentPage = lazy(() => import('./pages/RiskAssessmentPage'));
+const LearnTradingPage = lazy(() => import('./pages/LearnTradingPage'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+
+// Legal pages (rarely visited)
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
+const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
+const CookiePolicyPage = lazy(() => import('./pages/CookiePolicyPage'));
+const DisclaimerPage = lazy(() => import('./pages/DisclaimerPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+
+// Lazy load heavy components
+const TickerBar = lazy(() => import('./components/TickerBar'));
+const SearchBar = lazy(() => import('./components/SearchBar'));
+const NewsletterSignup = lazy(() => import('./components/NewsletterSignup'));
+
+// ============================================
+// LOADING FALLBACK - Minimal & Fast
+// ============================================
+const PageLoader = () => (
+  <div className="min-h-[60vh] flex items-center justify-center">
+    <div className="text-center space-y-4">
+      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+      <p className="text-muted-foreground text-sm">Se încarcă...</p>
+    </div>
+  </div>
+);
+
+const TickerLoader = () => (
+  <div className="h-10 bg-slate-100 dark:bg-slate-800 animate-pulse" />
+);
+
+const SearchLoader = () => (
+  <Skeleton className="h-9 w-48" />
+);
+
+// ============================================
+// USER MENU COMPONENT
+// ============================================
 function UserMenu() {
   const { user, logout, login } = useAuth();
   const navigate = useNavigate();
@@ -61,7 +104,7 @@ function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="flex items-center gap-2">
           {user.picture ? (
-            <img src={user.picture} alt="" className="w-8 h-8 rounded-full" />
+            <img src={user.picture} alt="" className="w-8 h-8 rounded-full" loading="lazy" />
           ) : (
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-blue-600 font-bold text-sm">{user.name?.[0]}</span>
@@ -103,35 +146,33 @@ function UserMenu() {
   );
 }
 
+// ============================================
+// NAVIGATION COMPONENT - Simplified
+// ============================================
 function Navigation({ darkMode, toggleDarkMode }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user } = useAuth();
   
   const navItems = [
-    { path: '/', label: 'Acasă', icon: <BarChart3 className="w-4 h-4" /> },
-    { path: '/trading-school', label: '🎓 Învață Trading', icon: <BookOpen className="w-4 h-4" /> },
-    { path: '/financial-education', label: '💰 Educație Financiară', icon: <DollarSign className="w-4 h-4" /> },
-    { path: '/stocks', label: 'Acțiuni BVB', icon: <TrendingUp className="w-4 h-4" /> },
-    { path: '/global', label: '🌍 Piețe Globale', icon: <TrendingUp className="w-4 h-4" /> },
-    { path: '/screener', label: '🔍 Screener', icon: <Filter className="w-4 h-4" /> },
-    { path: '/calendar', label: '📅 Dividende', icon: <Calendar className="w-4 h-4" /> },
-    { path: '/news', label: 'Știri', icon: <Newspaper className="w-4 h-4" /> },
-    { path: '/converter', label: 'Convertor', icon: <DollarSign className="w-4 h-4" /> },
+    { path: '/', label: 'Acasă', icon: '🏠' },
+    { path: '/trading-school', label: 'Învață Trading', icon: '🎓' },
+    { path: '/financial-education', label: 'Educație Financiară', icon: '💰' },
+    { path: '/stocks', label: 'Acțiuni BVB', icon: '📈' },
+    { path: '/global', label: 'Piețe Globale', icon: '🌍' },
+    { path: '/screener', label: 'Screener', icon: '🔍' },
+    { path: '/calendar', label: 'Dividende', icon: '📅' },
+    { path: '/news', label: 'Știri', icon: '📰' },
+    { path: '/converter', label: 'Convertor', icon: '💱' },
   ];
 
-  const userNavItems = user ? [
-    // Watchlist va fi afișat separat lângă user menu
-  ] : [];
-
-  // Watchlist button pentru useri logați
   const WatchlistButton = () => {
     if (!user) return null;
     return (
       <Link 
         to="/watchlist" 
         className="relative p-2 rounded-md hover:bg-accent transition-colors"
-        title="Watchlist - Acțiunile tale preferate"
+        title="Watchlist"
       >
         <Star className={`w-5 h-5 ${location.pathname === '/watchlist' ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground'}`} />
       </Link>
@@ -146,9 +187,11 @@ function Navigation({ darkMode, toggleDarkMode }) {
           <span className="font-bold text-xl hidden sm:inline">FinRomania</span>
         </Link>
         
-        {/* Search Bar - lângă logo */}
+        {/* Search Bar - Lazy */}
         <div className="hidden md:block mr-4">
-          <SearchBar />
+          <Suspense fallback={<SearchLoader />}>
+            <SearchBar />
+          </Suspense>
         </div>
         
         <nav className="hidden lg:flex items-center space-x-1 flex-1">
@@ -156,9 +199,13 @@ function Navigation({ darkMode, toggleDarkMode }) {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === item.path ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}
+              className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                location.pathname === item.path 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              }`}
             >
-              {item.icon}
+              <span>{item.icon}</span>
               <span>{item.label}</span>
             </Link>
           ))}
@@ -182,16 +229,22 @@ function Navigation({ darkMode, toggleDarkMode }) {
             <SheetContent side="left" className="w-72">
               <div className="flex flex-col space-y-4 mt-8">
                 <div className="mb-4">
-                  <SearchBar />
+                  <Suspense fallback={<SearchLoader />}>
+                    <SearchBar />
+                  </Suspense>
                 </div>
                 {navItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === item.path ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      location.pathname === item.path 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`}
                   >
-                    {item.icon}
+                    <span>{item.icon}</span>
                     <span>{item.label}</span>
                   </Link>
                 ))}
@@ -199,10 +252,14 @@ function Navigation({ darkMode, toggleDarkMode }) {
                   <Link
                     to="/watchlist"
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === '/watchlist' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      location.pathname === '/watchlist' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`}
                   >
-                    <Star className="w-4 h-4" />
-                    <span>⭐ Watchlist</span>
+                    <span>⭐</span>
+                    <span>Watchlist</span>
                   </Link>
                 )}
               </div>
@@ -214,55 +271,120 @@ function Navigation({ darkMode, toggleDarkMode }) {
   );
 }
 
+// ============================================
+// APP ROUTER - With Suspense
+// ============================================
 function AppRouter() {
   const location = useLocation();
   
-  // CRITICAL: Check URL fragment for session_id synchronously during render
-  // This prevents race conditions with ProtectedRoute checks
+  // CRITICAL: Check URL fragment for session_id synchronously
   if (location.hash?.includes('session_id=')) {
-    return <AuthCallback />;
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <AuthCallback />
+      </Suspense>
+    );
   }
   
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/stocks" element={<StocksPage />} />
-      <Route path="/stocks/:type/:symbol" element={<StockDetailPage />} />
-      <Route path="/news" element={<NewsPage />} />
-      <Route path="/news/:articleId" element={<ArticleDetailPage />} />
-      <Route path="/currencies" element={<CurrenciesPage />} />
-      <Route path="/privacy" element={<PrivacyPolicyPage />} />
-      <Route path="/terms" element={<TermsOfServicePage />} />
-      <Route path="/cookies" element={<CookiePolicyPage />} />
-      <Route path="/disclaimer" element={<DisclaimerPage />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/watchlist" element={<WatchlistPage />} />
-      <Route path="/portfolio" element={<PortfolioPage />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/education" element={<EducationPage />} />
-      <Route path="/education/success" element={<EducationPage />} />
-      <Route path="/education/lesson/:lessonId" element={<LessonPage />} />
-      <Route path="/risk-assessment" element={<RiskAssessmentPage />} />
-      <Route path="/advisor" element={<AIAdvisorPage />} />
-      <Route path="/converter" element={<CurrencyConverterPage />} />
-      <Route path="/glossary" element={<GlossaryPage />} />
-      <Route path="/learn" element={<LearnTradingPage />} />
-      <Route path="/trading-school" element={<TradingSchoolPage />} />
-      <Route path="/trading-school/:lessonId" element={<LessonPage />} />
-      <Route path="/financial-education" element={<FinancialEducationPage />} />
-      <Route path="/financial-education/:lessonId" element={<FinLessonPage />} />
-      <Route path="/faq" element={<FAQPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/calendar" element={<DividendCalendarPage />} />
-      <Route path="/screener" element={<StockScreenerPage />} />
-      <Route path="/notifications" element={<NotificationSettingsPage />} />
-      <Route path="/global" element={<GlobalMarketsPage />} />
-    </Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/stocks" element={<StocksPage />} />
+        <Route path="/stocks/:type/:symbol" element={<StockDetailPage />} />
+        <Route path="/news" element={<NewsPage />} />
+        <Route path="/news/:articleId" element={<ArticleDetailPage />} />
+        <Route path="/currencies" element={<CurrenciesPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsOfServicePage />} />
+        <Route path="/cookies" element={<CookiePolicyPage />} />
+        <Route path="/disclaimer" element={<DisclaimerPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/watchlist" element={<WatchlistPage />} />
+        <Route path="/portfolio" element={<PortfolioPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/education" element={<EducationPage />} />
+        <Route path="/education/success" element={<EducationPage />} />
+        <Route path="/education/lesson/:lessonId" element={<LessonPage />} />
+        <Route path="/risk-assessment" element={<RiskAssessmentPage />} />
+        <Route path="/advisor" element={<AIAdvisorPage />} />
+        <Route path="/converter" element={<CurrencyConverterPage />} />
+        <Route path="/glossary" element={<GlossaryPage />} />
+        <Route path="/learn" element={<LearnTradingPage />} />
+        <Route path="/trading-school" element={<TradingSchoolPage />} />
+        <Route path="/trading-school/:lessonId" element={<LessonPage />} />
+        <Route path="/financial-education" element={<FinancialEducationPage />} />
+        <Route path="/financial-education/:lessonId" element={<FinLessonPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/calendar" element={<DividendCalendarPage />} />
+        <Route path="/screener" element={<StockScreenerPage />} />
+        <Route path="/notifications" element={<NotificationSettingsPage />} />
+        <Route path="/global" element={<GlobalMarketsPage />} />
+      </Routes>
+    </Suspense>
   );
 }
 
+// ============================================
+// FOOTER - Simplified
+// ============================================
+function Footer() {
+  return (
+    <footer className="border-t py-8 mt-8 bg-muted/30">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+          <div>
+            <h4 className="font-semibold mb-3">FinRomania</h4>
+            <p className="text-sm text-muted-foreground">
+              Platformă de educație și date financiare pentru România
+            </p>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-3">Navigare</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/" className="text-muted-foreground hover:text-foreground">Acasă</Link></li>
+              <li><Link to="/stocks" className="text-muted-foreground hover:text-foreground">Acțiuni BVB</Link></li>
+              <li><Link to="/trading-school" className="text-muted-foreground hover:text-foreground">Trading School</Link></li>
+              <li><Link to="/financial-education" className="text-muted-foreground hover:text-foreground">Educație Financiară</Link></li>
+              <li><Link to="/glossary" className="text-muted-foreground hover:text-foreground">Glosar</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-3">Legal</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/about" className="text-muted-foreground hover:text-foreground">Despre Noi</Link></li>
+              <li><Link to="/privacy" className="text-muted-foreground hover:text-foreground">Confidențialitate</Link></li>
+              <li><Link to="/terms" className="text-muted-foreground hover:text-foreground">Termeni</Link></li>
+              <li><Link to="/disclaimer" className="text-muted-foreground hover:text-foreground">Disclaimer</Link></li>
+              <li><Link to="/faq" className="text-muted-foreground hover:text-foreground">FAQ</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-3">Newsletter</h4>
+            <p className="text-sm text-muted-foreground mb-3">
+              Primește ultimele știri financiare
+            </p>
+            <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+              <NewsletterSignup variant="inline" />
+            </Suspense>
+          </div>
+        </div>
+        <div className="border-t pt-6 text-center">
+          <p className="text-sm text-muted-foreground">
+            © 2025 FinRomania - Toate drepturile rezervate
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ============================================
+// MAIN APP COMPONENT
+// ============================================
 function App() {
   const [darkMode, setDarkMode] = useState(false);
 
@@ -283,57 +405,13 @@ function App() {
       <Router>
         <div className={`min-h-screen bg-background ${darkMode ? 'dark' : ''}`}>
           <Navigation darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
-          <TickerBar />
+          <Suspense fallback={<TickerLoader />}>
+            <TickerBar />
+          </Suspense>
           <main className="max-w-7xl mx-auto px-4 py-6">
             <AppRouter />
           </main>
-          <footer className="border-t py-8 mt-8 bg-muted/30">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-                <div>
-                  <h4 className="font-semibold mb-3">FinRomania</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Platformă de știri și date financiare pentru România
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-3">Navigare</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li><Link to="/" className="text-muted-foreground hover:text-foreground">Acasă</Link></li>
-                    <li><Link to="/stocks" className="text-muted-foreground hover:text-foreground">Acțiuni BVB</Link></li>
-                    <li><Link to="/news" className="text-muted-foreground hover:text-foreground">Știri</Link></li>
-                    <li><Link to="/currencies" className="text-muted-foreground hover:text-foreground">Valute</Link></li>
-                    <li><Link to="/trading-school" className="text-muted-foreground hover:text-foreground">Trading School</Link></li>
-                    <li><Link to="/financial-education" className="text-muted-foreground hover:text-foreground">💰 Educație Financiară</Link></li>
-                    <li><Link to="/glossary" className="text-muted-foreground hover:text-foreground">Glosar</Link></li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-3">Legal</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li><Link to="/about" className="text-muted-foreground hover:text-foreground">Despre Noi</Link></li>
-                    <li><Link to="/privacy" className="text-muted-foreground hover:text-foreground">Politica de Confidențialitate</Link></li>
-                    <li><Link to="/terms" className="text-muted-foreground hover:text-foreground">Termeni și Condiții</Link></li>
-                    <li><Link to="/cookies" className="text-muted-foreground hover:text-foreground">Politica de Cookie-uri</Link></li>
-                    <li><Link to="/disclaimer" className="text-muted-foreground hover:text-foreground">Disclaimer</Link></li>
-                    <li><Link to="/faq" className="text-muted-foreground hover:text-foreground">Întrebări Frecvente</Link></li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-3">Newsletter</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Primește ultimele știri financiare
-                  </p>
-                  <NewsletterSignup variant="inline" />
-                </div>
-              </div>
-              <div className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-sm text-muted-foreground">
-                  © 2025 FinRomania - Toate drepturile rezervate
-                </p>
-              </div>
-            </div>
-          </footer>
+          <Footer />
         </div>
       </Router>
     </AuthProvider>
