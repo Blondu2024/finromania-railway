@@ -147,6 +147,22 @@ function UserMenu() {
 }
 
 // ============================================
+// WATCHLIST BUTTON COMPONENT
+// ============================================
+function WatchlistButton({ user, isActive }) {
+  if (!user) return null;
+  return (
+    <Link 
+      to="/watchlist" 
+      className="relative p-2 rounded-md hover:bg-accent transition-colors"
+      title="Watchlist"
+    >
+      <Star className={`w-5 h-5 ${isActive ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground'}`} />
+    </Link>
+  );
+}
+
+// ============================================
 // NAVIGATION COMPONENT - Simplified
 // ============================================
 function Navigation({ darkMode, toggleDarkMode }) {
@@ -165,19 +181,6 @@ function Navigation({ darkMode, toggleDarkMode }) {
     { path: '/news', label: 'Știri', icon: '📰' },
     { path: '/converter', label: 'Convertor', icon: '💱' },
   ];
-
-  const WatchlistButton = () => {
-    if (!user) return null;
-    return (
-      <Link 
-        to="/watchlist" 
-        className="relative p-2 rounded-md hover:bg-accent transition-colors"
-        title="Watchlist"
-      >
-        <Star className={`w-5 h-5 ${location.pathname === '/watchlist' ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground'}`} />
-      </Link>
-    );
-  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -212,7 +215,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
         </nav>
 
         <div className="flex items-center space-x-2 ml-auto">
-          <WatchlistButton />
+          <WatchlistButton user={user} isActive={location.pathname === '/watchlist'} />
           
           <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
             {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
