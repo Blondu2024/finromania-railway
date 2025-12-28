@@ -110,7 +110,7 @@ async def get_companion_response(prompt: str, user_level: str = "incepator") -> 
         return response
     except Exception as e:
         logger.error(f"AI Companion error: {e}")
-        return f"Nu am putut genera răspunsul. Dar ține minte: înainte de orice decizie, întreabă-te - care e planul meu dacă merge prost?"
+        return "Nu am putut genera răspunsul. Dar ține minte: înainte de orice decizie, întreabă-te - care e planul meu dacă merge prost?"
 
 
 @router.post("/ask", response_model=CompanionResponse)
@@ -153,7 +153,7 @@ CONTEXT ACȚIUNE:
                         user_level = "intermediar"
                     else:
                         user_level = "expert"
-            except:
+            except Exception:
                 pass
         
         # Get AI response
@@ -171,7 +171,7 @@ CONTEXT ACȚIUNE:
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "anonymous": current_user is None
             })
-        except:
+        except Exception:
             pass  # Don't fail if logging fails
         
         return CompanionResponse(response=response)
