@@ -555,9 +555,12 @@ export default function GlobalMarketsPage() {
 
   const handleCloseReminder = useCallback(() => {
     setShowReminder(false);
+    // Don't open asset modal when closing reminder via "Am înțeles"
   }, []);
 
   const handleOpenCompanion = useCallback(() => {
+    setShowReminder(false);
+    setSelectedAsset(null); // Clear selected asset so modal doesn't open
     setCompanionOpen(true);
   }, []);
 
