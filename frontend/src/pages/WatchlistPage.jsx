@@ -138,19 +138,6 @@ const NotificationSettingsDialog = ({ token }) => {
     }
   };
 
-  const Toggle = ({ label, description, checked, onChange, icon: Icon }) => (
-    <div className="flex items-center justify-between py-3 border-b last:border-0">
-      <div className="flex items-center gap-3">
-        {Icon && <Icon className="w-4 h-4 text-muted-foreground" />}
-        <div>
-          <p className="font-medium text-sm">{label}</p>
-          <p className="text-xs text-muted-foreground">{description}</p>
-        </div>
-      </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
-    </div>
-  );
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
