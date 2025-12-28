@@ -1148,10 +1148,10 @@ class FinRomaniaAPITester:
         # ============================================
         # SESSION 6 PRIORITY 1: BVB STOCK DETAILS (CRITICAL - FRESHLY FIXED)
         # ============================================
-        print("\n🔥 SECTION 2: BVB Stock Details - CRITICAL (Freshly Fixed)")
+        print("\n🔥 SECTION 3: BVB Stock Details - CRITICAL (Freshly Fixed)")
         print("-" * 80)
         
-        # Test 3: BVB Stock Details for TLV
+        # Test 11: BVB Stock Details for TLV
         success, details, data = self.test_api_endpoint(
             'GET', '/api/stocks/bvb/TLV/details',
             validate_response=self.validate_bvb_stock_details
@@ -1160,7 +1160,7 @@ class FinRomaniaAPITester:
                      {"symbol": data.get('symbol'), "history_count": len(data.get('history', [])), 
                       "is_mock": data.get('is_mock')} if isinstance(data, dict) else data)
         
-        # Test 4: BVB Stock Details for H2O
+        # Test 12: BVB Stock Details for H2O
         success, details, data = self.test_api_endpoint(
             'GET', '/api/stocks/bvb/H2O/details',
             validate_response=self.validate_bvb_stock_details
