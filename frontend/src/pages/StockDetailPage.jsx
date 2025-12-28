@@ -8,6 +8,8 @@ import { Skeleton } from '../components/ui/skeleton';
 import AddToWatchlistButton from '../components/AddToWatchlistButton';
 import SocialShare from '../components/SocialShare';
 import AdvancedStockChart from '../components/AdvancedStockChart';
+import TradingCompanion, { TradingReminder, shouldShowReminder, markReminderShown } from '../components/TradingCompanion';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -18,6 +20,28 @@ export default function StockDetailPage() {
   const [error, setError] = useState(null);
   const [currentPeriod, setCurrentPeriod] = useState('1m');
   const [refreshing, setRefreshing] = useState(false);
+  const [showReminder, setShowReminder] = useState(false);
+  const [companionOpen, setCompanionOpen] = useState(false);
+  const { user } = useAuth();
+
+  // Show reminder on first load
+  useEffect(() => {
+    if (shouldShowReminder(!!user)) {
+      setShowReminder(true);
+      if (user) {
+        markReminderShown();
+      }
+    }
+  }, [user]);
+
+  const handleCloseReminder = () => {
+    setShowReminder(false);
+  };
+
+  const handleOpenCompanion = () => {
+    setShowReminder(false);
+    setCompanionOpen(true);
+  };
 
   const fetchDetails = useCallback(async (period = '1m', days = null) => {
     try {
