@@ -1,22 +1,25 @@
+# FinRomania robots.txt
 User-agent: *
 Allow: /
 
-# Sitemap
+# Sitemap location
 Sitemap: https://finromania-3.preview.emergentagent.com/sitemap.xml
 
-# Disallow admin and API routes
-Disallow: /api/
-Disallow: /admin
-Disallow: /auth/
-
-# Allow all content
-Allow: /trading-school
-Allow: /stocks
-Allow: /news
-Allow: /faq
-Allow: /glossary
-Allow: /converter
-Allow: /advisor
-
-# Crawl-delay
+# Crawl-delay for politeness
 Crawl-delay: 1
+
+# Block admin routes
+Disallow: /admin
+Disallow: /auth/callback
+
+# Allow important pages
+Allow: /stocks
+Allow: /global
+Allow: /news
+Allow: /trading-school
+Allow: /financial-education
+Allow: /screener
+Allow: /calendar
+Allow: /converter
+Allow: /glossary
+Allow: /advisor
