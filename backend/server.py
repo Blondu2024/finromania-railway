@@ -42,6 +42,7 @@ from routes.dividend_calendar import router as dividend_calendar_router
 from routes.stock_screener import router as stock_screener_router
 from routes.global_markets import router as global_markets_router
 from routes.push_notifications import router as push_notifications_router
+from routes.trading_companion import router as trading_companion_router
 
 # Configure logging
 logging.basicConfig(
