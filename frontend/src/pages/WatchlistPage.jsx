@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Star, Plus, Trash2, Bell, BellOff, TrendingUp, TrendingDown,
   AlertTriangle, Settings, Eye, Edit2, X, Save, RefreshCw,
-  Globe, Newspaper, GraduationCap, Loader2
+  Globe, Newspaper, GraduationCap, Loader2, Smartphone, CheckCircle2
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -22,6 +22,14 @@ import {
 } from '../components/ui/dialog';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
+import {
+  isPushSupported,
+  getPermissionStatus,
+  subscribeToPush,
+  unsubscribeFromPush,
+  isSubscribed,
+  sendTestNotification
+} from '../utils/pushNotifications';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -29,6 +37,10 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const NotificationSettingsDialog = ({ token }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [testingSending, setTestingSending] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushSupported, setPushSupported] = useState(true);
+  const [permissionStatus, setPermissionStatus] = useState('default');
   const [preferences, setPreferences] = useState({
     market_open_close: false,
     market_big_moves: false,
@@ -44,8 +56,20 @@ const NotificationSettingsDialog = ({ token }) => {
   useEffect(() => {
     if (isOpen && token) {
       fetchPreferences();
+      checkPushStatus();
     }
   }, [isOpen, token]);
+
+  const checkPushStatus = async () => {
+    const supported = isPushSupported();
+    setPushSupported(supported);
+    
+    if (supported) {
+      setPermissionStatus(getPermissionStatus());
+      const subscribed = await isSubscribed();
+      setPushEnabled(subscribed);
+    }
+  };
 
   const fetchPreferences = async () => {
     try {
@@ -58,6 +82,40 @@ const NotificationSettingsDialog = ({ token }) => {
       }
     } catch (err) {
       console.error('Error fetching preferences:', err);
+    }
+  };
+
+  const handlePushToggle = async (enable) => {
+    if (enable) {
+      const result = await subscribeToPush(token);
+      if (result.success) {
+        setPushEnabled(true);
+        setPermissionStatus('granted');
+      } else {
+        alert(result.error === 'Permission denied' 
+          ? 'Ai blocat notificările. Activează-le din setările browser-ului.'
+          : 'Eroare la activarea notificărilor: ' + result.error
+        );
+      }
+    } else {
+      await unsubscribeFromPush(token);
+      setPushEnabled(false);
+    }
+  };
+
+  const handleTestNotification = async () => {
+    setTestingSending(true);
+    try {
+      const result = await sendTestNotification(token);
+      if (result.success) {
+        alert(`✅ Notificare trimisă! Verifică pe ${result.sent} dispozitiv(e).`);
+      } else {
+        alert('❌ Eroare: ' + (result.error || 'Nu s-a putut trimite'));
+      }
+    } catch (err) {
+      alert('❌ Eroare la trimitere');
+    } finally {
+      setTestingSending(false);
     }
   };
 
@@ -113,6 +171,58 @@ const NotificationSettingsDialog = ({ token }) => {
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+          {/* Push Notifications Section - NEW */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+            <h4 className="font-semibold text-sm text-blue-600 dark:text-blue-400 mb-3 flex items-center gap-2">
+              <Smartphone className="w-4 h-4" /> Notificări Push (Timp Real)
+            </h4>
+            
+            {!pushSupported ? (
+              <p className="text-sm text-muted-foreground">
+                ⚠️ Browser-ul tău nu suportă notificări push. Încearcă Chrome, Firefox sau Edge.
+              </p>
+            ) : permissionStatus === 'denied' ? (
+              <p className="text-sm text-red-500">
+                🚫 Ai blocat notificările. Pentru a le activa, mergi în setările browser-ului.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-sm">Activează Notificări Push</p>
+                    <p className="text-xs text-muted-foreground">
+                      Primește alerte chiar dacă nu ești pe site
+                    </p>
+                  </div>
+                  <Switch 
+                    checked={pushEnabled} 
+                    onCheckedChange={handlePushToggle}
+                  />
+                </div>
+                
+                {pushEnabled && (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span className="text-sm text-green-600">Notificările sunt active</span>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="ml-auto"
+                      onClick={handleTestNotification}
+                      disabled={testingSending}
+                    >
+                      {testingSending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        'Testează'
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Piață */}
           <div>
             <h4 className="font-semibold text-sm text-blue-600 mb-2 flex items-center gap-2">
