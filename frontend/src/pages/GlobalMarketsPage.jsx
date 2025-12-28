@@ -737,6 +737,8 @@ export default function GlobalMarketsPage() {
         currentPrice={selectedAsset?.price}
         changePercent={selectedAsset?.change_percent || data?.sentiment?.avg_change}
         stockType="global"
+        forceOpen={companionOpen}
+        onOpenChange={setCompanionOpen}
       />
     </>
   );
