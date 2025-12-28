@@ -14,7 +14,7 @@ except ImportError:
     WEBPUSH_AVAILABLE = False
 
 from config.database import get_database
-from routes.auth import get_current_user
+from routes.auth import require_auth
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/push", tags=["Push Notifications"])
