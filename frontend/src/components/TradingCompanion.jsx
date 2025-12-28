@@ -113,7 +113,9 @@ const TradingCompanion = ({
   stockName, 
   currentPrice, 
   changePercent,
-  stockType = 'bvb' 
+  stockType = 'bvb',
+  forceOpen = false,
+  onOpenChange = null
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -122,6 +124,14 @@ const TradingCompanion = ({
   const [tips, setTips] = useState([]);
   const messagesEndRef = useRef(null);
   const { user, token } = useAuth();
+
+  // Handle forceOpen prop
+  useEffect(() => {
+    if (forceOpen) {
+      setIsOpen(true);
+      if (onOpenChange) onOpenChange(false); // Reset forceOpen
+    }
+  }, [forceOpen, onOpenChange]);
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
