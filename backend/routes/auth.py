@@ -73,6 +73,11 @@ async def require_auth(request: Request) -> dict:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
 
+# Dependency for optional auth (user can be None)
+async def get_current_user_optional(request: Request) -> Optional[dict]:
+    """Get current user if logged in, None otherwise (no error)"""
+    return await get_current_user(request)
+
 @router.post("/session")
 async def create_session(data: SessionRequest, response: Response):
     """Exchange session_id for session_token"""
