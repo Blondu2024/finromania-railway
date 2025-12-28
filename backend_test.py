@@ -970,9 +970,75 @@ class FinRomaniaAPITester:
                          f"Should return 401 but got: {details}", data)
             return False
 
+    def validate_companion_tips(self, data: Dict) -> tuple:
+        """Validate companion tips response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['symbol', 'tips', 'cta']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        tips = data.get('tips', [])
+        if not isinstance(tips, list):
+            return False, "Tips should be a list"
+        
+        if len(tips) == 0:
+            return False, "No tips returned"
+        
+        # Should return max 3 tips
+        if len(tips) > 3:
+            return False, f"Too many tips returned: {len(tips)}, expected max 3"
+        
+        # Validate tip content
+        for tip in tips:
+            if not isinstance(tip, str) or len(tip) < 10:
+                return False, f"Invalid tip content: {tip}"
+        
+        # Validate CTA
+        cta = data.get('cta', '')
+        if not isinstance(cta, str) or len(cta) < 10:
+            return False, f"Invalid CTA: {cta}"
+        
+        return True, f"Valid companion tips: {len(tips)} tips for {data.get('symbol')}"
+
+    def validate_companion_ask(self, data: Dict) -> tuple:
+        """Validate companion ask response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['response', 'disclaimer']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        response = data.get('response', '')
+        if not isinstance(response, str) or len(response) < 50:
+            return False, f"Response too short: {len(response)} chars, expected 50+"
+        
+        # Check that response doesn't contain direct buy/sell advice
+        forbidden_words = ['cumpără', 'vinde', 'ar trebui să cumperi', 'ar trebui să vinzi']
+        response_lower = response.lower()
+        for word in forbidden_words:
+            if word in response_lower:
+                return False, f"Response contains forbidden advice: '{word}'"
+        
+        # Check for questions (should help user think)
+        question_indicators = ['?', 'întreabă', 'gândește', 'considerat']
+        has_questions = any(indicator in response_lower for indicator in question_indicators)
+        if not has_questions:
+            return False, "Response should contain questions to help user think"
+        
+        disclaimer = data.get('disclaimer', '')
+        if not isinstance(disclaimer, str) or len(disclaimer) < 20:
+            return False, f"Disclaimer too short: {len(disclaimer)} chars"
+        
+        return True, f"Valid companion response: {len(response)} chars with proper disclaimer"
+
     def run_all_tests(self):
-        """Run comprehensive test suite focusing on authentication flow"""
-        print("🚀 Starting FinRomania API Testing - Authentication Flow Focus...")
+        """Run comprehensive test suite focusing on AI Trading Companion"""
+        print("🚀 Starting FinRomania API Testing - AI Trading Companion Focus...")
         print(f"📍 Testing against: {self.base_url}")
         print("=" * 80)
         
