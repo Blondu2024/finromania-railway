@@ -726,6 +726,15 @@ export default function GlobalMarketsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Trading Companion - Verifică Înainte */}
+      <TradingCompanion 
+        stockSymbol={selectedAsset?.symbol || "Global"}
+        stockName={selectedAsset?.name || "Piețe Globale"}
+        currentPrice={selectedAsset?.price}
+        changePercent={selectedAsset?.change_percent || data?.sentiment?.avg_change}
+        stockType="global"
+      />
     </>
   );
 }
