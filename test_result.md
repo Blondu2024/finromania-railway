@@ -350,6 +350,21 @@ backend:
         agent: "testing"
         comment: "Session 15: GET /api/global/chart/{symbol} endpoint working correctly. Tested with S&P 500 (^GSPC) returning 20 data points at $6,929.94 and Bitcoin (BTC-USD) returning 31 data points at $87,600.61. Historical OHLCV data structure validated."
 
+  - task: "Push Notifications API"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/push_notifications.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implemented push notifications API with VAPID keys, subscription management, and test notifications"
+      - working: true
+        agent: "testing"
+        comment: "Session 18: All 5 push notification endpoints verified working: GET /api/push/vapid-key (returns valid VAPID key), GET /api/push/status (auth required, returns subscription status), POST /api/push/subscribe (auth required, stores subscription), DELETE /api/push/unsubscribe (auth required, removes subscription), POST /api/push/test (auth required, expected 404 for no real subscriptions). Authentication protection working correctly. VAPID keys configured. Ready for production."
+
 frontend:
   - task: "Ticker Bar (scrolling indices)"
     implemented: true
