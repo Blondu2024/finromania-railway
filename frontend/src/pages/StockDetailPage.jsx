@@ -24,23 +24,28 @@ export default function StockDetailPage() {
   const [companionOpen, setCompanionOpen] = useState(false);
   const { user } = useAuth();
 
-  // Show reminder on first load
+  // Show reminder on first load (check only, don't mark as shown yet)
   useEffect(() => {
     if (shouldShowReminder(!!user)) {
       setShowReminder(true);
-      if (user) {
-        markReminderShown();
-      }
     }
   }, [user]);
 
   const handleCloseReminder = () => {
     setShowReminder(false);
+    // Mark as shown only when user actually sees and closes it
+    if (user) {
+      markReminderShown();
+    }
   };
 
   const handleOpenCompanion = () => {
     setShowReminder(false);
     setCompanionOpen(true);
+    // Mark as shown when user opens companion
+    if (user) {
+      markReminderShown();
+    }
   };
 
   const fetchDetails = useCallback(async (period = '1m', days = null) => {
