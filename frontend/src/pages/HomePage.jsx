@@ -168,15 +168,8 @@ const HeroSection = memo(function HeroSection() {
     </section>
   );
 });
-          </CardContent>
-        </Card>
-      </motion.div>
-    </Link>
-  );
-}
 
 export default function HomePage() {
-  const { user } = useAuth();
   const [bvbStocks, setBvbStocks] = useState([]);
   const [globalIndices, setGlobalIndices] = useState([]);
   const [news, setNews] = useState([]);
