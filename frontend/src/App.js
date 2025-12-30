@@ -195,10 +195,11 @@ function Navigation({ darkMode, toggleDarkMode }) {
         </Link>
         
         {/* Search Bar - Lazy */}
-        <div className="hidden md:block mr-4">
+        <div className="hidden md:flex items-center gap-2 mr-4">
           <Suspense fallback={<SearchLoader />}>
             <SearchBar />
           </Suspense>
+          <UserMenu />
         </div>
         
         <nav className="hidden lg:flex items-center space-x-1 flex-1">
