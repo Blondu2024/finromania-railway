@@ -120,15 +120,18 @@ async def firebase_login(request: FirebaseLoginRequest):
         # Create session token
         session_token = str(uuid.uuid4())
         
-        # Store session
-        await db.sessions.update_one(
+        # Session expires in 7 days
+        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
+        
+        # Store session in user_sessions collection (same as auth.py uses)
+        await db.user_sessions.update_one(
             {"user_id": user_id},
             {
                 "$set": {
                     "user_id": user_id,
                     "session_token": session_token,
                     "created_at": datetime.now(timezone.utc).isoformat(),
-                    "expires_at": datetime.now(timezone.utc).isoformat(),  # Will be extended
+                    "expires_at": expires_at.isoformat(),
                     "auth_provider": "firebase_google"
                 }
             },
