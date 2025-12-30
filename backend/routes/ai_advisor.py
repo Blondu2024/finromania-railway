@@ -105,6 +105,19 @@ Fii concis (max 200 cuvinte) și prietenos."""
     
     advice = await get_ai_response(prompt, system_prompt)
     
+    # Track AI usage
+    await db.ai_usage_logs.insert_one({
+        "user_id": user["user_id"],
+        "email": user.get("email"),
+        "feature": "portfolio_advice",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "credits_used": 1
+    })
+    await db.users.update_one(
+        {"user_id": user["user_id"]},
+        {"$inc": {"ai_credits_used": 1}}
+    )
+    
     return {
         "advice": advice,
         "profile": profile_key,
