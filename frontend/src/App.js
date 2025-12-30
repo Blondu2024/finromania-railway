@@ -226,7 +226,10 @@ function Navigation({ darkMode, toggleDarkMode }) {
             {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
           
-          <UserMenu />
+          {/* UserMenu doar pe mobile - pe desktop e lângă search */}
+          <div className="md:hidden">
+            <UserMenu />
+          </div>
           
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild className="lg:hidden">
