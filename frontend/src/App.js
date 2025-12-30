@@ -372,7 +372,7 @@ function Footer() {
           <div>
             <h4 className="font-semibold mb-3">Newsletter</h4>
             <p className="text-sm text-muted-foreground mb-3">
-              Primește ultimele știri financiare
+              Primește seara mesajul tău personal cu noutățile pieței
             </p>
             <Suspense fallback={<Skeleton className="h-10 w-full" />}>
               <NewsletterSignup variant="inline" />
