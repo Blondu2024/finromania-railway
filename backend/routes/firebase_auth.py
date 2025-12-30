@@ -83,7 +83,7 @@ async def firebase_login(request: FirebaseLoginRequest):
         is_new_user = False
         
         if existing_user:
-            # Update user info
+            # Update user info and increment login count
             user_id = existing_user["user_id"]
             await db.users.update_one(
                 {"email": user_info["email"]},
@@ -94,9 +94,21 @@ async def firebase_login(request: FirebaseLoginRequest):
                         "firebase_uid": user_info.get("uid"),
                         "last_login": datetime.now(timezone.utc).isoformat(),
                         "auth_provider": "firebase_google"
+                    },
+                    "$inc": {
+                        "total_logins": 1
                     }
                 }
             )
+            
+            # Log login for analytics
+            await db.login_logs.insert_one({
+                "user_id": user_id,
+                "email": user_info["email"],
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "ip": "unknown",  # Can be added from request headers
+                "user_agent": "unknown"
+            })
         else:
             # Create new user
             is_new_user = True
