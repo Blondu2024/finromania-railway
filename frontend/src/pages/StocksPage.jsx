@@ -59,7 +59,7 @@ const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
           </div>
 
           {/* Gauge Visual */}
-          <div className="relative w-48 h-24 mx-auto mb-4">
+          <div className="relative w-48 h-24 mx-auto mb-8">
             {/* Background arc */}
             <svg viewBox="0 0 200 100" className="w-full h-full">
               {/* Gradient definitions */}
@@ -102,9 +102,9 @@ const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
               </motion.g>
             </svg>
 
-            {/* Labels - positioned lower */}
-            <div className="absolute -bottom-4 left-2 text-xs text-red-400 font-bold">FRICĂ</div>
-            <div className="absolute -bottom-4 right-2 text-xs text-green-400 font-bold">LĂCOMIE</div>
+            {/* Labels - positioned below the gauge */}
+            <div className="absolute -bottom-6 left-0 text-xs text-red-400 font-bold">FRICĂ</div>
+            <div className="absolute -bottom-6 right-0 text-xs text-green-400 font-bold">LĂCOMIE</div>
           </div>
 
           {/* Score Display */}
