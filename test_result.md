@@ -1596,6 +1596,46 @@ test_session_13:
   conclusion:
     status: "✅ PHASE 2 & PHASE 3 COMPLETE SUCCESS"
     summary: "All Phase 2 & Phase 3 features are fully implemented and working correctly. Dividend Calendar shows comprehensive dividend data with working tabs and sidebar. Stock Screener has all predefined screeners, custom filters, and results table. Navigation links properly added to navbar. Notification Settings and Watchlist pages show appropriate login prompts for non-authenticated users with clear call-to-action buttons. All pages load without errors and display real data correctly."
+
+
+# ===========================================
+# TEST SESSION 19 - UI Improvements
+# ===========================================
+
+test_session_19:
+  timestamp: "2025-12-30T14:10:00Z"
+  focus: "Market Pulse Labels & Notification Text Updates"
+  agent: "main_agent"
+  
+  changes_made:
+    - task: "Market Pulse Labels Position"
+      file: "/app/frontend/src/pages/StocksPage.jsx"
+      description: "Moved FRICĂ and LĂCOMIE labels lower below the gauge"
+      old_style: "absolute bottom-0"
+      new_style: "absolute -bottom-6"
+      status: "✅ IMPLEMENTED"
+      
+    - task: "Notification Text - More Personal"
+      files:
+        - "/app/frontend/src/pages/WatchlistPage.jsx"
+        - "/app/frontend/src/pages/NotificationSettingsPage.jsx"
+        - "/app/frontend/src/components/NewsletterSignup.jsx"
+      description: "Changed 'Rezumat Zilnic' to 'Bună Seara, Investitorule' for more personal touch"
+      old_text: "Rezumat Zilnic"
+      new_text: "Bună Seara, Investitorule"
+      status: "✅ IMPLEMENTED"
+      
+  features_to_test:
+    - name: "Market Pulse Labels"
+      url: "/stocks"
+      expected: "FRICĂ and LĂCOMIE labels should be positioned below the gauge arc"
+      
+    - name: "Notification Settings Text"
+      url: "/watchlist"
+      expected: "Should show 'Bună Seara, Investitorule' instead of 'Rezumat Zilnic'"
+      
+  needs_retesting: true
+
   
   new_features_tested:
     - Market Pulse Gauge (Fear & Greed style indicator)
