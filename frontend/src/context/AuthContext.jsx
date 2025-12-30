@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { signInWithGoogle, firebaseSignOut } from '../config/firebase';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 const TOKEN_KEY = 'finromania_token';
@@ -74,15 +75,81 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, [checkAuth]);
 
-  const login = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+  // OLD Emergent login - kept as fallback
+  const loginEmergent = () => {
     const redirectUrl = window.location.origin + '/auth/callback';
-    console.log('[Auth] Redirecting to login with callback:', redirectUrl);
+    console.log('[Auth] Redirecting to Emergent login with callback:', redirectUrl);
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+  };
+
+  // NEW Firebase Google login
+  const login = async () => {
+    console.log('[Auth] Starting Firebase Google login...');
+    setLoading(true);
+    
+    try {
+      const result = await signInWithGoogle();
+      
+      if (result.success) {
+        console.log('[Auth] Firebase login successful, sending to backend...');
+        
+        // Send to our backend to create/update user and get session
+        const response = await fetch(`${API_URL}/api/auth/firebase/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id_token: result.idToken,
+            user_info: result.user
+          })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('[Auth] Backend login successful:', data.email);
+          
+          // Save token and user
+          localStorage.setItem(TOKEN_KEY, data.session_token);
+          setToken(data.session_token);
+          
+          const userData = {
+            user_id: data.user_id,
+            email: data.email,
+            name: data.name,
+            picture: data.picture
+          };
+          
+          localStorage.setItem(USER_KEY, JSON.stringify(userData));
+          setUser(userData);
+          
+          return userData;
+        } else {
+          const error = await response.json();
+          console.error('[Auth] Backend login error:', error);
+          alert('Eroare la autentificare. Încearcă din nou.');
+        }
+      } else {
+        console.error('[Auth] Firebase login failed:', result.error);
+        // Don't show error for user cancellation
+        if (!result.error?.includes('popup-closed')) {
+          alert('Nu s-a putut realiza conectarea. Încearcă din nou.');
+        }
+      }
+    } catch (error) {
+      console.error('[Auth] Login error:', error);
+      alert('Eroare la conectare. Verifică conexiunea la internet.');
+    } finally {
+      setLoading(false);
+    }
+    
+    return null;
   };
 
   const logout = async () => {
     try {
+      // Sign out from Firebase
+      await firebaseSignOut();
+      
+      // Sign out from backend
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
       await fetch(`${API_URL}/api/auth/logout`, {
         method: 'POST',
@@ -100,8 +167,9 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Process Emergent session (kept for backwards compatibility)
   const processSession = async (sessionId) => {
-    console.log('[Auth] Processing session:', sessionId.substring(0, 10) + '...');
+    console.log('[Auth] Processing Emergent session:', sessionId.substring(0, 10) + '...');
     try {
       const response = await fetch(`${API_URL}/api/auth/session`, {
         method: 'POST',
@@ -120,7 +188,6 @@ export function AuthProvider({ children }) {
           userName: data.name || data.email
         });
         
-        // The response IS the user object with session_token added
         const sessionToken = data.session_token;
         
         if (sessionToken) {
@@ -131,7 +198,6 @@ export function AuthProvider({ children }) {
           console.error('[Auth] No session_token in response!');
         }
         
-        // Remove session_token from user object before saving
         const { session_token, ...userData } = data;
         
         console.log('[Auth] Saving user to state and localStorage');
@@ -151,7 +217,16 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, processSession, checkAuth }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      loading, 
+      login,           // Firebase Google login
+      loginEmergent,   // Old Emergent login (backup)
+      logout, 
+      processSession, 
+      checkAuth 
+    }}>
       {children}
     </AuthContext.Provider>
   );
