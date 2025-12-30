@@ -102,6 +102,12 @@ async def firebase_login(request: FirebaseLoginRequest):
             is_new_user = True
             user_id = str(uuid.uuid4())
             
+            # Admin emails list
+            admin_emails = [
+                "tanasecristian2007@gmail.com",
+                "contact@finromania.ro"
+            ]
+            
             new_user = {
                 "user_id": user_id,
                 "email": user_info["email"],
@@ -111,11 +117,13 @@ async def firebase_login(request: FirebaseLoginRequest):
                 "auth_provider": "firebase_google",
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "last_login": datetime.now(timezone.utc).isoformat(),
-                "is_admin": False
+                "is_admin": user_info["email"].lower() in [e.lower() for e in admin_emails],
+                "ai_credits_used": 0,
+                "total_logins": 1
             }
             
             await db.users.insert_one(new_user)
-            logger.info(f"New user created via Firebase: {user_info['email']}")
+            logger.info(f"New user created via Firebase: {user_info['email']} (admin: {new_user['is_admin']})")
         
         # Create session token
         session_token = str(uuid.uuid4())
