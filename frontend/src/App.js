@@ -424,6 +424,10 @@ function App() {
             <AppRouter />
           </main>
           <Footer />
+          {/* PWA Install Prompt */}
+          <Suspense fallback={null}>
+            <InstallPWA />
+          </Suspense>
         </div>
       </Router>
     </AuthProvider>
