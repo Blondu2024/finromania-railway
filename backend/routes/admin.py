@@ -132,3 +132,135 @@ async def make_admin(user_id: str, user: dict = Depends(require_admin)):
         raise HTTPException(status_code=404, detail="User not found")
     
     return {"message": f"User {user_id} is now admin"}
+
+
+
+@router.get("/ai-stats")
+async def get_ai_stats(
+    user: dict = Depends(require_admin),
+    days: int = Query(default=7, ge=1, le=30)
+):
+    """Get AI usage statistics"""
+    db = await get_database()
+    
+    # Total AI credits used
+    pipeline = [
+        {"$group": {"_id": None, "total_credits": {"$sum": "$ai_credits_used"}}}
+    ]
+    result = await db.users.aggregate(pipeline).to_list(1)
+    total_credits = result[0]["total_credits"] if result else 0
+    
+    # AI usage by day
+    start_date = datetime.now(timezone.utc) - timedelta(days=days)
+    daily_usage = []
+    
+    for i in range(days):
+        date = datetime.now(timezone.utc) - timedelta(days=i)
+        day_start = date.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timedelta(days=1)
+        
+        count = await db.ai_usage_logs.count_documents({
+            "timestamp": {
+                "$gte": day_start.isoformat(),
+                "$lt": day_end.isoformat()
+            }
+        })
+        
+        daily_usage.append({
+            "date": day_start.strftime("%Y-%m-%d"),
+            "credits": count
+        })
+    
+    # Top users by AI usage
+    top_users = await db.users.find(
+        {"ai_credits_used": {"$gt": 0}},
+        {"_id": 0, "email": 1, "name": 1, "ai_credits_used": 1, "last_login": 1}
+    ).sort("ai_credits_used", -1).limit(10).to_list(10)
+    
+    # Usage by feature
+    feature_pipeline = [
+        {"$group": {"_id": "$feature", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}}
+    ]
+    features = await db.ai_usage_logs.aggregate(feature_pipeline).to_list(10)
+    
+    return {
+        "total_credits_used": total_credits,
+        "daily_usage": daily_usage[::-1],  # Oldest first
+        "top_users": top_users,
+        "usage_by_feature": [{"feature": f["_id"], "count": f["count"]} for f in features]
+    }
+
+
+@router.get("/login-history")
+async def get_login_history(
+    user: dict = Depends(require_admin),
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=50, ge=1, le=200)
+):
+    """Get login history"""
+    db = await get_database()
+    
+    logs = await db.login_logs.find(
+        {},
+        {"_id": 0}
+    ).sort("timestamp", -1).skip(skip).limit(limit).to_list(limit)
+    
+    total = await db.login_logs.count_documents({})
+    
+    return {
+        "logs": logs,
+        "total": total,
+        "skip": skip,
+        "limit": limit
+    }
+
+
+@router.get("/dashboard")
+async def get_admin_dashboard(user: dict = Depends(require_admin)):
+    """Get complete admin dashboard data"""
+    db = await get_database()
+    
+    # Basic stats
+    total_users = await db.users.count_documents({})
+    total_logins = await db.login_logs.count_documents({})
+    
+    # AI stats
+    pipeline = [
+        {"$group": {"_id": None, "total": {"$sum": "$ai_credits_used"}}}
+    ]
+    ai_result = await db.users.aggregate(pipeline).to_list(1)
+    total_ai_credits = ai_result[0]["total"] if ai_result else 0
+    
+    # Recent users
+    recent_users = await db.users.find(
+        {},
+        {"_id": 0, "email": 1, "name": 1, "created_at": 1, "last_login": 1, 
+         "total_logins": 1, "ai_credits_used": 1, "is_admin": 1}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
+    # Today's activity
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_logins = await db.login_logs.count_documents({
+        "timestamp": {"$gte": today.isoformat()}
+    })
+    today_ai_usage = await db.ai_usage_logs.count_documents({
+        "timestamp": {"$gte": today.isoformat()}
+    })
+    
+    # Active trading companion interactions
+    companion_total = await db.companion_interactions.count_documents({})
+    
+    return {
+        "overview": {
+            "total_users": total_users,
+            "total_logins": total_logins,
+            "total_ai_credits_used": total_ai_credits,
+            "companion_interactions": companion_total
+        },
+        "today": {
+            "logins": today_logins,
+            "ai_requests": today_ai_usage
+        },
+        "recent_users": recent_users
+    }
