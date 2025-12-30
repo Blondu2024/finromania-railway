@@ -3,13 +3,13 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCxcbngujHq5zilHION77cu7pELojGb_lk",
-  authDomain: "finromania-40cf3.firebaseapp.com",
-  projectId: "finromania-40cf3",
-  storageBucket: "finromania-40cf3.firebasestorage.app",
-  messagingSenderId: "631251281240",
-  appId: "1:631251281240:web:126a773fe7254fd5d9b12d",
-  measurementId: "G-H5XQP48KR3"
+  apiKey: "AIzaSyAd-6BrYhjACidqiE6fEx_HjzgB3RT-cNc",
+  authDomain: "fin-romania.firebaseapp.com",
+  projectId: "fin-romania",
+  storageBucket: "fin-romania.firebasestorage.app",
+  messagingSenderId: "767909387138",
+  appId: "1:767909387138:web:af4c23d33fef99d7a3cd9b",
+  measurementId: "G-Y0MBNC1ZJB"
 };
 
 // Initialize Firebase
