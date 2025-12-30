@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://finromania-3.preview.emergentagent.com/sitemap.xml
+Sitemap: https://finmarket-4.preview.emergentagent.com/sitemap.xml
 
 # Crawl-delay for politeness
 Crawl-delay: 1
