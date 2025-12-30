@@ -171,6 +171,23 @@ CONTEXT ACȚIUNE:
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "anonymous": current_user is None
             })
+            
+            # Increment AI credits used for logged-in users
+            if current_user and current_user.get("user_id"):
+                await db.users.update_one(
+                    {"user_id": current_user.get("user_id")},
+                    {"$inc": {"ai_credits_used": 1}}
+                )
+                
+                # Also log to AI usage collection for detailed tracking
+                await db.ai_usage_logs.insert_one({
+                    "user_id": current_user.get("user_id"),
+                    "email": current_user.get("email"),
+                    "feature": "trading_companion",
+                    "symbol": request.symbol,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "credits_used": 1
+                })
         except Exception:
             pass  # Don't fail if logging fails
         
