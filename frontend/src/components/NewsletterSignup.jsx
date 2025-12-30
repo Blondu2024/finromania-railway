@@ -54,7 +54,7 @@ export default function NewsletterSignup({ variant = 'inline' }) {
             <h3 className="font-semibold">Newsletter FinRomania</h3>
           </div>
           <p className="text-sm text-blue-100 mb-4">
-            Primește rezumatul zilnic cu cele mai importante știri financiare.
+            Primește seara mesajul tău personal cu cele mai importante știri financiare.
           </p>
           <form onSubmit={handleSubmit} className="flex gap-2">
             <Input
