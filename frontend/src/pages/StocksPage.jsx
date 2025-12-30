@@ -102,9 +102,9 @@ const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
               </motion.g>
             </svg>
 
-            {/* Labels */}
-            <div className="absolute bottom-0 left-2 text-xs text-red-400 font-bold">FRICĂ</div>
-            <div className="absolute bottom-0 right-2 text-xs text-green-400 font-bold">LĂCOMIE</div>
+            {/* Labels - positioned lower */}
+            <div className="absolute -bottom-4 left-2 text-xs text-red-400 font-bold">FRICĂ</div>
+            <div className="absolute -bottom-4 right-2 text-xs text-green-400 font-bold">LĂCOMIE</div>
           </div>
 
           {/* Score Display */}

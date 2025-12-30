@@ -258,8 +258,8 @@ export default function NotificationSettingsPage() {
             icon={TrendingUp}
           />
           <ToggleItem
-            label="Rezumat Zilnic"
-            description="Primești seara un rezumat al pieței"
+            label="Bună Seara, Investitorule"
+            description="Mesajul tău personal de seară cu noutățile pieței"
             checked={preferences.daily_summary}
             onChange={(v) => updatePreference('daily_summary', v)}
             icon={Mail}

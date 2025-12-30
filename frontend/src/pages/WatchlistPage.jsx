@@ -243,8 +243,8 @@ const NotificationSettingsDialog = ({ token }) => {
                 onChange={(v) => setPreferences(p => ({ ...p, market_big_moves: v }))}
               />
               <Toggle
-                label="Rezumat Zilnic"
-                description="Seara la 18:30"
+                label="Bună Seara, Investitorule"
+                description="Mesajul tău personal de seară cu noutățile pieței"
                 checked={preferences.daily_summary}
                 onChange={(v) => setPreferences(p => ({ ...p, daily_summary: v }))}
               />
