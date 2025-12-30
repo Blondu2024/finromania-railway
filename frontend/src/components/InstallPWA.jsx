@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Download, X, Smartphone } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 import { Button } from './ui/button';
 
 export default function InstallPWA() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showBanner, setShowBanner] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
   useEffect(() => {
     // Check if already installed
@@ -19,17 +17,7 @@ export default function InstallPWA() {
       return;
     }
 
-    // Detect iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    setIsIOS(isIOSDevice);
-
-    if (isIOSDevice) {
-      // Show banner for iOS after 5 seconds
-      const timer = setTimeout(() => setShowBanner(true), 5000);
-      return () => clearTimeout(timer);
-    }
-
-    // Listen for beforeinstallprompt (Android/Desktop)
+    // Listen for beforeinstallprompt (Chrome Android/Desktop)
     const handleBeforeInstall = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -42,11 +30,6 @@ export default function InstallPWA() {
   }, []);
 
   const handleInstall = async () => {
-    if (isIOS) {
-      setShowIOSInstructions(true);
-      return;
-    }
-
     if (!deferredPrompt) return;
 
     deferredPrompt.prompt();
@@ -60,45 +43,12 @@ export default function InstallPWA() {
 
   const handleDismiss = () => {
     setShowBanner(false);
-    setShowIOSInstructions(false);
     localStorage.setItem('pwa_banner_dismissed', Date.now().toString());
   };
 
-  if (!showBanner) return null;
+  // Only show on Chrome/Android/Desktop - not iOS
+  if (!showBanner || !deferredPrompt) return null;
 
-  // iOS Instructions Modal
-  if (showIOSInstructions) {
-    return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
-        <div className="bg-background rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6 space-y-4">
-          <div className="flex justify-between items-start">
-            <div className="flex items-center gap-3">
-              <Smartphone className="w-8 h-8 text-blue-600" />
-              <h3 className="font-bold text-lg">Instalează FinRomania</h3>
-            </div>
-            <button onClick={handleDismiss} className="p-1">
-              <X className="w-5 h-5 text-muted-foreground" />
-            </button>
-          </div>
-          
-          <div className="space-y-3 text-sm">
-            <p className="text-muted-foreground">Pentru a instala aplicația pe iPhone/iPad:</p>
-            <ol className="space-y-2 list-decimal list-inside">
-              <li>Apasă pe butonul <strong>Share</strong> (pătratul cu săgeată) din Safari</li>
-              <li>Derulează și alege <strong>"Add to Home Screen"</strong></li>
-              <li>Apasă <strong>"Add"</strong> în colțul din dreapta sus</li>
-            </ol>
-          </div>
-          
-          <Button onClick={handleDismiss} className="w-full">
-            Am înțeles
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Install Banner
   return (
     <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-4 shadow-2xl z-50 animate-in slide-in-from-bottom-5">
       <button 
@@ -123,7 +73,7 @@ export default function InstallPWA() {
             variant="secondary"
             className="mt-2 text-xs h-8"
           >
-            {isIOS ? 'Vezi cum' : 'Instalează'}
+            Instalează Acum
           </Button>
         </div>
       </div>
