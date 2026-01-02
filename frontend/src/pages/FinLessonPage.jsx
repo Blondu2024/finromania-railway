@@ -10,7 +10,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function FinLessonPage() {
   const { lessonId } = useParams();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
   const [allLessons, setAllLessons] = useState([]);
