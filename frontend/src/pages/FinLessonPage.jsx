@@ -74,7 +74,6 @@ export default function FinLessonPage() {
     }
 
     try {
-      const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/api/financial-education/quiz/submit`, {
         method: 'POST',
         headers: { 
