@@ -7,7 +7,7 @@ import { useState } from 'react';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function AddToWatchlistButton({ symbol, type, name, onAdd }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState(false);
 
@@ -21,7 +21,10 @@ export default function AddToWatchlistButton({ symbol, type, name, onAdd }) {
     try {
       const res = await fetch(`${API_URL}/api/watchlist`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         credentials: 'include',
         body: JSON.stringify({ symbol, type, name })
       });
@@ -32,6 +35,9 @@ export default function AddToWatchlistButton({ symbol, type, name, onAdd }) {
         setTimeout(() => setAdded(false), 2000);
       } else if (res.status === 400) {
         setAdded(true); // Already in watchlist
+      } else {
+        const error = await res.json();
+        console.error('Watchlist error:', error);
       }
     } catch (error) {
       console.error('Error adding to watchlist:', error);
