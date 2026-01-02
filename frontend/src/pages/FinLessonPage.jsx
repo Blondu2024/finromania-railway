@@ -74,9 +74,13 @@ export default function FinLessonPage() {
     }
 
     try {
+      const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/api/financial-education/quiz/submit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         credentials: 'include',
         body: JSON.stringify({
           lesson_id: lessonId,
@@ -87,9 +91,13 @@ export default function FinLessonPage() {
       if (res.ok) {
         const result = await res.json();
         setQuizResult(result);
+      } else {
+        const error = await res.json();
+        alert(error.detail || 'Eroare la trimiterea quiz-ului');
       }
     } catch (error) {
       console.error('Error submitting quiz:', error);
+      alert('Eroare de conexiune. Încearcă din nou.');
     }
   };
 
