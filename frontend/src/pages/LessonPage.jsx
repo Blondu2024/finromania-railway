@@ -12,7 +12,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function LessonPage() {
   const { lessonId } = useParams();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
   const [showQuiz, setShowQuiz] = useState(false);
@@ -53,7 +53,10 @@ export default function LessonPage() {
     try {
       const res = await fetch(`${API_URL}/api/trading-school/quiz/submit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         credentials: 'include',
         body: JSON.stringify({
           lesson_id: lessonId,
@@ -64,9 +67,13 @@ export default function LessonPage() {
       if (res.ok) {
         const result = await res.json();
         setQuizResult(result);
+      } else {
+        const error = await res.json();
+        alert(error.detail || 'Eroare la trimiterea quiz-ului');
       }
     } catch (error) {
       console.error('Error submitting quiz:', error);
+      alert('Eroare de conexiune. Încearcă din nou.');
     }
   };
 
