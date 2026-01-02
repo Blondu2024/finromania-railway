@@ -68,7 +68,7 @@ async def get_watchlist(current_user: dict = Depends(get_current_user)):
         
         # Get user's watchlist
         watchlist = await db.watchlists.find_one(
-            {"user_id": current_user["id"]},
+            {"user_id": current_user["user_id"]},
             {"_id": 0}
         )
         
@@ -133,7 +133,7 @@ async def add_to_watchlist(
             raise HTTPException(status_code=404, detail=f"Stock {item.symbol} not found")
         
         # Get or create watchlist
-        watchlist = await db.watchlists.find_one({"user_id": current_user["id"]})
+        watchlist = await db.watchlists.find_one({"user_id": current_user["user_id"]})
         
         new_item = {
             "symbol": item.symbol.upper(),
@@ -151,13 +151,13 @@ async def add_to_watchlist(
             
             # Add to existing watchlist
             await db.watchlists.update_one(
-                {"user_id": current_user["id"]},
+                {"user_id": current_user["user_id"]},
                 {"$push": {"items": new_item}}
             )
         else:
             # Create new watchlist
             await db.watchlists.insert_one({
-                "user_id": current_user["id"],
+                "user_id": current_user["user_id"],
                 "items": [new_item],
                 "created_at": datetime.now(timezone.utc).isoformat()
             })
@@ -185,7 +185,7 @@ async def remove_from_watchlist(
         db = await get_database()
         
         result = await db.watchlists.update_one(
-            {"user_id": current_user["id"]},
+            {"user_id": current_user["user_id"]},
             {"$pull": {"items": {"symbol": symbol.upper()}}}
         )
         
@@ -216,7 +216,7 @@ async def update_watchlist_item(
         
         result = await db.watchlists.update_one(
             {
-                "user_id": current_user["id"],
+                "user_id": current_user["user_id"],
                 "items.symbol": symbol.upper()
             },
             {
@@ -254,7 +254,7 @@ async def get_notification_preferences(current_user: dict = Depends(get_current_
         db = await get_database()
         
         prefs = await db.notification_preferences.find_one(
-            {"user_id": current_user["id"]},
+            {"user_id": current_user["user_id"]},
             {"_id": 0}
         )
         
@@ -279,7 +279,7 @@ async def update_notification_preferences(
         db = await get_database()
         
         await db.notification_preferences.update_one(
-            {"user_id": current_user["id"]},
+            {"user_id": current_user["user_id"]},
             {
                 "$set": {
                     "preferences": preferences.dict(),
@@ -311,7 +311,7 @@ async def check_triggered_alerts(current_user: dict = Depends(get_current_user))
         db = await get_database()
         
         watchlist = await db.watchlists.find_one(
-            {"user_id": current_user["id"]},
+            {"user_id": current_user["user_id"]},
             {"_id": 0}
         )
         
