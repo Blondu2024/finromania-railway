@@ -19,7 +19,7 @@ export default function AddToWatchlistButton({ symbol, type, name, onAdd }) {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/watchlist`, {
+      const res = await fetch(`${API_URL}/api/watchlist/add`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
