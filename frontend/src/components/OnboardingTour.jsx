@@ -241,7 +241,7 @@ const StepContent = ({ step, onNavigate }) => {
 
       {step.benefits && (
         <motion.div 
-          className="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-6"
+          className="grid grid-cols-2 gap-2 max-w-sm mx-auto mb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -249,13 +249,13 @@ const StepContent = ({ step, onNavigate }) => {
           {step.benefits.map((benefit, i) => (
             <motion.div
               key={i}
-              className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2"
+              className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-2 py-1.5"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 + i * 0.1 }}
             >
-              <benefit.icon className="w-4 h-4 text-green-400" />
-              <span className="text-xs text-white">{benefit.text}</span>
+              <benefit.icon className="w-3 h-3 text-green-400 flex-shrink-0" />
+              <span className="text-xs text-white leading-tight">{benefit.text}</span>
             </motion.div>
           ))}
         </motion.div>
