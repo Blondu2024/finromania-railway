@@ -51,6 +51,39 @@ const tourSteps = [
     ctaText: 'Vezi Piețele Globale →'
   },
   {
+    id: 'news',
+    title: 'Știri Financiare 📰',
+    subtitle: 'Fii mereu la curent cu ce se întâmplă pe piață',
+    description: 'Știri din România și din lume, traduse automat în română. Analiză AI pentru fiecare articol ca să înțelegi impactul asupra investițiilor tale.',
+    icon: Newspaper,
+    gradient: 'from-rose-600 via-pink-600 to-fuchsia-600',
+    path: '/news',
+    highlights: ['Știri Live', 'Traduse în Română', 'Analiză AI'],
+    ctaText: 'Citește Știrile →'
+  },
+  {
+    id: 'dividends',
+    title: 'Calendar Dividende 📅',
+    subtitle: 'Nu rata niciun dividend!',
+    description: 'Vezi când și cât plătesc companiile de pe BVB. Planifică-ți investițiile pentru a maximiza veniturile din dividende.',
+    icon: Calendar,
+    gradient: 'from-green-600 via-emerald-600 to-teal-600',
+    path: '/calendar',
+    highlights: ['Date Exacte', 'Randamente', 'Istoric Plăți'],
+    ctaText: 'Vezi Calendarul →'
+  },
+  {
+    id: 'converter',
+    title: 'Convertor Valutar 💱',
+    subtitle: 'Cursul BNR în timp real',
+    description: 'Convertește rapid între RON, EUR, USD și alte valute. Curs oficial BNR actualizat zilnic.',
+    icon: DollarSign,
+    gradient: 'from-sky-600 via-blue-600 to-indigo-600',
+    path: '/converter',
+    highlights: ['Curs BNR', 'Conversie Rapidă', 'Istoric Valutar'],
+    ctaText: 'Deschide Convertorul →'
+  },
+  {
     id: 'education',
     title: 'Învață Trading de la Zero',
     subtitle: 'Cursuri gratuite pentru toate nivelurile',
