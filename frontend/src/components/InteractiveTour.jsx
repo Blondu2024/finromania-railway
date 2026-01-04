@@ -615,8 +615,8 @@ export default function InteractiveTour() {
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
-      const step = tourSteps[currentStep];
-      if (step.type === 'spotlight') {
+      const step = filteredSteps[currentStep];
+      if (step && step.type === 'spotlight') {
         const element = findElement(step);
         if (element) {
           setTargetRect(element.getBoundingClientRect());
@@ -626,7 +626,7 @@ export default function InteractiveTour() {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [currentStep, findElement]);
+  }, [currentStep, findElement, filteredSteps]);
 
   // Check if tour should show
   useEffect(() => {
