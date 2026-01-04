@@ -662,8 +662,10 @@ export default function InteractiveTour() {
 
   if (!isVisible) return null;
 
-  const step = tourSteps[currentStep];
-  const isLast = currentStep === tourSteps.length - 1;
+  const step = filteredSteps[currentStep];
+  if (!step) return null;
+  
+  const isLast = currentStep === filteredSteps.length - 1;
 
   return (
     <AnimatePresence mode="wait">
