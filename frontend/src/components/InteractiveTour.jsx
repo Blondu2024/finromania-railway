@@ -510,9 +510,29 @@ export default function InteractiveTour() {
   const [isVisible, setIsVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [targetRect, setTargetRect] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Get filtered steps based on device
+  const getFilteredSteps = useCallback(() => {
+    return tourSteps.filter(step => {
+      if (isMobile && step.mobileSkip) return false;
+      if (!isMobile && step.mobileOnly) return false;
+      return true;
+    });
+  }, [isMobile]);
+
+  const filteredSteps = getFilteredSteps();
 
   // Find DOM element for current step
   const findElement = useCallback((step) => {
