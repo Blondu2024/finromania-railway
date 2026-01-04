@@ -445,17 +445,24 @@ export default function OnboardingTour() {
               {/* Next/Complete Button */}
               {isLastStep ? (
                 <motion.div
+                  className="relative"
                   initial={{ scale: 0.9 }}
                   animate={{ scale: [0.9, 1.05, 1] }}
                   transition={{ delay: 0.5, duration: 0.5 }}
                 >
+                  {/* Glow effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-white rounded-lg blur-lg"
+                    animate={{ opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
                   <Button
                     onClick={handleComplete}
-                    className="bg-white text-gray-900 hover:bg-gray-100 font-semibold px-6 shadow-lg"
+                    className="relative bg-white text-gray-900 hover:bg-gray-100 font-bold px-6 shadow-xl text-base"
                   >
-                    <Zap className="w-4 h-4 mr-2" />
+                    <Zap className="w-5 h-5 mr-2 text-yellow-500" />
                     Creează Cont GRATUIT
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </motion.div>
               ) : (
