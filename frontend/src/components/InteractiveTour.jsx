@@ -591,7 +591,9 @@ export default function InteractiveTour() {
   useEffect(() => {
     if (!isVisible) return;
 
-    const step = tourSteps[currentStep];
+    const step = filteredSteps[currentStep];
+    if (!step) return;
+
     if (step.type === 'spotlight') {
       const element = findElement(step);
       if (element) {
@@ -608,7 +610,7 @@ export default function InteractiveTour() {
     } else {
       setTargetRect(null);
     }
-  }, [currentStep, isVisible, findElement]);
+  }, [currentStep, isVisible, findElement, filteredSteps]);
 
   // Handle window resize
   useEffect(() => {
