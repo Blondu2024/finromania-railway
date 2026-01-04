@@ -4,8 +4,8 @@ export const SEO = ({
   title = 'FinRomania - Platformă Educațională de Trading',
   description = 'Prima platformă educațională de trading din România. Învață trading gratuit cu 17 lecții interactive, date live BVB, AI Advisor, și instrumente profesionale - 100% în română!',
   keywords = 'trading romania, bursa bucuresti, bvb, invatare trading, cursuri trading gratuite, actiuni romanesti, analiza tehnica, investitii romania, educational trading',
-  image = 'https://finmarket-4.preview.emergentagent.com/og-image.jpg',
-  url = 'https://finmarket-4.preview.emergentagent.com',
+  image = 'https://romfinance-1.preview.emergentagent.com/og-image.jpg',
+  url = 'https://romfinance-1.preview.emergentagent.com',
   type = 'website',
   author = 'FinRomania',
   publishedTime,
@@ -23,12 +23,12 @@ export const SEO = ({
     "@type": "WebSite",
     "name": "FinRomania",
     "alternateName": "FinRomania - Educație Financiară Gratuită",
-    "url": "https://finmarket-4.preview.emergentagent.com",
+    "url": "https://romfinance-1.preview.emergentagent.com",
     "description": "Prima platformă din România cu educație financiară gratuită și date live de pe bursă",
     "inLanguage": "ro-RO",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://finmarket-4.preview.emergentagent.com/search?q={search_term_string}",
+      "target": "https://romfinance-1.preview.emergentagent.com/search?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
@@ -38,8 +38,8 @@ export const SEO = ({
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "FinRomania",
-    "url": "https://finmarket-4.preview.emergentagent.com",
-    "logo": "https://finmarket-4.preview.emergentagent.com/logo.png",
+    "url": "https://romfinance-1.preview.emergentagent.com",
+    "logo": "https://romfinance-1.preview.emergentagent.com/logo.png",
     "description": "Platformă de educație financiară și date bursiere pentru România",
     "areaServed": "RO",
     "knowsLanguage": "ro",
@@ -80,7 +80,7 @@ export const SEO = ({
       "name": "FinRomania",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://finmarket-4.preview.emergentagent.com/logo.png"
+        "url": "https://romfinance-1.preview.emergentagent.com/logo.png"
       }
     },
     "datePublished": publishedTime,
