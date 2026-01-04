@@ -449,12 +449,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Ticker Bar animation and click navigation"
-    - "Stock Detail Page with chart"
-    - "Article translation to Romanian"
-    - "Centered layout verification"
+    - "OnboardingTour Component"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 # ===========================================
