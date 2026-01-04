@@ -429,6 +429,10 @@ function App() {
           <Suspense fallback={null}>
             <InstallPWA />
           </Suspense>
+          {/* Onboarding Tour for new visitors */}
+          <Suspense fallback={null}>
+            <OnboardingTour />
+          </Suspense>
         </div>
       </Router>
     </AuthProvider>
