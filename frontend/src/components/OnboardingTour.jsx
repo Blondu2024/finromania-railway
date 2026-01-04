@@ -84,6 +84,17 @@ const tourSteps = [
     requiresAuth: true
   },
   {
+    id: 'faq',
+    title: 'Ai Întrebări? 🤔',
+    subtitle: 'Răspunsuri la cele mai frecvente întrebări',
+    description: 'Tot ce trebuie să știi despre platformă, investiții și cum să începi. Găsești răspunsuri clare și la obiect.',
+    icon: BookOpen,
+    gradient: 'from-slate-600 via-gray-700 to-zinc-800',
+    path: '/faq',
+    highlights: ['Întrebări Frecvente', 'Ghid Complet', 'Suport'],
+    ctaText: 'Vezi FAQ →'
+  },
+  {
     id: 'final',
     title: 'Gata! Ești pregătit! 🚀',
     subtitle: 'Acum ai toate uneltele pentru succes',
