@@ -692,7 +692,7 @@ export default function InteractiveTour() {
               onNext={handleNext}
               onSkip={handleSkip}
               currentStep={currentStep}
-              totalSteps={tourSteps.length}
+              totalSteps={filteredSteps.length}
             />
           )}
         </React.Fragment>
