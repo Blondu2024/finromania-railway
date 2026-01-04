@@ -5,7 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { 
   BarChart3, TrendingUp, GraduationCap, Bot, Globe, Star, 
   ChevronRight, ChevronLeft, X, Sparkles, ArrowRight,
-  BookOpen, PieChart, Zap, Shield, Users, Trophy
+  BookOpen, PieChart, Zap, Shield, Users, Trophy,
+  Newspaper, Calendar, DollarSign
 } from 'lucide-react';
 import { Button } from './ui/button';
 
