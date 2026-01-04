@@ -100,8 +100,7 @@ const tourSteps = [
   {
     id: 'login',
     type: 'spotlight',
-    selector: 'button:has-text("Conectare"), button:has(.lucide-user)',
-    fallbackSelector: '[class*="UserMenu"], button:has(svg)',
+    selector: '[class*="UserMenu"] button, button[class*="default"]',
     title: '👤 Conectează-te',
     description: 'Creează-ți cont GRATUIT pentru Watchlist, Alerte și multe altele!',
     position: 'left',
