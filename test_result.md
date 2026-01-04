@@ -574,6 +574,18 @@ test_session_3:
     - "Newsletter card added to homepage sidebar"
     - "Social share added to article and stock detail pages"
 
+  - task: "OnboardingTour Component"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/OnboardingTour.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW FEATURE - OnboardingTour component implemented with 8 steps, gradient backgrounds, navigation controls, localStorage persistence, mobile responsive design, and final CTA button. Appears for non-logged users after 1 second delay."
+
 agent_communication:
   - agent: "main"
     message: "V2 complete! Added: 1) Ticker bar with scrolling indices, 2) Stock detail pages with real 30-day charts, 3) AI translation of articles to Romanian using Emergent Key, 4) Centered layout. Ready for testing."
