@@ -503,20 +503,50 @@ export default function InteractiveTour() {
   const findElement = useCallback((step) => {
     if (step.type !== 'spotlight') return null;
 
+    let element = null;
+
     // Try main selector
-    let element = document.querySelector(step.selector);
+    try {
+      element = document.querySelector(step.selector);
+    } catch (e) {
+      console.log('Invalid selector:', step.selector);
+    }
     
     // Try fallback
     if (!element && step.fallbackSelector) {
-      element = document.querySelector(step.fallbackSelector);
+      try {
+        element = document.querySelector(step.fallbackSelector);
+      } catch (e) {
+        console.log('Invalid fallback selector:', step.fallbackSelector);
+      }
     }
 
-    // Try finding by text content for navigation items
-    if (!element && step.selector.includes('href=')) {
-      const href = step.selector.match(/href="([^"]+)"/)?.[1];
-      if (href) {
-        element = document.querySelector(`a[href="${href}"]`);
+    // Try finding navigation links by href
+    if (!element) {
+      const hrefMatch = step.selector.match(/href="([^"]+)"/);
+      if (hrefMatch) {
+        element = document.querySelector(`nav a[href="${hrefMatch[1]}"]`);
+        if (!element) {
+          element = document.querySelector(`a[href="${hrefMatch[1]}"]`);
+        }
       }
+    }
+
+    // Special handling for login button - find by text content
+    if (!element && step.id === 'login') {
+      const buttons = document.querySelectorAll('button');
+      for (const btn of buttons) {
+        if (btn.textContent.includes('Conectare') || btn.querySelector('.lucide-user')) {
+          element = btn;
+          break;
+        }
+      }
+    }
+
+    // Special handling for search input
+    if (!element && step.id === 'search') {
+      element = document.querySelector('input[type="text"]') || 
+                document.querySelector('input[placeholder]');
     }
 
     return element;
