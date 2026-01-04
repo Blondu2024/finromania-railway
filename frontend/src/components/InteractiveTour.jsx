@@ -643,10 +643,10 @@ export default function InteractiveTour() {
   }, [user, location]);
 
   const handleNext = useCallback(() => {
-    if (currentStep < tourSteps.length - 1) {
+    if (currentStep < filteredSteps.length - 1) {
       setCurrentStep(prev => prev + 1);
     }
-  }, [currentStep]);
+  }, [currentStep, filteredSteps.length]);
 
   const handleSkip = useCallback(() => {
     localStorage.setItem(TOUR_STORAGE_KEY, 'true');
