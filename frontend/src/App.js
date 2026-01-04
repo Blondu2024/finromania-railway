@@ -67,6 +67,7 @@ const TickerBar = lazy(() => import('./components/TickerBar'));
 const SearchBar = lazy(() => import('./components/SearchBar'));
 const NewsletterSignup = lazy(() => import('./components/NewsletterSignup'));
 const InstallPWA = lazy(() => import('./components/InstallPWA'));
+const OnboardingTour = lazy(() => import('./components/OnboardingTour'));
 
 // ============================================
 // LOADING FALLBACK - Minimal & Fast
