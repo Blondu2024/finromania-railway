@@ -202,42 +202,13 @@ const tourSteps = [
 
   // ========== FOOTER LINKS ==========
   {
-    id: 'footer-glossary',
+    id: 'footer-section',
     type: 'spotlight',
-    selector: 'footer a[href="/glossary"]',
-    title: '📖 Glosar Financiar',
-    description: 'Nu știi un termen? Aici găsești explicații pentru toți termenii financiari!',
+    selector: 'footer',
+    title: '📋 Footer-ul Platformei',
+    description: 'Aici găsești linkuri către Glosar, FAQ, Despre Noi, Contact și poți să te abonezi la newsletter!',
     position: 'top',
     icon: BookOpen,
-  },
-  {
-    id: 'footer-faq',
-    type: 'spotlight',
-    selector: 'footer a[href="/faq"]',
-    title: '❓ Întrebări Frecvente',
-    description: 'Răspunsuri la cele mai comune întrebări despre platformă și investiții.',
-    position: 'top',
-    icon: HelpCircle,
-  },
-  {
-    id: 'footer-about',
-    type: 'spotlight',
-    selector: 'footer a[href="/about"]',
-    title: '👋 Despre Noi',
-    description: 'Află povestea FinRomania și misiunea noastră!',
-    position: 'top',
-    icon: Star,
-  },
-
-  // ========== NEWSLETTER ==========
-  {
-    id: 'newsletter',
-    type: 'spotlight',
-    selector: 'footer input[type="email"], [class*="newsletter"] input, footer form input',
-    title: '📧 Newsletter',
-    description: 'Abonează-te pentru a primi zilnic cele mai importante știri financiare!',
-    position: 'top',
-    icon: Newspaper,
   },
 
   // ========== FINAL ==========
