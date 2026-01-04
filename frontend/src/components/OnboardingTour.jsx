@@ -390,7 +390,7 @@ export default function OnboardingTour() {
 
           {/* Main Card */}
           <motion.div
-            className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-10 shadow-2xl border border-white/20"
+            className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 md:p-10 shadow-2xl border border-white/20 max-h-[85vh] overflow-y-auto"
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 200 }}
