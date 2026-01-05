@@ -108,6 +108,15 @@ async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
 @router.get("/portfolio-advice")
 async def get_portfolio_advice(user: dict = Depends(require_auth)):
     """Get AI-powered portfolio advice based on user's risk profile"""
+    
+    # Check AI limit
+    can_use, used, remaining = await check_ai_limit(user)
+    if not can_use:
+        raise HTTPException(
+            status_code=429, 
+            detail=f"Ai atins limita lunară de {AI_MONTHLY_LIMIT} credite AI. Limita se resetează luna viitoare."
+        )
+    
     db = await get_database()
     
     # Get user's risk profile
