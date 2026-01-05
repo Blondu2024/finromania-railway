@@ -236,6 +236,14 @@ async def ask_advisor(request: AdviceRequest, user: dict = Depends(require_auth)
     if not request.question:
         raise HTTPException(status_code=400, detail="Întrebarea este obligatorie")
     
+    # Check AI limit
+    can_use, used, remaining = await check_ai_limit(user)
+    if not can_use:
+        raise HTTPException(
+            status_code=429, 
+            detail=f"Ai atins limita lunară de {AI_MONTHLY_LIMIT} credite AI. Limita se resetează luna viitoare."
+        )
+    
     system_prompt = """Ești un consilier financiar educațional pentru investitori români începători.
 Răspunzi doar la întrebări legate de investiții, finanțe personale și piețe de capital.
 Răspunzi în română, ești prietenos și simplu de înțeles.
@@ -245,18 +253,23 @@ Maxim 200 cuvinte per răspuns."""
     
     answer = await get_ai_response(request.question, system_prompt)
     
-    # Log question for analytics
+    # Log and increment usage
     db = await get_database()
     await db.advisor_questions.insert_one({
         "user_id": user["user_id"],
-        "question": request.question[:500],  # Limit stored question
+        "question": request.question[:500],
         "timestamp": datetime.now(timezone.utc).isoformat()
     })
+    await increment_ai_usage(user, "ask_advisor")
+    
+    # Get updated credits
+    _, used_now, remaining_now = await check_ai_limit(user)
     
     return {
         "question": request.question,
         "answer": answer,
-        "disclaimer": "Răspunsurile sunt doar în scop educativ."
+        "disclaimer": "Răspunsurile sunt doar în scop educativ.",
+        "credits_remaining": remaining_now
     }
 
 @router.get("/tip-of-the-day")
