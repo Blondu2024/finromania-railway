@@ -26,24 +26,29 @@ class RomanianRSSClient:
             'category': 'business'
         },
         {
-            'name': 'Bursa',
-            'url': 'https://www.bursa.ro/rss',
-            'category': 'stock_market'
-        },
-        {
-            'name': 'Wall-Street.ro',
-            'url': 'https://www.wall-street.ro/rss/wall-street.xml',
+            'name': 'Capital.ro',
+            'url': 'https://www.capital.ro/feed',
             'category': 'business'
         },
         {
             'name': 'Economica.net',
-            'url': 'https://www.economica.net/rss.xml',
+            'url': 'https://www.economica.net/feed',
             'category': 'economy'
         },
         {
-            'name': 'Capital.ro',
-            'url': 'https://www.capital.ro/feed',
-            'category': 'business'
+            'name': 'Hotnews Economie',
+            'url': 'https://economie.hotnews.ro/rss',
+            'category': 'economy'
+        },
+        {
+            'name': 'Digi24 Economie',
+            'url': 'https://www.digi24.ro/rss/economie',
+            'category': 'economy'
+        },
+        {
+            'name': 'Mediafax',
+            'url': 'https://www.mediafax.ro/rss',
+            'category': 'general'
         }
     ]
     
