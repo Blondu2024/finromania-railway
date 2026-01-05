@@ -44,6 +44,7 @@ from routes.global_markets import router as global_markets_router
 from routes.push_notifications import router as push_notifications_router
 from routes.trading_companion import router as trading_companion_router
 from routes.firebase_auth import router as firebase_auth_router
+from routes.admin_dashboard import router as admin_dashboard_router
 
 # Configure logging
 logging.basicConfig(
