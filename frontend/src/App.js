@@ -51,7 +51,7 @@ const CurrenciesPage = lazy(() => import('./pages/CurrenciesPage'));
 const AIAdvisorPage = lazy(() => import('./pages/AIAdvisorPage'));
 const RiskAssessmentPage = lazy(() => import('./pages/RiskAssessmentPage'));
 const LearnTradingPage = lazy(() => import('./pages/LearnTradingPage'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboardPro'));
 
 // Legal pages (rarely visited)
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
