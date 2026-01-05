@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/advisor", tags=["ai-advisor"])
 
+# AI Monthly Limit
+AI_MONTHLY_LIMIT = 10
+
 # Try to import emergent integrations for AI
 try:
     from emergentintegrations.llm.chat import LlmChat, UserMessage
@@ -26,6 +29,55 @@ class AdviceRequest(BaseModel):
     question: Optional[str] = None
 
 import uuid
+
+async def check_ai_limit(user: dict) -> tuple[bool, int, int]:
+    """Check if user has reached AI limit. Returns (can_use, used, remaining)"""
+    db = await get_database()
+    user_data = await db.users.find_one({"user_id": user["user_id"]})
+    
+    if not user_data:
+        return True, 0, AI_MONTHLY_LIMIT
+    
+    # Check for custom limit
+    limit = user_data.get("custom_ai_limit", AI_MONTHLY_LIMIT)
+    used = user_data.get("ai_credits_used", 0)
+    remaining = max(0, limit - used)
+    
+    # Admin bypass
+    if user_data.get("is_admin"):
+        return True, used, 999
+    
+    return remaining > 0, used, remaining
+
+async def increment_ai_usage(user: dict, feature: str):
+    """Increment AI usage for user"""
+    db = await get_database()
+    
+    await db.ai_usage_logs.insert_one({
+        "user_id": user["user_id"],
+        "email": user.get("email"),
+        "feature": feature,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "credits_used": 1
+    })
+    
+    await db.users.update_one(
+        {"user_id": user["user_id"]},
+        {"$inc": {"ai_credits_used": 1}}
+    )
+
+@router.get("/credits")
+async def get_ai_credits(user: dict = Depends(require_auth)):
+    """Get user's AI credits info"""
+    can_use, used, remaining = await check_ai_limit(user)
+    
+    return {
+        "credits_used": used,
+        "credits_remaining": remaining,
+        "monthly_limit": AI_MONTHLY_LIMIT,
+        "can_use_ai": can_use,
+        "resets_on": "1st of next month"
+    }
 
 async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
     """Get AI response using Emergent Universal Key"""
