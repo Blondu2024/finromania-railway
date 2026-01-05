@@ -167,23 +167,17 @@ Fii concis (max 200 cuvinte) și prietenos."""
     advice = await get_ai_response(prompt, system_prompt)
     
     # Track AI usage
-    await db.ai_usage_logs.insert_one({
-        "user_id": user["user_id"],
-        "email": user.get("email"),
-        "feature": "portfolio_advice",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "credits_used": 1
-    })
-    await db.users.update_one(
-        {"user_id": user["user_id"]},
-        {"$inc": {"ai_credits_used": 1}}
-    )
+    await increment_ai_usage(user, "portfolio_advice")
+    
+    # Get updated credits
+    _, used_now, remaining_now = await check_ai_limit(user)
     
     return {
         "advice": advice,
         "profile": profile_key,
         "holdings_count": len(holdings),
-        "needs_assessment": False
+        "needs_assessment": False,
+        "credits_remaining": remaining_now
     }
 
 @router.get("/stock-analysis/{symbol}")
