@@ -555,8 +555,17 @@ app.add_middleware(
         "https://finromania.ro",
         "https://www.finromania.ro",
         "https://finromania-4.preview.emergentagent.com",
+        os.getenv("CORS_ORIGINS", "*"),
     ],
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+# ============================================
+# ROOT HEALTH CHECK (Required for Kubernetes)
+# ============================================
+@app.get("/health")
+async def root_health_check():
+    """Health check endpoint at root level for Kubernetes probes"""
+    return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
