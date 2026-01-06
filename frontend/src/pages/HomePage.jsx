@@ -232,9 +232,9 @@ export default function HomePage() {
   return (
     <>
       <SEO 
-        title="FinRomania - Educație Financiară Gratuită + Date Live BVB"
-        description="Prima platformă din România cu educație financiară gratuită și date live de pe bursă. 32 lecții de trading, prețuri BVB în timp real, screener acțiuni, calendar dividende. 100% gratuit!"
-        keywords="educatie financiara gratuita, cursuri trading romania, bursa bucuresti live, bvb actiuni, investitii romania, analiza tehnica, trading pentru incepatori, actiuni romanesti"
+        title="FinRomania - Înțelege Piața Înainte să Investești"
+        description="Date reale. Educație clară. Decizii mai bune. Platforma românească pentru investitorul care vrea claritate, nu promisiuni. Educație financiară gratuită și date live BVB."
+        keywords="educatie financiara, date bvb, bursa bucuresti, investitii romania, analiza actiuni, trading romania, piata de capital, finante personale"
       />
       
       <div className="space-y-10">
