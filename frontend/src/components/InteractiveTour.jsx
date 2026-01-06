@@ -17,10 +17,10 @@ const tourSteps = [
   {
     id: 'welcome',
     type: 'modal',
-    title: 'Bine ai venit pe FinRomania! 🇷🇴',
-    description: 'Hai să-ți arăt toate funcțiile platformei în doar 2 minute!',
+    title: 'Explorează FinRomania 🇷🇴',
+    description: 'Îți arătăm platforma în 2 minute — educație, date și instrumente pentru decizii informate.',
     icon: Sparkles,
-    gradient: 'from-blue-600 via-purple-600 to-pink-600',
+    gradient: 'from-slate-700 via-blue-800 to-slate-900',
   },
   
   // ========== NAVIGATION MENU - DESKTOP ==========
