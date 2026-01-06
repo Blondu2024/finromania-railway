@@ -1690,7 +1690,7 @@ test_session_19:
     - Education CTA section
     
   testing_results:
-    page_loading: "✅ PASS - Page loads without errors at https://romfinance-1.preview.emergentagent.com/stocks"
+    page_loading: "✅ PASS - Page loads without errors at https://finromania-4.preview.emergentagent.com/stocks"
     
     market_pulse_gauge:
       status: "✅ FULLY FUNCTIONAL"
