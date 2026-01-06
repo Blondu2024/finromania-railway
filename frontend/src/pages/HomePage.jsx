@@ -77,7 +77,7 @@ const NewsCard = memo(function NewsCard({ article }) {
 });
 
 // ============================================
-// HERO SECTION - What is FinRomania?
+// HERO SECTION - Strategic Messaging (Mature & Clear)
 // ============================================
 const HeroSection = memo(function HeroSection() {
   return (
@@ -87,17 +87,20 @@ const HeroSection = memo(function HeroSection() {
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl -ml-24 -mb-24" />
       
       <div className="relative z-10">
-        {/* Main Title */}
+        {/* Main Message - Strategic & Mature */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-5xl font-bold mb-3">
-            🇷🇴 Bine ai venit pe <span className="text-blue-400">FinRomania</span>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">
+            Înțelege piața <span className="text-blue-400">înainte</span> să investești.
           </h1>
-          <p className="text-lg md:text-xl text-blue-200 max-w-2xl mx-auto">
-            Prima platformă din România care combină <strong>educația financiară gratuită</strong> cu <strong>date live de pe bursă</strong>
+          <p className="text-lg md:text-xl text-blue-200 max-w-2xl mx-auto mb-2">
+            Date reale. Educație clară. Decizii mai bune.
+          </p>
+          <p className="text-base text-blue-300/80 max-w-xl mx-auto">
+            Platforma românească pentru investitorul care vrea claritate, nu promisiuni.
           </p>
         </div>
 
-        {/* 4 Pillars Grid */}
+        {/* 4 Pillars Grid - Matured Text */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {/* Pillar 1: Education */}
           <Link to="/trading-school" className="group">
@@ -106,8 +109,8 @@ const HeroSection = memo(function HeroSection() {
                 <GraduationCap className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">🎓 Educație</h3>
-              <p className="text-sm text-blue-200">32 lecții gratuite de trading și finanțe</p>
-              <Badge className="mt-2 bg-green-500/20 text-green-300">100% GRATUIT</Badge>
+              <p className="text-sm text-blue-200">Structurată pentru începători și intermediari</p>
+              <Badge className="mt-2 bg-green-500/20 text-green-300 text-xs">GRATUIT</Badge>
             </div>
           </Link>
 
@@ -118,8 +121,8 @@ const HeroSection = memo(function HeroSection() {
                 <BarChart3 className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">📈 Date BVB</h3>
-              <p className="text-sm text-blue-200">Prețuri live de pe Bursa București</p>
-              <Badge className="mt-2 bg-blue-500/20 text-blue-300">LIVE</Badge>
+              <p className="text-sm text-blue-200">Piața românească, fără intermediari</p>
+              <Badge className="mt-2 bg-blue-500/20 text-blue-300 text-xs">TIMP REAL</Badge>
             </div>
           </Link>
 
@@ -130,8 +133,8 @@ const HeroSection = memo(function HeroSection() {
                 <Globe className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">🌍 Piețe Globale</h3>
-              <p className="text-sm text-blue-200">S&P 500, Bitcoin, Aur, Forex</p>
-              <Badge className="mt-2 bg-purple-500/20 text-purple-300">24/7</Badge>
+              <p className="text-sm text-blue-200">Piețe internaționale într-un singur loc</p>
+              <Badge className="mt-2 bg-purple-500/20 text-purple-300 text-xs">MONDIAL</Badge>
             </div>
           </Link>
 
@@ -142,24 +145,24 @@ const HeroSection = memo(function HeroSection() {
                 <Search className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">🔧 Instrumente</h3>
-              <p className="text-sm text-blue-200">Screener, Calendar, Convertor</p>
-              <Badge className="mt-2 bg-orange-500/20 text-orange-300">PRO</Badge>
+              <p className="text-sm text-blue-200">Pentru decizii informate</p>
+              <Badge className="mt-2 bg-orange-500/20 text-orange-300 text-xs">PRO</Badge>
             </div>
           </Link>
         </div>
 
-        {/* CTA Buttons */}
+        {/* CTA Buttons - More Professional */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link to="/trading-school">
             <Button size="lg" className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
               <BookOpen className="w-5 h-5 mr-2" />
-              Începe să Înveți Gratuit
+              Explorează Educația
             </Button>
           </Link>
           <Link to="/stocks">
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
               <TrendingUp className="w-5 h-5 mr-2" />
-              Vezi Bursa BVB
+              Vezi Piața BVB
             </Button>
           </Link>
         </div>
