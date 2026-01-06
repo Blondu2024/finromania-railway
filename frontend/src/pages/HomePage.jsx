@@ -484,11 +484,14 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Educational Benefits - MOVED HERE */}
+        {/* Educational Benefits - PROFESSIONAL TONE */}
         <section className="mt-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">
-            🎓 Învață Să Investești Inteligent
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2">
+            🎓 Educație Structurată
           </h2>
+          <p className="text-center text-muted-foreground mb-6 max-w-xl mx-auto">
+            Fără promisiuni, fără hype. Doar cunoștințe concrete pentru decizii informate.
+          </p>
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
               <CardContent className="p-6 text-center space-y-3">
@@ -497,11 +500,11 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-bold">Școala de Trading</h3>
                 <p className="text-muted-foreground">
-                  17 lecții: acțiuni, leverage, indicatori tehnici, strategii
+                  De la bazele pieței de capital la indicatori tehnici și strategii avansate
                 </p>
                 <Link to="/trading-school">
                   <Button className="w-full">
-                    Vezi Lecțiile <ArrowRight className="w-4 h-4 ml-1" />
+                    Accesează <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardContent>
@@ -512,13 +515,13 @@ export default function HomePage() {
                 <div className="inline-block p-4 bg-green-100 rounded-full">
                   <Target className="w-8 h-8 text-green-600" />
                 </div>
-                <h3 className="text-xl font-bold">💰 Educație Financiară</h3>
+                <h3 className="text-xl font-bold">💰 Finanțe Personale</h3>
                 <p className="text-muted-foreground">
-                  15 lecții: bugete, economii, pensii, investiții de bază
+                  Bugete, economii, pensii — fundația oricărei decizii financiare solide
                 </p>
                 <Link to="/financial-education">
                   <Button className="w-full bg-green-600 hover:bg-green-700">
-                    Începe Gratuit <ArrowRight className="w-4 h-4 ml-1" />
+                    Accesează <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardContent>
@@ -529,13 +532,13 @@ export default function HomePage() {
                 <div className="inline-block p-4 bg-purple-100 rounded-full">
                   <Award className="w-8 h-8 text-purple-600" />
                 </div>
-                <h3 className="text-xl font-bold">Quiz-uri Interactive</h3>
+                <h3 className="text-xl font-bold">Verificare Cunoștințe</h3>
                 <p className="text-muted-foreground">
-                  Verifică-ți cunoștințele și primește feedback instant
+                  Quiz-uri la finalul fiecărei lecții pentru a-ți consolida înțelegerea
                 </p>
                 <Link to="/trading-school">
                   <Button className="w-full" variant="outline">
-                    Încearcă un Quiz <ArrowRight className="w-4 h-4 ml-1" />
+                    Testează-te <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardContent>
