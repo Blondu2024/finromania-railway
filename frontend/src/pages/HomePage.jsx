@@ -546,29 +546,27 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Final CTA - Compact */}
+        {/* Final CTA - Professional & Clear */}
         <section className="mt-12">
-          <Card className="bg-gradient-to-br from-green-600 to-blue-600 text-white border-0 max-w-4xl mx-auto">
+          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 text-white border-0 max-w-4xl mx-auto">
             <CardContent className="p-8 text-center space-y-4">
-              <div className="inline-block p-3 bg-white/20 rounded-full">
-                <GraduationCap className="w-10 h-10" />
-              </div>
-              <h2 className="text-3xl font-bold">
-                Nu Știi De Unde Să Începi? Hai Să Te Ajutăm!
+              <h2 className="text-2xl md:text-3xl font-bold">
+                Claritate într-un domeniu haotic.
               </h2>
-              <p className="text-lg text-green-100 max-w-2xl mx-auto">
-                De la bazele finanțelor personale până la strategii avansate de trading — totul gratuit, în română, pentru tine!
+              <p className="text-base text-slate-300 max-w-2xl mx-auto">
+                FinRomania nu îți promite îmbogățire rapidă. Îți oferă instrumentele și cunoștințele 
+                necesare pentru a lua decizii informate — fie că ești la început sau ai experiență.
               </p>
-              <div className="flex gap-4 justify-center flex-wrap">
+              <div className="flex gap-4 justify-center flex-wrap pt-2">
                 <Link to="/financial-education/fin_lesson_1">
-                  <Button size="lg" className="bg-white text-green-600 hover:bg-green-50">
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
                     <Target className="w-5 h-5 mr-2" />
                     Începe cu Bazele
                   </Button>
                 </Link>
-                <Link to="/trading-school">
-                  <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10">
-                    Școala de Trading →
+                <Link to="/stocks">
+                  <Button size="lg" variant="outline" className="border-slate-500 text-white hover:bg-slate-700">
+                    Explorează Piața →
                   </Button>
                 </Link>
               </div>
