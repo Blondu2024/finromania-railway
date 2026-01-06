@@ -6,11 +6,15 @@ from datetime import datetime, timezone, timedelta
 import httpx
 import uuid
 import logging
+import os
 from config.database import get_database
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+# Emergent Auth API URL (configurable via environment)
+EMERGENT_AUTH_URL = os.getenv("EMERGENT_AUTH_URL", "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data")
 
 # Models
 class UserResponse(BaseModel):
