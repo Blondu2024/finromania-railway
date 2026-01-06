@@ -1,0 +1,625 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+#                        FINROMANIA 2.0 - PLAN STRATEGIC
+#                           Arhitectură & Implementare
+# ═══════════════════════════════════════════════════════════════════════════════
+
+## 📋 CUPRINS
+1. Viziune Generală
+2. Arhitectura Platformei
+3. Partiția BVB (România)
+4. Partiția GLOBAL
+5. Sistem AI Integrat
+6. Simulatoare Trading
+7. Plan Implementare pe Faze
+8. Estimare Costuri & Timeline
+9. Monetizare
+
+═══════════════════════════════════════════════════════════════════════════════
+                              1. VIZIUNE GENERALĂ
+═══════════════════════════════════════════════════════════════════════════════
+
+FinRomania 2.0 = Platformă educațională + Trading Simulator PREMIUM
+
+STRUCTURĂ:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              FINROMANIA 2.0                                  │
+├─────────────────────────────┬───────────────────────────────────────────────┤
+│       🇷🇴 PARTIȚIA BVB       │              🌍 PARTIȚIA GLOBAL                │
+│                             │                                               │
+│   ┌─────────────────────┐   │   ┌─────────────────────────────────────────┐ │
+│   │ 🟢 Începător        │   │   │  💱 FOREX                               │ │
+│   │ 🟡 Mediu            │   │   │  🪙 CRYPTO                              │ │
+│   │ 🔴 Avansat          │   │   │  🌐 PIEȚE MONDIALE (US/EU/Asia)         │ │
+│   └─────────────────────┘   │   │  📦 MĂRFURI (Aur, Petrol, etc.)         │ │
+│                             │   └─────────────────────────────────────────┘ │
+│   + Simulator BVB           │   + Simulator pentru fiecare                  │
+│   + AI Advisor RO           │   + AI Specialist per categorie               │
+└─────────────────────────────┴───────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                          2. ARHITECTURA PLATFORMEI
+═══════════════════════════════════════════════════════════════════════════════
+
+PAGINA PRINCIPALĂ (Homepage):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  [Logo FinRomania]                    [Căutare] [🌙] [Conectare]            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌─────────────────────────────┐  ┌─────────────────────────────────────┐  │
+│   │                             │  │                                     │  │
+│   │    🇷🇴 INVESTEȘTE ÎN        │  │    🌍 INVESTEȘTE GLOBAL             │  │
+│   │       ROMÂNIA               │  │                                     │  │
+│   │                             │  │    💱 Forex  🪙 Crypto              │  │
+│   │    Bursa de Valori          │  │    🌐 Piețe  📦 Mărfuri             │  │
+│   │    București (BVB)          │  │                                     │  │
+│   │                             │  │                                     │  │
+│   │    [Începe Acum →]          │  │    [Explorează →]                   │  │
+│   │                             │  │                                     │  │
+│   └─────────────────────────────┘  └─────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                           3. PARTIȚIA BVB (ROMÂNIA)
+═══════════════════════════════════════════════════════════════════════════════
+
+URL: /bvb sau /romania
+
+STRUCTURĂ INTERNĂ:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          🇷🇴 BURSA BUCUREȘTI                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  NIVEL EXPERIENȚĂ:  [🟢 Începător]  [🟡 Mediu]  [🔴 Avansat]                │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+
+🟢 ÎNCEPĂTOR (Nivel 1)
+├── 📚 Educație:
+│   ├── Ce este bursa?
+│   ├── Ce sunt acțiunile?
+│   ├── Cum funcționează BVB?
+│   ├── Termeni de bază (P/E, dividend, etc.)
+│   ├── Cum să-ți deschizi cont la broker
+│   └── Prima ta investiție (ghid pas cu pas)
+│
+├── 📊 Date Simplificate:
+│   ├── Top 10 companii BVB (vizualizare simplă)
+│   ├── Grafice simple (doar preț)
+│   └── Explicații pentru fiecare indicator
+│
+├── 🎮 Simulator Începător:
+│   ├── Buget virtual: 5,000 RON
+│   ├── Doar acțiuni "safe" (blue chips)
+│   ├── AI te ghidează la fiecare pas
+│   ├── Nu poți pierde mai mult de 20%
+│   └── Achievements: "Prima achiziție", "Primul dividend"
+│
+├── 🤖 AI Companion (Prietenos):
+│   ├── Limbaj simplu, fără jargon
+│   ├── Explică orice termen
+│   ├── Răspunde la întrebări de bază
+│   └── Sugestii educaționale
+│
+└── 📝 Quiz-uri:
+    ├── După fiecare lecție
+    ├── Trebuie 70% pentru a avansa
+    └── Puncte și badge-uri
+
+🟡 MEDIU (Nivel 2)
+├── 📚 Educație:
+│   ├── Analiză fundamentală (P/E, P/B, ROE)
+│   ├── Citirea rapoartelor financiare
+│   ├── Strategii de investiție
+│   ├── Diversificarea portofoliului
+│   ├── Dividende și randament
+│   └── Riscuri și cum să le gestionezi
+│
+├── 📊 Date Avansate:
+│   ├── Toate companiile BVB
+│   ├── Grafice cu indicatori (MA, Volume)
+│   ├── Fundamentale complete
+│   ├── Calendar dividende
+│   └── Screener basic
+│
+├── 🎮 Simulator Mediu:
+│   ├── Buget virtual: 25,000 RON
+│   ├── Toate acțiunile BVB
+│   ├── Ordine Limit și Stop-Loss
+│   ├── AI oferă sugestii (nu obligatorii)
+│   └── Competiție săptămânală
+│
+├── 🤖 AI Advisor (Analitic):
+│   ├── Analiză companii
+│   ├── Comparații
+│   ├── Răspunsuri detaliate
+│   └── Recomandări educaționale (cu disclaimer)
+│
+└── 📝 Provocări:
+    ├── "Construiește un portofoliu diversificat"
+    ├── "Găsește 3 acțiuni cu dividend > 5%"
+    └── Certificat la finalizare
+
+🔴 AVANSAT (Nivel 3)
+├── 📚 Educație:
+│   ├── Analiză tehnică (RSI, MACD, Bollinger)
+│   ├── Trading activ vs. investiție pasivă
+│   ├── Psihologia investitorului
+│   ├── Managementul riscului avansat
+│   ├── Opțiuni și derivate (teorie)
+│   └── Construirea unei strategii proprii
+│
+├── 📊 Date Profesionale:
+│   ├── Grafice intraday (1min, 5min)
+│   ├── Toți indicatorii tehnici
+│   ├── Screener avansat
+│   ├── Alerte de preț
+│   ├── Heatmap în timp real
+│   └── Date instituționale
+│
+├── 🎮 Simulator Avansat:
+│   ├── Buget virtual: 100,000 RON
+│   ├── Trading intraday
+│   ├── Short selling (simulat)
+│   ├── Leverage (simulat, cu risc explicat)
+│   ├── Fără ajutor AI (doar la cerere)
+│   └── Leaderboard național
+│
+├── 🤖 AI Expert (Profesional):
+│   ├── Analiză tehnică automată
+│   ├── Identificare pattern-uri
+│   ├── Backtesting strategii
+│   └── Rapoarte personalizate
+│
+└── 🏆 Certificare:
+    ├── Examen final
+    ├── Certificat "Expert BVB FinRomania"
+    └── Badge special în profil
+
+═══════════════════════════════════════════════════════════════════════════════
+                           4. PARTIȚIA GLOBAL
+═══════════════════════════════════════════════════════════════════════════════
+
+URL: /global
+
+STRUCTURĂ INTERNĂ:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            🌍 PIEȚE GLOBALE                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐                    │
+│  │  💱      │  │  🪙      │  │  🌐      │  │  📦      │                    │
+│  │  FOREX   │  │  CRYPTO  │  │  PIEȚE   │  │  MĂRFURI │                    │
+│  │          │  │          │  │ MONDIALE │  │          │                    │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+──────────────────────────────────────────────────────────────────────────────
+                         💱 FOREX (Valute)
+──────────────────────────────────────────────────────────────────────────────
+URL: /global/forex
+
+DESCRIERE: Pentru cei care vor să învețe și să practice trading pe valute.
+"Nimeni nu te învață Forex ca lumea în România - noi o facem!"
+
+🟢 ÎNCEPĂTOR FOREX
+├── 📚 Ce este Forex?
+├── 📚 Perechile valutare (EUR/USD, etc.)
+├── 📚 Cum funcționează cursul de schimb
+├── 📚 Pips, loturi, leverage (explicat simplu)
+├── 📚 Sesiunile de trading (Londra, NY, Tokyo)
+├── 🎮 Simulator: 1,000$ virtual, leverage 1:10
+└── 🤖 AI: Explică orice termen Forex
+
+🟡 MEDIU FOREX
+├── 📚 Analiză tehnică pentru Forex
+├── 📚 Strategii: Scalping, Day trading, Swing
+├── 📚 Corelații între valute
+├── 📚 Calendar economic (NFP, CPI, etc.)
+├── 📚 Managementul riscului
+├── 🎮 Simulator: 10,000$ virtual, leverage 1:50
+└── 🤖 AI: Analiză perechi, predicții
+
+🔴 AVANSAT FOREX
+├── 📚 Price Action avansat
+├── 📚 Strategii instituționale
+├── 📚 Hedging și carry trade
+├── 📚 Trading cu știrile
+├── 📚 Psihologie și disciplină
+├── 🎮 Simulator: 50,000$ virtual, leverage 1:100
+├── 🏆 Leaderboard Forex
+└── 🤖 AI: Backtesting, semnale
+
+──────────────────────────────────────────────────────────────────────────────
+                         🪙 CRYPTO (Criptomonede)
+──────────────────────────────────────────────────────────────────────────────
+URL: /global/crypto
+
+DESCRIERE: "Crypto demistificat - învață înainte să investești!"
+"Nimeni nu te învață crypto ca lumea - noi umplem acest gol!"
+
+🟢 ÎNCEPĂTOR CRYPTO
+├── 📚 Ce este blockchain? (explicat simplu)
+├── 📚 Bitcoin - de la zero
+├── 📚 Ethereum și smart contracts
+├── 📚 Portofele crypto (hot vs cold)
+├── 📚 Cum să cumperi crypto în România
+├── 📚 Riscurile crypto (volatilitate, scam-uri)
+├── 🎮 Simulator: 500$ virtual
+├──     Doar BTC și ETH
+└── 🤖 AI: Explică orice concept crypto
+
+🟡 MEDIU CRYPTO
+├── 📚 Altcoins - cum să le evaluezi
+├── 📚 DeFi (Decentralized Finance)
+├── 📚 NFT-uri și utilitatea lor
+├── 📚 Staking și yield farming
+├── 📚 Analiză on-chain
+├── 📚 Ciclurile pieței crypto
+├── 🎮 Simulator: 5,000$ virtual
+├──     Top 50 crypto
+└── 🤖 AI: Analiză proiecte, metrici
+
+🔴 AVANSAT CRYPTO
+├── 📚 Trading futures și options crypto
+├── 📚 Arbitraj
+├── 📚 Tokenomics avansat
+├── 📚 DAO-uri și guvernanță
+├── 📚 Strategii de portfolio crypto
+├── 🎮 Simulator: 25,000$ virtual
+├──     Toate crypto, inclusiv futures (simulat)
+├── 🏆 Leaderboard Crypto
+└── 🤖 AI: Semnale, analiză tehnică
+
+──────────────────────────────────────────────────────────────────────────────
+                      🌐 PIEȚE MONDIALE (Acțiuni)
+──────────────────────────────────────────────────────────────────────────────
+URL: /global/stocks
+
+SUB-CATEGORII:
+├── 🇺🇸 SUA (NYSE, NASDAQ)
+│   ├── Apple, Tesla, Google, Microsoft
+│   ├── S&P 500, Dow Jones, NASDAQ
+│   └── ETF-uri americane
+│
+├── 🇪🇺 Europa
+│   ├── DAX (Germania)
+│   ├── CAC 40 (Franța)
+│   ├── FTSE 100 (UK)
+│   └── Acțiuni europene majore
+│
+├── 🇯🇵 Asia-Pacific
+│   ├── Nikkei (Japonia)
+│   ├── Hang Seng (Hong Kong)
+│   ├── ASX (Australia)
+│   └── Emerging markets
+│
+└── 📊 ETF-uri Globale
+    ├── SPY, QQQ, VOO
+    ├── ETF-uri sectoriale
+    └── ETF-uri tematice
+
+🟢 ÎNCEPĂTOR STOCKS GLOBAL
+├── 📚 Diferențele între piețe (US vs EU vs Asia)
+├── 📚 Orele de tranzacționare
+├── 📚 Cum să investești din România în acțiuni străine
+├── 📚 ETF-uri pentru începători
+├── 📚 Riscul valutar
+├── 🎮 Simulator: 5,000$ virtual (doar ETF-uri)
+└── 🤖 AI: Explică companii și piețe
+
+🟡 MEDIU STOCKS GLOBAL
+├── 📚 Stock picking internațional
+├── 📚 Analiză fundamentală globală
+├── 📚 Earnings season și cum să o folosești
+├── 📚 ADR-uri și cum funcționează
+├── 📚 Diversificare geografică
+├── 🎮 Simulator: 25,000$ virtual (top 500 acțiuni)
+└── 🤖 AI: Analiză companii, comparații
+
+🔴 AVANSAT STOCKS GLOBAL
+├── 📚 Strategii instituționale
+├── 📚 Options basics (teorie)
+├── 📚 Sector rotation
+├── 📚 Macro trading
+├── 🎮 Simulator: 100,000$ virtual (toate acțiunile)
+├── 🏆 Leaderboard Global
+└── 🤖 AI: Screener avansat, semnale
+
+──────────────────────────────────────────────────────────────────────────────
+                         📦 MĂRFURI (Commodities)
+──────────────────────────────────────────────────────────────────────────────
+URL: /global/commodities
+
+CATEGORII:
+├── 🥇 Metale Prețioase (Aur, Argint, Platină)
+├── 🛢️ Energie (Petrol, Gaz Natural)
+├── 🌾 Agricole (Grâu, Porumb, Cafea)
+└── 🏭 Metale Industriale (Cupru, Aluminiu)
+
+🟢 ÎNCEPĂTOR MĂRFURI
+├── 📚 Ce sunt mărfurile și de ce contează
+├── 📚 Aurul ca "safe haven"
+├── 📚 Petrolul și economia globală
+├── 📚 Cum să investești în mărfuri (ETF-uri)
+├── 🎮 Simulator: 2,000$ virtual (Aur, Petrol)
+└── 🤖 AI: Explică factorii care influențează prețurile
+
+🟡 MEDIU MĂRFURI
+├── 📚 Futures pe mărfuri (teorie)
+├── 📚 Sezonalitate și cicluri
+├── 📚 Corelații (petrol-dolar, aur-inflație)
+├── 📚 Supply & Demand analysis
+├── 🎮 Simulator: 10,000$ virtual (toate mărfurile)
+└── 🤖 AI: Analiză, predicții
+
+🔴 AVANSAT MĂRFURI
+├── 📚 Trading activ pe mărfuri
+├── 📚 Spread trading
+├── 📚 Hedging cu mărfuri
+├── 🎮 Simulator: 50,000$ virtual
+├── 🏆 Leaderboard Commodities
+└── 🤖 AI: Strategii avansate
+
+═══════════════════════════════════════════════════════════════════════════════
+                          5. SISTEM AI INTEGRAT
+═══════════════════════════════════════════════════════════════════════════════
+
+TIPURI DE AI ADVISOR:
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          🤖 AI ADVISORS                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  📍 AI BVB Expert                                                           │
+│  ├── Specializat pe piața românească                                        │
+│  ├── Cunoaște toate companiile BVB                                          │
+│  ├── Vorbește română nativ                                                  │
+│  └── Disclaimer obligatoriu la orice recomandare                            │
+│                                                                             │
+│  📍 AI Forex Expert                                                         │
+│  ├── Specializat pe valute                                                  │
+│  ├── Calendar economic integrat                                             │
+│  └── Analiză perechi valutare                                               │
+│                                                                             │
+│  📍 AI Crypto Expert                                                        │
+│  ├── Specializat pe criptomonede                                            │
+│  ├── Analiză on-chain                                                       │
+│  └── Avertizări despre scam-uri                                             │
+│                                                                             │
+│  📍 AI Global Stocks Expert                                                 │
+│  ├── Cunoaște piețele mondiale                                              │
+│  ├── Earnings și fundamentale                                               │
+│  └── ETF-uri și diversificare                                               │
+│                                                                             │
+│  📍 AI Commodities Expert                                                   │
+│  ├── Specializat pe mărfuri                                                 │
+│  └── Supply/demand analysis                                                 │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  ⚠️ DISCLAIMER OBLIGATORIU PE TOATE:                                        │
+│  "Informațiile sunt doar în scop educativ. Nu reprezintă sfaturi de         │
+│   investiții. Consultă un specialist înainte de a investi bani reali."      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+LIMITA AI: 10 credite/lună gratuit, mai multe în plan PRO
+
+═══════════════════════════════════════════════════════════════════════════════
+                         6. SIMULATOARE TRADING
+═══════════════════════════════════════════════════════════════════════════════
+
+CARACTERISTICI COMUNE:
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      🎮 SIMULATOR FEATURES                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ✅ Portofoliu virtual cu bani ficțivi                                      │
+│  ✅ Prețuri REALE de la EODHD (delay 1 min)                                 │
+│  ✅ Grafice interactive cu indicatori                                       │
+│  ✅ Ordine: Market, Limit, Stop-Loss, Take-Profit                           │
+│  ✅ Istoric tranzacții                                                      │
+│  ✅ Performanță: P&L, ROI, Sharpe Ratio                                     │
+│  ✅ AI Companion care te ghidează                                           │
+│  ✅ Leaderboard (competiție)                                                │
+│  ✅ Achievements și badge-uri                                               │
+│  ✅ Jurnal de trading automat                                               │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  BUDGETE VIRTUALE:                                                          │
+│  ┌───────────────┬───────────┬───────────┬───────────┐                     │
+│  │ Categorie     │ Începător │   Mediu   │  Avansat  │                     │
+│  ├───────────────┼───────────┼───────────┼───────────┤                     │
+│  │ BVB           │  5,000 RON│ 25,000 RON│100,000 RON│                     │
+│  │ Forex         │  1,000 $  │ 10,000 $  │ 50,000 $  │                     │
+│  │ Crypto        │    500 $  │  5,000 $  │ 25,000 $  │                     │
+│  │ Stocks Global │  5,000 $  │ 25,000 $  │100,000 $  │                     │
+│  │ Mărfuri       │  2,000 $  │ 10,000 $  │ 50,000 $  │                     │
+│  └───────────────┴───────────┴───────────┴───────────┘                     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                     7. PLAN IMPLEMENTARE PE FAZE
+═══════════════════════════════════════════════════════════════════════════════
+
+FAZA 0 - PREGĂTIRE (Săptămâna 1-2)
+├── ✅ Upgrade EODHD la All-In-One ($99.99/lună)
+├── ✅ Arhitectură nouă bază de date
+├── ✅ Structură routing nouă
+└── ✅ Design system actualizat
+
+FAZA 1 - BVB COMPLET (Săptămâna 3-6) ⭐ PRIORITATE
+├── 📦 Restructurare secțiune BVB
+│   ├── Pagină alegere nivel (Începător/Mediu/Avansat)
+│   ├── Dashboard specific per nivel
+│   └── Educație structurată pe nivele
+├── 🎮 Simulator BVB v1
+│   ├── Portofoliu virtual
+│   ├── Cumpără/Vinde acțiuni
+│   ├── Istoric și performanță
+│   └── AI Companion integrat
+├── 🤖 AI BVB Expert
+│   ├── Prompt specializat BVB
+│   └── Disclaimer obligatoriu
+└── 🧪 Testare și lansare
+
+FAZA 2 - GLOBAL: FOREX (Săptămâna 7-10)
+├── 📦 Secțiune Forex completă
+│   ├── Educație 3 nivele
+│   ├── Date live perechi valutare
+│   └── Calendar economic
+├── 🎮 Simulator Forex
+│   ├── Leverage simulat
+│   ├── Pips calculator
+│   └── Margin tracking
+├── 🤖 AI Forex Expert
+└── 🧪 Testare și lansare
+
+FAZA 3 - GLOBAL: CRYPTO (Săptămâna 11-14)
+├── 📦 Secțiune Crypto completă
+│   ├── Educație 3 nivele
+│   ├── Date live top crypto
+│   └── Fear & Greed Index
+├── 🎮 Simulator Crypto
+│   ├── Volatilitate reală
+│   ├── Portfolio tracking
+│   └── Avertizări risc
+├── 🤖 AI Crypto Expert
+└── 🧪 Testare și lansare
+
+FAZA 4 - GLOBAL: STOCKS (Săptămâna 15-18)
+├── 📦 Secțiune Piețe Mondiale
+│   ├── US (NYSE, NASDAQ)
+│   ├── Europa (DAX, CAC, FTSE)
+│   ├── Asia (Nikkei, Hang Seng)
+│   └── ETF-uri globale
+├── 🎮 Simulator Stocks Global
+├── 🤖 AI Global Expert
+└── 🧪 Testare și lansare
+
+FAZA 5 - GLOBAL: MĂRFURI (Săptămâna 19-22)
+├── 📦 Secțiune Commodities
+│   ├── Metale, Energie, Agricole
+│   └── Educație completă
+├── 🎮 Simulator Mărfuri
+├── 🤖 AI Commodities Expert
+└── 🧪 Testare și lansare
+
+FAZA 6 - GAMIFICARE & COMPETIȚII (Săptămâna 23-26)
+├── 🏆 Leaderboards per categorie
+├── 🎖️ Sistem achievements complet
+├── 📜 Certificări
+├── 🏅 Competiții săptămânale/lunare
+└── 👥 Profil public utilizator
+
+═══════════════════════════════════════════════════════════════════════════════
+                        8. ESTIMARE COSTURI & TIMELINE
+═══════════════════════════════════════════════════════════════════════════════
+
+COSTURI LUNARE:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Serviciu                    │  Cost/lună   │  Notă                         │
+├──────────────────────────────┼──────────────┼───────────────────────────────┤
+│  EODHD All-In-One            │  $99.99      │  Date pentru tot              │
+│  Emergent Platform           │  ~$30-50     │  Hosting + AI                 │
+│  Domeniu + extras            │  ~$5         │                               │
+├──────────────────────────────┼──────────────┼───────────────────────────────┤
+│  TOTAL                       │  ~$135-155   │  /lună                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+TIMELINE:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Fază        │ Durată      │ Ce se livrează                                 │
+├──────────────┼─────────────┼────────────────────────────────────────────────┤
+│  Faza 0      │ 2 săptămâni │ Setup, arhitectură                             │
+│  Faza 1      │ 4 săptămâni │ BVB complet cu simulator                       │
+│  Faza 2      │ 4 săptămâni │ Forex complet                                  │
+│  Faza 3      │ 4 săptămâni │ Crypto complet                                 │
+│  Faza 4      │ 4 săptămâni │ Stocks Global complet                          │
+│  Faza 5      │ 4 săptămâni │ Mărfuri complet                                │
+│  Faza 6      │ 4 săptămâni │ Gamificare, competiții                         │
+├──────────────┼─────────────┼────────────────────────────────────────────────┤
+│  TOTAL       │ ~26 săpt.   │ ~6 luni pentru totul                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                            9. MONETIZARE
+═══════════════════════════════════════════════════════════════════════════════
+
+STRATEGIE: Freemium + Premium
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          💰 PLANURI                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  🆓 FREE (Pentru toți)                                                      │
+│  ├── Educație completă (toate nivelele)                                     │
+│  ├── Simulator ÎNCEPĂTOR                                                    │
+│  ├── 10 credite AI/lună                                                     │
+│  ├── Date end-of-day                                                        │
+│  └── Ads (minimal, neagresive)                                              │
+│                                                                             │
+│  ⭐ PRO (€9.99/lună sau €99/an)                                             │
+│  ├── Tot ce e în FREE +                                                     │
+│  ├── Simulator MEDIU și AVANSAT                                             │
+│  ├── 100 credite AI/lună                                                    │
+│  ├── Date intraday (1min, 5min)                                             │
+│  ├── Screener avansat                                                       │
+│  ├── Alerte de preț                                                         │
+│  ├── Fără reclame                                                           │
+│  ├── Badge PRO în profil                                                    │
+│  └── Competiții exclusive                                                   │
+│                                                                             │
+│  👑 ELITE (€24.99/lună sau €249/an)                                         │
+│  ├── Tot ce e în PRO +                                                      │
+│  ├── AI nelimitat                                                           │
+│  ├── Rapoarte personalizate                                                 │
+│  ├── Backtesting strategii                                                  │
+│  ├── Webinarii exclusive                                                    │
+│  ├── Suport prioritar                                                       │
+│  └── Certificări gratuite                                                   │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  PROIECȚIE REVENUE (la 6 luni):                                             │
+│  ├── 1000 useri free                                                        │
+│  ├── 50 PRO (€500/lună)                                                     │
+│  ├── 10 ELITE (€250/lună)                                                   │
+│  ├── TOTAL: ~€750/lună                                                      │
+│  └── Break-even: ~20 PRO + 5 ELITE                                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                              CONCLUZIE
+═══════════════════════════════════════════════════════════════════════════════
+
+ACEST PLAN OFERĂ:
+
+✅ Educație completă pentru TOATE categoriile de investitori
+✅ Simulatoare REALE cu date de la EODHD
+✅ AI specializat pe fiecare domeniu
+✅ Gamificare și competiții pentru engagement
+✅ Model de monetizare sustenabil
+✅ Diferențiere clară față de competiție
+✅ Scalabilitate pe termen lung
+
+CE FACE PLATFORMA UNICĂ:
+🎯 SINGURA platformă din România care oferă:
+   - Educație + Simulator + AI pentru BVB, Forex, Crypto, Global, Mărfuri
+   - În ROMÂNĂ
+   - Cu date REALE
+   - GRATUIT pentru educație, premium pentru features avansate
+
+NEXT STEPS:
+1. Confirmă viziunea și prioritățile
+2. Upgrade EODHD
+3. Începem Faza 0 + Faza 1 (BVB)
+
+═══════════════════════════════════════════════════════════════════════════════
+                     DOCUMENT CREAT: Ianuarie 2025
+                          PENTRU: FinRomania
+═══════════════════════════════════════════════════════════════════════════════
