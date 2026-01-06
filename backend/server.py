@@ -546,17 +546,17 @@ async def stripe_webhook(request: FastAPIRequest):
         logger.error(f"Webhook error: {e}")
         return {"status": "error"}
 
+# CORS Configuration - Uses CORS_ORIGINS env var or allows all
+cors_origins_env = os.getenv("CORS_ORIGINS", "*")
+if cors_origins_env == "*":
+    cors_origins = ["*"]
+else:
+    cors_origins = [origin.strip() for origin in cors_origins_env.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://localhost:3000",
-        "https://finromania.ro",
-        "https://www.finromania.ro",
-        "https://finromania-4.preview.emergentagent.com",
-        os.getenv("CORS_ORIGINS", "*"),
-    ],
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
