@@ -361,30 +361,30 @@ export default function HomePage() {
             {/* Newsletter */}
             <NewsletterSignup variant="sidebar" />
 
-            {/* Trading School CTA - REPLACED WITH HERO */}
-            <Card className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white border-0">
+            {/* Trading School CTA - Professional Tone */}
+            <Card className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white border-0">
               <CardContent className="p-6 text-center space-y-3">
-                <div className="inline-block p-3 bg-white/20 rounded-full backdrop-blur-sm">
+                <div className="inline-block p-3 bg-white/10 rounded-full">
                   <GraduationCap className="w-8 h-8" />
                 </div>
-                <h3 className="text-2xl font-bold">
-                  Gata Să Înveți Trading?
+                <h3 className="text-xl font-bold">
+                  Școala de Trading
                 </h3>
-                <p className="text-sm text-blue-100">
-                  17 lecții interactive + quiz-uri
+                <p className="text-sm text-slate-300">
+                  17 lecții structurate cu quiz-uri de verificare
                 </p>
-                <p className="text-xs text-blue-50">
-                  100% GRATUIT în română
+                <p className="text-xs text-slate-400">
+                  Gratuit. În română. La ritmul tău.
                 </p>
                 <Link to="/trading-school/lesson_1">
-                  <Button className="w-full bg-white text-blue-600 hover:bg-blue-50 font-semibold">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 font-medium">
                     <GraduationCap className="w-4 h-4 mr-2" />
                     Începe Lecția 1
                   </Button>
                 </Link>
                 <Link to="/trading-school">
-                  <Button variant="outline" className="w-full border-white text-white hover:bg-white/10">
-                    Vezi Programul →
+                  <Button variant="ghost" className="w-full text-slate-300 hover:text-white hover:bg-white/10">
+                    Vezi Programa →
                   </Button>
                 </Link>
               </CardContent>
