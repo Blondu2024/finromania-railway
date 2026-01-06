@@ -394,9 +394,12 @@ export default function HomePage() {
 
         {/* Top Movers Section - WITH VERTICAL SCROLL! */}
         <section className="mt-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6">
-            📊 Mișcările Pieței Astăzi
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2">
+            📊 Mișcările Zilei pe BVB
           </h2>
+          <p className="text-center text-muted-foreground mb-6">
+            Cele mai semnificative variații de preț — actualizate în timp real
+          </p>
           <div className="grid md:grid-cols-2 gap-6">
             {/* Top Gainers - Vertical Scroll */}
             <Card className="border-2 border-green-300">
