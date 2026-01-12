@@ -290,19 +290,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Social Proof */}
-        <SocialProof />
-
-        {/* Quick Calculator FREE with Upgrade */}
-        <QuickCalculator user={user} />
-
-        {/* FREE vs PRO Comparison - MEGA CLAR */}
-        <FreeVsProComparison />
-
         {/* Quick Calculator FREE cu Upgrade Prompt */}
         <QuickCalculator user={user} />
 
         {/* FREE vs PRO Comparison - SEPARARE MEGA CLARĂ */}
+        <FreeVsProComparison />
+
+        {/* Main Sections - Ordinea Corectă */}
         <FreeVsProComparison />
 
         {/* Portofoliu + Tools */}
