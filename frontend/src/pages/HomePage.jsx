@@ -289,62 +289,140 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Main Sections - Ordinea Corectă: BVB, Global, Dividende, Știri + Tools */}
-        {/* Main Features Grid - TOATE Vizibile */}
-
-        {/* Portofoliu + Tools - Secțiunea mică de jos */}
+        {/* Main Features Grid - TOATE Vizibile (8 Carduri) */}
         <section>
-          <h3 className="text-2xl font-bold mb-6">Portofoliu & Instrumente Avansate</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Link to="/portfolio-bvb">
-              <Card className="hover:shadow-lg transition-all cursor-pointer bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-800">
-                <CardContent className="p-5 flex items-center gap-3">
-                  <Briefcase className="w-10 h-10 text-blue-500" />
-                  <div>
-                    <h4 className="font-semibold">Portofoliu BVB</h4>
-                    <p className="text-sm text-muted-foreground">Sistem 3 Straturi</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link to="/advisor">
-              <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardContent className="p-5 flex items-center gap-3">
-                  <Activity className="w-10 h-10 text-purple-500" />
-                  <div>
-                    <h4 className="font-semibold">AI Advisor</h4>
-                    <p className="text-sm text-muted-foreground">5 gratis, ∞ PRO</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link to="/screener">
-              <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardContent className="p-5 flex items-center gap-3">
-                  <Search className="w-10 h-10 text-green-500" />
-                  <div>
-                    <h4 className="font-semibold">Stock Screener</h4>
-                    <p className="text-sm text-muted-foreground">Filtre BVB</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link to="/converter">
-              <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardContent className="p-5 flex items-center gap-3">
-                  <ArrowRight className="w-10 h-10 text-orange-500" />
-                  <div>
-                    <h4 className="font-semibold">Convertor Valutar</h4>
-                    <p className="text-sm text-muted-foreground">RON ⇄ USD/EUR</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-2">Explorează Platforma Completă</h2>
+            <p className="text-muted-foreground">BVB · Global · Dividende · Știri · Screener · Convertor · Portofoliu · AI</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Row 1: Piețe și Date */}
+            <FeatureCard 
+              to="/stocks"
+              icon={TrendingUp}
+              title="Bursa București"
+              description="50+ acțiuni BVB live (delay 15min)"
+              badge={{ text: "LIVE", color: "bg-green-500" }}
+              gradient="from-green-500 to-emerald-500"
+              stats={[
+                { value: "50+", label: "Acțiuni" },
+                { value: "BET", label: "Index" }
+              ]}
+            />
+
+            <FeatureCard 
+              to="/global"
+              icon={Globe}
+              title="Piețe Globale"
+              description="US, EU, Asia - Delay 1 secundă!"
+              badge={{ text: "1s Delay", color: "bg-purple-500" }}
+              gradient="from-purple-500 to-pink-500"
+              stats={[
+                { value: "LIVE", label: "Real-time" },
+                { value: "1s", label: "Delay" }
+              ]}
+            />
+
+            <FeatureCard 
+              to="/calendar"
+              icon={Target}
+              title="Calendar Dividende"
+              description="Plăți dividende BVB upcoming"
+              badge={{ text: "Calendar", color: "bg-blue-500" }}
+              gradient="from-blue-500 to-cyan-500"
+              stats={[
+                { value: "BVB", label: "Companii" },
+                { value: "Live", label: "Updates" }
+              ]}
+            />
+
+            <FeatureCard 
+              to="/news"
+              icon={Newspaper}
+              title="Știri Financiare"
+              description="Știri BVB și piețe internaționale"
+              badge={{ text: "Daily", color: "bg-red-500" }}
+              gradient="from-red-500 to-pink-500"
+              stats={[
+                { value: "Fresh", label: "Updates" },
+                { value: "RO", label: "Limbă" }
+              ]}
+            />
+
+            {/* Row 2: Tools și Instrumente */}
+            <FeatureCard 
+              to="/screener"
+              icon={Search}
+              title="Stock Screener"
+              description="Filtrează acțiuni BVB după criterii"
+              gradient="from-cyan-500 to-blue-500"
+              stats={[
+                { value: "50+", label: "Acțiuni" },
+                { value: "Filtre", label: "Multiple" }
+              ]}
+            />
+
+            <FeatureCard 
+              to="/converter"
+              icon={ArrowRight}
+              title="Convertor Valutar"
+              description="RON ⇄ USD, EUR, GBP live"
+              gradient="from-orange-500 to-red-500"
+              stats={[
+                { value: "BNR", label: "Oficial" },
+                { value: "Live", label: "Cursuri" }
+              ]}
+            />
+
+            <FeatureCard 
+              to="/portfolio-bvb"
+              icon={Briefcase}
+              title="Portofoliu BVB"
+              description="Sistem 3 Straturi cu AI"
+              badge={user ? { text: "Activ", color: "bg-green-500" } : { text: "Login", color: "bg-gray-500" }}
+              gradient="from-blue-500 to-indigo-500"
+              stats={[
+                { value: "3", label: "Nivele" },
+                { value: "AI", label: "Analiză" }
+              ]}
+            />
+
+            <FeatureCard 
+              to="/advisor"
+              icon={Activity}
+              title="AI Advisor"
+              description="5 gratis/zi, nelimitat cu PRO"
+              badge={{ text: "AI", color: "bg-purple-500" }}
+              gradient="from-purple-500 to-fuchsia-500"
+              stats={[
+                { value: "5", label: "FREE/zi" },
+                { value: "∞", label: "PRO" }
+              ]}
+            />
           </div>
         </section>
+
+        {/* Quick Calculator + CTA Încearcă PRO */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <QuickCalculator user={user} />
+          
+          {/* CTA Încearcă PRO */}
+          <Link to="/incearca-pro">
+            <Card className="h-full bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 text-white hover:shadow-2xl transition-all cursor-pointer">
+              <CardContent className="p-8 flex flex-col items-center justify-center h-full text-center">
+                <Crown className="w-16 h-16 mb-4" />
+                <h3 className="text-2xl font-bold mb-2">Vezi Toate Diferențele</h3>
+                <p className="text-white/90 mb-4">
+                  Comparație completă FREE vs PRO
+                </p>
+                <Badge className="bg-white/20 text-white text-lg px-4 py-2">
+                  Tabel Detaliat →
+                </Badge>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
 
         {/* BVB Stocks - Vertical Auto-Scroll */}
         <section>
