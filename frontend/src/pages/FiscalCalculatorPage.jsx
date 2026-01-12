@@ -141,7 +141,7 @@ export default function FiscalCalculatorPage() {
       fetchPreview();
     }, 300);
     return () => clearTimeout(timer);
-  }, [castigCapital, dividende, areSalariu]);
+  }, [castigCapital, dividende, areSalariu, tipPiata]);
 
   const fetchConstante = async () => {
     try {
