@@ -514,6 +514,10 @@ app.include_router(push_notifications_router)
 app.include_router(trading_companion_router)
 app.include_router(firebase_auth_router)
 app.include_router(admin_dashboard_router, prefix="/api")
+app.include_router(fear_greed_router, prefix="/api")
+app.include_router(subscriptions_router, prefix="/api")
+app.include_router(quiz_router, prefix="/api")
+app.include_router(ai_advisor_pro_router, prefix="/api")
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest
