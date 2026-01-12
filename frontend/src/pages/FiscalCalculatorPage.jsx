@@ -262,19 +262,27 @@ export default function FiscalCalculatorPage() {
 
         {/* Quick Preview */}
         {preview && !results && (
-          <Card className="bg-gradient-to-r from-green-600 to-emerald-600 text-white">
+          <Card className={`${tipPiata === 'bvb' ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-blue-600 to-purple-600'} text-white`}>
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <Sparkles className="w-12 h-12" />
                   <div>
-                    <p className="text-green-100">Pentru {formatRON(venitTotal)} venit din investiții</p>
+                    <p className="text-white/80">Pentru {formatRON(venitTotal)} venit din investiții</p>
                     <p className="text-2xl font-bold">{preview.mesaj_principal}</p>
+                    {preview.bonus_bvb && tipPiata === 'bvb' && (
+                      <p className="text-sm text-white/90 mt-1">💡 {preview.bonus_bvb}</p>
+                    )}
+                    {preview.nota_bvb && tipPiata === 'international' && (
+                      <p className="text-sm text-amber-200 mt-1">⚠️ {preview.nota_bvb}</p>
+                    )}
                   </div>
                 </div>
                 <div className="text-center md:text-right">
-                  <p className="text-sm text-green-100">Total taxe ca PF</p>
-                  <p className="text-3xl font-bold">{formatRON(preview.comparatie?.pf_bvb?.total_taxe || 0)}</p>
+                  <p className="text-sm text-white/80">Total taxe ca PF ({tipPiata === 'bvb' ? 'BVB' : 'Internațional'})</p>
+                  <p className="text-3xl font-bold">
+                    {formatRON(tipPiata === 'bvb' ? preview.comparatie?.pf_bvb?.total_taxe || 0 : preview.comparatie?.pf_international?.total_taxe || 0)}
+                  </p>
                 </div>
               </div>
             </CardContent>
