@@ -124,6 +124,8 @@ export default function FiscalCalculatorPage() {
   const [results, setResults] = useState(null);
   const [preview, setPreview] = useState(null);
   const [constante, setConstante] = useState(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [checkingSubscription, setCheckingSubscription] = useState(true);
   
   // Form state - adaptat pentru investiții
   const [castigCapital, setCastigCapital] = useState(50000);
@@ -133,6 +135,32 @@ export default function FiscalCalculatorPage() {
   const [procentTermenLung, setProcentTermenLung] = useState(50);
   const [areSalariu, setAreSalariu] = useState(true);
   const [areAngajat, setAreAngajat] = useState(false);
+
+  // Check subscription status
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!user || !token) {
+        setCheckingSubscription(false);
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/api/subscriptions/status`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setSubscriptionStatus(data);
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+      } finally {
+        setCheckingSubscription(false);
+      }
+    };
+    
+    checkSubscription();
+  }, [user, token]);
 
   useEffect(() => {
     fetchConstante();
