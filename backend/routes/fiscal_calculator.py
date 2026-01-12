@@ -540,15 +540,24 @@ async def calculeaza_impozite(
 ):
     """
     Calculează și compară scenariile fiscale pentru investiții.
+    DOAR PENTRU UTILIZATORI PRO!
     ACTUALIZAT conform legislației române 2024-2025.
     """
     db = await get_database()
     
-    # Verifică dacă user-ul are PRO (comentat pentru testare)
-    # user_data = await db.users.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    # subscription_level = user_data.get("subscription_level", "free") if user_data else "free"
-    # if subscription_level != "pro":
-    #     raise HTTPException(status_code=403, detail="PRO required")
+    # Verifică dacă user-ul are PRO
+    user_data = await db.users.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    subscription_level = user_data.get("subscription_level", "free") if user_data else "free"
+    
+    if subscription_level != "pro":
+        raise HTTPException(
+            status_code=403, 
+            detail={
+                "error": "pro_required",
+                "message": "Calculatorul Fiscal este disponibil doar pentru utilizatorii PRO.",
+                "upgrade_url": "/pricing"
+            }
+        )
     
     # Calculează scenariile bazate pe piața selectată
     if input_data.tip_piata == TipPiata.BVB:
