@@ -236,26 +236,33 @@ export default function FiscalCalculatorPage() {
         </div>
 
         {/* Key Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="bg-green-500/10 border-green-500/30">
             <CardContent className="p-4 text-center">
-              <Calendar className="w-8 h-8 text-green-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-green-600">1%</p>
-              <p className="text-sm text-muted-foreground">Impozit BVB (deținere ≥1 an)</p>
+              <Calendar className="w-6 h-6 text-green-600 mx-auto mb-2" />
+              <p className="text-xl font-bold text-green-600">1%</p>
+              <p className="text-xs text-muted-foreground">🇷🇴 BVB ≥1 an</p>
             </CardContent>
           </Card>
           <Card className="bg-yellow-500/10 border-yellow-500/30">
             <CardContent className="p-4 text-center">
-              <Clock className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-yellow-600">3%</p>
-              <p className="text-sm text-muted-foreground">Impozit BVB (deținere &lt;1 an)</p>
+              <Clock className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
+              <p className="text-xl font-bold text-yellow-600">3%</p>
+              <p className="text-xs text-muted-foreground">🇷🇴 BVB &lt;1 an</p>
             </CardContent>
           </Card>
           <Card className="bg-blue-500/10 border-blue-500/30">
             <CardContent className="p-4 text-center">
-              <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-blue-600">8%</p>
-              <p className="text-sm text-muted-foreground">Impozit dividende (reținut la sursă)</p>
+              <TrendingUp className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+              <p className="text-xl font-bold text-blue-600">10%</p>
+              <p className="text-xs text-muted-foreground">🌍 Internațional</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-purple-500/10 border-purple-500/30">
+            <CardContent className="p-4 text-center">
+              <TrendingUp className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+              <p className="text-xl font-bold text-purple-600">8%</p>
+              <p className="text-xs text-muted-foreground">Dividende RO</p>
             </CardContent>
           </Card>
         </div>
