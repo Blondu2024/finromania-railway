@@ -608,7 +608,7 @@ class FinRomania2Tester:
         else:
             self.log_test("Submit Quiz - Intermediate", False, "No quiz questions available", None)
         
-        # Test 4.3: PRO user should skip quiz
+        # Test 4.4: PRO user should skip quiz
         success, details, data = self.test_api_endpoint(
             'GET', '/api/quiz/advanced',
             auth_token=self.pro_token
@@ -621,18 +621,21 @@ class FinRomania2Tester:
         else:
             self.log_test("PRO User - Skip Quiz", False, details, data)
         
-        # Test 4.4: Get quiz history
-        success, details, data = self.test_api_endpoint(
-            'GET', '/api/quiz/history/intermediate',
-            auth_token=self.beginner_token
-        )
-        if success and isinstance(data, dict):
-            has_attempts = 'attempts' in data
-            self.log_test("Get Quiz History", has_attempts,
-                         f"Attempts: {len(data.get('attempts', []))}, Best score: {data.get('best_score', 0)}",
-                         data)
+        # Test 4.5: Get quiz history
+        if hasattr(self, 'quiz_token'):
+            success, details, data = self.test_api_endpoint(
+                'GET', '/api/quiz/history/intermediate',
+                auth_token=self.quiz_token
+            )
+            if success and isinstance(data, dict):
+                has_attempts = 'attempts' in data
+                self.log_test("Get Quiz History", has_attempts,
+                             f"Attempts: {len(data.get('attempts', []))}, Best score: {data.get('best_score', 0)}",
+                             data)
+            else:
+                self.log_test("Get Quiz History", False, details, data)
         else:
-            self.log_test("Get Quiz History", False, details, data)
+            self.log_test("Get Quiz History", False, "No quiz token available", None)
         
         # ============================================
         # PRINT SUMMARY
