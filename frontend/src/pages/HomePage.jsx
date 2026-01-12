@@ -11,7 +11,6 @@ import SEO from '../components/SEO';
 import FearGreedIndex from '../components/FearGreedIndex';
 import { useAuth } from '../context/AuthContext';
 import FeatureCard from '../components/FeatureCard';
-import FreeVsProComparison from '../components/FreeVsProComparison';
 import QuickCalculator from '../components/QuickCalculator';
 import TrustBadges from '../components/TrustBadges';
 
