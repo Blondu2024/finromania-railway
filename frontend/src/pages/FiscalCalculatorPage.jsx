@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, TrendingUp, Building2, User, Crown, Lock, ChevronRight, CheckCircle, XCircle, Info, AlertTriangle, Sparkles } from 'lucide-react';
+import { Calculator, TrendingUp, Building2, User, Crown, Lock, ChevronRight, CheckCircle, XCircle, Info, AlertTriangle, Sparkles, Clock, Calendar } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -51,8 +51,8 @@ const ResultCard = ({ scenario, isBest, isWorst }) => {
             </div>
             <div>
               <CardTitle className="text-lg">{scenario.nume_entitate}</CardTitle>
-              {isBest && <Badge className="bg-green-500 text-white mt-1">Cel mai avantajos</Badge>}
-              {isWorst && <Badge variant="destructive" className="mt-1">Cel mai costisitor</Badge>}
+              {isBest && <Badge className="bg-green-500 text-white mt-1">✅ Recomandat</Badge>}
+              {isWorst && <Badge variant="destructive" className="mt-1">❌ Nu e recomandat</Badge>}
             </div>
           </div>
           <div className="text-right">
@@ -81,22 +81,22 @@ const ResultCard = ({ scenario, isBest, isWorst }) => {
         <div className="space-y-2">
           <p className="text-sm font-medium">Detalii calcul:</p>
           {scenario.detalii.map((detaliu, idx) => (
-            <p key={idx} className="text-sm text-muted-foreground flex items-center gap-2">
-              <ChevronRight className="w-3 h-3" />
-              {detaliu}
+            <p key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+              <ChevronRight className="w-3 h-3 mt-1 flex-shrink-0" />
+              <span>{detaliu}</span>
             </p>
           ))}
         </div>
 
         {/* Pros & Cons */}
-        <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+        <div className="grid grid-cols-1 gap-4 pt-2 border-t">
           <div>
             <p className="text-sm font-medium text-green-600 mb-2 flex items-center gap-1">
               <CheckCircle className="w-4 h-4" /> Avantaje
             </p>
             <ul className="space-y-1">
-              {scenario.avantaje.slice(0, 3).map((av, idx) => (
-                <li key={idx} className="text-xs text-muted-foreground">• {av}</li>
+              {scenario.avantaje.map((av, idx) => (
+                <li key={idx} className="text-xs text-muted-foreground">{av}</li>
               ))}
             </ul>
           </div>
@@ -105,8 +105,8 @@ const ResultCard = ({ scenario, isBest, isWorst }) => {
               <XCircle className="w-4 h-4" /> Dezavantaje
             </p>
             <ul className="space-y-1">
-              {scenario.dezavantaje.slice(0, 3).map((dez, idx) => (
-                <li key={idx} className="text-xs text-muted-foreground">• {dez}</li>
+              {scenario.dezavantaje.map((dez, idx) => (
+                <li key={idx} className="text-xs text-muted-foreground">{dez}</li>
               ))}
             </ul>
           </div>
@@ -123,25 +123,25 @@ export default function FiscalCalculatorPage() {
   const [preview, setPreview] = useState(null);
   const [constante, setConstante] = useState(null);
   
-  // Form state
-  const [venitAnual, setVenitAnual] = useState(100000);
-  const [tipVenit, setTipVenit] = useState('mixt');
-  const [procentDividende, setProcentDividende] = useState(50);
-  const [areAlteVenituri, setAreAlteVenituri] = useState(true);
+  // Form state - adaptat pentru investiții
+  const [castigCapital, setCastigCapital] = useState(50000);
+  const [dividende, setDividende] = useState(10000);
+  const [tipPiata, setTipPiata] = useState('bvb');
+  const [perioadaDetinere, setPerioadaDetinere] = useState('mixt');
+  const [procentTermenLung, setProcentTermenLung] = useState(50);
+  const [areSalariu, setAreSalariu] = useState(true);
   const [areAngajat, setAreAngajat] = useState(false);
 
   useEffect(() => {
     fetchConstante();
-    fetchPreview();
   }, []);
 
   useEffect(() => {
-    // Update preview when venit changes
     const timer = setTimeout(() => {
       fetchPreview();
-    }, 500);
+    }, 300);
     return () => clearTimeout(timer);
-  }, [venitAnual]);
+  }, [castigCapital, dividende, areSalariu]);
 
   const fetchConstante = async () => {
     try {
@@ -157,7 +157,9 @@ export default function FiscalCalculatorPage() {
 
   const fetchPreview = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/fiscal/preview?venit=${venitAnual}`);
+      const response = await fetch(
+        `${API_URL}/api/fiscal/preview?castig=${castigCapital}&dividende=${dividende}&are_salariu=${areSalariu}`
+      );
       if (response.ok) {
         const data = await response.json();
         setPreview(data);
@@ -169,7 +171,6 @@ export default function FiscalCalculatorPage() {
 
   const handleCalculate = async () => {
     if (!user || !token) {
-      // Redirect to login
       window.location.href = '/login';
       return;
     }
@@ -183,24 +184,19 @@ export default function FiscalCalculatorPage() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          venit_brut_anual: venitAnual,
-          tip_venit: tipVenit,
-          procent_dividende: procentDividende,
-          are_alte_venituri_cass: areAlteVenituri,
-          are_angajat_srl: areAngajat,
-          cheltuieli_deductibile_pfa: 0
+          castig_capital_anual: castigCapital,
+          dividende_anuale: dividende,
+          tip_piata: tipPiata,
+          perioada_detinere: perioadaDetinere,
+          procent_termen_lung: procentTermenLung,
+          are_alte_venituri_cass: areSalariu,
+          are_angajat_srl: areAngajat
         })
       });
 
       if (response.ok) {
         const data = await response.json();
         setResults(data);
-      } else {
-        const error = await response.json();
-        if (error.detail?.error === 'pro_required') {
-          // Show upgrade prompt
-          alert('Calculatorul complet este disponibil doar pentru PRO');
-        }
       }
     } catch (error) {
       console.error('Error calculating:', error);
@@ -215,47 +211,71 @@ export default function FiscalCalculatorPage() {
   const worstScenario = results?.scenarii?.reduce((worst, curr) => 
     curr.venit_net < worst.venit_net ? curr : worst, results.scenarii[0]);
 
+  const venitTotal = castigCapital + dividende;
+
   return (
     <>
       <SEO 
-        title="Calculator Fiscal | FinRomania"
-        description="Compară PF vs PFA vs SRL. Află cum să optimizezi impozitele din investiții în România."
+        title="Calculator Fiscal Investiții BVB | FinRomania"
+        description="Calculează impozitele pe câștiguri din acțiuni BVB. Compară PF vs PFA vs SRL. Impozit 1-3% pentru BVB!"
       />
       
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         {/* Hero Section */}
         <div className="text-center space-y-4">
-          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1">
-            <Crown className="w-4 h-4 mr-1 inline" />
-            Feature PRO
+          <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-1">
+            🏆 Actualizat 2024-2025
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold">
-            Calculator <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Fiscal</span>
+            Calculator <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Fiscal BVB</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Compară PF vs PFA vs SRL și află cum să economisești mii de lei la impozite
+            Știai că pe BVB plătești doar <strong className="text-green-600">1-3% impozit</strong> pe câștiguri?
+            Calculează exact cât datorezi statului.
           </p>
         </div>
 
-        {/* Quick Preview for Everyone */}
+        {/* Key Info Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="bg-green-500/10 border-green-500/30">
+            <CardContent className="p-4 text-center">
+              <Calendar className="w-8 h-8 text-green-600 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-green-600">1%</p>
+              <p className="text-sm text-muted-foreground">Impozit BVB (deținere ≥1 an)</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-yellow-500/10 border-yellow-500/30">
+            <CardContent className="p-4 text-center">
+              <Clock className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-yellow-600">3%</p>
+              <p className="text-sm text-muted-foreground">Impozit BVB (deținere &lt;1 an)</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-blue-500/10 border-blue-500/30">
+            <CardContent className="p-4 text-center">
+              <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <p className="text-2xl font-bold text-blue-600">8%</p>
+              <p className="text-sm text-muted-foreground">Impozit dividende (reținut la sursă)</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Preview */}
         {preview && !results && (
-          <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+          <Card className="bg-gradient-to-r from-green-600 to-emerald-600 text-white">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <Sparkles className="w-12 h-12" />
                   <div>
-                    <p className="text-blue-100">Pentru un venit de {formatRON(venitAnual)}</p>
-                    <p className="text-2xl font-bold">{preview.mesaj}</p>
+                    <p className="text-green-100">Pentru {formatRON(venitTotal)} venit din investiții</p>
+                    <p className="text-2xl font-bold">{preview.mesaj_principal}</p>
                   </div>
                 </div>
-                <Button 
-                  size="lg" 
-                  className="bg-white text-blue-600 hover:bg-blue-50"
-                  onClick={handleCalculate}
-                >
-                  {user ? 'Calculează Acum' : 'Conectează-te pentru Calcul Complet'}
-                </Button>
+                <div className="text-center md:text-right">
+                  <p className="text-sm text-green-100">Total taxe ca PF</p>
+                  <p className="text-3xl font-bold">{formatRON(preview.comparatie?.pf_bvb?.total_taxe || 0)}</p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -269,82 +289,107 @@ export default function FiscalCalculatorPage() {
                 <Calculator className="w-5 h-5" />
                 Datele Tale
               </CardTitle>
-              <CardDescription>Ajustează parametrii pentru calcul</CardDescription>
+              <CardDescription>Introdu câștigurile din investiții</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Venit Anual */}
+              {/* Câștig Capital */}
               <div className="space-y-3">
                 <Label className="flex items-center justify-between">
-                  Venit Anual din Investiții
-                  <span className="font-bold text-blue-600">{formatRON(venitAnual)}</span>
+                  Câștig din vânzare acțiuni
+                  <span className="font-bold text-blue-600">{formatRON(castigCapital)}</span>
                 </Label>
                 <Slider
-                  value={[venitAnual]}
-                  onValueChange={(v) => setVenitAnual(v[0])}
-                  min={10000}
-                  max={1000000}
-                  step={10000}
+                  value={[castigCapital]}
+                  onValueChange={(v) => setCastigCapital(v[0])}
+                  min={0}
+                  max={500000}
+                  step={5000}
                   className="cursor-pointer"
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>10k</span>
-                  <span>500k</span>
-                  <span>1M RON</span>
+                  <span>0</span>
+                  <span>250k</span>
+                  <span>500k RON</span>
                 </div>
               </div>
 
-              {/* Tip Venit */}
+              {/* Dividende */}
               <div className="space-y-3">
-                <Label>Tip Venit</Label>
-                <Tabs value={tipVenit} onValueChange={setTipVenit}>
-                  <TabsList className="grid grid-cols-3 w-full">
-                    <TabsTrigger value="castig_capital">Capital</TabsTrigger>
-                    <TabsTrigger value="dividende">Dividende</TabsTrigger>
-                    <TabsTrigger value="mixt">Mixt</TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                <Label className="flex items-center justify-between">
+                  Dividende primite
+                  <span className="font-bold text-purple-600">{formatRON(dividende)}</span>
+                </Label>
+                <Slider
+                  value={[dividende]}
+                  onValueChange={(v) => setDividende(v[0])}
+                  min={0}
+                  max={100000}
+                  step={1000}
+                  className="cursor-pointer"
+                />
               </div>
 
-              {/* Procent Dividende (doar pentru mixt) */}
-              {tipVenit === 'mixt' && (
+              {/* Tip Piață */}
+              <div className="space-y-3">
+                <Label>Piața</Label>
+                <Tabs value={tipPiata} onValueChange={setTipPiata}>
+                  <TabsList className="grid grid-cols-2 w-full">
+                    <TabsTrigger value="bvb">🇷🇴 BVB</TabsTrigger>
+                    <TabsTrigger value="international">🌍 Global</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                {tipPiata === 'bvb' && (
+                  <p className="text-xs text-green-600">✅ Impozit avantajos: 1-3%</p>
+                )}
+                {tipPiata === 'international' && (
+                  <p className="text-xs text-yellow-600">⚠️ Impozit: 10%</p>
+                )}
+              </div>
+
+              {/* Perioada Deținere (doar pentru BVB) */}
+              {tipPiata === 'bvb' && (
                 <div className="space-y-3">
-                  <Label className="flex items-center justify-between">
-                    Procent Dividende
-                    <span className="font-bold">{procentDividende}%</span>
-                  </Label>
-                  <Slider
-                    value={[procentDividende]}
-                    onValueChange={(v) => setProcentDividende(v[0])}
-                    min={0}
-                    max={100}
-                    step={5}
-                  />
+                  <Label>Perioada de deținere</Label>
+                  <Tabs value={perioadaDetinere} onValueChange={setPerioadaDetinere}>
+                    <TabsList className="grid grid-cols-3 w-full">
+                      <TabsTrigger value="peste_1_an" className="text-xs">≥1 an (1%)</TabsTrigger>
+                      <TabsTrigger value="sub_1_an" className="text-xs">&lt;1 an (3%)</TabsTrigger>
+                      <TabsTrigger value="mixt" className="text-xs">Mixt</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  
+                  {perioadaDetinere === 'mixt' && (
+                    <div className="space-y-2 mt-2">
+                      <Label className="text-xs">% pe termen lung (≥1 an): {procentTermenLung}%</Label>
+                      <Slider
+                        value={[procentTermenLung]}
+                        onValueChange={(v) => setProcentTermenLung(v[0])}
+                        min={0}
+                        max={100}
+                        step={10}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Switches */}
-              <div className="space-y-4">
+              <div className="space-y-4 pt-4 border-t">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="alte-venituri" className="cursor-pointer">
-                    Am salariu/alte venituri cu CASS
+                  <Label htmlFor="salariu" className="cursor-pointer text-sm">
+                    Am salariu (plătesc CASS de acolo)
                   </Label>
                   <Switch
-                    id="alte-venituri"
-                    checked={areAlteVenituri}
-                    onCheckedChange={setAreAlteVenituri}
+                    id="salariu"
+                    checked={areSalariu}
+                    onCheckedChange={setAreSalariu}
                   />
                 </div>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="angajat" className="cursor-pointer">
-                    SRL-ul are angajat
-                  </Label>
-                  <Switch
-                    id="angajat"
-                    checked={areAngajat}
-                    onCheckedChange={setAreAngajat}
-                  />
-                </div>
+                {!areSalariu && (
+                  <p className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-2 rounded">
+                    ⚠️ Fără salariu, vei datora CASS (10%) dacă venitul &gt; 22.200 RON/an
+                  </p>
+                )}
               </div>
 
               {/* Calculate Button */}
@@ -362,7 +407,7 @@ export default function FiscalCalculatorPage() {
                 ) : (
                   <span className="flex items-center gap-2">
                     <Calculator className="w-4 h-4" />
-                    Calculează Impozitele
+                    Calculează
                   </span>
                 )}
               </Button>
@@ -370,7 +415,7 @@ export default function FiscalCalculatorPage() {
               {!user && (
                 <p className="text-sm text-center text-muted-foreground">
                   <Lock className="w-4 h-4 inline mr-1" />
-                  Conectează-te pentru calcul complet
+                  Conectează-te pentru comparație completă
                 </p>
               )}
             </CardContent>
@@ -385,19 +430,18 @@ export default function FiscalCalculatorPage() {
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                       <div>
-                        <p className="text-sm text-muted-foreground">Economie maximă posibilă</p>
-                        <p className="text-4xl font-bold text-green-600">{formatRON(results.economie_maxima)}/an</p>
+                        <p className="text-sm text-muted-foreground">Economie vs cea mai scumpă opțiune</p>
+                        <p className="text-4xl font-bold text-green-600">{formatRON(results.economie_maxima)}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Recomandare</p>
-                        <p className="font-semibold">{results.recomandare}</p>
+                        <Badge className="bg-green-500 text-white mb-2">🏆 {results.recomandare}</Badge>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
                 {/* Scenario Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-4">
                   {results.scenarii.map((scenario) => (
                     <ResultCard
                       key={scenario.tip_entitate}
@@ -413,31 +457,46 @@ export default function FiscalCalculatorPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Info className="w-5 h-5" />
-                      Explicație Detaliată
+                      Explicație
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose dark:prose-invert max-w-none">
+                    <div className="prose dark:prose-invert max-w-none text-sm">
                       <div dangerouslySetInnerHTML={{ 
                         __html: results.explicatie_detaliata
+                          .replace(/###\s*(.*)/g, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>')
                           .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                           .replace(/\n/g, '<br/>')
+                          .replace(/\|(.+)\|/g, '<code>$1</code>')
                       }} />
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Legal Note */}
+                {results.nota_legala && (
+                  <Card className="bg-amber-500/10 border-amber-500/30">
+                    <CardContent className="p-4">
+                      <p className="text-sm text-amber-800 dark:text-amber-200">
+                        {results.nota_legala}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
               </>
             ) : (
-              /* Placeholder when no results */
               <Card className="h-full min-h-[400px] flex items-center justify-center">
                 <CardContent className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto">
-                    <Calculator className="w-8 h-8 text-muted-foreground" />
+                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto">
+                    <TrendingUp className="w-8 h-8 text-green-600" />
                   </div>
-                  <h3 className="text-xl font-semibold">Ajustează parametrii și calculează</h3>
+                  <h3 className="text-xl font-semibold">Investești pe BVB?</h3>
                   <p className="text-muted-foreground max-w-md">
-                    Introdu venitul tău anual din investiții și setările pentru a vedea comparația 
-                    completă între PF, PFA și SRL.
+                    Vești bune! România are unul dintre cele mai avantajoase regimuri fiscale 
+                    pentru investitorii la bursă: doar <strong className="text-green-600">1-3%</strong> impozit pe câștiguri!
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Completează formularul pentru a calcula exact cât datorezi.
                   </p>
                 </CardContent>
               </Card>
@@ -445,52 +504,61 @@ export default function FiscalCalculatorPage() {
           </div>
         </div>
 
-        {/* Info Section */}
-        <Card className="bg-amber-500/10 border-amber-500/30">
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
-              <div>
-                <h4 className="font-semibold text-amber-800 dark:text-amber-200">Disclaimer Important</h4>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Acest calculator oferă estimări orientative bazate pe legislația fiscală din România. 
-                  Rezultatele nu constituie consultanță fiscală sau juridică. Pentru situația ta specifică, 
-                  te recomandăm să consulți un contabil autorizat sau un consultant fiscal.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Tax Constants Info */}
         {constante && (
           <Card>
             <CardHeader>
-              <CardTitle>Constante Fiscale {constante.an_fiscal}</CardTitle>
-              <CardDescription>Valorile folosite în calcule</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="w-5 h-5" />
+                Legislație Fiscală {constante.an_fiscal}
+              </CardTitle>
+              <CardDescription>Ultima actualizare: {constante.ultima_actualizare}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
-                  <p className="text-sm text-muted-foreground">Salariu Minim</p>
-                  <p className="font-semibold">{formatRON(constante.salariu_minim_brut)}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                  <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">🇷🇴 BVB</h4>
+                  <p className="text-sm text-muted-foreground">Câștig ≥1 an: <strong>1%</strong></p>
+                  <p className="text-sm text-muted-foreground">Câștig &lt;1 an: <strong>3%</strong></p>
+                  <p className="text-sm text-muted-foreground">Dividende: <strong>8%</strong></p>
                 </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
-                  <p className="text-sm text-muted-foreground">Impozit Capital</p>
-                  <p className="font-semibold">{constante.impozite.castig_capital}</p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🌍 Internațional</h4>
+                  <p className="text-sm text-muted-foreground">Câștig capital: <strong>10%</strong></p>
+                  <p className="text-sm text-muted-foreground">Dividende: <strong>10%</strong></p>
                 </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
-                  <p className="text-sm text-muted-foreground">Impozit Dividende</p>
-                  <p className="font-semibold">{constante.impozite.dividende}</p>
+                <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
+                  <h4 className="font-semibold text-amber-700 dark:text-amber-300 mb-2">🏥 CASS</h4>
+                  <p className="text-sm text-muted-foreground">Rată: <strong>10%</strong></p>
+                  <p className="text-sm text-muted-foreground">Prag: <strong>{constante.cass?.prag_activare}</strong></p>
+                  <p className="text-xs text-muted-foreground mt-1">{constante.cass?.nota}</p>
                 </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
-                  <p className="text-sm text-muted-foreground">SRL Micro (cu angajat)</p>
-                  <p className="font-semibold">{constante.micro_srl.cu_angajat}</p>
+                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                  <h4 className="font-semibold text-purple-700 dark:text-purple-300 mb-2">🏢 SRL Micro</h4>
+                  <p className="text-sm text-muted-foreground">Cu angajat: <strong>{constante.micro_srl?.cu_angajat}</strong></p>
+                  <p className="text-sm text-muted-foreground">Fără angajat: <strong>{constante.micro_srl?.fara_angajat}</strong></p>
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
+
+        {/* Disclaimer */}
+        <Card className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <AlertTriangle className="w-6 h-6 text-slate-600 flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="font-semibold">Disclaimer</h4>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Calculele sunt orientative și bazate pe legislația în vigoare. Legislația fiscală 
+                  se poate modifica. Pentru situația ta specifică, consultă un contabil autorizat CECCAR.
+                  FinRomania nu oferă consiliere fiscală sau juridică.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </>
   );
