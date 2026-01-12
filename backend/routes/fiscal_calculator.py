@@ -631,47 +631,123 @@ async def get_constante_fiscale():
 async def get_preview_calcul(
     castig: float = 50000,
     dividende: float = 10000,
-    are_salariu: bool = True
+    are_salariu: bool = True,
+    piata: str = "bvb"
 ):
     """
     Preview rapid pentru homepage (public)
     Arată economiile posibile între PF și alte forme
+    Suportă atât BVB cât și piețe internaționale
     """
+    tip_piata = TipPiata.INTERNATIONAL if piata == "international" else TipPiata.BVB
+    
     input_data = CalculFiscalInput(
         castig_capital_anual=castig,
         dividende_anuale=dividende,
-        tip_piata=TipPiata.BVB,
+        tip_piata=tip_piata,
         perioada_detinere=PerioadaDetinere.MIXT,
         procent_termen_lung=50,
         are_alte_venituri_cass=are_salariu,
         are_angajat_srl=False
     )
     
-    pf = calcul_pf_bvb(input_data)
-    srl = calcul_srl_micro_investitii(input_data)
-    
-    economie = pf.venit_net - srl.venit_net
-    
-    return {
-        "castig_capital": castig,
-        "dividende": dividende,
-        "venit_total": castig + dividende,
-        "comparatie": {
-            "pf_bvb": {
-                "venit_net": round(pf.venit_net),
-                "total_taxe": round(pf.total_taxe),
-                "rata_impozitare": f"{pf.rata_efectiva_impozitare:.1f}%",
-                "detalii": "1-3% câștig + 8% dividende"
+    if tip_piata == TipPiata.BVB:
+        pf = calcul_pf_bvb(input_data)
+        srl = calcul_srl_micro_investitii(input_data)
+        economie = pf.venit_net - srl.venit_net
+        
+        # Comparație cu international
+        input_int = CalculFiscalInput(
+            castig_capital_anual=castig,
+            dividende_anuale=dividende,
+            tip_piata=TipPiata.INTERNATIONAL,
+            perioada_detinere=PerioadaDetinere.MIXT,
+            procent_termen_lung=50,
+            are_alte_venituri_cass=are_salariu,
+            are_angajat_srl=False
+        )
+        pf_int = calcul_pf_international(input_int)
+        diferenta_bvb_vs_int = pf.venit_net - pf_int.venit_net
+        
+        return {
+            "piata": "BVB",
+            "castig_capital": castig,
+            "dividende": dividende,
+            "venit_total": castig + dividende,
+            "comparatie": {
+                "pf_bvb": {
+                    "venit_net": round(pf.venit_net),
+                    "total_taxe": round(pf.total_taxe),
+                    "rata_impozitare": f"{pf.rata_efectiva_impozitare:.1f}%",
+                    "detalii": "1-3% câștig + 8% dividende"
+                },
+                "pf_international": {
+                    "venit_net": round(pf_int.venit_net),
+                    "total_taxe": round(pf_int.total_taxe),
+                    "rata_impozitare": f"{pf_int.rata_efectiva_impozitare:.1f}%",
+                    "detalii": "10% câștig + 15% dividende (reținere SUA)"
+                },
+                "srl_micro": {
+                    "venit_net": round(srl.venit_net),
+                    "total_taxe": round(srl.total_taxe),
+                    "rata_impozitare": f"{srl.rata_efectiva_impozitare:.1f}%",
+                    "detalii": "3% micro + 8% dividende + costuri admin"
+                }
             },
-            "srl_micro": {
-                "venit_net": round(srl.venit_net),
-                "total_taxe": round(srl.total_taxe),
-                "rata_impozitare": f"{srl.rata_efectiva_impozitare:.1f}%",
-                "detalii": "3% micro + 8% dividende + costuri admin"
-            }
-        },
-        "economie_pf_vs_srl": round(economie) if economie > 0 else 0,
-        "concluzie": "Pentru investiții pe BVB, Persoana Fizică este aproape întotdeauna mai avantajoasă!",
-        "mesaj_principal": f"Ca PF, plătești doar {pf.rata_efectiva_impozitare:.1f}% taxe pe BVB!",
-        "is_preview": True
-    }
+            "economie_pf_vs_srl": round(economie) if economie > 0 else 0,
+            "economie_bvb_vs_international": round(diferenta_bvb_vs_int) if diferenta_bvb_vs_int > 0 else 0,
+            "concluzie": "Pentru investiții pe BVB, Persoana Fizică este aproape întotdeauna mai avantajoasă!",
+            "mesaj_principal": f"🇷🇴 BVB: doar {pf.rata_efectiva_impozitare:.1f}% taxe vs 🌍 International: {pf_int.rata_efectiva_impozitare:.1f}%",
+            "bonus_bvb": f"Economisești {diferenta_bvb_vs_int:,.0f} RON investind pe BVB în loc de SUA!",
+            "is_preview": True
+        }
+    else:  # INTERNATIONAL
+        pf_int = calcul_pf_international(input_data)
+        srl = calcul_srl_micro_investitii(input_data)
+        economie = pf_int.venit_net - srl.venit_net
+        
+        # Comparație cu BVB
+        input_bvb = CalculFiscalInput(
+            castig_capital_anual=castig,
+            dividende_anuale=dividende,
+            tip_piata=TipPiata.BVB,
+            perioada_detinere=PerioadaDetinere.MIXT,
+            procent_termen_lung=50,
+            are_alte_venituri_cass=are_salariu,
+            are_angajat_srl=False
+        )
+        pf_bvb = calcul_pf_bvb(input_bvb)
+        diferenta_int_vs_bvb = pf_bvb.venit_net - pf_int.venit_net
+        
+        return {
+            "piata": "Internațional",
+            "castig_capital": castig,
+            "dividende": dividende,
+            "venit_total": castig + dividende,
+            "comparatie": {
+                "pf_international": {
+                    "venit_net": round(pf_int.venit_net),
+                    "total_taxe": round(pf_int.total_taxe),
+                    "rata_impozitare": f"{pf_int.rata_efectiva_impozitare:.1f}%",
+                    "detalii": "10% câștig + 15% dividende (reținere SUA)"
+                },
+                "pf_bvb": {
+                    "venit_net": round(pf_bvb.venit_net),
+                    "total_taxe": round(pf_bvb.total_taxe),
+                    "rata_impozitare": f"{pf_bvb.rata_efectiva_impozitare:.1f}%",
+                    "detalii": "1-3% câștig + 8% dividende"
+                },
+                "srl_micro": {
+                    "venit_net": round(srl.venit_net),
+                    "total_taxe": round(srl.total_taxe),
+                    "rata_impozitare": f"{srl.rata_efectiva_impozitare:.1f}%",
+                    "detalii": "3% micro + 8% dividende + costuri admin"
+                }
+            },
+            "economie_pf_vs_srl": round(economie) if economie > 0 else 0,
+            "cost_vs_bvb": round(diferenta_int_vs_bvb) if diferenta_int_vs_bvb > 0 else 0,
+            "concluzie": "Piețele internaționale au impozit mai mare, dar oferă diversificare globală.",
+            "mesaj_principal": f"🌍 International: {pf_int.rata_efectiva_impozitare:.1f}% taxe (vs 🇷🇴 BVB: {pf_bvb.rata_efectiva_impozitare:.1f}%)",
+            "nota_bvb": f"Ai plăti cu {diferenta_int_vs_bvb:,.0f} RON mai puțin pe BVB",
+            "is_preview": True
+        }
