@@ -61,6 +61,7 @@ const DisclaimerPage = lazy(() => import('./pages/DisclaimerPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
+const QuizPage = lazy(() => import('./pages/QuizPage'));
 
 // Lazy load heavy components
 const TickerBar = lazy(() => import('./components/TickerBar'));
