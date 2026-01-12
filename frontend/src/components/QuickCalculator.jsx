@@ -39,7 +39,7 @@ export default function QuickCalculator({ user }) {
   };
   
   const preview = calculateQuickPreview();
-  const isPro = user?.subscription_level === 'pro';
+  const isPro = user && user.subscription_level === 'pro';
   
   return (
     <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
