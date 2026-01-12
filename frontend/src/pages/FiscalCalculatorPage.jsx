@@ -242,6 +242,32 @@ export default function FiscalCalculatorPage() {
     curr.venit_net < worst.venit_net ? curr : worst, results.scenarii[0]);
 
   const venitTotal = castigCapital + dividende;
+  
+  // Check if user has PRO access
+  const isPro = subscriptionStatus?.subscription?.is_pro;
+  const isLoggedIn = !!user;
+
+  // Show loading while checking subscription
+  if (checkingSubscription) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // Show paywall for non-PRO users
+  if (!isPro) {
+    return (
+      <>
+        <SEO 
+          title="Calculator Fiscal PRO | FinRomania"
+          description="Calculator fiscal profesional pentru investiții la bursă. Funcție PRO exclusivă."
+        />
+        <ProPaywall feature="Calculatorul Fiscal cu AI" />
+      </>
+    );
+  }
 
   return (
     <>
