@@ -290,13 +290,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Quick Calculator FREE cu Upgrade Prompt */}
-        <QuickCalculator user={user} />
-
-        {/* FREE vs PRO Comparison - SEPARARE MEGA CLARĂ */}
-        <FreeVsProComparison />
-
-        {/* Main Sections - Ordinea Corectă */}
+        {/* Main Sections - Ordinea Corectă: BVB, Global, Dividende, Știri + Tools */}
         <FreeVsProComparison />
 
         {/* Portofoliu + Tools */}
