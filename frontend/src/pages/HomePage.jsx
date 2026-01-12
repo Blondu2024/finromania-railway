@@ -183,6 +183,7 @@ const HeroSection = memo(function HeroSection({ user }) {
 });
 
 export default function HomePage() {
+  const { user } = useAuth();
   const [bvbStocks, setBvbStocks] = useState([]);
   const [globalIndices, setGlobalIndices] = useState([]);
   const [news, setNews] = useState([]);
