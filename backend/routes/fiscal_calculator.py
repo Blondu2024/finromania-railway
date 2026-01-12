@@ -606,7 +606,10 @@ async def get_constante_fiscale():
         },
         "international": {
             "castig_capital": "10%",
-            "nota": "Trebuie declarat în Declarația Unică"
+            "dividende_sua": "15% reținut la sursă (cu W-8BEN)",
+            "dividende_ue": "10-25% (variază pe țară)",
+            "credit_fiscal": "Se scade impozitul plătit în străinătate",
+            "nota": "Trebuie declarat în Declarația Unică (212)"
         },
         "cass": {
             "rata": "10%",
