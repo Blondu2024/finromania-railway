@@ -1,16 +1,69 @@
 {
   "summary": {
-    "total_tests": 48,
-    "passed_tests": 48,
-    "success_rate": "100.0%",
-    "timestamp": "2025-12-28T20:18:03.898102"
+    "total_tests": 53,
+    "passed_tests": 50,
+    "success_rate": "94.3%",
+    "timestamp": "2026-01-12T15:28:26.659808"
   },
   "detailed_results": [
+    {
+      "test_name": "Fear & Greed Index",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-01-12T15:27:32.081495",
+      "response_sample": {
+        "score": 85,
+        "label": "L\u0103comie Extrem\u0103",
+        "components": [
+          "rsi",
+          "momentum",
+          "volatility",
+          "volume"
+        ]
+      }
+    },
+    {
+      "test_name": "Subscription Pricing",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-01-12T15:27:32.221672",
+      "response_sample": {
+        "pro_monthly": 49.0,
+        "pro_yearly": 490.0
+      }
+    },
+    {
+      "test_name": "Fear & Greed History (7 days)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-01-12T15:27:32.441685",
+      "response_sample": {
+        "period_days": 7,
+        "data_points": 4
+      }
+    },
+    {
+      "test_name": "Root Health Check",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-01-12T15:27:32.613687",
+      "response_sample": "<!doctype html>\n<html lang=\"ro\">\n    <head>\n        <meta charset=\"utf-8\" />\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n        <meta name=\"theme-color\" content=\"#2"
+    },
+    {
+      "test_name": "API Health Check",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-01-12T15:27:32.714030",
+      "response_sample": {
+        "status": "healthy",
+        "timestamp": "2026-01-12T15:27:32.708460+00:00"
+      }
+    },
     {
       "test_name": "Companion Tips - TLV (-5%)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:34.588381",
+      "timestamp": "2026-01-12T15:27:32.873697",
       "response_sample": {
         "symbol": "TLV",
         "tips": [
@@ -25,7 +78,7 @@
       "test_name": "Companion Tips - TLV (+5%)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:34.638566",
+      "timestamp": "2026-01-12T15:27:33.061373",
       "response_sample": {
         "symbol": "TLV",
         "tips": [
@@ -40,7 +93,7 @@
       "test_name": "Companion Tips - TLV (0%)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:34.687258",
+      "timestamp": "2026-01-12T15:27:33.136320",
       "response_sample": {
         "symbol": "TLV",
         "tips": [
@@ -55,7 +108,7 @@
       "test_name": "Companion Tips - TLV (-10%)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:34.735973",
+      "timestamp": "2026-01-12T15:27:33.220210",
       "response_sample": {
         "symbol": "TLV",
         "tips": [
@@ -70,17 +123,17 @@
       "test_name": "Companion Ask - No Auth",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:39.228481",
+      "timestamp": "2026-01-12T15:27:40.679568",
       "response_sample": {
-        "response_length": 946,
+        "response_length": 1010,
         "has_disclaimer": true
       }
     },
     {
       "test_name": "Regular User Creation",
       "success": true,
-      "details": "Test user created: testuser_1766953059.235669@test.com",
-      "timestamp": "2025-12-28T20:17:41.477651",
+      "details": "Test user created: testuser_1768231660.691027@test.com",
+      "timestamp": "2026-01-12T15:27:47.573893",
       "response_sample": {
         "has_token": true
       }
@@ -89,9 +142,9 @@
       "test_name": "Companion Ask - With Auth",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:45.187050",
+      "timestamp": "2026-01-12T15:28:00.305473",
       "response_sample": {
-        "response_length": 1098,
+        "response_length": 1044,
         "has_disclaimer": true
       }
     },
@@ -99,47 +152,47 @@
       "test_name": "Companion Ask - Level incepator",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:49.310028",
+      "timestamp": "2026-01-12T15:28:06.806682",
       "response_sample": {
         "user_level": "incepator",
-        "response_length": 1048
+        "response_length": 1114
       }
     },
     {
       "test_name": "Companion Ask - Level intermediar",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:53.406389",
+      "success": false,
+      "details": "Validation failed: Response contains forbidden advice: 'vinde'",
+      "timestamp": "2026-01-12T15:28:14.207722",
       "response_sample": {
         "user_level": "intermediar",
-        "response_length": 1067
+        "response_length": 1020
       }
     },
     {
       "test_name": "Companion Ask - Level expert",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:56.652345",
+      "timestamp": "2026-01-12T15:28:18.963792",
       "response_sample": {
         "user_level": "expert",
-        "response_length": 915
+        "response_length": 599
       }
     },
     {
       "test_name": "Health Check",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:56.732590",
+      "timestamp": "2026-01-12T15:28:19.051665",
       "response_sample": {
         "status": "healthy",
-        "timestamp": "2025-12-28T20:17:56.727756+00:00"
+        "timestamp": "2026-01-12T15:28:19.044453+00:00"
       }
     },
     {
       "test_name": "API Root Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:56.776795",
+      "timestamp": "2026-01-12T15:28:19.130489",
       "response_sample": {
         "message": "FinRomania API",
         "version": "1.0.0",
@@ -154,23 +207,23 @@
     },
     {
       "test_name": "BVB Stock Details - TLV (REAL EODHD)",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:57.138767",
+      "success": false,
+      "details": "Validation failed: Too few history entries: 17, expected around 30",
+      "timestamp": "2026-01-12T15:28:19.601086",
       "response_sample": {
         "symbol": "TLV",
-        "history_count": 21,
+        "history_count": 17,
         "is_mock": false
       }
     },
     {
       "test_name": "BVB Stock Details - H2O (REAL EODHD)",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:57.417838",
+      "success": false,
+      "details": "Validation failed: Too few history entries: 17, expected around 30",
+      "timestamp": "2026-01-12T15:28:19.970675",
       "response_sample": {
         "symbol": "H2O",
-        "history_count": 21,
+        "history_count": 17,
         "is_mock": false
       }
     },
@@ -178,7 +231,7 @@
       "test_name": "Data Sources - BVB should be EODHD (REAL)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:58.760919",
+      "timestamp": "2026-01-12T15:28:20.498557",
       "response_sample": {
         "bvb_source": "EODHD (REAL)",
         "global_source": "Yahoo Finance (REAL)",
@@ -189,18 +242,18 @@
       "test_name": "BVB Stocks List (REAL data verification)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:58.808241",
+      "timestamp": "2026-01-12T15:28:20.543316",
       "response_sample": [
         {
           "symbol": "H2O",
           "name": "Hidroelectrica",
-          "price": 125.0,
-          "change": 0.0,
-          "change_percent": 0.0,
-          "volume": 21535,
-          "open": 125.0,
-          "high": 125.0,
-          "low": 124.1,
+          "price": 125.2,
+          "change": 0.7,
+          "change_percent": 0.5622,
+          "volume": 55344,
+          "open": 124.5,
+          "high": 125.4,
+          "low": 124.5,
           "currency": "RON",
           "market": "BVB",
           "source": "mock_data",
@@ -209,13 +262,13 @@
         {
           "symbol": "TLV",
           "name": "Banca Transilvania",
-          "price": 30.34,
-          "change": 0.02,
-          "change_percent": 0.066,
-          "volume": 412625,
-          "open": 30.34,
-          "high": 30.4,
-          "low": 30.18,
+          "price": 32.62,
+          "change": 0.52,
+          "change_percent": 1.6199,
+          "volume": 585414,
+          "open": 32.06,
+          "high": 32.8,
+          "low": 32.04,
           "currency": "RON",
           "market": "BVB",
           "source": "mock_data",
@@ -227,7 +280,7 @@
       "test_name": "Admin Authentication Setup",
       "success": true,
       "details": "Admin session token created",
-      "timestamp": "2025-12-28T20:17:59.367527",
+      "timestamp": "2026-01-12T15:28:21.337992",
       "response_sample": {
         "has_token": true
       }
@@ -236,21 +289,21 @@
       "test_name": "Admin Stats Endpoint",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.421873",
+      "timestamp": "2026-01-12T15:28:21.421329",
       "response_sample": {
         "totals": {
-          "users": 22,
-          "articles": 721,
+          "users": 23,
+          "articles": 1858,
           "watchlist_items": 1,
           "portfolio_transactions": 5,
           "newsletter_subscribers": 2
         },
         "today": {
-          "logins": 1,
+          "logins": 0,
           "page_visits": 0
         },
         "last_7_days": {
-          "new_users": 22
+          "new_users": 1
         }
       }
     },
@@ -258,17 +311,17 @@
       "test_name": "Admin Users List (limit=5)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.484392",
+      "timestamp": "2026-01-12T15:28:21.476457",
       "response_sample": {
         "users_count": 5,
-        "total": 22
+        "total": 23
       }
     },
     {
       "test_name": "Admin Analytics (7 days)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.546073",
+      "timestamp": "2026-01-12T15:28:21.548303",
       "response_sample": {
         "days_count": 7
       }
@@ -277,7 +330,7 @@
       "test_name": "Admin Access Control (403 for non-admin)",
       "success": true,
       "details": "Correctly denied access to non-admin user",
-      "timestamp": "2025-12-28T20:17:59.602679",
+      "timestamp": "2026-01-12T15:28:21.595446",
       "response_sample": {
         "detail": "Admin access required"
       }
@@ -286,7 +339,7 @@
       "test_name": "Glossary - All Terms (~99 terms)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.644554",
+      "timestamp": "2026-01-12T15:28:21.647330",
       "response_sample": {
         "total": 99,
         "sample_terms": [
@@ -300,7 +353,7 @@
       "test_name": "Glossary - Search (dividend)",
       "success": true,
       "details": "Found 2 matching terms",
-      "timestamp": "2025-12-28T20:17:59.686303",
+      "timestamp": "2026-01-12T15:28:21.691352",
       "response_sample": {
         "total": 2,
         "terms": [
@@ -313,32 +366,32 @@
       "test_name": "Global Indices (Yahoo Finance)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.729080",
+      "timestamp": "2026-01-12T15:28:21.742516",
       "response_sample": [
         {
           "symbol": "^GSPC",
           "name": "S&P 500",
-          "price": 6929.94,
-          "change": -2.1098633,
-          "change_percent": -0.030436356,
-          "previous_close": 6932.05,
-          "open": 6936.02,
-          "high": 6945.77,
-          "low": 6921.6,
-          "volume": 1439287000,
+          "price": 6961.33,
+          "change": -4.949707,
+          "change_percent": -0.07104993,
+          "previous_close": 6966.28,
+          "open": 6944.12,
+          "high": 6964.87,
+          "low": 6934.07,
+          "volume": 565300602,
           "source": "yahoo_finance"
         },
         {
           "symbol": "^IXIC",
           "name": "NASDAQ",
-          "price": 23593.096,
-          "change": -20.205078,
-          "change_percent": -0.08556651,
-          "previous_close": 23613.3,
-          "open": 23645.908,
-          "high": 23665.15,
-          "low": 23567.855,
-          "volume": 4434886000,
+          "price": 23689.729,
+          "change": 18.382812,
+          "change_percent": 0.07765847,
+          "previous_close": 23671.346,
+          "open": 23576.877,
+          "high": 23697.088,
+          "low": 23562.969,
+          "volume": 2338208000,
           "source": "yahoo_finance"
         }
       ]
@@ -347,22 +400,22 @@
       "test_name": "Financial News",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.774927",
+      "timestamp": "2026-01-12T15:28:21.792810",
       "response_sample": [
         {
-          "id": "58c9a7f0-f13f-4185-a18b-71758c862dfd",
-          "title": "Zelenski \u0219i Trump discut\u0103 propunerea de pace \u00een 20 de puncte. Ce condi\u021bii s-ar afla pe list\u0103",
-          "description": "Zelenski \u0219i Trump discut\u0103 propunerea de pace \u00een 20 de puncte Zelenski a afirmat c\u0103 planul ar putea servi drept fundament pentru un viitor acord de \u00eencheiere a r\u0103zboiului cu Rusia. Dup\u0103 s\u0103pt\u0103m\u00e2ni de negocieri pentru revizuirea unui proiect anterior de 28 de puncte, considerat favorabil multor cereri ale Rusiei, pre\u0219edintele ucrainean a declarat c\u0103 [\u2026]",
-          "content": "Zelenski \u0219i Trump discut\u0103 propunerea de pace \u00een 20 de puncte Zelenski a afirmat c\u0103 planul ar putea servi drept fundament pentru un viitor acord de \u00eencheiere a r\u0103zboiului cu Rusia. Dup\u0103 s\u0103pt\u0103m\u00e2ni de negocieri pentru revizuirea unui proiect anterior de 28 de puncte, considerat favorabil multor cereri ale Rusiei, pre\u0219edintele ucrainean a declarat c\u0103 [\u2026]",
-          "url": "https://www.capital.ro/zelenski-si-trump-discuta-propunerea-de-pace-in-20-de-puncte-ce-conditii-s-ar-afla-pe-lista.html",
+          "id": "02c70274-ff8a-4e9c-be11-43bdbe11ee5c",
+          "title": "Neptun Deep este \u00eenaintea graficului stabilit. Bogdan Ivan: \u00cen prima jum\u0103tate a anului 2027 vom \u00eencepe extragerea",
+          "description": "\u00cen ceea ce prive\u0219te plafonarea pre\u021burilor la gaze, ministrul a precizat c\u0103 autorit\u0103\u021bile au analizat mai multe mecanisme de pia\u021b\u0103 transparente, \u00eempreun\u0103 cu produc\u0103torii, transportatorii \u0219i distribuitorii de gaze naturale. \u00cen prezent, exist\u0103 deja oferte sub nivelul pre\u021bului plafonat, iar oficialul \u0219i-a exprimat \u00eencrederea c\u0103 p\u00e2n\u0103 la data de 1 aprilie pre\u021bul din pia\u021b\u0103 va [\u2026]",
+          "content": "\u00cen ceea ce prive\u0219te plafonarea pre\u021burilor la gaze, ministrul a precizat c\u0103 autorit\u0103\u021bile au analizat mai multe mecanisme de pia\u021b\u0103 transparente, \u00eempreun\u0103 cu produc\u0103torii, transportatorii \u0219i distribuitorii de gaze naturale. \u00cen prezent, exist\u0103 deja oferte sub nivelul pre\u021bului plafonat, iar oficialul \u0219i-a exprimat \u00eencrederea c\u0103 p\u00e2n\u0103 la data de 1 aprilie pre\u021bul din pia\u021b\u0103 va [\u2026]",
+          "url": "https://www.capital.ro/neptun-deep-este-inaintea-graficului-stabilit-bogdan-ivan-in-prima-jumatate-a-anului-2027-vom-incepe-extragerea.html",
           "image_url": null,
           "source": {
             "name": "Capital.ro",
-            "url": "https://www.capital.ro/zelenski-si-trump-discuta-propunerea-de-pace-in-20-de-puncte-ce-conditii-s-ar-afla-pe-lista.html",
+            "url": "https://www.capital.ro/neptun-deep-este-inaintea-graficului-stabilit-bogdan-ivan-in-prima-jumatate-a-anului-2027-vom-incepe-extragerea.html",
             "category": "business"
           },
-          "author": "Vlad Dima",
-          "published_at": "2025-12-28T20:06:53",
+          "author": "Leonard B\u0103dil\u0103",
+          "published_at": "2026-01-12T15:11:48",
           "language": "ro",
           "is_rewritten": false,
           "is_translated": false,
@@ -376,14 +429,14 @@
       "test_name": "Currency Rates (BNR)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.818225",
+      "timestamp": "2026-01-12T15:28:21.839095",
       "response_sample": {
         "sample_rates": [
           "AED",
           "AUD",
-          "BGN",
           "BRL",
-          "CAD"
+          "CAD",
+          "CHF"
         ]
       }
     },
@@ -391,7 +444,7 @@
       "test_name": "Market Overview (Combined)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.872584",
+      "timestamp": "2026-01-12T15:28:21.893761",
       "response_sample": {
         "bvb_count": 20,
         "global_count": 6
@@ -401,7 +454,7 @@
       "test_name": "Education Packages",
       "success": true,
       "details": "Found 2 packages",
-      "timestamp": "2025-12-28T20:17:59.917466",
+      "timestamp": "2026-01-12T15:28:21.941346",
       "response_sample": {
         "packages": [
           {
@@ -451,18 +504,18 @@
       "test_name": "AI Advisor - Tip of the Day",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.960072",
+      "timestamp": "2026-01-12T15:28:21.988533",
       "response_sample": {
-        "tip": "Diversificarea este singurul 'free lunch' \u00een investi\u021bii. Nu pune toate ou\u0103le \u00eentr-un singur co\u0219.",
-        "category": "Risc",
-        "date": "2025-12-28"
+        "tip": "\u00cenainte de orice investi\u021bie, asigur\u0103-te c\u0103 ai un fond de urgen\u021b\u0103 de 3-6 luni de cheltuieli.",
+        "category": "Baz\u0103 financiar\u0103",
+        "date": "2026-01-12"
       }
     },
     {
       "test_name": "Financial Education - All Lessons (15 total)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:17:59.999993",
+      "timestamp": "2026-01-12T15:28:22.037266",
       "response_sample": {
         "total": 15,
         "modules": 3,
@@ -477,7 +530,7 @@
       "test_name": "Financial Education - Lesson 1 Detail",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:00.048967",
+      "timestamp": "2026-01-12T15:28:22.088531",
       "response_sample": {
         "title": "Ce Este Educa\u021bia Financiar\u0103 \u0219i De Ce Conteaz\u0103",
         "module": 1,
@@ -489,7 +542,7 @@
       "test_name": "Financial Education - Quiz Submit (Correct)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:00.102070",
+      "timestamp": "2026-01-12T15:28:22.149608",
       "response_sample": {
         "score": 100.0,
         "passed": true,
@@ -501,7 +554,7 @@
       "test_name": "Financial Education - Progress Tracking",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:00.146359",
+      "timestamp": "2026-01-12T15:28:22.205779",
       "response_sample": {
         "completed": 1,
         "total": 15,
@@ -512,7 +565,7 @@
       "test_name": "Financial Education - Quiz Submit (Wrong)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:00.195353",
+      "timestamp": "2026-01-12T15:28:22.260319",
       "response_sample": {
         "score": 0.0,
         "passed": false
@@ -522,16 +575,16 @@
       "test_name": "Global Markets - Overview (Main Endpoint)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:02.589115",
+      "timestamp": "2026-01-12T15:28:24.984079",
       "response_sample": {
         "indices_count": 10,
         "commodities_count": 6,
         "crypto_count": 5,
         "forex_count": 4,
         "sentiment": {
-          "gainers": 9,
-          "losers": 15,
-          "avg_change": 0.05,
+          "gainers": 17,
+          "losers": 7,
+          "avg_change": 0.93,
           "status": "bullish"
         }
       }
@@ -540,13 +593,13 @@
       "test_name": "Global Markets - Indices",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:02.877909",
+      "timestamp": "2026-01-12T15:28:25.297257",
       "response_sample": {
         "count": 10,
         "sample_indices": [
           "Nikkei 225",
-          "DAX",
-          "Hang Seng"
+          "Hang Seng",
+          "Shanghai"
         ]
       }
     },
@@ -554,7 +607,7 @@
       "test_name": "Global Markets - Commodities",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:03.066925",
+      "timestamp": "2026-01-12T15:28:25.488638",
       "response_sample": {
         "count": 6,
         "sample_commodities": [
@@ -568,7 +621,7 @@
       "test_name": "Global Markets - Cryptocurrency",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:03.215816",
+      "timestamp": "2026-01-12T15:28:25.666591",
       "response_sample": {
         "count": 5,
         "sample_crypto": [
@@ -582,7 +635,7 @@
       "test_name": "Global Markets - Forex",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:03.345395",
+      "timestamp": "2026-01-12T15:28:25.817266",
       "response_sample": {
         "count": 4,
         "sample_forex": [
@@ -596,29 +649,29 @@
       "test_name": "Global Markets - Chart Data (S&P 500)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:03.451335",
+      "timestamp": "2026-01-12T15:28:25.924125",
       "response_sample": {
         "symbol": "^GSPC",
         "data_points": 20,
-        "current_price": 6929.94
+        "current_price": 6960.01
       }
     },
     {
       "test_name": "Global Markets - Chart Data (Bitcoin)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:03.581812",
+      "timestamp": "2026-01-12T15:28:26.115771",
       "response_sample": {
         "symbol": "BTC-USD",
-        "data_points": 31,
-        "current_price": 87472.61
+        "data_points": 32,
+        "current_price": 91207.06
       }
     },
     {
       "test_name": "Push Notifications - VAPID Public Key",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:03.622484",
+      "timestamp": "2026-01-12T15:28:26.170880",
       "response_sample": {
         "publicKey": "BGvVP9Pb2PrUIt5zIexi..."
       }
@@ -627,7 +680,7 @@
       "test_name": "Push Notifications - Status (Auth Required)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:03.671894",
+      "timestamp": "2026-01-12T15:28:26.224517",
       "response_sample": {
         "subscribed": false,
         "count": 0
@@ -637,7 +690,7 @@
       "test_name": "Push Notifications - Subscribe (Auth Required)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:03.718309",
+      "timestamp": "2026-01-12T15:28:26.281410",
       "response_sample": {
         "success": true,
         "message": "Subscribed to push notifications"
@@ -647,7 +700,7 @@
       "test_name": "Push Notifications - Unsubscribe (Auth Required)",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-28T20:18:03.761562",
+      "timestamp": "2026-01-12T15:28:26.340007",
       "response_sample": {
         "success": true,
         "message": "Unsubscribed from push notifications"
@@ -657,7 +710,7 @@
       "test_name": "Push Notifications - Test Send (Auth Required)",
       "success": true,
       "details": "Status: 404",
-      "timestamp": "2025-12-28T20:18:03.806047",
+      "timestamp": "2026-01-12T15:28:26.412906",
       "response_sample": {
         "detail": "No active subscriptions found"
       }
@@ -666,7 +719,7 @@
       "test_name": "Push Notifications - Status Without Auth (401)",
       "success": true,
       "details": "Correctly returns 401 when no authentication provided",
-      "timestamp": "2025-12-28T20:18:03.851291",
+      "timestamp": "2026-01-12T15:28:26.595951",
       "response_sample": {
         "detail": "Not authenticated"
       }
@@ -675,7 +728,7 @@
       "test_name": "Push Notifications - Subscribe Without Auth (401)",
       "success": true,
       "details": "Correctly returns 401 when no authentication provided",
-      "timestamp": "2025-12-28T20:18:03.895640",
+      "timestamp": "2026-01-12T15:28:26.657097",
       "response_sample": {
         "detail": "Not authenticated"
       }
