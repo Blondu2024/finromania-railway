@@ -8,6 +8,7 @@ import { Skeleton } from '../components/ui/skeleton';
 import NewsletterSignup from '../components/NewsletterSignup';
 import VerticalScroller from '../components/VerticalScroller';
 import SEO from '../components/SEO';
+import FearGreedIndex from '../components/FearGreedIndex';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
