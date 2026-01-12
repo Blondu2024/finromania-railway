@@ -219,6 +219,105 @@ def calcul_pf_bvb(input_data: CalculFiscalInput) -> ScenariuFiscal:
     )
 
 
+def calcul_pf_international(input_data: CalculFiscalInput) -> ScenariuFiscal:
+    """
+    Calculează impozitele pentru Persoană Fizică - Investiții INTERNAȚIONALE
+    
+    LEGISLAȚIE 2024-2025 pentru piețe străine:
+    - Câștig capital: 10% (indiferent de perioadă)
+    - Dividende: 10% în România + reținere la sursă în țara emitentului
+    - Pierderile se pot compensa până la 70% din câștiguri
+    - CASS: 10% dacă venit total > 6 salarii minime și NU ai alte surse CASS
+    - Trebuie declarat în Declarația Unică (formularul 212)
+    """
+    castig = input_data.castig_capital_anual
+    dividende = input_data.dividende_anuale
+    venit_total = castig + dividende
+    
+    # === IMPOZIT PE CÂȘTIG DE CAPITAL ===
+    # 10% indiferent de perioada de deținere
+    impozit_castig = castig * IMPOZIT_INTERNATIONAL
+    nota_castig = f"10% câștig capital: {impozit_castig:,.0f} RON"
+    
+    # === IMPOZIT PE DIVIDENDE INTERNAȚIONALE ===
+    # Reținere la sursă în țara emitentului + impozit în RO
+    # Cu tratate de evitare a dublei impuneri, se acordă credit fiscal
+    
+    # Exemplu SUA cu W-8BEN: 15% reținut în SUA
+    retinere_sursa = dividende * RETINERE_USA
+    
+    # În România se datorează 10%, dar se scade ce s-a plătit în străinătate (credit fiscal)
+    # Dacă s-a reținut 15% în SUA, nu mai datorezi nimic în RO (15% > 10%)
+    impozit_div_ro = max(0, dividende * IMPOZIT_DIVIDENDE_STRAINE - retinere_sursa)
+    impozit_div_total = retinere_sursa + impozit_div_ro
+    
+    nota_div = f"Dividende: {retinere_sursa:,.0f} RON reținut la sursă (15% SUA)"
+    if impozit_div_ro > 0:
+        nota_div += f" + {impozit_div_ro:,.0f} RON în RO"
+    else:
+        nota_div += " (credit fiscal acoperă impozitul RO)"
+    
+    # === CASS ===
+    cass = 0
+    nota_cass = ""
+    
+    if not input_data.are_alte_venituri_cass:
+        if venit_total > CASS_PRAG_MINIM:
+            baza_cass = max(CASS_PRAG_MINIM, min(venit_total, CASS_PRAG_MINIM * 4))
+            cass = baza_cass * CASS_RATE
+            nota_cass = f"CASS 10% pe baza de {baza_cass:,.0f} RON = {cass:,.0f} RON"
+        else:
+            nota_cass = f"CASS: 0 RON (venit sub pragul de {CASS_PRAG_MINIM:,.0f} RON)"
+    else:
+        nota_cass = "CASS: 0 RON (plătit din salariu/alte venituri)"
+    
+    total_taxe = impozit_castig + impozit_div_total + cass
+    venit_net = venit_total - total_taxe
+    rata_efectiva = (total_taxe / venit_total * 100) if venit_total > 0 else 0
+    
+    detalii = [
+        f"Câștig capital: {castig:,.0f} RON",
+        f"Dividende brute: {dividende:,.0f} RON",
+        f"Impozit câștig capital: {nota_castig}",
+        nota_div,
+        nota_cass,
+        "📋 Trebuie completată Declarația Unică (212)"
+    ]
+    
+    avantaje = [
+        "✅ Acces la mii de companii globale",
+        "✅ Diversificare geografică",
+        "✅ Pierderile se pot compensa (70%)",
+        "✅ ETF-uri cu costuri mici",
+        "✅ Credit fiscal pentru dividende (tratate)"
+    ]
+    
+    dezavantaje = [
+        "❌ Impozit 10% vs 1-3% pe BVB",
+        "❌ Trebuie să completezi Declarația Unică",
+        "❌ Calcul manual al impozitului",
+        "❌ Complexitate cu reținerea la sursă",
+        "❌ Risc valutar (USD/EUR)"
+    ]
+    
+    return ScenariuFiscal(
+        tip_entitate="pf_international",
+        nume_entitate="Persoană Fizică (Piețe Internaționale)",
+        venit_brut=venit_total,
+        impozit_castig_capital=impozit_castig,
+        impozit_dividende=impozit_div_total,
+        cass=cass,
+        cas=0,
+        alte_taxe=0,
+        total_taxe=total_taxe,
+        venit_net=venit_net,
+        rata_efectiva_impozitare=rata_efectiva,
+        detalii=detalii,
+        avantaje=avantaje,
+        dezavantaje=dezavantaje
+    )
+
+
 def calcul_pfa_investitii(input_data: CalculFiscalInput) -> ScenariuFiscal:
     """
     Calculează pentru PFA - NU este recomandat pentru investiții pure!
