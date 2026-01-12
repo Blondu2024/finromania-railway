@@ -292,8 +292,8 @@ class FinRomania2Tester:
         
         # Test 2.4: PRO Paywall - Fiscal Calculator (Free user should get 403)
         success, details, data = self.test_api_endpoint(
-            'POST', '/api/fiscal/calculate',
-            auth_token=self.beginner_token,
+            'POST', '/api/fiscal/calculeaza',
+            auth_token=self.intermediate_token,  # Use intermediate (still free)
             data={
                 "castig_capital_anual": 10000,
                 "dividende_anuale": 2000,
@@ -311,7 +311,7 @@ class FinRomania2Tester:
         
         # Test 2.5: PRO user can access fiscal calculator
         success, details, data = self.test_api_endpoint(
-            'POST', '/api/fiscal/calculate',
+            'POST', '/api/fiscal/calculeaza',
             auth_token=self.pro_token,
             data={
                 "castig_capital_anual": 10000,
