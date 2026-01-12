@@ -580,8 +580,8 @@ class FinRomania2Tester:
             self.log_test("Get Quiz - Intermediate", False, "Failed to create quiz test user", None)
             self.quiz_questions = []
         
-        # Test 4.2: Submit quiz with passing score (7/10)
-        if self.quiz_questions:
+        # Test 4.3: Submit quiz with passing score (7/10)
+        if self.quiz_questions and hasattr(self, 'quiz_token'):
             # Create answers - answer first 7 correctly (index 1 is usually correct based on quiz structure)
             answers = {}
             for i, q in enumerate(self.quiz_questions):
@@ -590,7 +590,7 @@ class FinRomania2Tester:
             
             success, details, data = self.test_api_endpoint(
                 'POST', '/api/quiz/submit',
-                auth_token=self.beginner_token,
+                auth_token=self.quiz_token,
                 data={
                     "level": "intermediate",
                     "answers": answers
