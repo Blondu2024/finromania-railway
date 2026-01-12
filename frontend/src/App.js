@@ -342,6 +342,8 @@ function AppRouter() {
         <Route path="/global" element={<GlobalMarketsPage />} />
         <Route path="/quiz/:level" element={<QuizPage />} />
         <Route path="/calculator-fiscal" element={<FiscalCalculatorPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/portfolio-bvb" element={<PortfolioBVBPage />} />
       </Routes>
     </Suspense>
   );
