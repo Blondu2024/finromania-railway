@@ -158,7 +158,7 @@ export default function FiscalCalculatorPage() {
   const fetchPreview = async () => {
     try {
       const response = await fetch(
-        `${API_URL}/api/fiscal/preview?castig=${castigCapital}&dividende=${dividende}&are_salariu=${areSalariu}`
+        `${API_URL}/api/fiscal/preview?castig=${castigCapital}&dividende=${dividende}&are_salariu=${areSalariu}&piata=${tipPiata}`
       );
       if (response.ok) {
         const data = await response.json();
