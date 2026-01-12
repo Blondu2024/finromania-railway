@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, TrendingUp, Building2, User, Crown, Lock, ChevronRight, CheckCircle, XCircle, Info, AlertTriangle, Sparkles, Clock, Calendar } from 'lucide-react';
+import { Calculator, TrendingUp, Building2, User, Crown, Lock, ChevronRight, CheckCircle, XCircle, Info, AlertTriangle, Sparkles, Clock, Calendar, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -9,6 +9,7 @@ import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
+import FiscalAIChat from '../components/FiscalAIChat';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
