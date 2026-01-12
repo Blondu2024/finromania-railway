@@ -280,6 +280,36 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Calculator Fiscal - Prominent CTA */}
+        <section>
+          <Link to="/calculator-fiscal">
+            <Card className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white hover:shadow-2xl transition-all hover:scale-[1.01] cursor-pointer overflow-hidden relative">
+              <div className="absolute inset-0 bg-black/10" />
+              <CardContent className="p-6 md:p-8 relative z-10">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-4 bg-white/20 rounded-2xl">
+                      <Calculator className="w-10 h-10" />
+                    </div>
+                    <div>
+                      <Badge className="bg-white/20 text-white mb-2">🏆 EXCLUSIV</Badge>
+                      <h3 className="text-2xl md:text-3xl font-bold">Calculator Fiscal</h3>
+                      <p className="text-white/90 mt-1">PF vs PFA vs SRL - Află cum să economisești mii de lei</p>
+                    </div>
+                  </div>
+                  <div className="text-center md:text-right">
+                    <p className="text-white/80 text-sm">Economie potențială de până la</p>
+                    <p className="text-4xl font-bold">50.000+ RON/an</p>
+                    <Button className="mt-3 bg-white text-orange-600 hover:bg-white/90">
+                      Calculează Gratuit <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        </section>
+
         {/* BVB Stocks - Vertical Auto-Scroll */}
         <section>
           <div className="flex justify-between items-center mb-6">
