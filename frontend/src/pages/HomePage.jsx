@@ -286,17 +286,29 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Secondary Features */}
+        {/* Portofoliu + Tools */}
         <section>
-          <h3 className="text-2xl font-bold mb-6">Mai Multe Unelte</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <h3 className="text-2xl font-bold mb-6">Portofoliu & Instrumente Avansate</h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Link to="/portfolio-bvb">
+              <Card className="hover:shadow-lg transition-all cursor-pointer bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-800">
+                <CardContent className="p-5 flex items-center gap-3">
+                  <Briefcase className="w-10 h-10 text-blue-500" />
+                  <div>
+                    <h4 className="font-semibold">Portofoliu BVB</h4>
+                    <p className="text-sm text-muted-foreground">Sistem 3 Straturi</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+            
             <Link to="/advisor">
               <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <Activity className="w-8 h-8 text-blue-500" />
+                <CardContent className="p-5 flex items-center gap-3">
+                  <Activity className="w-10 h-10 text-purple-500" />
                   <div>
                     <h4 className="font-semibold">AI Advisor</h4>
-                    <p className="text-sm text-muted-foreground">Întrebări nelimitate PRO</p>
+                    <p className="text-sm text-muted-foreground">5 gratis, ∞ PRO</p>
                   </div>
                 </CardContent>
               </Card>
@@ -304,23 +316,23 @@ export default function HomePage() {
             
             <Link to="/screener">
               <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <Search className="w-8 h-8 text-green-500" />
+                <CardContent className="p-5 flex items-center gap-3">
+                  <Search className="w-10 h-10 text-green-500" />
                   <div>
                     <h4 className="font-semibold">Stock Screener</h4>
-                    <p className="text-sm text-muted-foreground">Filtrează acțiuni BVB</p>
+                    <p className="text-sm text-muted-foreground">Filtre BVB</p>
                   </div>
                 </CardContent>
               </Card>
             </Link>
             
-            <Link to="/calendar">
+            <Link to="/converter">
               <Card className="hover:shadow-lg transition-all cursor-pointer">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <Target className="w-8 h-8 text-purple-500" />
+                <CardContent className="p-5 flex items-center gap-3">
+                  <ArrowRight className="w-10 h-10 text-orange-500" />
                   <div>
-                    <h4 className="font-semibold">Calendar Dividende</h4>
-                    <p className="text-sm text-muted-foreground">Urmărește plățile</p>
+                    <h4 className="font-semibold">Convertor Valutar</h4>
+                    <p className="text-sm text-muted-foreground">RON ⇄ USD/EUR</p>
                   </div>
                 </CardContent>
               </Card>
