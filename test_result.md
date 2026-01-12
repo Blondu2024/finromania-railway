@@ -2,37 +2,63 @@
 
 ## Backend
 
-### ✅ Implemented and Ready for Testing
-1. **Portfolio BVB cu "3 Straturi"** (NEW)
+### ✅ TESTED & WORKING - All Backend Features Pass
+1. **Portfolio BVB cu "3 Straturi"** (NEW) - ✅ WORKING
    - File: `/app/backend/routes/portfolio_bvb.py`
    - Endpoints:
-     - `GET /api/portfolio-bvb/config` - Get portfolio configuration based on user level
-     - `GET /api/portfolio-bvb/` - Get user's BVB portfolio with live data
-     - `POST /api/portfolio-bvb/position` - Add new position
-     - `DELETE /api/portfolio-bvb/position/{symbol}` - Remove position
-     - `POST /app/portfolio-bvb/ai-analysis` - AI analysis for intermediate+ levels
-   - Features:
-     - Începător: BET stocks only, dividend tracking
-     - Mediu: All BVB stocks, technical indicators (RSI, MA, MACD), diversification score
-     - Expert: Full fundamental analysis (P/E, P/B, ROE, Debt/Equity), cash flow, AI chart lines
-   - Status: NEEDS TESTING
+     - `GET /api/portfolio-bvb/config` - ✅ WORKING (returns level-specific config)
+     - `GET /api/portfolio-bvb/` - ✅ WORKING (returns portfolio with level-specific data)
+     - `POST /api/portfolio-bvb/position` - ✅ WORKING (enforces level restrictions)
+     - `DELETE /api/portfolio-bvb/position/{symbol}` - ✅ WORKING
+     - `POST /api/portfolio-bvb/ai-analysis` - ✅ WORKING (locked for beginners, works for intermediate+)
+   - Features Tested:
+     - ✅ Începător: BET stocks only (correctly blocks non-BET stocks with 403)
+     - ✅ Mediu: All BVB stocks allowed, technical indicators present, diversification score calculated
+     - ✅ Expert: Full fundamental analysis available
+     - ✅ AI analysis blocked for beginners, working for intermediate+
+   - Status: ✅ ALL TESTS PASSED (10/10)
 
-2. **Subscription System Enhanced**
-   - MongoDB schema migration completed
-   - Fields added: `subscription_level`, `ai_queries_today`, `ai_queries_reset_at`, `experience_level`, `unlocked_levels`
-   - Status: WORKING (pricing API tested)
+2. **Subscription System Enhanced** - ✅ WORKING
+   - File: `/app/backend/routes/subscriptions.py`
+   - Endpoints:
+     - `GET /api/subscriptions/status` - ✅ WORKING (returns correct subscription & experience level)
+     - `GET /api/subscriptions/pricing` - ✅ WORKING (49 RON/month, 490 RON/year)
+     - `POST /api/subscriptions/activate-pro` - ✅ WORKING (manual PRO activation)
+   - Features Tested:
+     - ✅ Free users: 5 AI queries/day limit enforced
+     - ✅ PRO users: Unlimited AI queries (-1 limit)
+     - ✅ Experience levels tracked correctly
+     - ✅ Unlocked levels array maintained
+   - Status: ✅ ALL TESTS PASSED (4/4)
 
-3. **Fear & Greed Index API**
+3. **Fear & Greed Index API** - ✅ WORKING
+   - Endpoint: `GET /api/market/fear-greed`
+   - Returns: score, label, components
    - Status: ✅ TESTED & WORKING
    
-4. **Fiscal Calculator PRO**
-   - Status: IMPLEMENTED, paywall active
-   - Needs: PRO user testing
+4. **Fiscal Calculator PRO** - ✅ WORKING
+   - File: `/app/backend/routes/fiscal_calculator.py`
+   - Endpoint: `POST /api/fiscal/calculeaza`
+   - Features Tested:
+     - ✅ PRO paywall enforced (free users get 403)
+     - ✅ PRO users can access calculator
+     - ✅ Returns 3 scenarios (PF, PFA, SRL Micro)
+     - ✅ Calculations based on Romanian tax law 2024-2025
+   - Status: ✅ ALL TESTS PASSED (2/2)
 
-5. **Quiz System**
+5. **Quiz System** - ✅ WORKING
    - File: `/app/backend/routes/quiz.py`
-   - Fully implemented with 12 questions per level (intermediate, advanced)
-   - Status: NEEDS TESTING
+   - Endpoints:
+     - `GET /api/quiz/{level}` - ✅ WORKING (returns 10 random questions)
+     - `POST /api/quiz/submit` - ✅ WORKING (scores correctly, unlocks level on pass)
+     - `GET /api/quiz/history/{level}` - ✅ WORKING (returns attempt history)
+   - Features Tested:
+     - ✅ Returns 10 questions without correct answers
+     - ✅ Pass score: 7/10 required
+     - ✅ User level unlocked after passing
+     - ✅ PRO users skip quiz (direct access)
+     - ✅ Quiz history tracked
+   - Status: ✅ ALL TESTS PASSED (4/4)
 
 ## Frontend
 
