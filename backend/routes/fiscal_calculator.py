@@ -455,7 +455,7 @@ def calcul_srl_micro_investitii(input_data: CalculFiscalInput) -> ScenariuFiscal
 
 
 def genereaza_recomandare(scenarii: List[ScenariuFiscal], input_data: CalculFiscalInput) -> tuple:
-    """Generează recomandarea bazată pe legislația română pentru BVB"""
+    """Generează recomandarea bazată pe legislația română"""
     
     venit = input_data.castig_capital_anual + input_data.dividende_anuale
     
@@ -493,14 +493,37 @@ vei datora CASS (10% din baza de calcul).
 2. Companiile rețin 8% din dividende
 3. Completezi Declarația Unică (212) până în mai pentru CASS (dacă e cazul)
 """
-    else:
+    else:  # INTERNATIONAL
+        # Comparație BVB vs International
+        pf_bvb_ipotetic = input_data.castig_capital_anual * 0.02  # Media 2% pentru BVB
+        pf_int = input_data.castig_capital_anual * 0.10  # 10% international
+        diferenta_bvb_int = pf_int - pf_bvb_ipotetic
+        
         explicatie = f"""
-### Pentru piețe internaționale:
+### 🌍 CONCLUZIE PENTRU INVESTIȚII INTERNAȚIONALE:
 
-Impozitul este **10%** pe câștigurile de capital.
-Trebuie să declari și să plătești tu impozitul prin Declarația Unică.
+**Impozitarea este mai mare decât pe BVB, dar încă rezonabilă.**
 
-Economie maximă posibilă: **{economie:,.0f} RON/an**
+| Piață | Impozit Câștig | Impozit Dividende |
+|-------|----------------|-------------------|
+| 🇷🇴 BVB | **1-3%** | 8% |
+| 🇺🇸 USA | **10%** | 15% (reținut) + credit fiscal |
+| 🇪🇺 UE | **10%** | 10-25% (variază) |
+
+**Calculul tău:**
+- Câștig capital: {input_data.castig_capital_anual:,.0f} RON × 10% = **{input_data.castig_capital_anual * 0.10:,.0f} RON**
+- Dividende: {input_data.dividende_anuale:,.0f} RON × ~15% = **{input_data.dividende_anuale * 0.15:,.0f} RON** (reținut în SUA)
+
+**💡 Comparație cu BVB:**
+Dacă ai investi aceeași sumă pe BVB, ai plăti ~**{diferenta_bvb_int:,.0f} RON mai puțin** impozit pe câștiguri!
+
+📋 **Ce trebuie să faci:**
+1. Completează formularul **W-8BEN** la broker (reduce impozitul SUA de la 30% la 15%)
+2. Depune **Declarația Unică (212)** până în mai
+3. Calculează și plătește diferența de impozit
+4. Păstrează toate rapoartele de la broker
+
+⚠️ **CASS**: Se aplică la fel ca pentru BVB dacă nu ai salariu.
 """
     
     return cel_mai_bun.tip_entitate, economie, explicatie
