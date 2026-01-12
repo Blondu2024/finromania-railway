@@ -1690,11 +1690,32 @@ class FinRomaniaAPITester:
             return False
 
 def main():
-    """Main test execution"""
+    """Main test execution for FinRomania 2.0"""
     tester = FinRomaniaAPITester()
     
     try:
-        success = tester.run_all_tests()
+        tester.run_finromania_2_tests()
+        
+        # Print summary
+        print("\n" + "=" * 80)
+        print("📊 FINROMANIA 2.0 TEST SUMMARY")
+        print("=" * 80)
+        print(f"✅ Tests Passed: {tester.tests_passed}/{tester.tests_run}")
+        print(f"❌ Tests Failed: {tester.tests_run - tester.tests_passed}/{tester.tests_run}")
+        
+        success = tester.tests_passed == tester.tests_run
+        
+        if success:
+            print("\n🎉 All FinRomania 2.0 features are working correctly!")
+        else:
+            print(f"\n⚠️  {tester.tests_run - tester.tests_passed} tests failed. Check the details above.")
+            
+            # Show failed tests
+            failed_tests = [test for test in tester.test_results if not test["success"]]
+            if failed_tests:
+                print("\n❌ Failed Tests:")
+                for test in failed_tests:
+                    print(f"   - {test['test_name']}: {test['details']}")
         
         # Save detailed results
         with open('/app/backend_test_results.json', 'w') as f:
