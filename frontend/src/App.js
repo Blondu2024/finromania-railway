@@ -250,6 +250,8 @@ function Navigation({ darkMode, toggleDarkMode }) {
                     <SearchBar />
                   </Suspense>
                 </div>
+                
+                {/* Main Navigation - Simplified */}
                 {navItems.map((item) => (
                   <Link
                     key={item.path}
@@ -265,19 +267,77 @@ function Navigation({ darkMode, toggleDarkMode }) {
                     <span>{item.label}</span>
                   </Link>
                 ))}
+
+                {/* Academia Group */}
+                <div className="pt-2 border-t">
+                  <p className="px-4 text-xs font-semibold text-muted-foreground mb-2">ACADEMIA</p>
+                  {academiaItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        location.pathname === item.path 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      }`}
+                    >
+                      <span>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Instrumente Group */}
+                <div className="pt-2 border-t">
+                  <p className="px-4 text-xs font-semibold text-muted-foreground mb-2">INSTRUMENTE</p>
+                  {instrumenteItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        location.pathname === item.path 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      }`}
+                    >
+                      <span>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+                
                 {user && (
-                  <Link
-                    to="/watchlist"
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                      location.pathname === '/watchlist' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                    }`}
-                  >
-                    <span>⭐</span>
-                    <span>Watchlist</span>
-                  </Link>
+                  <>
+                    <div className="pt-2 border-t">
+                      <p className="px-4 text-xs font-semibold text-muted-foreground mb-2">CONT</p>
+                      <Link
+                        to="/watchlist"
+                        onClick={() => setMobileOpen(false)}
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                          location.pathname === '/watchlist' 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                        }`}
+                      >
+                        <span>⭐</span>
+                        <span>Watchlist</span>
+                      </Link>
+                      <Link
+                        to="/portfolio-bvb"
+                        onClick={() => setMobileOpen(false)}
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                          location.pathname === '/portfolio-bvb' 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                        }`}
+                      >
+                        <span>💼</span>
+                        <span>Portofoliu BVB</span>
+                      </Link>
+                    </div>
+                  </>
                 )}
               </div>
             </SheetContent>
