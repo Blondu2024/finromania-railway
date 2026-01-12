@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, BarChart3, Globe, BookOpen, Calculator, Search, PieChart, Target, Award } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, BarChart3, Globe, BookOpen, Calculator, Search, PieChart, Target, Award, Zap, Crown, Activity, Briefcase } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -9,6 +9,8 @@ import NewsletterSignup from '../components/NewsletterSignup';
 import VerticalScroller from '../components/VerticalScroller';
 import SEO from '../components/SEO';
 import FearGreedIndex from '../components/FearGreedIndex';
+import { useAuth } from '../context/AuthContext';
+import FeatureCard from '../components/FeatureCard';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -78,9 +80,9 @@ const NewsCard = memo(function NewsCard({ article }) {
 });
 
 // ============================================
-// HERO SECTION - Strategic Messaging (Mature & Clear)
+// HERO SECTION - Clear Value Props
 // ============================================
-const HeroSection = memo(function HeroSection() {
+const HeroSection = memo(function HeroSection({ user }) {
   return (
     <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-6 md:p-10">
       {/* Background decorations */}
@@ -88,16 +90,20 @@ const HeroSection = memo(function HeroSection() {
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl -ml-24 -mb-24" />
       
       <div className="relative z-10">
-        {/* Main Message - Strategic & Mature */}
+        {/* Main Message */}
         <div className="text-center mb-8">
+          <Badge className="bg-green-500/20 text-green-300 border-green-500/50 mb-4">
+            <Zap className="w-3 h-3 mr-1" />
+            Date LIVE · Delay 1s pentru Global Markets
+          </Badge>
           <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">
-            Înțelege piața <span className="text-blue-400">înainte</span> să investești.
+            Investește <span className="text-blue-400">Inteligent</span> pe BVB și Global
           </h1>
           <p className="text-lg md:text-xl text-blue-200 max-w-2xl mx-auto mb-2">
-            Date reale. Educație clară. Decizii mai bune.
+            Portofoliu · Calculator Fiscal · Date Live · AI Advisor
           </p>
           <p className="text-base text-blue-300/80 max-w-xl mx-auto">
-            Platforma românească pentru investitorul care vrea claritate, nu promisiuni.
+            Platforma românească completă pentru investitori moderni.
           </p>
         </div>
 
@@ -280,34 +286,46 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Calculator Fiscal - Prominent CTA */}
+        {/* Secondary Features */}
         <section>
-          <Link to="/calculator-fiscal">
-            <Card className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white hover:shadow-2xl transition-all hover:scale-[1.01] cursor-pointer overflow-hidden relative">
-              <div className="absolute inset-0 bg-black/10" />
-              <CardContent className="p-6 md:p-8 relative z-10">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-4 bg-white/20 rounded-2xl">
-                      <Calculator className="w-10 h-10" />
-                    </div>
-                    <div>
-                      <Badge className="bg-white/20 text-white mb-2">🏆 EXCLUSIV</Badge>
-                      <h3 className="text-2xl md:text-3xl font-bold">Calculator Fiscal</h3>
-                      <p className="text-white/90 mt-1">PF vs PFA vs SRL - Află cum să economisești mii de lei</p>
-                    </div>
+          <h3 className="text-2xl font-bold mb-6">Mai Multe Unelte</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link to="/advisor">
+              <Card className="hover:shadow-lg transition-all cursor-pointer">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <Activity className="w-8 h-8 text-blue-500" />
+                  <div>
+                    <h4 className="font-semibold">AI Advisor</h4>
+                    <p className="text-sm text-muted-foreground">Întrebări nelimitate PRO</p>
                   </div>
-                  <div className="text-center md:text-right">
-                    <p className="text-white/80 text-sm">Economie potențială de până la</p>
-                    <p className="text-4xl font-bold">50.000+ RON/an</p>
-                    <Button className="mt-3 bg-white text-orange-600 hover:bg-white/90">
-                      Calculează Gratuit <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
+                </CardContent>
+              </Card>
+            </Link>
+            
+            <Link to="/screener">
+              <Card className="hover:shadow-lg transition-all cursor-pointer">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <Search className="w-8 h-8 text-green-500" />
+                  <div>
+                    <h4 className="font-semibold">Stock Screener</h4>
+                    <p className="text-sm text-muted-foreground">Filtrează acțiuni BVB</p>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+                </CardContent>
+              </Card>
+            </Link>
+            
+            <Link to="/calendar">
+              <Card className="hover:shadow-lg transition-all cursor-pointer">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <Target className="w-8 h-8 text-purple-500" />
+                  <div>
+                    <h4 className="font-semibold">Calendar Dividende</h4>
+                    <p className="text-sm text-muted-foreground">Urmărește plățile</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
         </section>
 
         {/* BVB Stocks - Vertical Auto-Scroll */}
