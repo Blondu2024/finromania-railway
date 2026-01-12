@@ -1036,9 +1036,99 @@ class FinRomaniaAPITester:
         
         return True, f"Valid companion response: {len(response)} chars with proper disclaimer"
 
-    def run_all_tests(self):
-        """Run comprehensive test suite focusing on AI Trading Companion"""
-        print("🚀 Starting FinRomania API Testing - AI Trading Companion Focus...")
+    def validate_fear_greed_index(self, data: Dict) -> tuple:
+        """Validate Fear & Greed Index response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['score', 'label', 'color', 'components', 'history']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        # Validate score (0-100)
+        score = data.get('score')
+        if not isinstance(score, (int, float)) or score < 0 or score > 100:
+            return False, f"Score should be 0-100, got: {score}"
+        
+        # Validate components
+        components = data.get('components', {})
+        required_components = ['rsi', 'momentum', 'volatility', 'volume']
+        for component in required_components:
+            if component not in components:
+                return False, f"Missing component: {component}"
+            
+            comp_data = components[component]
+            if not isinstance(comp_data, dict) or 'score' not in comp_data:
+                return False, f"Invalid component structure for {component}"
+        
+        # Validate history
+        history = data.get('history', [])
+        if not isinstance(history, list):
+            return False, "History should be a list"
+        
+        return True, f"Valid Fear & Greed Index: score={score}, components={len(components)}, history={len(history)}"
+
+    def validate_subscription_pricing(self, data: Dict) -> tuple:
+        """Validate subscription pricing response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['plans', 'features']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        plans = data.get('plans', {})
+        if 'pro_monthly' not in plans or 'pro_yearly' not in plans:
+            return False, "Missing pro_monthly or pro_yearly plans"
+        
+        # Validate pro_monthly pricing
+        pro_monthly = plans.get('pro_monthly', {})
+        if pro_monthly.get('price') != 49.0:
+            return False, f"pro_monthly price should be 49.0 RON, got: {pro_monthly.get('price')}"
+        
+        # Validate pro_yearly pricing
+        pro_yearly = plans.get('pro_yearly', {})
+        if pro_yearly.get('price') != 490.0:
+            return False, f"pro_yearly price should be 490.0 RON, got: {pro_yearly.get('price')}"
+        
+        # Validate features
+        features = data.get('features', {})
+        if 'free' not in features or 'pro' not in features:
+            return False, "Missing free or pro features"
+        
+        return True, f"Valid pricing: pro_monthly={pro_monthly.get('price')} RON, pro_yearly={pro_yearly.get('price')} RON"
+
+    def validate_fear_greed_history(self, data: Dict) -> tuple:
+        """Validate Fear & Greed history response"""
+        if not isinstance(data, dict):
+            return False, "Response should be a dictionary"
+        
+        required_fields = ['period_days', 'data_points', 'history']
+        for field in required_fields:
+            if field not in data:
+                return False, f"Missing required field: {field}"
+        
+        history = data.get('history', [])
+        if not isinstance(history, list):
+            return False, "History should be a list"
+        
+        # Validate history entries
+        for entry in history[:3]:  # Check first 3 entries
+            if not isinstance(entry, dict):
+                return False, "History entry should be a dictionary"
+            
+            required_entry_fields = ['score', 'timestamp']
+            for field in required_entry_fields:
+                if field not in entry:
+                    return False, f"Missing field in history entry: {field}"
+        
+        return True, f"Valid history: {len(history)} data points for {data.get('period_days')} days"
+
+    def run_finromania_2_tests(self):
+        """Run FinRomania 2.0 specific feature tests"""
+        print("🚀 Starting FinRomania 2.0 Feature Testing...")
         print(f"📍 Testing against: {self.base_url}")
         print("=" * 80)
         
