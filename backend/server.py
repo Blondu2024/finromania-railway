@@ -49,6 +49,7 @@ from routes.fear_greed import router as fear_greed_router
 from routes.subscriptions import router as subscriptions_router
 from routes.quiz import router as quiz_router
 from routes.ai_advisor_pro import router as ai_advisor_pro_router
+from routes.fiscal_calculator import router as fiscal_calculator_router
 
 # Configure logging
 logging.basicConfig(
@@ -518,6 +519,7 @@ app.include_router(fear_greed_router, prefix="/api")
 app.include_router(subscriptions_router, prefix="/api")
 app.include_router(quiz_router, prefix="/api")
 app.include_router(ai_advisor_pro_router, prefix="/api")
+app.include_router(fiscal_calculator_router, prefix="/api")
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest
