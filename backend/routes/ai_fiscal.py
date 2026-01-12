@@ -149,40 +149,26 @@ async def ask_fiscal_question(
 ):
     """
     Întreabă AI-ul despre fiscalitate bursieră.
-    Limitat la 5 întrebări/zi pentru utilizatori FREE.
+    DOAR pentru utilizatori PRO!
     """
     db = await get_database()
     
-    # Verifică limitele
+    # Verifică dacă utilizatorul are PRO
     user_data = await db.users.find_one({"user_id": user["user_id"]}, {"_id": 0})
     subscription_level = user_data.get("subscription_level", "free") if user_data else "free"
     
-    # Verifică query count pentru FREE users
-    if subscription_level == "free":
-        fiscal_queries_today = user_data.get("fiscal_queries_today", 0) if user_data else 0
-        reset_at = user_data.get("fiscal_queries_reset_at")
-        
-        if reset_at:
-            reset_time = datetime.fromisoformat(reset_at.replace("Z", "+00:00")) if isinstance(reset_at, str) else reset_at
-            if datetime.now(timezone.utc) - reset_time > timedelta(hours=24):
-                fiscal_queries_today = 0
-                await db.users.update_one(
-                    {"user_id": user["user_id"]},
-                    {"$set": {
-                        "fiscal_queries_today": 0,
-                        "fiscal_queries_reset_at": datetime.now(timezone.utc).isoformat()
-                    }}
-                )
-        
-        if fiscal_queries_today >= 5:
-            return {
-                "success": False,
-                "error": "limit_reached",
-                "message": "Ai atins limita de 5 întrebări fiscale pe zi.",
-                "used": fiscal_queries_today,
-                "limit": 5,
-                "upgrade_message": "Treci la PRO pentru întrebări nelimitate și consultanță avansată!"
+    # AI Fiscal este DOAR pentru PRO
+    if subscription_level != "pro":
+        return {
+            "success": False,
+            "error": "pro_required",
+            "message": "AI Fiscal Advisor este disponibil doar pentru utilizatorii PRO.",
+            "upgrade_message": "Activează PRO pentru acces complet la Calculator Fiscal și AI Advisor!",
+            "pricing": {
+                "monthly": "49 RON/lună",
+                "yearly": "490 RON/an (economisești 2 luni)"
             }
+        }
     
     # Construiește mesajul
     full_question = data.question
