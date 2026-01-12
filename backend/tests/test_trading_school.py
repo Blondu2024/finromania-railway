@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Dict, List, Any
 
 class TradingSchoolTester:
-    def __init__(self, base_url="https://bvb-global.preview.emergentagent.com"):
+    def __init__(self, base_url="https://finiq-3.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
