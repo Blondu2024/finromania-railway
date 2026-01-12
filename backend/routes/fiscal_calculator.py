@@ -550,12 +550,19 @@ async def calculeaza_impozite(
     # if subscription_level != "pro":
     #     raise HTTPException(status_code=403, detail="PRO required")
     
-    # Calculează toate scenariile
-    scenarii = [
-        calcul_pf_bvb(input_data),
-        calcul_pfa_investitii(input_data),
-        calcul_srl_micro_investitii(input_data)
-    ]
+    # Calculează scenariile bazate pe piața selectată
+    if input_data.tip_piata == TipPiata.BVB:
+        scenarii = [
+            calcul_pf_bvb(input_data),
+            calcul_pfa_investitii(input_data),
+            calcul_srl_micro_investitii(input_data)
+        ]
+    else:  # INTERNATIONAL
+        scenarii = [
+            calcul_pf_international(input_data),
+            calcul_pfa_investitii(input_data),
+            calcul_srl_micro_investitii(input_data)
+        ]
     
     # Generează recomandare
     cel_mai_bun, economie, explicatie = genereaza_recomandare(scenarii, input_data)
