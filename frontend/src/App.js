@@ -62,6 +62,7 @@ const ContactPage = lazy(() => import('./pages/ContactPage'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
+const FiscalCalculatorPage = lazy(() => import('./pages/FiscalCalculatorPage'));
 
 // Lazy load heavy components
 const TickerBar = lazy(() => import('./components/TickerBar'));
@@ -338,6 +339,7 @@ function AppRouter() {
         <Route path="/notifications" element={<NotificationSettingsPage />} />
         <Route path="/global" element={<GlobalMarketsPage />} />
         <Route path="/quiz/:level" element={<QuizPage />} />
+        <Route path="/calculator-fiscal" element={<FiscalCalculatorPage />} />
       </Routes>
     </Suspense>
   );
