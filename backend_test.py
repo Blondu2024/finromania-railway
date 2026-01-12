@@ -1133,10 +1133,44 @@ class FinRomaniaAPITester:
         print("=" * 80)
         
         # ============================================
-        # AI TRADING COMPANION TESTING (PRIMARY FOCUS)
+        # FINROMANIA 2.0 FEATURES - PRIMARY FOCUS
         # ============================================
-        print("\n🤖 SECTION 1: AI Trading Companion Testing")
+        print("\n🆕 SECTION 1: FinRomania 2.0 New Features")
         print("-" * 80)
+        
+        # Test 1: Fear & Greed Index (Public endpoint)
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/market/fear-greed',
+            validate_response=self.validate_fear_greed_index
+        )
+        self.log_test("Fear & Greed Index", success, details, 
+                     {"score": data.get('score'), "label": data.get('label'), 
+                      "components": list(data.get('components', {}).keys())} if isinstance(data, dict) else data)
+        
+        # Test 2: Subscription Pricing (Public endpoint)
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/subscriptions/pricing',
+            validate_response=self.validate_subscription_pricing
+        )
+        self.log_test("Subscription Pricing", success, details,
+                     {"pro_monthly": data.get('plans', {}).get('pro_monthly', {}).get('price'),
+                      "pro_yearly": data.get('plans', {}).get('pro_yearly', {}).get('price')} if isinstance(data, dict) else data)
+        
+        # Test 3: Fear & Greed History (Public endpoint)
+        success, details, data = self.test_api_endpoint(
+            'GET', '/api/market/fear-greed/history?days=7',
+            validate_response=self.validate_fear_greed_history
+        )
+        self.log_test("Fear & Greed History (7 days)", success, details,
+                     {"period_days": data.get('period_days'), "data_points": data.get('data_points')} if isinstance(data, dict) else data)
+        
+        # Test 4: Root Health Check
+        success, details, data = self.test_api_endpoint('GET', '/health')
+        self.log_test("Root Health Check", success, details, data)
+        
+        # Test 5: API Health Check
+        success, details, data = self.test_api_endpoint('GET', '/api/health')
+        self.log_test("API Health Check", success, details, data)
         
         # Test 1: Companion Tips - TLV with negative change
         success, details, data = self.test_api_endpoint(
