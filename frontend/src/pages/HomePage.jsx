@@ -242,6 +242,44 @@ export default function HomePage() {
         {/* NEW: Hero Section with 4 Pillars */}
         <HeroSection />
 
+        {/* Fear & Greed Index - Prominent Position */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <FearGreedIndex />
+          </div>
+          <div className="lg:col-span-2">
+            <Card className="h-full bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 border-slate-200 dark:border-slate-700">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
+                  Cum să interpretezi Fear & Greed?
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-red-500/10 rounded-lg border border-red-500/20">
+                    <p className="font-semibold text-red-600 dark:text-red-400">0-25: Frică Extremă</p>
+                    <p className="text-sm text-muted-foreground mt-1">Investitorii sunt panicați. Poate fi moment de cumpărare pentru cei cu strategie pe termen lung.</p>
+                  </div>
+                  <div className="p-4 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                    <p className="font-semibold text-orange-600 dark:text-orange-400">25-45: Frică</p>
+                    <p className="text-sm text-muted-foreground mt-1">Pesimism general. Oportunități selective pentru investitori educați.</p>
+                  </div>
+                  <div className="p-4 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                    <p className="font-semibold text-yellow-600 dark:text-yellow-400">45-55: Neutru</p>
+                    <p className="text-sm text-muted-foreground mt-1">Piață echilibrată. Continuă analiza individuală a fiecărei acțiuni.</p>
+                  </div>
+                  <div className="p-4 bg-green-500/10 rounded-lg border border-green-500/20">
+                    <p className="font-semibold text-green-600 dark:text-green-400">55-100: Lăcomie</p>
+                    <p className="text-sm text-muted-foreground mt-1">Optimism crescut. Atenție la supraevaluare și protejează profiturile.</p>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-4 italic">
+                  ⚠️ Indicatorul Fear & Greed nu este o recomandare de investiții. Folosește-l ca un instrument de analiză alături de cercetarea ta.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* BVB Stocks - Vertical Auto-Scroll */}
         <section>
           <div className="flex justify-between items-center mb-6">
