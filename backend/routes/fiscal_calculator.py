@@ -34,11 +34,20 @@ IMPOZIT_BVB_TERMEN_LUNG = 0.01      # 1% - deținere >= 365 zile
 IMPOZIT_BVB_TERMEN_SCURT = 0.03    # 3% - deținere < 365 zile
 
 # === IMPOZITE PIEȚE INTERNAȚIONALE ===
-IMPOZIT_INTERNATIONAL = 0.10       # 10% pentru piețe străine
+IMPOZIT_INTERNATIONAL = 0.10       # 10% pentru piețe străine (câștig capital)
+IMPOZIT_DIVIDENDE_INTERNATIONALE = 0.10  # 10% pentru dividende străine
 
 # === DIVIDENDE ===
 IMPOZIT_DIVIDENDE_RO = 0.08        # 8% pentru dividende BVB (reținut la sursă)
-# NOTĂ: Unele surse indică 10%, depinde de anul fiscal și tipul companiei
+IMPOZIT_DIVIDENDE_STRAINE = 0.10   # 10% pentru dividende din străinătate
+
+# Reținere la sursă în alte țări (tratate de evitare a dublei impuneri)
+RETINERE_USA = 0.15               # 15% reținere SUA (cu W-8BEN) sau 30% fără
+RETINERE_EU_MEDIE = 0.15          # Media UE ~15% (variază pe țară)
+
+# NOTĂ IMPORTANTĂ pentru dividende internaționale:
+# - SUA: 15% reținut la sursă (cu W-8BEN), apoi 10% în RO, dar cu credit fiscal
+# - UE: Variază, de obicei 15-25%, cu credit fiscal în RO
 
 # === CASS ===
 CASS_RATE = 0.10  # 10% CASS pe baza de calcul
