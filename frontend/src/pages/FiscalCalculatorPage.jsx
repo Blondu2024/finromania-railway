@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
 import FiscalAIChat from '../components/FiscalAIChat';
+import ProPaywall from '../components/ProPaywall';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
