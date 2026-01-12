@@ -12,7 +12,6 @@ import FearGreedIndex from '../components/FearGreedIndex';
 import { useAuth } from '../context/AuthContext';
 import FeatureCard from '../components/FeatureCard';
 import FreeVsProComparison from '../components/FreeVsProComparison';
-import SocialProof from '../components/SocialProof';
 import QuickCalculator from '../components/QuickCalculator';
 import TrustBadges from '../components/TrustBadges';
 
@@ -298,6 +297,12 @@ export default function HomePage() {
         <QuickCalculator user={user} />
 
         {/* FREE vs PRO Comparison - MEGA CLAR */}
+        <FreeVsProComparison />
+
+        {/* Quick Calculator FREE cu Upgrade Prompt */}
+        <QuickCalculator user={user} />
+
+        {/* FREE vs PRO Comparison - SEPARARE MEGA CLARĂ */}
         <FreeVsProComparison />
 
         {/* Portofoliu + Tools */}
