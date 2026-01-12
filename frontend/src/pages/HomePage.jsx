@@ -243,14 +243,14 @@ export default function HomePage() {
   return (
     <>
       <SEO 
-        title="FinRomania - Înțelege Piața Înainte să Investești"
-        description="Date reale. Educație clară. Decizii mai bune. Platforma românească pentru investitorul care vrea claritate, nu promisiuni. Educație financiară gratuită și date live BVB."
-        keywords="educatie financiara, date bvb, bursa bucuresti, investitii romania, analiza actiuni, trading romania, piata de capital, finante personale"
+        title="FinRomania - Investește Inteligent pe BVB și Global"
+        description="Portofoliu BVB cu 3 Straturi, Calculator Fiscal PRO, Date LIVE Global (1s delay), AI Advisor."
+        keywords="calculator fiscal, portofoliu bvb, date live bvb, global markets, investitii romania"
       />
       
       <div className="space-y-10">
-        {/* NEW: Hero Section with 4 Pillars */}
-        <HeroSection />
+        {/* Hero Section */}
+        <HeroSection user={user} />
 
         {/* Fear & Greed Index - Prominent Position */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
