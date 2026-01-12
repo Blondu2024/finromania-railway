@@ -63,6 +63,8 @@ const FAQPage = lazy(() => import('./pages/FAQPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
 const FiscalCalculatorPage = lazy(() => import('./pages/FiscalCalculatorPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
+const PortfolioBVBPage = lazy(() => import('./pages/PortfolioBVBPage'));
 
 // Lazy load heavy components
 const TickerBar = lazy(() => import('./components/TickerBar'));
