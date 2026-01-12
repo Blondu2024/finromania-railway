@@ -515,22 +515,69 @@ class FinRomania2Tester:
         print("\n🎓 SECTION 4: Quiz System")
         print("-" * 80)
         
-        # Test 4.1: Get intermediate quiz questions
-        success, details, data = self.test_api_endpoint(
-            'GET', '/api/quiz/intermediate',
-            auth_token=self.beginner_token
-        )
-        if success and isinstance(data, dict):
-            has_questions = 'questions' in data and len(data.get('questions', [])) == 10
-            pass_score = data.get('pass_score') == 7
-            self.log_test("Get Quiz - Intermediate", has_questions and pass_score,
-                         f"Questions: {len(data.get('questions', []))}, Pass score: {data.get('pass_score')}/10",
-                         data)
+        # Test 4.1: Create a fresh user for quiz testing (not upgraded to PRO)
+        print("\n👤 Creating fresh user for quiz testing...")
+        result = subprocess.run([
+            'mongosh', 'mongodb://localhost:27017/stock_news_romania', '--quiet', '--eval',
+            f"""
+            const now = new Date().toISOString();
+            const expiresAt = new Date(Date.now() + 7*24*60*60*1000).toISOString();
             
-            # Store questions for submission test
-            self.quiz_questions = data.get('questions', [])
+            const quizUserId = 'test_user_quiz_' + Date.now();
+            db.users.insertOne({{
+                user_id: quizUserId,
+                email: 'test_quiz@finromania2.test',
+                name: 'Test Quiz User',
+                picture: 'https://example.com/pic.jpg',
+                is_admin: false,
+                subscription_level: 'free',
+                experience_level: 'beginner',
+                unlocked_levels: ['beginner'],
+                ai_queries_today: 0,
+                ai_queries_reset_at: now,
+                quiz_scores: {{}},
+                created_at: now,
+                last_login: now
+            }});
+            const quizToken = 'test_token_quiz_' + Date.now();
+            db.user_sessions.insertOne({{
+                user_id: quizUserId,
+                session_token: quizToken,
+                expires_at: expiresAt,
+                created_at: now
+            }});
+            print(quizToken);
+            """
+        ], capture_output=True, text=True)
+        
+        quiz_token = None
+        if result.returncode == 0 and result.stdout.strip():
+            quiz_token = result.stdout.strip()
+            print(f"✅ Created quiz test user with token")
         else:
-            self.log_test("Get Quiz - Intermediate", False, details, data)
+            print(f"❌ Failed to create quiz test user")
+        
+        # Test 4.2: Get intermediate quiz questions
+        if quiz_token:
+            success, details, data = self.test_api_endpoint(
+                'GET', '/api/quiz/intermediate',
+                auth_token=quiz_token
+            )
+            if success and isinstance(data, dict):
+                has_questions = 'questions' in data and len(data.get('questions', [])) == 10
+                pass_score = data.get('pass_score') == 7
+                self.log_test("Get Quiz - Intermediate", has_questions and pass_score,
+                             f"Questions: {len(data.get('questions', []))}, Pass score: {data.get('pass_score')}/10",
+                             data)
+                
+                # Store questions for submission test
+                self.quiz_questions = data.get('questions', [])
+                self.quiz_token = quiz_token
+            else:
+                self.log_test("Get Quiz - Intermediate", False, details, data)
+                self.quiz_questions = []
+        else:
+            self.log_test("Get Quiz - Intermediate", False, "Failed to create quiz test user", None)
             self.quiz_questions = []
         
         # Test 4.2: Submit quiz with passing score (7/10)
