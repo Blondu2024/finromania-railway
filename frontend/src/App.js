@@ -337,6 +337,7 @@ function AppRouter() {
         <Route path="/screener" element={<StockScreenerPage />} />
         <Route path="/notifications" element={<NotificationSettingsPage />} />
         <Route path="/global" element={<GlobalMarketsPage />} />
+        <Route path="/quiz/:level" element={<QuizPage />} />
       </Routes>
     </Suspense>
   );
