@@ -107,69 +107,69 @@ const HeroSection = memo(function HeroSection({ user }) {
           </p>
         </div>
 
-        {/* 4 Pillars Grid - Matured Text */}
+        {/* 4 Pillars - ORDINEA CORECTĂ pentru prima impresie PRO */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {/* Pillar 1: Education */}
-          <Link to="/trading-school" className="group">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
-              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                <GraduationCap className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg mb-1">🎓 Educație</h3>
-              <p className="text-sm text-blue-200">Structurată pentru începători și intermediari</p>
-              <Badge className="mt-2 bg-green-500/20 text-green-300 text-xs">GRATUIT</Badge>
-            </div>
-          </Link>
-
-          {/* Pillar 2: BVB Data */}
+          {/* 1. BVB - PRIMUL (arată că e platformă serioasă) */}
           <Link to="/stocks" className="group">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
-              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                <BarChart3 className="w-6 h-6" />
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                <TrendingUp className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-lg mb-1">📈 Date BVB</h3>
-              <p className="text-sm text-blue-200">Piața românească, fără intermediari</p>
-              <Badge className="mt-2 bg-blue-500/20 text-blue-300 text-xs">TIMP REAL</Badge>
+              <h3 className="font-bold text-lg mb-1">📈 Bursa BVB</h3>
+              <p className="text-sm text-blue-200">50+ acțiuni, date live, delay 15min</p>
+              <Badge className="mt-2 bg-green-500/20 text-green-300 text-xs">LIVE DATA</Badge>
             </div>
           </Link>
 
-          {/* Pillar 3: Global Markets */}
+          {/* 2. GLOBAL - AL DOILEA (arată feature PRO) */}
           <Link to="/global" className="group">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
               <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Globe className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">🌍 Piețe Globale</h3>
-              <p className="text-sm text-blue-200">Piețe internaționale într-un singur loc</p>
-              <Badge className="mt-2 bg-purple-500/20 text-purple-300 text-xs">MONDIAL</Badge>
+              <p className="text-sm text-blue-200">US, EU, Asia - delay doar 1 secundă!</p>
+              <Badge className="mt-2 bg-purple-500/20 text-purple-300 text-xs animate-pulse">1s DELAY</Badge>
             </div>
           </Link>
 
-          {/* Pillar 4: Tools */}
-          <Link to="/screener" className="group">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
-              <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Search className="w-6 h-6" />
+          {/* 3. CALCULATOR - AL TREILEA (valoare reală) */}
+          <Link to="/calculator-fiscal" className="group">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105 ring-2 ring-amber-400/50">
+              <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Calculator className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-lg mb-1">🔧 Instrumente</h3>
-              <p className="text-sm text-blue-200">Pentru decizii informate</p>
-              <Badge className="mt-2 bg-orange-500/20 text-orange-300 text-xs">PRO</Badge>
+              <h3 className="font-bold text-lg mb-1">🧮 Calculator Fiscal</h3>
+              <p className="text-sm text-blue-200">Economisește până la 50k+ RON/an</p>
+              <Badge className="mt-2 bg-amber-500/20 text-amber-300 text-xs">PRO</Badge>
+            </div>
+          </Link>
+
+          {/* 4. EDUCAȚIE - LA FINAL (pentru cei care vor să învețe) */}
+          <Link to="/trading-school" className="group">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
+              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-lg mb-1">🎓 Educație</h3>
+              <p className="text-sm text-blue-200">Cursuri gratuite pentru toți</p>
+              <Badge className="mt-2 bg-blue-500/20 text-blue-300 text-xs">GRATUIT</Badge>
             </div>
           </Link>
         </div>
 
-        {/* CTA Buttons - More Professional */}
+        {/* CTA Buttons - Focus pe VALUE */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/trading-school">
+          <Link to="/stocks">
             <Button size="lg" className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
-              <BookOpen className="w-5 h-5 mr-2" />
-              Explorează Educația
+              <TrendingUp className="w-5 h-5 mr-2" />
+              Vezi Bursa BVB
             </Button>
           </Link>
-          <Link to="/stocks">
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
-              <TrendingUp className="w-5 h-5 mr-2" />
-              Vezi Piața BVB
+          <Link to="/calculator-fiscal">
+            <Button size="lg" className="bg-amber-600 hover:bg-amber-700 w-full sm:w-auto">
+              <Calculator className="w-5 h-5 mr-2" />
+              Calculator Fiscal PRO
             </Button>
           </Link>
         </div>
