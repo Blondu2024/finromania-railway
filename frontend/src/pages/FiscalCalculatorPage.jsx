@@ -559,6 +559,43 @@ export default function FiscalCalculatorPage() {
           </Card>
         )}
 
+        {/* AI Fiscal Advisor */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="bg-gradient-to-br from-blue-600/10 to-purple-600/10 border-blue-500/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="w-5 h-5 text-blue-500" />
+                Întrebări despre Fiscalitate?
+              </CardTitle>
+              <CardDescription>
+                AI-ul nostru fiscal îți răspunde la întrebări despre impozite, declarații, CASS, W-8BEN și multe altele.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Cum completez Declarația Unică?
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Ce e W-8BEN și când am nevoie?
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Cum calculez CASS pentru investiții?
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Pot compensa pierderile cu câștigurile?
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+          
+          <FiscalAIChat />
+        </div>
+
         {/* Disclaimer */}
         <Card className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600">
           <CardContent className="p-6">
