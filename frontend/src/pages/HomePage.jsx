@@ -11,6 +11,10 @@ import SEO from '../components/SEO';
 import FearGreedIndex from '../components/FearGreedIndex';
 import { useAuth } from '../context/AuthContext';
 import FeatureCard from '../components/FeatureCard';
+import FreeVsProComparison from '../components/FreeVsProComparison';
+import SocialProof from '../components/SocialProof';
+import QuickCalculator from '../components/QuickCalculator';
+import TrustBadges from '../components/TrustBadges';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -285,6 +289,15 @@ export default function HomePage() {
             </Card>
           </div>
         </section>
+
+        {/* Social Proof */}
+        <SocialProof />
+
+        {/* Quick Calculator FREE with Upgrade */}
+        <QuickCalculator user={user} />
+
+        {/* FREE vs PRO Comparison - MEGA CLAR */}
+        <FreeVsProComparison />
 
         {/* Portofoliu + Tools */}
         <section>
