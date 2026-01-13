@@ -87,9 +87,9 @@ const NewsCard = memo(function NewsCard({ article }) {
 const HeroSection = memo(function HeroSection({ user }) {
   return (
     <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-6 md:p-10">
-      {/* Background decorations */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -mr-32 -mt-32" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl -ml-24 -mb-24" />
+      {/* Background decorations - REDUSE */}
+      <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl -mr-24 -mt-24" />
+      <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -ml-16 -mb-16" />
       
       <div className="relative z-10">
         {/* Main Message */}
@@ -99,13 +99,13 @@ const HeroSection = memo(function HeroSection({ user }) {
             Date LIVE · Delay 1s pentru Global Markets
           </Badge>
           <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">
-            Investește <span className="text-blue-400">Inteligent</span> pe BVB și Global
+            Înțelege Piața <span className="text-blue-400">Înainte</span> să Investești
           </h1>
           <p className="text-lg md:text-xl text-blue-200 max-w-2xl mx-auto mb-2">
-            Portofoliu · Calculator Fiscal · Date Live · AI Advisor
+            Educație · Analiză · Date Live · Instrumente Profesionale
           </p>
           <p className="text-base text-blue-300/80 max-w-xl mx-auto">
-            Platforma românească completă pentru investitori moderni.
+            Platforma românească de educație financiară cu date reale BVB și Global.
           </p>
         </div>
 
