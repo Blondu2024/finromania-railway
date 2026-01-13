@@ -513,6 +513,25 @@ export default function GlobalMarketsPage() {
   const [showReminder, setShowReminder] = useState(false);
   const [companionOpen, setCompanionOpen] = useState(false);
   const { user } = useAuth();
+  
+  // Check subscription for delay badge
+  const [subscriptionLevel, setSubscriptionLevel] = useState('free');
+  
+  useEffect(() => {
+    if (user) {
+      fetch(`${API_URL}/api/subscriptions/status`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+      })
+        .then(res => res.json())
+        .then(data => setSubscriptionLevel(data?.subscription?.subscription_level || 'free'))
+        .catch(() => setSubscriptionLevel('free'));
+    }
+  }, [user]);
+  
+  // Delay info
+  const delayInfo = subscriptionLevel === 'pro'
+    ? { text: 'Delay 1s', color: 'bg-green-500', description: 'Date REAL-TIME (PRO)' }
+    : { text: 'Delay 15min', color: 'bg-yellow-500', description: 'Plan Gratuit' };
 
   const fetchData = async () => {
     try {
