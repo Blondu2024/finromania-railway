@@ -181,15 +181,16 @@ function Navigation({ darkMode, toggleDarkMode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user } = useAuth();
   
-  // Simplified navigation - GROUPED pentru mobile
+  // Main navigation items - ACELEAȘI pentru desktop și mobile
   const navItems = [
+    { path: '/', label: 'Acasă', icon: '🏠' },
     { path: '/stocks', label: 'Acțiuni BVB', icon: '📈' },
     { path: '/global', label: 'Piețe Globale', icon: '🌍' },
     { path: '/calculator-fiscal', label: 'Calculator Fiscal', icon: '🧮' },
     { path: '/news', label: 'Știri', icon: '📰' },
   ];
 
-  // Grouped menu items pentru mobile
+  // Grouped menu items
   const academiaItems = [
     { path: '/trading-school', label: 'Învață Trading', icon: '🎓' },
     { path: '/financial-education', label: 'Educație Financiară', icon: '📚' },
