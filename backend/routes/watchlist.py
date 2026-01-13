@@ -18,7 +18,7 @@ router = APIRouter(prefix="/watchlist", tags=["Watchlist"])
 
 WATCHLIST_LIMITS = {
     "free": {
-        "max_stocks": 10,  # Max 10 stocks în watchlist pentru FREE
+        "max_stocks": 3,   # Max 3 stocks în watchlist pentru FREE
         "max_alerts": 2,   # Max 2 companii cu alerte pentru FREE
         "name": "Plan Gratuit"
     },

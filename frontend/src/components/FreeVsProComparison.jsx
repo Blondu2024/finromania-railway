@@ -12,9 +12,19 @@ const COMPARISON_FEATURES = [
     pro: { available: true, text: "Acces Complet + AI Fiscal" }
   },
   {
-    category: "AI Queries",
+    category: "AI Queries (Întrebări)",
     free: { available: true, text: "5 întrebări/zi" },
     pro: { available: true, text: "NELIMITATE ∞" }
+  },
+  {
+    category: "Watchlist (Favorite)",
+    free: { available: true, text: "Max 3 acțiuni" },
+    pro: { available: true, text: "NELIMITAT" }
+  },
+  {
+    category: "Alerte Preț",
+    free: { available: true, text: "Max 2 companii" },
+    pro: { available: true, text: "NELIMITATE (toate companiile)" }
   },
   {
     category: "Acțiuni BVB",
