@@ -15,6 +15,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function StockDetailPage() {
   const { type, symbol } = useParams();
+  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,7 +23,20 @@ export default function StockDetailPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [showReminder, setShowReminder] = useState(false);
   const [companionOpen, setCompanionOpen] = useState(false);
-  const { user } = useAuth();
+  
+  // Check PRO status
+  const [isPro, setIsPro] = useState(false);
+  
+  useEffect(() => {
+    if (user) {
+      fetch(`${API_URL}/api/subscriptions/status`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+      })
+        .then(res => res.json())
+        .then(data => setIsPro(data?.subscription?.is_pro || false))
+        .catch(() => setIsPro(false));
+    }
+  }, [user]);
 
   // Show reminder on first load (check only, don't mark as shown yet)
   useEffect(() => {

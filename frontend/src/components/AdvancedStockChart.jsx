@@ -26,15 +26,22 @@ import {
   X
 } from 'lucide-react';
 
-// Timeframe options
-const TIMEFRAMES = [
-  { label: '7Z', value: '1d', days: 7 },
-  { label: '2S', value: '1w', days: 14 },
-  { label: '1L', value: '1m', days: 30 },
-  { label: '3L', value: '3m', days: 90 },
-  { label: '6L', value: '6m', days: 180 },
-  { label: '1A', value: '1y', days: 365 },
-  { label: '5A', value: '5y', days: 1825 },
+// Timeframe options - DAILY (FREE users)
+const TIMEFRAMES_DAILY = [
+  { label: '7Z', value: '1d', days: 7, type: 'daily' },
+  { label: '2S', value: '1w', days: 14, type: 'daily' },
+  { label: '1L', value: '1m', days: 30, type: 'daily' },
+  { label: '3L', value: '3m', days: 90, type: 'daily' },
+  { label: '6L', value: '6m', days: 180, type: 'daily' },
+  { label: '1A', value: '1y', days: 365, type: 'daily' },
+];
+
+// Timeframe options - INTRADAY (PRO users only!)
+const TIMEFRAMES_INTRADAY = [
+  { label: '30min', value: '30m', interval: '30m', type: 'intraday', pro: true },
+  { label: '15min', value: '15m', interval: '15m', type: 'intraday', pro: true },
+  { label: '5min', value: '5m', interval: '5m', type: 'intraday', pro: true },
+  { label: '1min', value: '1m', interval: '1m', type: 'intraday', pro: true },
 ];
 
 // Chart type options
