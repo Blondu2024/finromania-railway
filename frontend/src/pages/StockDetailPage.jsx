@@ -240,13 +240,12 @@ export default function StockDetailPage() {
         </Card>
       </div>
 
-      {/* Advanced Chart */}
-      <AdvancedStockChart 
-        symbol={data.symbol}
-        data={history}
-        currency={data.currency || 'RON'}
-        onTimeframeChange={handleTimeframeChange}
-        currentTimeframe={currentPeriod}
+      {/* PRO Chart Component */}
+      <ProStockChart
+        symbol={symbol}
+        type={type}
+        isPro={isPro}
+        token={localStorage.getItem('auth_token')}
       />
 
       {/* Price Info */}
