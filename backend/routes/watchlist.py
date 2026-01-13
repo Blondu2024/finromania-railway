@@ -12,6 +12,23 @@ from routes.auth import get_current_user
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/watchlist", tags=["Watchlist"])
 
+# ============================================
+# LIMITS - FREE vs PRO
+# ============================================
+
+WATCHLIST_LIMITS = {
+    "free": {
+        "max_stocks": 10,  # Max 10 stocks în watchlist pentru FREE
+        "max_alerts": 2,   # Max 2 companii cu alerte pentru FREE
+        "name": "Plan Gratuit"
+    },
+    "pro": {
+        "max_stocks": -1,  # Unlimited pentru PRO
+        "max_alerts": -1,  # Unlimited alerte pentru PRO
+        "name": "Plan PRO"
+    }
+}
+
 
 # ============================================
 # MODELS
