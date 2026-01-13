@@ -87,9 +87,7 @@ const NewsCard = memo(function NewsCard({ article }) {
 const HeroSection = memo(function HeroSection({ user }) {
   return (
     <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-6 md:p-10">
-      {/* Background decorations - REDUSE */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl -mr-24 -mt-24" />
-      <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -ml-16 -mb-16" />
+      {/* Fără blur-uri decorative - look clean */}
       
       <div className="relative z-10">
         {/* Main Message */}
