@@ -248,15 +248,19 @@ export default function ProStockChart({
   
   const handleTimeframeClick = (timeframe, interval = null) => {
     if (interval && !isPro) {
-      const message = '⏱️ Grafice INTRADAY (1min, 5min, 15min, 30min, 1H) sunt DOAR PRO!' + '\n\n' +
-        'Upgrade la PRO: 49 RON/lună' + '\n\n' +
-        'Beneficii PRO:' + '\n' +
-        '✓ Grafice intraday complete' + '\n' +
-        '✓ Indicatori tehnici avansați' + '\n' +
-        '✓ Update la 3 secunde' + '\n' +
-        '✓ Calculator Fiscal' + '\n\n' +
-        'Vezi /pricing';
-      alert(message);
+      alert([
+        '⏱️ Grafice INTRADAY (1min, 5min, 15min, 30min, 1H) sunt DOAR PRO!',
+        '',
+        'Upgrade la PRO: 49 RON/lună',
+        '',
+        'Beneficii PRO:',
+        '✓ Grafice intraday complete',
+        '✓ Indicatori tehnici avansați',
+        '✓ Update la 3 secunde',
+        '✓ Calculator Fiscal',
+        '',
+        'Vezi /pricing'
+      ].join('\n'));
       return;
     }
     
