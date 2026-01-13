@@ -16,38 +16,44 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/fiscal", tags=["fiscal-calculator"])
 
 # ============================================
-# CONSTANTE FISCALE ROMÂNIA 2024-2025
+# CONSTANTE FISCALE ROMÂNIA 2025
 # ACTUALIZATE CONFORM LEGISLAȚIEI ÎN VIGOARE
+# ATENȚIE: Modificări planificate pentru 2026!
 # ============================================
 
-# Salariu minim brut pe economie 2024
-SALARIU_MINIM_BRUT = 3700  # RON/lună
+# Salariu minim brut pe economie 2025 (crescut de la 3.700 în 2024)
+SALARIU_MINIM_BRUT = 4050  # RON/lună (de la 1 ianuarie 2025)
 
 # Prag CASS pentru venituri din investiții
-# CASS se datorează dacă venitul TOTAL din investiții > 6 salarii minime brute anuale
-CASS_PRAG_MINIM = 6 * SALARIU_MINIM_BRUT  # 22.200 RON (baza minimă de calcul)
-CASS_PRAG_ANUAL = 6 * SALARIU_MINIM_BRUT * 12  # ~266.400 RON (prag activare)
+# CASS se datorează dacă venitul TOTAL din investiții > 6 salarii minime brute
+CASS_PRAG_MINIM = 6 * SALARIU_MINIM_BRUT  # 24.300 RON (baza minimă de calcul 2025)
+CASS_PRAG_MAXIM = 12 * SALARIU_MINIM_BRUT  # 48.600 RON (baza maximă pentru calcul CASS minim)
 
 # === IMPOZITE BVB (Titluri listate în România) ===
-# Conform Codului Fiscal actualizat 2024-2025
-IMPOZIT_BVB_TERMEN_LUNG = 0.01      # 1% - deținere >= 365 zile
-IMPOZIT_BVB_TERMEN_SCURT = 0.03    # 3% - deținere < 365 zile
+# Conform Codului Fiscal 2025
+# ⚠️ ATENȚIE: Din 1 ianuarie 2026 cresc la 3% și 6%!
+IMPOZIT_BVB_TERMEN_LUNG = 0.01      # 1% - deținere >= 365 zile (2025)
+IMPOZIT_BVB_TERMEN_SCURT = 0.03    # 3% - deținere < 365 zile (2025)
+
+# Viitor 2026:
+IMPOZIT_BVB_TERMEN_LUNG_2026 = 0.03  # 3% din 2026
+IMPOZIT_BVB_TERMEN_SCURT_2026 = 0.06 # 6% din 2026
 
 # === IMPOZITE PIEȚE INTERNAȚIONALE ===
-IMPOZIT_INTERNATIONAL = 0.10       # 10% pentru piețe străine (câștig capital)
-IMPOZIT_DIVIDENDE_INTERNATIONALE = 0.10  # 10% pentru dividende străine
+IMPOZIT_INTERNATIONAL = 0.10       # 10% pentru piețe străine (câștig capital) - 2025
+IMPOZIT_INTERNATIONAL_2026 = 0.16  # 16% din 1 ianuarie 2026
 
 # === DIVIDENDE ===
-IMPOZIT_DIVIDENDE_RO = 0.08        # 8% pentru dividende BVB (reținut la sursă)
-IMPOZIT_DIVIDENDE_STRAINE = 0.10   # 10% pentru dividende din străinătate
+# IMPORTANT: Dividendele BVB au crescut la 10% în 2025!
+IMPOZIT_DIVIDENDE_RO = 0.10        # 10% pentru dividende românești (2025, crescut de la 8%)
+IMPOZIT_DIVIDENDE_STRAINE = 0.10   # 10% pentru dividende din străinătate (2025)
+
+# Viitor 2026:
+IMPOZIT_DIVIDENDE_2026 = 0.16      # 16% din 1 ianuarie 2026
 
 # Reținere la sursă în alte țări (tratate de evitare a dublei impuneri)
 RETINERE_USA = 0.15               # 15% reținere SUA (cu W-8BEN) sau 30% fără
 RETINERE_EU_MEDIE = 0.15          # Media UE ~15% (variază pe țară)
-
-# NOTĂ IMPORTANTĂ pentru dividende internaționale:
-# - SUA: 15% reținut la sursă (cu W-8BEN), apoi 10% în RO, dar cu credit fiscal
-# - UE: Variază, de obicei 15-25%, cu credit fiscal în RO
 
 # === CASS ===
 CASS_RATE = 0.10  # 10% CASS pe baza de calcul
@@ -158,7 +164,7 @@ def calcul_pf_bvb(input_data: CalculFiscalInput) -> ScenariuFiscal:
     
     # === IMPOZIT PE DIVIDENDE ===
     impozit_div = dividende * IMPOZIT_DIVIDENDE_RO
-    nota_div = f"8% reținut la sursă: {impozit_div:,.0f} RON"
+    nota_div = f"10% reținut la sursă (2025): {impozit_div:,.0f} RON"
     
     # === CASS ===
     cass = 0
@@ -167,8 +173,8 @@ def calcul_pf_bvb(input_data: CalculFiscalInput) -> ScenariuFiscal:
     if not input_data.are_alte_venituri_cass:
         # Trebuie să plătești CASS dacă nu ai alte surse de venit
         if venit_total > CASS_PRAG_MINIM:
-            # Baza de calcul CASS = minim 6 salarii minime, maxim venitul real
-            baza_cass = max(CASS_PRAG_MINIM, min(venit_total, CASS_PRAG_MINIM * 4))
+            # Baza de calcul CASS = minim 6 salarii minime (24.300 RON în 2025)
+            baza_cass = max(CASS_PRAG_MINIM, min(venit_total, CASS_PRAG_MAXIM))
             cass = baza_cass * CASS_RATE
             nota_cass = f"CASS 10% pe baza de {baza_cass:,.0f} RON = {cass:,.0f} RON"
         else:
@@ -189,16 +195,18 @@ def calcul_pf_bvb(input_data: CalculFiscalInput) -> ScenariuFiscal:
     ]
     
     avantaje = [
-        "✅ Impozit foarte mic pe BVB: 1-3%",
+        "✅ Impozit foarte mic pe BVB: 1-3% (2025)",
         "✅ Reținere la sursă (broker-ul plătește)",
         "✅ Fără contabilitate sau declarații complexe",
-        "✅ Ideal pentru investitori pasivi"
+        "✅ Ideal pentru investitori pasivi",
+        "⚠️ Din 2026: impozit crește la 3-6%"
     ]
     
     dezavantaje = [
         "❌ Nu poți compensa pierderile cu câștigurile",
-        "❌ CASS obligatoriu dacă nu ai salariu",
-        "❌ Nu poți deduce nicio cheltuială"
+        "❌ CASS obligatoriu dacă nu ai salariu (24.300 RON prag 2025)",
+        "❌ Nu poți deduce nicio cheltuială",
+        "❌ Din 2026: impozite mai mari (3-6% vs 1-3%)"
     ]
     
     return ScenariuFiscal(
