@@ -558,6 +558,7 @@ const SectorPerformance = ({ sectors }) => {
 // MAIN STOCKS PAGE COMPONENT
 // ============================================
 export default function StocksPage() {
+  const { user } = useAuth();
   const [stocks, setStocks] = useState([]);
   const [indices, setIndices] = useState([]);
   const [topMovers, setTopMovers] = useState({ gainers: [], losers: [], most_traded: [] });
@@ -566,6 +567,25 @@ export default function StocksPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'change_percent', direction: 'desc' });
+  
+  // Check subscription for delay badge
+  const [subscriptionLevel, setSubscriptionLevel] = useState('free');
+  
+  useEffect(() => {
+    if (user) {
+      fetch(`${API_URL}/api/subscriptions/status`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+      })
+        .then(res => res.json())
+        .then(data => setSubscriptionLevel(data?.subscription?.subscription_level || 'free'))
+        .catch(() => setSubscriptionLevel('free'));
+    }
+  }, [user]);
+  
+  // Delay info
+  const delayInfo = subscriptionLevel === 'pro'
+    ? { text: 'Delay 15min', color: 'bg-green-500', description: 'Date aproape live (PRO)' }
+    : { text: 'Delay 30min', color: 'bg-yellow-500', description: 'Plan Gratuit' };
 
   const fetchAllData = async () => {
     try {
