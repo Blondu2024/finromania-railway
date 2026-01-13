@@ -136,13 +136,15 @@ async def get_watchlist(current_user: dict = Depends(get_current_user)):
 
 
 @router.post("/add")
-async def add_to_watchlist(
-    item: WatchlistItem,
-    current_user: dict = Depends(get_current_user)
-):
-    """Add a stock to watchlist"""
+async def add_to_watchlist(item: WatchlistItem, current_user: dict = Depends(get_current_user)):
+    """Add a stock to watchlist with subscription limits"""
     try:
         db = await get_database()
+        
+        # Check user subscription level
+        user_data = await db.users.find_one({"user_id": current_user["user_id"]}, {"_id": 0})
+        subscription_level = user_data.get("subscription_level", "free") if user_data else "free"
+        limits = WATCHLIST_LIMITS.get(subscription_level, WATCHLIST_LIMITS["free"])
         
         # Verify stock exists
         stock = await db.stocks_bvb.find_one({"symbol": item.symbol.upper()})
@@ -151,6 +153,27 @@ async def add_to_watchlist(
         
         # Get or create watchlist
         watchlist = await db.watchlists.find_one({"user_id": current_user["user_id"]})
+        
+        current_items = watchlist.get("items", []) if watchlist else []
+        
+        # Check if already in watchlist
+        if item.symbol.upper() in [i["symbol"] for i in current_items]:
+            raise HTTPException(status_code=400, detail="Stock already in watchlist")
+        
+        # Check FREE limits for watchlist size
+        if subscription_level == "free":
+            if limits["max_stocks"] != -1 and len(current_items) >= limits["max_stocks"]:
+                raise HTTPException(
+                    status_code=403,
+                    detail={
+                        "error": "watchlist_limit_reached",
+                        "message": f"Plan Gratuit permite max {limits['max_stocks']} acțiuni în watchlist.",
+                        "current_count": len(current_items),
+                        "limit": limits["max_stocks"],
+                        "upgrade_message": "Treci la PRO pentru watchlist nelimitat!",
+                        "pricing_url": "/pricing"
+                    }
+                )
         
         new_item = {
             "symbol": item.symbol.upper(),
@@ -165,6 +188,21 @@ async def add_to_watchlist(
             existing_symbols = [i["symbol"] for i in watchlist.get("items", [])]
             if item.symbol.upper() in existing_symbols:
                 raise HTTPException(status_code=400, detail="Stock already in watchlist")
+            
+            # Check FREE limits before adding
+            if subscription_level == "free" and limits["max_stocks"] != -1:
+                if len(existing_symbols) >= limits["max_stocks"]:
+                    raise HTTPException(
+                        status_code=403,
+                        detail={
+                            "error": "watchlist_limit_reached",
+                            "message": f"Plan Gratuit: max {limits['max_stocks']} acțiuni în watchlist.",
+                            "current_count": len(existing_symbols),
+                            "limit": limits["max_stocks"],
+                            "upgrade_message": "Upgrade la PRO pentru watchlist nelimitat!",
+                            "pricing_url": "/pricing"
+                        }
+                    )
             
             # Add to existing watchlist
             await db.watchlists.update_one(
