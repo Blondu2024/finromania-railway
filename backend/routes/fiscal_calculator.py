@@ -481,24 +481,26 @@ def genereaza_recomandare(scenarii: List[ScenariuFiscal], input_data: CalculFisc
 
 De ce? Legislația română oferă un regim fiscal FOARTE avantajos pentru investitorii pe BVB:
 
-| Situație | Impozit |
-|----------|---------|
-| Deținere ≥ 1 an | **1%** |
-| Deținere < 1 an | **3%** |
-| Dividende | **8%** (reținut la sursă) |
+| Situație | Impozit 2025 | Impozit 2026 |
+|----------|--------------|--------------|
+| Deținere ≥ 1 an | **1%** | **3%** ⚠️ |
+| Deținere < 1 an | **3%** | **6%** ⚠️ |
+| Dividende | **10%** | **16%** ⚠️ |
 
 **Comparativ:**
 - PFA: ~35-45% (impozit + CAS + CASS)
-- SRL Micro: ~9-11% + costuri administrative
+- SRL Micro: ~11-13% + costuri administrative
 
 **Economie folosind PF:** până la **{economie:,.0f} RON/an**
 
-⚠️ **CASS**: Dacă NU ai salariu și câștigurile depășesc {CASS_PRAG_MINIM:,.0f} RON/an, 
+⚠️ **CASS**: Dacă NU ai salariu și câștigurile depășesc {CASS_PRAG_MINIM:,.0f} RON/an (2025), 
 vei datora CASS (10% din baza de calcul).
+
+⚠️ **IMPORTANT 2026**: Impozitele pe BVB vor crește! (1%→3%, 3%→6%, dividende 10%→16%)
 
 📋 **Ce trebuie să faci:**
 1. Broker-ul reține automat impozitul pe câștig (1% sau 3%)
-2. Companiile rețin 8% din dividende
+2. Companiile rețin 10% din dividende
 3. Completezi Declarația Unică (212) până în mai pentru CASS (dacă e cazul)
 """
     else:  # INTERNATIONAL
@@ -512,18 +514,20 @@ vei datora CASS (10% din baza de calcul).
 
 **Impozitarea este mai mare decât pe BVB, dar încă rezonabilă.**
 
-| Piață | Impozit Câștig | Impozit Dividende |
-|-------|----------------|-------------------|
-| 🇷🇴 BVB | **1-3%** | 8% |
-| 🇺🇸 USA | **10%** | 15% (reținut) + credit fiscal |
-| 🇪🇺 UE | **10%** | 10-25% (variază) |
+| Piață | Impozit Câștig 2025 | Impozit Câștig 2026 | Dividende 2025 | Dividende 2026 |
+|-------|---------------------|---------------------|----------------|----------------|
+| 🇷🇴 BVB | **1-3%** | **3-6%** ⚠️ | 10% | 16% ⚠️ |
+| 🇺🇸 USA | **10%** | **16%** ⚠️ | 15% reținut + credit | 15% + credit |
+| 🇪🇺 UE | **10%** | **16%** ⚠️ | 10-25% variază | 10-25% variază |
 
-**Calculul tău:**
+**Calculul tău (2025):**
 - Câștig capital: {input_data.castig_capital_anual:,.0f} RON × 10% = **{input_data.castig_capital_anual * 0.10:,.0f} RON**
 - Dividende: {input_data.dividende_anuale:,.0f} RON × ~15% = **{input_data.dividende_anuale * 0.15:,.0f} RON** (reținut în SUA)
 
 **💡 Comparație cu BVB:**
-Dacă ai investi aceeași sumă pe BVB, ai plăti ~**{diferenta_bvb_int:,.0f} RON mai puțin** impozit pe câștiguri!
+Dacă ai investi aceeași sumă pe BVB, ai plăti ~**{diferenta_bvb_int:,.0f} RON mai puțin** impozit pe câștiguri (2025)!
+
+⚠️ **ATENȚIE 2026**: Impozitele cresc la 16% pentru piețe internaționale!
 
 📋 **Ce trebuie să faci:**
 1. Completează formularul **W-8BEN** la broker (reduce impozitul SUA de la 30% la 15%)
@@ -531,7 +535,7 @@ Dacă ai investi aceeași sumă pe BVB, ai plăti ~**{diferenta_bvb_int:,.0f} RO
 3. Calculează și plătește diferența de impozit
 4. Păstrează toate rapoartele de la broker
 
-⚠️ **CASS**: Se aplică la fel ca pentru BVB dacă nu ai salariu.
+⚠️ **CASS**: Se aplică la fel ca pentru BVB dacă nu ai salariu (prag 24.300 RON în 2025).
 """
     
     return cel_mai_bun.tip_entitate, economie, explicatie
