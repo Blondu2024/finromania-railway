@@ -528,9 +528,9 @@ export default function GlobalMarketsPage() {
     }
   }, [user]);
   
-  // Delay info cu update frequency
+  // Delay info cu update frequency AGRESIV pentru PRO
   const delayInfo = subscriptionLevel === 'pro'
-    ? { text: 'Live Update 5s', color: 'bg-green-500', description: 'Date actualizate la 5 secunde (PRO)', frequency: '5s' }
+    ? { text: 'LIVE Update 3s', color: 'bg-green-500', description: 'Date actualizate la 3 secunde (PRO)', frequency: '3s' }
     : { text: 'Update 30s', color: 'bg-yellow-500', description: 'Actualizare la 30 secunde', frequency: '30s' };
 
   const fetchData = async () => {

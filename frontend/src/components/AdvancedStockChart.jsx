@@ -26,7 +26,7 @@ import {
   X
 } from 'lucide-react';
 
-// Timeframe options - DAILY (FREE users)
+// Timeframe options - Daily (FREE + PRO)
 const TIMEFRAMES_DAILY = [
   { label: '7Z', value: '1d', days: 7, type: 'daily' },
   { label: '2S', value: '1w', days: 14, type: 'daily' },
@@ -36,12 +36,18 @@ const TIMEFRAMES_DAILY = [
   { label: '1A', value: '1y', days: 365, type: 'daily' },
 ];
 
-// Timeframe options - INTRADAY (PRO users only!)
+// Timeframe options - Intraday (PRO only!)
 const TIMEFRAMES_INTRADAY = [
   { label: '30min', value: '30m', interval: '30m', type: 'intraday', pro: true },
   { label: '15min', value: '15m', interval: '15m', type: 'intraday', pro: true },
   { label: '5min', value: '5m', interval: '5m', type: 'intraday', pro: true },
   { label: '1min', value: '1m', interval: '1m', type: 'intraday', pro: true },
+];
+
+// Combined pentru backward compatibility
+const TIMEFRAMES = [
+  ...TIMEFRAMES_DAILY,
+  { label: '5A', value: '5y', days: 1825, type: 'daily' }
 ];
 
 // Chart type options
