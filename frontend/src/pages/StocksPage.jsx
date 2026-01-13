@@ -654,16 +654,29 @@ export default function StocksPage() {
       />
 
       <div className="space-y-6">
-        {/* Hero Section */}
+        {/* Hero Section cu Delay Badge */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center py-4"
         >
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-            🏛️ Bursa de Valori București
-          </h1>
-          <p className="text-muted-foreground">Date în timp real • Actualizare la 30 secunde</p>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+              🏛️ Bursa de Valori București
+            </h1>
+            <Badge className={`${delayInfo.color} text-white`}>
+              <Clock className="w-3 h-3 mr-1" />
+              {delayInfo.text}
+            </Badge>
+          </div>
+          <p className="text-muted-foreground">
+            {delayInfo.description}
+            {subscriptionLevel === 'free' && (
+              <Link to="/pricing" className="text-amber-600 hover:underline ml-2">
+                → PRO: 15min delay
+              </Link>
+            )}
+          </p>
         </motion.div>
 
         {/* Market Status Bar */}
