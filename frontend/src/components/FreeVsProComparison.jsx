@@ -17,6 +17,16 @@ const COMPARISON_FEATURES = [
     pro: { available: true, text: "NELIMITATE ∞" }
   },
   {
+    category: "Delay Date BVB",
+    free: { available: true, text: "30 minute" },
+    pro: { available: true, text: "15 minute (Real BVB)" }
+  },
+  {
+    category: "Delay Global Markets",
+    free: { available: true, text: "15 minute" },
+    pro: { available: true, text: "1 secundă (REAL-TIME!)" }
+  },
+  {
     category: "Watchlist (Favorite)",
     free: { available: true, text: "Max 3 acțiuni" },
     pro: { available: true, text: "NELIMITAT" }
