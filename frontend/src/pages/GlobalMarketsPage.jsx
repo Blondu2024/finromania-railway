@@ -528,10 +528,10 @@ export default function GlobalMarketsPage() {
     }
   }, [user]);
   
-  // Delay info
+  // Delay info cu update frequency
   const delayInfo = subscriptionLevel === 'pro'
-    ? { text: 'Delay 1s', color: 'bg-green-500', description: 'Date REAL-TIME (PRO)' }
-    : { text: 'Delay 15min', color: 'bg-yellow-500', description: 'Plan Gratuit' };
+    ? { text: 'Live Update 5s', color: 'bg-green-500', description: 'Date actualizate la 5 secunde (PRO)', frequency: '5s' }
+    : { text: 'Update 30s', color: 'bg-yellow-500', description: 'Actualizare la 30 secunde', frequency: '30s' };
 
   const fetchData = async () => {
     try {
@@ -644,16 +644,22 @@ export default function GlobalMarketsPage() {
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               🌍 Piețe Globale
             </h1>
-            <Badge className={`${delayInfo.color} text-white animate-pulse`}>
+            <Badge className={`${delayInfo.color} text-white ${subscriptionLevel === 'pro' ? 'animate-pulse' : ''}`}>
               <Zap className="w-3 h-3 mr-1" />
               {delayInfo.text}
             </Badge>
+            {refreshing && (
+              <Badge className="bg-blue-500 text-white">
+                <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                Actualizare...
+              </Badge>
+            )}
           </div>
           <p className="text-muted-foreground">
-            {delayInfo.description}
+            {delayInfo.description} • Auto-refresh la {delayInfo.frequency}
             {subscriptionLevel === 'free' && (
               <Link to="/pricing" className="text-amber-600 hover:underline ml-2">
-                → PRO: 1s delay REAL-TIME!
+                → PRO: Update la 5s!
               </Link>
             )}
           </p>
