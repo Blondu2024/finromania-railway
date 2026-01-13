@@ -8,6 +8,7 @@ import { Skeleton } from '../components/ui/skeleton';
 import AddToWatchlistButton from '../components/AddToWatchlistButton';
 import SocialShare from '../components/SocialShare';
 import AdvancedStockChart from '../components/AdvancedStockChart';
+import ProStockChart from '../components/ProStockChart';
 import TradingCompanion, { TradingReminder, shouldShowReminder, markReminderShown } from '../components/TradingCompanion';
 import { useAuth } from '../context/AuthContext';
 
