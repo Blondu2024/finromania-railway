@@ -615,17 +615,28 @@ export default function GlobalMarketsPage() {
       )}
 
       <div className="space-y-6">
-        {/* Hero */}
+        {/* Hero cu Delay Badge */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center py-4"
         >
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            🌍 Piețe Globale
-          </h1>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              🌍 Piețe Globale
+            </h1>
+            <Badge className={`${delayInfo.color} text-white animate-pulse`}>
+              <Zap className="w-3 h-3 mr-1" />
+              {delayInfo.text}
+            </Badge>
+          </div>
           <p className="text-muted-foreground">
-            Indici, Comodități, Crypto & Forex • Live
+            {delayInfo.description}
+            {subscriptionLevel === 'free' && (
+              <Link to="/pricing" className="text-amber-600 hover:underline ml-2">
+                → PRO: 1s delay REAL-TIME!
+              </Link>
+            )}
           </p>
         </motion.div>
 
