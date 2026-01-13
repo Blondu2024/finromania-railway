@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Crown, Check, X, Sparkles, Zap, ArrowRight, Lock } from 'lucide-react';
+import { Crown, Check, X, Sparkles, Zap, ArrowRight, Lock, Shield, Clock, TrendingUp, Calculator, Brain, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -10,13 +10,78 @@ import FreeVsProComparison from '../components/FreeVsProComparison';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+const WHY_PRO_CARDS = [
+  {
+    icon: Calculator,
+    title: "Economisește Mii de RON",
+    description: "Calculatorul Fiscal îți arată exact cum să optimizezi impozitarea investițiilor. Un singur calcul corect poate însemna economii de 10.000-50.000 RON anual.",
+    gradient: "from-amber-500 to-orange-500"
+  },
+  {
+    icon: Brain,
+    title: "Învață Fără Limite",
+    description: "AI Advisor nelimitat înseamnă că poți întreba orice, oricând. Înveți în ritmul tău, fără să numeri întrebările.",
+    gradient: "from-blue-500 to-purple-500"
+  },
+  {
+    icon: TrendingUp,
+    title: "Date Mai Rapide",
+    description: "Delay-uri reduse: 15min pentru BVB (vs 30min) și 1 secundă pentru Global Markets (vs 15min). Reacționezi mai rapid la piață.",
+    gradient: "from-green-500 to-emerald-500"
+  },
+  {
+    icon: Target,
+    title: "Monitorizare Completă",
+    description: "Watchlist nelimitat și alerte pentru toate companiile din portofoliu. Nu mai alegi între acțiuni - le urmărești pe toate.",
+    gradient: "from-purple-500 to-pink-500"
+  }
+];
+
+const FAQ_ITEMS = [
+  {
+    q: "De ce să plătesc pentru o platformă de educație?",
+    a: "Educația (lecțiile și cursurile) rămâne 100% GRATUITĂ! Planul PRO deblochează INSTRUMENTE PROFESIONALE precum Calculatorul Fiscal (poate economisi zeci de mii de RON), AI nelimitat, date mai rapide și funcții avansate de analiză. E diferența dintre a învăța teorie și a avea uneltele pentru a aplica practic."
+  },
+  {
+    q: "Calculatorul Fiscal chiar merită investiția?",
+    a: "Absolut! Un singur calcul corect despre impozitare (PF vs SRL) poate economisi 10.000-50.000 RON pe an pentru investitorii activi. Abonamentul PRO se plătește singur din prima lună dacă investești serios pe BVB sau internațional. Include și AI Fiscal Advisor pentru întrebări complexe."
+  },
+  {
+    q: "Ce înseamnă delay-uri diferite pentru date?",
+    a: "FREE users primesc date cu un delay mai mare (30min BVB, 15min Global), suficient pentru analiză și educație. PRO users primesc date mai rapide (15min BVB, 1s Global), esențiale pentru decizii de trading mai rapide și monitorizare activă."
+  },
+  {
+    q: "De ce limite la watchlist și alerte?",
+    a: "Planul FREE permite 3 acțiuni în watchlist și alerte pentru 2 companii - perfect pentru început. PRO oferă watchlist și alerte nelimitate, necesar când ai un portofoliu diversificat cu 5-15+ acțiuni și vrei să le monitorizezi pe toate."
+  },
+  {
+    q: "Ce înseamnă 'toate nivelurile fără quiz'?",
+    a: "FREE users trebuie să treacă un quiz (minim 7 din 10 răspunsuri corecte) pentru a avansa la nivelele Mediu și Expert. PRO users au acces DIRECT la toate cele 3 nivele din prima zi, cu toate funcțiile avansate (indicatori tehnici, analiză fundamentală)."
+  },
+  {
+    q: "Pot anula oricând?",
+    a: "Da, 100%! Anulezi când vrei, fără costuri ascunse. Vei avea acces la funcțiile PRO până la sfârșitul perioadei plătite. Planul anual (490 RON) oferă economie de 2 luni față de lunar."
+  },
+  {
+    q: "Ce diferență e între planul lunar și anual?",
+    a: "Planul lunar: 49 RON/lună (588 RON/an). Planul anual: 490 RON/an - economisești 98 RON (2 luni gratuite). Ambele oferă aceleași funcții PRO, diferă doar prețul și perioada de facturare."
+  },
+  {
+    q: "Cum funcționează plata și facturarea?",
+    a: "Plata se face securizat prin card bancar. Vei primi factură fiscală pentru fiecare plată. Pentru planul lunar, facturarea e automată în fiecare lună. Poți anula oricând din contul tău."
+  }
+];
+
 export default function TryProPage() {
   const { user, token } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user && token) {
       fetchSubscriptionStatus();
+    } else {
+      setLoading(false);
     }
   }, [user, token]);
 
@@ -31,202 +96,222 @@ export default function TryProPage() {
       }
     } catch (error) {
       console.error('Error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const isPro = subscriptionStatus?.subscription?.is_pro;
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+      </div>
+    );
+  }
+
   return (
     <>
       <SEO 
-        title="Încearcă PRO | FinRomania"
-        description="Descoperă ce primești cu abonamentul PRO: Calculator Fiscal, AI nelimitat, toate nivelurile, indicatori tehnici și mai mult."
+        title="Încearcă PRO - Toate Funcțiile Avansate | FinRomania"
+        description="Descoperă diferențele între planul Gratuit și PRO: Calculator Fiscal, AI nelimitat, date mai rapide, watchlist nelimitat și mai mult."
       />
       
-      <div className="max-w-7xl mx-auto px-4 py-12 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 py-12 space-y-16">
         {/* Hero */}
-        <div className="text-center space-y-4">
-          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 text-lg">
-            <Crown className="w-4 h-4 mr-1" />
+        <div className="text-center space-y-6">
+          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2 text-lg">
+            <Crown className="w-5 h-5 mr-2" />
             Încearcă PRO
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold">
-            Deblochează <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">Toate Funcțiile</span>
+          <h1 className="text-5xl md:text-6xl font-bold">
+            Deblochează <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">Totul</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            De la 5 întrebări AI pe zi la NELIMITATE. De la BET la TOATE acțiunile BVB. 
-            De la nivel Începător la EXPERT fără quiz.
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            De la 5 întrebări AI pe zi la <strong>NELIMITATE</strong>. 
+            De la 3 acțiuni în watchlist la <strong>TOATE</strong>. 
+            De la delay 30min la <strong>15min</strong> (BVB) și <strong>1 secundă</strong> (Global).
           </p>
         </div>
 
         {/* Current Status */}
         {user && (
-          <Card className={isPro ? 'bg-green-500/10 border-green-500' : 'bg-slate-100 dark:bg-slate-800'}>
-            <CardContent className="p-6 text-center">
-              <p className="text-lg">
-                {isPro ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Crown className="w-6 h-6 text-amber-500" />
-                    <strong>Felicitări! Ai deja PRO activ</strong>
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <Lock className="w-6 h-6 text-gray-500" />
-                    <strong>Plan curent: GRATUIT</strong>
-                  </span>
-                )}
-              </p>
+          <Card className={isPro ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500' : 'bg-slate-100 dark:bg-slate-800'}>
+            <CardContent className="p-8 text-center">
+              {isPro ? (
+                <div className="flex items-center justify-center gap-3">
+                  <Crown className="w-8 h-8 text-amber-500" />
+                  <div>
+                    <p className="text-2xl font-bold">Ai deja PRO Activ! 🎉</p>
+                    <p className="text-muted-foreground">Bucură-te de toate funcțiile premium</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-3">
+                  <Lock className="w-8 h-8 text-gray-500" />
+                  <div>
+                    <p className="text-xl font-semibold">Plan curent: GRATUIT</p>
+                    <p className="text-muted-foreground">Upgrade pentru a debloca toate funcțiile</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
 
-        {/* Main Comparison Table */}
-        <FreeVsProComparison />
-
-        {/* Why PRO Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/20 dark:to-slate-800">
-            <CardHeader>
-              <Sparkles className="w-8 h-8 text-amber-500 mb-2" />
-              <CardTitle>Economisește Mii de RON</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Doar Calculatorul Fiscal îți poate arăta cum să economisești până la 50.000+ RON/an 
-                prin alegerea corectă între PF, PFA și SRL.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-slate-800">
-            <CardHeader>
-              <Zap className="w-8 h-8 text-blue-500 mb-2" />
-              <CardTitle>Învață Mai Rapid</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                AI nelimitat înseamnă că poți întreba orice, oricând. Fără limite de 5/zi. 
-                Înveți în ritmul tău.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-white dark:from-purple-900/20 dark:to-slate-800">
-            <CardHeader>
-              <Crown className="w-8 h-8 text-purple-500 mb-2" />
-              <CardTitle>Acces Complet</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Toate cele 3 nivele (Începător, Mediu, Expert) fără quiz. 
-                Indicatori tehnici, analiză fundamentală, AI chart lines.
-              </p>
-            </CardContent>
-          </Card>
+        {/* Why PRO Cards */}
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8">De Ce PRO?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {WHY_PRO_CARDS.map((card, idx) => (
+              <Card key={idx} className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 hover:shadow-xl transition-all">
+                <CardContent className="p-6 text-center">
+                  <div className={`w-16 h-16 bg-gradient-to-br ${card.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                    <card.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">{card.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {card.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="border-2">
-            <CardHeader>
-              <CardTitle className="text-2xl">PRO Lunar</CardTitle>
-              <div className="pt-4">
-                <span className="text-5xl font-bold">49</span>
-                <span className="text-2xl text-muted-foreground"> RON</span>
-                <span className="text-muted-foreground">/lună</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Link to="/pricing">
-                <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 h-12">
-                  <Crown className="w-4 h-4 mr-2" />
-                  Activează Lunar
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-              <p className="text-xs text-center text-muted-foreground mt-3">
-                Anulare oricând
-              </p>
-            </CardContent>
-          </Card>
+        {/* Main Comparison Table */}
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8">Comparație Completă FREE vs PRO</h2>
+          <FreeVsProComparison />
+        </div>
 
-          <Card className="border-2 border-green-500 relative">
-            <div className="absolute -top-3 right-4">
-              <Badge className="bg-green-500 text-white">Economisești 2 luni!</Badge>
-            </div>
-            <CardHeader>
-              <CardTitle className="text-2xl">PRO Anual</CardTitle>
-              <div className="pt-4">
-                <span className="text-5xl font-bold">490</span>
-                <span className="text-2xl text-muted-foreground"> RON</span>
-                <span className="text-muted-foreground">/an</span>
+        {/* Pricing */}
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8">Alege Planul Tău</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <Card className="border-2">
+              <CardHeader>
+                <CardTitle className="text-2xl">PRO Lunar</CardTitle>
+                <CardDescription>Flexibil, anulare oricând</CardDescription>
+                <div className="pt-4">
+                  <span className="text-5xl font-bold">49</span>
+                  <span className="text-2xl text-muted-foreground"> RON</span>
+                  <span className="text-muted-foreground">/lună</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Link to="/pricing">
+                  <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 h-12">
+                    <Crown className="w-4 h-4 mr-2" />
+                    Activează Lunar
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+                <p className="text-xs text-center text-muted-foreground mt-3">
+                  Anulare oricând • Fără costuri ascunse
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-green-500 relative shadow-xl">
+              <div className="absolute -top-3 right-4">
+                <Badge className="bg-green-500 text-white px-3 py-1">📈 Economisești 2 luni!</Badge>
               </div>
-              <p className="text-sm text-green-600">vs 588 RON (2 luni gratuite)</p>
-            </CardHeader>
-            <CardContent>
-              <Link to="/pricing">
-                <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 h-12">
-                  <Crown className="w-4 h-4 mr-2" />
-                  Activează Anual
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-              <p className="text-xs text-center text-muted-foreground mt-3">
-                Cea mai bună ofertă
-              </p>
-            </CardContent>
-          </Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">PRO Anual</CardTitle>
+                <CardDescription>Cel mai bun preț</CardDescription>
+                <div className="pt-4">
+                  <span className="text-5xl font-bold">490</span>
+                  <span className="text-2xl text-muted-foreground"> RON</span>
+                  <span className="text-muted-foreground">/an</span>
+                </div>
+                <p className="text-sm text-green-600 font-semibold">vs 588 RON lunar • Economie: 98 RON</p>
+              </CardHeader>
+              <CardContent>
+                <Link to="/pricing">
+                  <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 h-12">
+                    <Crown className="w-4 h-4 mr-2" />
+                    Activează Anual
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+                <p className="text-xs text-center text-muted-foreground mt-3">
+                  Cea mai bună ofertă • 41 RON/lună (anual)
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* FAQ */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Întrebări Frecvente despre PRO</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">De ce să plătesc pentru educație?</h3>
-              <p className="text-sm text-muted-foreground">
-                Educația (lecții, cursuri) rămâne 100% GRATUITĂ! PRO îți deblochează <strong>INSTRUMENTE AVANSATE</strong> 
-                precum Calculatorul Fiscal (economisește mii de RON), AI nelimitat, indicatori tehnici PRO și analiză fundamentală completă.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">Ce înseamnă "toate nivelurile fără quiz"?</h3>
-              <p className="text-sm text-muted-foreground">
-                FREE users trebuie să treacă un quiz (7/10) pentru a accesa nivelele Mediu și Expert. 
-                PRO users au acces DIRECT la toate cele 3 nivele din prima zi.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">Calculatorul Fiscal chiar merită?</h3>
-              <p className="text-sm text-muted-foreground">
-                Da! Un singur calcul corect te poate ajuta să economisești mii sau zeci de mii de RON anual. 
-                Compară PF vs PFA vs SRL Micro pentru investiții BVB și internaționale. Include și AI Fiscal Advisor.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-2">Pot anula oricând?</h3>
-              <p className="text-sm text-muted-foreground">
-                Da, 100%! Anulezi când vrei. Vei avea acces până la sfârșitul perioadei plătite.
-              </p>
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8">Întrebări Frecvente</h2>
+          <div className="max-w-4xl mx-auto space-y-4">
+            {FAQ_ITEMS.map((item, idx) => (
+              <Card key={idx} className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-start gap-3">
+                    <span className="text-amber-600 flex-shrink-0">Q{idx + 1}.</span>
+                    <span>{item.q}</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground leading-relaxed pl-8">
+                    {item.a}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Trust & Security */}
+        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+          <CardContent className="p-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <Shield className="w-12 h-12 text-blue-600" />
+                <div>
+                  <h3 className="text-xl font-bold mb-1">Date Securizate & Conforme</h3>
+                  <p className="text-muted-foreground">
+                    Platforma respectă legislația GDPR și standardele de securitate. 
+                    Datele tale sunt protejate cu criptare SSL.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <Link to="/privacy">
+                  <Button variant="outline" size="sm">
+                    Confidențialitate
+                  </Button>
+                </Link>
+                <Link to="/terms">
+                  <Button variant="outline" size="sm">
+                    Termeni
+                  </Button>
+                </Link>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Final CTA */}
-        <div className="text-center bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-2xl p-8">
-          <h2 className="text-3xl font-bold mb-4">Gata să deblochezi totul?</h2>
-          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Alătură-te investitorilor care folosesc instrumente PRO pentru decizii mai bune.
+        <div className="text-center bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 rounded-3xl p-12 border-2 border-amber-500/20">
+          <h2 className="text-4xl font-bold mb-4">Gata să Deblochezi Totul?</h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Alătură-te investitorilor care folosesc instrumente PRO pentru decizii mai bune și economii reale.
           </p>
           <Link to="/pricing">
-            <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-8 h-14 text-lg">
-              <Crown className="w-5 h-5 mr-2" />
-              Vezi Planurile PRO
-              <ArrowRight className="w-5 h-5 ml-2" />
+            <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-12 h-16 text-xl">
+              <Crown className="w-6 h-6 mr-3" />
+              Activează PRO Acum
+              <ArrowRight className="w-6 h-6 ml-3" />
             </Button>
           </Link>
+          <p className="text-sm text-muted-foreground mt-4">
+            💳 Plată securizată • 🔄 Anulare oricând • ⚡ Activare instant
+          </p>
         </div>
       </div>
     </>
