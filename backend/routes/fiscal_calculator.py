@@ -614,19 +614,23 @@ async def calculeaza_impozite(
 
 @router.get("/constante")
 async def get_constante_fiscale():
-    """Returnează constantele fiscale actuale pentru BVB (public)"""
+    """Returnează constantele fiscale actuale pentru BVB (public) - ACTUALIZAT 2025"""
     return {
-        "an_fiscal": "2024-2025",
+        "an_fiscal": "2025",
         "ultima_actualizare": "Ianuarie 2025",
         "salariu_minim_brut": SALARIU_MINIM_BRUT,
+        "warning_2026": "⚠️ Din 1 ianuarie 2026 impozitele CRESC: BVB 3-6%, Dividende 16%!",
         "bvb": {
-            "castig_capital_termen_lung": "1% (deținere ≥ 365 zile)",
-            "castig_capital_termen_scurt": "3% (deținere < 365 zile)",
-            "dividende": "8% (reținut la sursă)",
+            "castig_capital_termen_lung": "1% (deținere ≥ 365 zile) - 2025",
+            "castig_capital_termen_scurt": "3% (deținere < 365 zile) - 2025",
+            "castig_capital_2026": "3-6% (crește din 2026!)",
+            "dividende": "10% (reținut la sursă) - 2025",
+            "dividende_2026": "16% (crește din 2026!)",
             "nota": "Impozitul este reținut automat de broker"
         },
         "international": {
-            "castig_capital": "10%",
+            "castig_capital": "10% - 2025",
+            "castig_capital_2026": "16% (crește din 2026!)",
             "dividende_sua": "15% reținut la sursă (cu W-8BEN)",
             "dividende_ue": "10-25% (variază pe țară)",
             "credit_fiscal": "Se scade impozitul plătit în străinătate",
@@ -634,12 +638,16 @@ async def get_constante_fiscale():
         },
         "cass": {
             "rata": "10%",
-            "prag_activare": f"{CASS_PRAG_MINIM:,} RON/an",
+            "prag_activare": f"{CASS_PRAG_MINIM:,} RON/an (6 × salariu minim 2025)",
+            "baza_calcul_minima": f"{CASS_PRAG_MINIM:,} RON",
+            "baza_calcul_maxima": f"{CASS_PRAG_MAXIM:,} RON",
             "nota": "Se datorează doar dacă NU ai alte venituri cu CASS (ex: salariu)"
         },
         "micro_srl": {
             "cu_angajat": "1%",
             "fara_angajat": "3%",
+            "dividende_la_retragere_2025": "10%",
+            "dividende_la_retragere_2026": "16%",
             "plafon_venituri_eur": MICRO_PLAFON_VENITURI_EUR
         },
         "pfa": {
@@ -647,7 +655,7 @@ async def get_constante_fiscale():
             "cas": "25%",
             "cass": "10%"
         },
-        "disclaimer": "Valorile sunt orientative conform legislației în vigoare. Consultați un contabil pentru situația dumneavoastră specifică."
+        "disclaimer": "⚠️ Valorile sunt orientative conform legislației în vigoare în 2025. Din 2026 intră în vigoare CREȘTERI MAJORE de impozite! Consultați un contabil CECCAR pentru situația dumneavoastră specifică."
     }
 
 
