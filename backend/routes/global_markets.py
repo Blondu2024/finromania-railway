@@ -230,9 +230,9 @@ async def get_global_overview():
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
-        # Cache for 30 seconds
-        cache.set(cache_key, result, ttl_seconds=30)
-        logger.info(f"Cached global overview ({len(all_items)} assets)")
+        # Cache pentru 10 secunde (permite refresh mai frecvent)
+        cache.set(cache_key, result, ttl_seconds=10)
+        logger.info(f"Cached global overview ({len(all_items)} assets) for 10s")
         
         return result
     except Exception as e:
