@@ -121,8 +121,57 @@ async def ask_companion(
     """
     Ask the AI Trading Companion for guidance
     Works for both logged-in and anonymous users
+    FREE users: 5 queries per day
+    PRO users: Unlimited
     """
     try:
+        db = await get_database()
+        
+        # Check AI query limits
+        if current_user:
+            # Logged in user - check their limits
+            user_data = await db.users.find_one(
+                {"user_id": current_user.get("user_id")},
+                {"_id": 0}
+            )
+            
+            subscription_level = user_data.get("subscription_level", "free")
+            ai_queries_today = user_data.get("ai_queries_today", 0)
+            
+            # Check if we need to reset (new day)
+            reset_at = user_data.get("ai_queries_reset_at")
+            if reset_at:
+                from datetime import timedelta
+                reset_time = datetime.fromisoformat(reset_at.replace("Z", "+00:00")) if isinstance(reset_at, str) else reset_at
+                if datetime.now(timezone.utc) - reset_time > timedelta(hours=24):
+                    # Reset for new day
+                    await db.users.update_one(
+                        {"user_id": current_user.get("user_id")},
+                        {"$set": {
+                            "ai_queries_today": 0,
+                            "ai_queries_reset_at": datetime.now(timezone.utc).isoformat()
+                        }}
+                    )
+                    ai_queries_today = 0
+            
+            # Check limit for FREE users
+            if subscription_level != "pro":
+                if ai_queries_today >= 5:
+                    raise HTTPException(
+                        status_code=429,
+                        detail={
+                            "error": "ai_limit_reached",
+                            "message": "Ai atins limita de 5 întrebări AI pe zi. Upgrade la PRO pentru întrebări nelimitate!",
+                            "queries_used": ai_queries_today,
+                            "limit": 5,
+                            "subscription_level": "free"
+                        }
+                    )
+        else:
+            # Not logged in - use IP-based rate limiting with localStorage
+            # For now, we'll allow but track in separate collection
+            # Frontend will handle the limit with localStorage
+            pass
         # Build context for AI
         stock_context = f"""
 CONTEXT ACȚIUNE:
