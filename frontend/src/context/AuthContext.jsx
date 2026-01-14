@@ -17,25 +17,25 @@ export function AuthProvider({ children }) {
 
   const checkAuth = useCallback(async () => {
     const storedToken = localStorage.getItem(TOKEN_KEY);
+    const storedUser = localStorage.getItem(USER_KEY);
+    
     console.log('[Auth] Checking auth, stored token:', storedToken ? 'exists' : 'none');
     
-    if (storedToken) {
+    if (storedToken && storedUser) {
       try {
+        // Verify token is still valid
         const response = await fetch(`${API_URL}/api/auth/me`, {
-          headers: { 'Authorization': `Bearer ${storedToken}` },
-          credentials: 'include'
+          headers: { 'Authorization': `Bearer ${storedToken}` }
         });
         
         console.log('[Auth] /me response status:', response.status);
         
         if (response.ok) {
           const userData = await response.json();
-          console.log('[Auth] User data received:', userData.name || userData.email);
+          console.log('[Auth] User authenticated:', userData.name || userData.email);
           setUser(userData);
           setToken(storedToken);
           localStorage.setItem(USER_KEY, JSON.stringify(userData));
-          setLoading(false);
-          return;
         } else {
           console.log('[Auth] Token invalid, clearing...');
           localStorage.removeItem(TOKEN_KEY);
@@ -45,30 +45,23 @@ export function AuthProvider({ children }) {
         }
       } catch (error) {
         console.error('[Auth] Error checking auth:', error);
+        // Keep user logged in even if verification fails (offline mode)
+        try {
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+          setToken(storedToken);
+          console.log('[Auth] Using cached user data');
+        } catch (e) {
+          console.error('[Auth] Failed to parse stored user:', e);
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(USER_KEY);
+          setToken(null);
+          setUser(null);
+        }
       }
     }
     
-    // Fallback to cookie
-    try {
-      const response = await fetch(`${API_URL}/api/auth/me`, {
-        credentials: 'include'
-      });
-      
-      if (response.ok) {
-        const userData = await response.json();
-        console.log('[Auth] Cookie auth successful:', userData.name || userData.email);
-        setUser(userData);
-        localStorage.setItem(USER_KEY, JSON.stringify(userData));
-      } else {
-        setUser(null);
-        localStorage.removeItem(USER_KEY);
-      }
-    } catch (error) {
-      console.error('[Auth] Cookie auth error:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -150,12 +143,12 @@ export function AuthProvider({ children }) {
       await firebaseSignOut();
       
       // Sign out from backend
-      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-      await fetch(`${API_URL}/api/auth/logout`, {
-        method: 'POST',
-        headers,
-        credentials: 'include'
-      });
+      if (token) {
+        await fetch(`${API_URL}/api/auth/firebase/logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      }
     } catch (error) {
       console.error('[Auth] Logout error:', error);
     } finally {
@@ -174,7 +167,6 @@ export function AuthProvider({ children }) {
       const response = await fetch(`${API_URL}/api/auth/session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ session_id: sessionId })
       });
       
