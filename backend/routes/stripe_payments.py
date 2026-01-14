@@ -12,21 +12,23 @@ from emergentintegrations.payments.stripe.checkout import StripeCheckout, Checko
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/payments", tags=["Payments"])
 
-# PRO Subscription Packages
+# PRO Subscription Packages cu Stripe Price IDs
 SUBSCRIPTION_PACKAGES = {
     "pro_monthly": {
+        "stripe_price_id": "price_1SpR6gHYGAlAOMyTTxLNRB9a",
         "amount": 49.0,
         "currency": "RON",
         "duration_days": 30,
         "name": "PRO Lunar",
-        "description": "Acces complet PRO pentru 30 zile"
+        "description": "Abonament PRO recurent lunar - 49 RON/lună"
     },
     "pro_yearly": {
+        "stripe_price_id": "price_1SpRAtHYGAlAOMyTxwQNbG0N",
         "amount": 490.0,
         "currency": "RON",
         "duration_days": 365,
         "name": "PRO Anual",
-        "description": "Acces complet PRO pentru 365 zile (2 luni gratuite!)"
+        "description": "Abonament PRO recurent anual - 490 RON/an (2 luni gratuite!)"
     }
 }
 
@@ -74,10 +76,10 @@ async def create_checkout_session(
             "duration_days": str(package["duration_days"])
         }
         
-        # Create checkout session
+        # Create checkout session cu Stripe Price ID (subscription recurent)
         checkout_request = CheckoutSessionRequest(
-            amount=package["amount"],
-            currency=package["currency"],
+            stripe_price_id=package["stripe_price_id"],
+            quantity=1,
             success_url=success_url,
             cancel_url=cancel_url,
             metadata=metadata
