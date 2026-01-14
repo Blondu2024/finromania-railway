@@ -193,7 +193,7 @@ async def firebase_logout(request: Request):
             session_token = auth_header.split(" ")[1]
             
             db = await get_database()
-            await db.sessions.delete_one({"session_token": session_token})
+            await db.user_sessions.delete_one({"session_token": session_token})
         
         return {"success": True, "message": "Logged out successfully"}
     except Exception as e:
