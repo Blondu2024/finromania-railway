@@ -408,11 +408,14 @@ class FirebaseAuthTester:
                 if result.returncode == 0:
                     session_status = result.stdout.strip()
                     
-                    # Note: The logout endpoint deletes from 'sessions' collection, not 'user_sessions'
-                    # This is a bug in the implementation
-                    self.log_test("Logout", True, 
-                                 f"Logout endpoint called successfully (Note: Bug - deletes from wrong collection)", 
-                                 {"response": data, "session_in_db": session_status})
+                    if session_status == 'deleted':
+                        self.log_test("Logout", True, 
+                                     f"Logout successful - session deleted from database", 
+                                     {"response": data, "session_deleted": True})
+                    else:
+                        self.log_test("Logout", False, 
+                                     f"Session still exists in database after logout", 
+                                     {"response": data, "session_in_db": session_status})
                 else:
                     self.log_test("Logout", True, 
                                  f"Logout successful", data)
