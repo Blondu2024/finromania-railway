@@ -110,10 +110,27 @@ async def get_admin_stats(admin: dict = Depends(require_admin)):
         "created_at": {"$gte": week_ago}
     })
     
+    # Active users (logged in last 7 days)
+    active_users = await db.users.count_documents({
+        "last_login": {"$gte": week_ago}
+    })
+    
+    # AI usage stats
+    ai_queries_pipeline = [
+        {"$group": {
+            "_id": None,
+            "total_queries": {"$sum": "$ai_credits_used"}
+        }}
+    ]
+    ai_usage = await db.users.aggregate(ai_queries_pipeline).to_list(1)
+    total_ai_queries = ai_usage[0]["total_queries"] if ai_usage else 0
+    
     return {
         "total_users": total_users,
         "pro_users": pro_users,
         "free_users": free_users,
         "recent_signups_7d": recent_signups,
+        "active_users_7d": active_users,
+        "total_ai_queries": total_ai_queries,
         "pro_percentage": round((pro_users / total_users * 100) if total_users > 0 else 0, 1)
     }
