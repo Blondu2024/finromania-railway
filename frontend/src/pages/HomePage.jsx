@@ -6,6 +6,8 @@ import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import NewsletterSignup from '../components/NewsletterSignup';
+import VerticalScroller from '../components/VerticalScroller';
+import TrustBadges from '../components/TrustBadges';
 import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import FeatureCard from '../components/FeatureCard';
