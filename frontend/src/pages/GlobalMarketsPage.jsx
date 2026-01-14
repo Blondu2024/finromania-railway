@@ -457,14 +457,14 @@ export default function GlobalMarketsPage() {
   useEffect(() => {
     fetchData();
     
-    // Interval diferențiat: PRO = 5s, FREE = 30s
-    const refreshInterval = isPro ? 5000 : 30000;
-    const interval = setInterval(fetchData, refreshInterval);
+    // Refresh agresiv: 10 secunde pentru TOȚI (pentru senzație live)
+    // Cache backend va optimiza API calls
+    const interval = setInterval(fetchData, 10000);
     
-    console.log(`[GlobalMarkets] Auto-refresh every ${refreshInterval/1000}s (${isPro ? 'PRO' : 'FREE'})`);
+    console.log('[GlobalMarkets] Auto-refresh every 10s');
     
     return () => clearInterval(interval);
-  }, [fetchData, isPro]);
+  }, [fetchData]);
 
   const handleRefresh = () => {
     setRefreshing(true);
