@@ -1,32 +1,21 @@
-# FinRomania robots.txt
+# FinRomania - robots.txt pentru SEO maxim
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://finromania.ro/sitemap.xml
-
-# Crawl-delay for politeness
-Crawl-delay: 1
-
-# Block admin and auth routes
-Disallow: /admin
-Disallow: /auth/callback
-Disallow: /portfolio
-
-# Allow all important pages
+# Pagini importante pentru indexare
 Allow: /stocks
 Allow: /global
-Allow: /news
+Allow: /calculator-fiscal
+Allow: /pricing
 Allow: /trading-school
-Allow: /financial-education
-Allow: /screener
-Allow: /calendar
-Allow: /converter
-Allow: /glossary
-Allow: /advisor
-Allow: /about
-Allow: /faq
-Allow: /contact
-Allow: /privacy
-Allow: /terms
-Allow: /disclaimer
+
+# Exclude pagini admin/private
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth/
+
+# Sitemap
+Sitemap: https://finromania.ro/sitemap.xml
+
+# Crawl-delay pentru a nu overload serverul
+Crawl-delay: 1
