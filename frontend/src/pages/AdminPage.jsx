@@ -259,6 +259,87 @@ export default function AdminPage() {
                       {u.subscription_level?.toUpperCase() || 'FREE'}
                     </Badge>
                     {u.is_admin && <Badge className="bg-blue-500">ADMIN</Badge>}
+                    
+                    {/* Quick Actions */}
+                    {u.subscription_level === 'pro' ? (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={async () => {
+                          if (window.confirm(`Downgrade ${u.email} la FREE?`)) {
+                            setLoading(true);
+                            try {
+                              const res = await fetch(`${API_URL}/api/admin/set-subscription`, {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                  email: u.email,
+                                  subscription_level: 'free',
+                                  duration_days: 0
+                                })
+                              });
+                              if (res.ok) {
+                                alert(`✅ ${u.email} acum este FREE`);
+                                fetchUsers();
+                                fetchStats();
+                              } else {
+                                alert('❌ Eroare la downgrade');
+                              }
+                            } catch (err) {
+                              alert(`❌ Eroare: ${err.message}`);
+                            } finally {
+                              setLoading(false);
+                            }
+                          }
+                        }}
+                        disabled={loading}
+                      >
+                        → FREE
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        className="bg-amber-500 hover:bg-amber-600"
+                        onClick={async () => {
+                          const days = prompt(`Câte zile PRO pentru ${u.email}?`, '30');
+                          if (days && parseInt(days) > 0) {
+                            setLoading(true);
+                            try {
+                              const res = await fetch(`${API_URL}/api/admin/set-subscription`, {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                  email: u.email,
+                                  subscription_level: 'pro',
+                                  duration_days: parseInt(days)
+                                })
+                              });
+                              if (res.ok) {
+                                alert(`✅ ${u.email} acum este PRO (${days} zile)`);
+                                fetchUsers();
+                                fetchStats();
+                              } else {
+                                alert('❌ Eroare la upgrade');
+                              }
+                            } catch (err) {
+                              alert(`❌ Eroare: ${err.message}`);
+                            } finally {
+                              setLoading(false);
+                            }
+                          }
+                        }}
+                        disabled={loading}
+                      >
+                        → PRO
+                      </Button>
+                    )}
+                    
                     <Button
                       size="sm"
                       variant="outline"
@@ -267,7 +348,7 @@ export default function AdminPage() {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                     >
-                      Modifică
+                      Editează
                     </Button>
                   </div>
                 </div>
