@@ -305,6 +305,19 @@ const TradingCompanion = ({
                     <p className="text-xs text-blue-200">
                       {stockSymbol ? `Analizăm ${stockSymbol}` : 'Asistent Trading'}
                     </p>
+                    {user && aiQueriesRemaining !== null && (
+                      <p className="text-xs text-blue-100 mt-1">
+                        {subscriptionLevel === 'pro' ? (
+                          <span className="flex items-center gap-1">
+                            <span className="text-amber-300">👑 PRO:</span> Întrebări nelimitate
+                          </span>
+                        ) : (
+                          <span className={aiQueriesRemaining === 0 ? 'text-red-300 font-bold' : ''}>
+                            {aiQueriesRemaining === 0 ? '🔒 Limită atinsă!' : `💬 ${aiQueriesRemaining} întrebări rămase azi`}
+                          </span>
+                        )}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <Button
