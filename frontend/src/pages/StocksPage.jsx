@@ -569,24 +569,35 @@ export default function StocksPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'change_percent', direction: 'desc' });
   
-  // Check subscription for delay badge
+  // Check subscription for delay badge și refresh rate
   const [subscriptionLevel, setSubscriptionLevel] = useState('free');
+  const [isPro, setIsPro] = useState(false);
   
   useEffect(() => {
-    if (user) {
+    if (user && token) {
       fetch(`${API_URL}/api/subscriptions/status`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
-        .then(data => setSubscriptionLevel(data?.subscription?.subscription_level || 'free'))
-        .catch(() => setSubscriptionLevel('free'));
+        .then(data => {
+          const level = data?.subscription?.subscription_level || 'free';
+          const is_pro = data?.subscription?.is_pro || false;
+          setSubscriptionLevel(level);
+          setIsPro(is_pro);
+          console.log('[StocksPage] Subscription:', level, 'isPro:', is_pro);
+        })
+        .catch((err) => {
+          console.error('[StocksPage] Failed to fetch subscription:', err);
+          setSubscriptionLevel('free');
+          setIsPro(false);
+        });
     }
-  }, [user]);
+  }, [user, token]);
   
-  // Delay info
-  const delayInfo = subscriptionLevel === 'pro'
-    ? { text: 'Delay 15min', color: 'bg-green-500', description: 'Date aproape live (PRO)' }
-    : { text: 'Delay 30min', color: 'bg-yellow-500', description: 'Plan Gratuit' };
+  // Delay info - BVB data refresh
+  const delayInfo = isPro
+    ? { text: 'Update 15s', color: 'bg-green-500', description: 'Date BVB actualizate la 15 secunde (PRO)', refresh: 15000 }
+    : { text: 'Update 60s', color: 'bg-yellow-500', description: 'Date BVB actualizate la 60 secunde (Gratuit)', refresh: 60000 };
 
   const fetchAllData = async () => {
     try {
