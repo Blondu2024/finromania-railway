@@ -18,13 +18,77 @@ import {
 import SEO from '../components/SEO';
 import TradingCompanion, { TradingReminder, shouldShowReminder, markReminderShown } from '../components/TradingCompanion';
 import { useAuth } from '../context/AuthContext';
+import ProStockChart from '../components/ProStockChart';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // ============================================
-// ASSET DETAIL MODAL WITH CHART
+// ASSET DETAIL MODAL WITH PRO CHART
 // ============================================
-const AssetDetailModal = ({ asset, onClose }) => {
+const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
+  if (!asset) return null;
+
+  const isPositive = asset.change_percent >= 0;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="bg-white dark:bg-slate-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className={`p-6 ${isPositive ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-red-500 to-rose-500'} text-white`}>
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-3xl">{asset.flag}</span>
+                  <h2 className="text-2xl font-bold">{asset.name}</h2>
+                </div>
+                <p className="text-white/80">{asset.symbol} • {asset.country || asset.category}</p>
+              </div>
+              <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="mt-4 flex items-end gap-4">
+              <div>
+                <p className="text-4xl font-bold">{asset.price?.toLocaleString('ro-RO', { maximumFractionDigits: 2 })}</p>
+              </div>
+              <div className={`flex items-center gap-2 ${isPositive ? 'text-white' : 'text-white'}`}>
+                {isPositive ? <TrendingUp className="w-6 h-6" /> : <TrendingDown className="w-6 h-6" />}
+                <span className="text-2xl font-bold">
+                  {isPositive ? '+' : ''}{asset.change_percent?.toFixed(2)}%
+                </span>
+                <span className="text-lg">({isPositive ? '+' : ''}{asset.change?.toFixed(2)})</span>
+              </div>
+            </div>
+          </div>
+
+          {/* PRO Stock Chart - Candlesticks, Intraday, Indicatori */}
+          <div className="p-6">
+            <ProStockChart
+              symbol={asset.symbol}
+              type="global"
+              isPro={isPro}
+              token={token}
+            />
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('1mo');
@@ -628,9 +692,14 @@ export default function GlobalMarketsPage() {
         onOpenCompanion={handleOpenCompanion}
       />
 
-      {/* Asset Detail Modal */}
+      {/* Asset Detail Modal cu ProStockChart */}
       {selectedAsset && !showReminder && (
-        <AssetDetailModal asset={selectedAsset} onClose={handleCloseModal} />
+        <AssetDetailModal 
+          asset={selectedAsset} 
+          onClose={handleCloseModal}
+          isPro={subscriptionLevel === 'pro'}
+          token={localStorage.getItem('finromania_token')}
+        />
       )}
 
       <div className="space-y-6">
