@@ -34,7 +34,8 @@ async def get_all_users(admin: dict = Depends(require_admin)):
     users = await db.users.find(
         {},
         {"_id": 0, "user_id": 1, "email": 1, "name": 1, "subscription_level": 1, 
-         "experience_level": 1, "created_at": 1, "last_login": 1, "is_admin": 1}
+         "experience_level": 1, "created_at": 1, "last_login": 1, "is_admin": 1,
+         "ai_credits_used": 1}
     ).sort("created_at", -1).limit(100).to_list(100)
     
     return {
