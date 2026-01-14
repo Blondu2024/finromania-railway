@@ -487,6 +487,7 @@ export default function GlobalMarketsPage() {
 
   const handleCloseModal = useCallback(() => {
     setSelectedAsset(null);
+    setCompanionOpen(false); // Also close companion when closing modal
   }, []);
 
   const allAssets = useMemo(() => {
@@ -674,15 +675,17 @@ export default function GlobalMarketsPage() {
       </div>
 
       {/* Trading Companion - Verifică Înainte */}
-      <TradingCompanion 
-        stockSymbol={selectedAsset?.symbol || "Global"}
-        stockName={selectedAsset?.name || "Piețe Globale"}
-        currentPrice={selectedAsset?.price}
-        changePercent={selectedAsset?.change_percent || data?.sentiment?.avg_change}
-        stockType="global"
-        forceOpen={companionOpen}
-        onOpenChange={setCompanionOpen}
-      />
+      {!selectedAsset && (
+        <TradingCompanion 
+          stockSymbol={selectedAsset?.symbol || "Global"}
+          stockName={selectedAsset?.name || "Piețe Globale"}
+          currentPrice={selectedAsset?.price}
+          changePercent={selectedAsset?.change_percent || data?.sentiment?.avg_change}
+          stockType="global"
+          forceOpen={companionOpen}
+          onOpenChange={setCompanionOpen}
+        />
+      )}
     </>
   );
 }
