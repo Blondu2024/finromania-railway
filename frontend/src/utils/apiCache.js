@@ -4,7 +4,7 @@
  */
 
 const cache = new Map();
-const CACHE_DURATION = 30000; // 30 seconds
+const CACHE_DURATION = 10000; // 10 seconds pentru live data
 
 class APICache {
   set(key, data) {
