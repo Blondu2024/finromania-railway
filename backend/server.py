@@ -528,6 +528,7 @@ app.include_router(fiscal_calculator_router, prefix="/api")
 app.include_router(ai_fiscal_router, prefix="/api")
 app.include_router(portfolio_bvb_router, prefix="/api")
 app.include_router(intraday_router, prefix="/api")
+app.include_router(bvb_charts_router)  # Already has /api/bvb prefix
 app.include_router(admin_router_new)  # Already has /api/admin prefix
 
 # Stripe Webhook endpoint
