@@ -240,10 +240,19 @@ export default function AdminPage() {
           <CardContent>
             <div className="space-y-2">
               {users.map((u) => (
-                <div key={u.user_id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                  <div>
+                <div key={u.user_id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                  <div className="flex-1">
                     <p className="font-semibold">{u.email}</p>
                     <p className="text-sm text-muted-foreground">{u.name}</p>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                      <span>AI Credits: {u.ai_credits_used || 0}</span>
+                      {u.last_login && (
+                        <span>Last login: {new Date(u.last_login).toLocaleDateString('ro-RO')}</span>
+                      )}
+                      {u.created_at && (
+                        <span>Înregistrat: {new Date(u.created_at).toLocaleDateString('ro-RO')}</span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge className={u.subscription_level === 'pro' ? 'bg-amber-500' : 'bg-gray-500'}>
@@ -253,7 +262,10 @@ export default function AdminPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => setTargetEmail(u.email)}
+                      onClick={() => {
+                        setTargetEmail(u.email);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
                     >
                       Modifică
                     </Button>
