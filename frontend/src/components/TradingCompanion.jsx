@@ -199,7 +199,17 @@ const TradingCompanion = ({
           content: data.response,
           disclaimer: data.disclaimer
         }]);
+      } else if (res.status === 429) {
+        // AI limit reached
+        const errorData = await res.json();
+        setConversation(prev => [...prev, { 
+          role: 'assistant', 
+          content: `🔒 ${errorData.detail?.message || 'Ai atins limita de întrebări AI.'}\n\n💎 **Upgrade la PRO:**\n- Întrebări AI nelimitate\n- Grafice intraday profesionale\n- Date live actualizate la 3s\n\n[Vezi /pricing pentru detalii]`,
+          isError: true,
+          isLimitReached: true
+        }]);
       } else {
+        const errorText = await res.text();
         setConversation(prev => [...prev, { 
           role: 'assistant', 
           content: 'Nu am putut procesa cererea. Încearcă din nou.',
