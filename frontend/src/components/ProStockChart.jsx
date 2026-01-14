@@ -91,17 +91,32 @@ export default function ProStockChart({ symbol, type = 'bvb', isPro = false, tok
   const [showRSI, setShowRSI] = useState(true);
   const [showVolume, setShowVolume] = useState(true);
   
+  // Map frontend periods to yfinance periods
+  const mapPeriodToYFinance = (period) => {
+    const mapping = {
+      '1d': '1d',
+      '1w': '5d',
+      '1m': '1mo',
+      '3m': '3mo',
+      '6m': '6mo',
+      '1y': '1y'
+    };
+    return mapping[period] || '1mo';
+  };
+
   const fetchData = async (tf, intv = null) => {
     setLoading(true);
     try {
       let url;
       if (intv && isPro) {
-        url = `${API_URL}/api/intraday/${type}/${symbol}?interval=${intv}`;
+        // Intraday data (PRO only)
+        url = `${API_URL}/api/data/intraday/${type}/${encodeURIComponent(symbol)}?interval=${intv}`;
       } else {
-        const days = TIMEFRAMES_DAILY.find(t => t.value === tf)?.days || 30;
+        // Daily/historical data
+        const mappedPeriod = mapPeriodToYFinance(tf);
         url = type === 'bvb'
-          ? `${API_URL}/api/stocks/bvb/${symbol}/details?period=${tf}&days=${days}`
-          : `${API_URL}/api/stocks/global/${encodeURIComponent(symbol)}/details?period=${tf}`;
+          ? `${API_URL}/api/stocks/bvb/${encodeURIComponent(symbol)}?period=${mappedPeriod}`
+          : `${API_URL}/api/global/chart/${encodeURIComponent(symbol)}?period=${mappedPeriod}`;
       }
       
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
@@ -110,16 +125,22 @@ export default function ProStockChart({ symbol, type = 'bvb', isPro = false, tok
       if (res.ok) {
         const result = await res.json();
         setData(result.data || result.history || []);
+      } else {
+        console.error('Failed to fetch chart data:', res.status, res.statusText);
+        setData([]);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching chart data:', err);
+      setData([]);
     }
     setLoading(false);
   };
   
   useEffect(() => {
-    fetchData(timeframe, interval);
-  }, [symbol]);
+    if (symbol) {
+      fetchData(timeframe, interval);
+    }
+  }, [symbol, timeframe, interval]);
   
   const processedData = useMemo(() => {
     if (!data || data.length === 0) return [];
