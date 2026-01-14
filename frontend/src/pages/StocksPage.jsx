@@ -559,7 +559,7 @@ const SectorPerformance = ({ sectors }) => {
 // MAIN STOCKS PAGE COMPONENT
 // ============================================
 export default function StocksPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [stocks, setStocks] = useState([]);
   const [indices, setIndices] = useState([]);
   const [topMovers, setTopMovers] = useState({ gainers: [], losers: [], most_traded: [] });
@@ -627,9 +627,15 @@ export default function StocksPage() {
 
   useEffect(() => {
     fetchAllData();
-    const interval = setInterval(fetchAllData, 30000); // 30 sec refresh
+    
+    // Interval diferențiat: PRO = 15s, FREE = 60s
+    const refreshInterval = delayInfo.refresh;
+    const interval = setInterval(fetchAllData, refreshInterval);
+    
+    console.log(`[StocksPage] Auto-refresh every ${refreshInterval/1000}s (${isPro ? 'PRO' : 'FREE'})`);
+    
     return () => clearInterval(interval);
-  }, []);
+  }, [isPro, delayInfo.refresh]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
