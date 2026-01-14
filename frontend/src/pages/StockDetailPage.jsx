@@ -141,8 +141,32 @@ export default function StockDetailPage() {
   const avgVolume = history.length > 0 ? Math.round(history.reduce((acc, h) => acc + (h.volume || 0), 0) / history.length) : 0;
   const totalVolume = history.reduce((acc, h) => acc + (h.volume || 0), 0);
 
+  // Structured data pentru Google Rich Results
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "FinancialProduct",
+    "name": `${data.name} (${data.symbol})`,
+    "description": `Preț live ${data.name} - ${data.symbol} la ${data.exchange || 'BVB'}. Urmărește cotația în timp real, grafice istorice, volum de tranzacționare.`,
+    "provider": {
+      "@type": "Organization",
+      "name": "FinRomania"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": data.price || lastPrice,
+      "priceCurrency": data.currency || "RON"
+    }
+  };
+
   return (
     <div className="space-y-6">
+      <SEO 
+        title={`${data.name} (${data.symbol}) - Preț Live ${(data.price || lastPrice)?.toFixed(2)} ${data.currency || 'RON'}`}
+        description={`Preț live ${data.name} (${data.symbol}) la ${data.exchange || 'BVB'}: ${(data.price || lastPrice)?.toFixed(2)} ${data.currency || 'RON'} (${isPositive ? '+' : ''}${(data.change_percent || percentChange)?.toFixed(2)}%). Grafice profesionale, analiză tehnică, date istorice.`}
+        keywords={`${data.symbol} preț, ${data.name} cotație, ${data.symbol} live, ${data.symbol} grafic, acțiune ${data.symbol}, ${data.exchange || 'BVB'} ${data.symbol}`}
+        structuredData={structuredData}
+      />
+      
       {/* Back Button */}
       <Link to="/stocks">
         <Button variant="ghost" size="sm">
