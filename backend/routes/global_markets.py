@@ -3,9 +3,11 @@ from fastapi import APIRouter, HTTPException
 from datetime import datetime, timezone
 import yfinance as yf
 import logging
+from utils.cache import get_cache
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/global", tags=["Global Markets"])
+cache = get_cache()
 
 # Global indices and assets configuration
 GLOBAL_INDICES = {
