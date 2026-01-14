@@ -1,5 +1,5 @@
 """Stripe Payment Integration pentru FinRomania PRO"""
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel
 from typing import Optional, Dict
 from datetime import datetime, timezone, timedelta
