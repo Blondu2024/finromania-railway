@@ -437,9 +437,9 @@ export default function GlobalMarketsPage() {
     }
   }, [user, token]);
   
-  // Delay info cu update frequency AGRESIV pentru PRO
+  // Delay info cu update frequency REAL pentru PRO
   const delayInfo = isPro
-    ? { text: 'LIVE Update 3s', color: 'bg-green-500', description: 'Date actualizate la 3 secunde (PRO)', frequency: '3s' }
+    ? { text: 'LIVE Update 5s', color: 'bg-green-500', description: 'Date actualizate la 5 secunde (PRO)', frequency: '5s' }
     : { text: 'Update 30s', color: 'bg-yellow-500', description: 'Actualizare la 30 secunde', frequency: '30s' };
 
   const fetchData = useCallback(async () => {
@@ -456,9 +456,15 @@ export default function GlobalMarketsPage() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 60000); // 1 min refresh
+    
+    // Interval diferențiat: PRO = 5s, FREE = 30s
+    const refreshInterval = isPro ? 5000 : 30000;
+    const interval = setInterval(fetchData, refreshInterval);
+    
+    console.log(`[GlobalMarkets] Auto-refresh every ${refreshInterval/1000}s (${isPro ? 'PRO' : 'FREE'})`);
+    
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchData, isPro]);
 
   const handleRefresh = () => {
     setRefreshing(true);
