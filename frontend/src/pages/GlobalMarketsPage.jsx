@@ -23,12 +23,49 @@ import ProStockChart from '../components/ProStockChart';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // ============================================
-// ASSET DETAIL MODAL WITH PRO CHART
+// ASSET DETAIL MODAL WITH CHART
 // ============================================
 const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState('1mo');
+  const [chartInfo, setChartInfo] = useState(null);
+
+  const periods = [
+    { value: '5d', label: '5 Zile' },
+    { value: '1mo', label: '1 Lună' },
+    { value: '3mo', label: '3 Luni' },
+    { value: '6mo', label: '6 Luni' },
+    { value: '1y', label: '1 An' },
+  ];
+
+  useEffect(() => {
+    const fetchChart = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${API_URL}/api/global/chart/${encodeURIComponent(asset.symbol)}?period=${period}`);
+        if (res.ok) {
+          const data = await res.json();
+          setChartData(data.data || []);
+          setChartInfo(data);
+        }
+      } catch (err) {
+        console.error('Error fetching chart:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (asset?.symbol) {
+      fetchChart();
+    }
+  }, [asset?.symbol, period]);
+
   if (!asset) return null;
 
   const isPositive = asset.change_percent >= 0;
+  const minPrice = chartData.length > 0 ? Math.min(...chartData.map(d => d.low || d.close)) * 0.995 : 0;
+  const maxPrice = chartData.length > 0 ? Math.max(...chartData.map(d => d.high || d.close)) * 1.005 : 0;
 
   return (
     <AnimatePresence>
@@ -43,39 +80,38 @@ const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white dark:bg-slate-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-auto"
+          className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className={`p-6 ${isPositive ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-red-500 to-rose-500'} text-white`}>
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-3xl">{asset.flag}</span>
+          <div className={`p-6 ${isPositive ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-red-600 to-orange-600'} text-white`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span className="text-4xl">{asset.flag}</span>
+                <div>
                   <h2 className="text-2xl font-bold">{asset.name}</h2>
+                  <p className="text-white/80 text-sm">{asset.symbol} • {asset.country || asset.category}</p>
                 </div>
-                <p className="text-white/80">{asset.symbol} • {asset.country || asset.category}</p>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition">
+              <Button variant="ghost" size="icon" onClick={onClose} className="text-white hover:bg-white/20">
                 <X className="w-6 h-6" />
-              </button>
+              </Button>
             </div>
             
-            <div className="mt-4 flex items-end gap-4">
-              <div>
-                <p className="text-4xl font-bold">{asset.price?.toLocaleString('ro-RO', { maximumFractionDigits: 2 })}</p>
-              </div>
-              <div className={`flex items-center gap-2 ${isPositive ? 'text-white' : 'text-white'}`}>
-                {isPositive ? <TrendingUp className="w-6 h-6" /> : <TrendingDown className="w-6 h-6" />}
+            <div className="mt-4 flex items-end gap-6">
+              <p className="text-4xl font-bold">
+                {asset.price?.toLocaleString('ro-RO', { maximumFractionDigits: 2 })}
+              </p>
+              <div className="flex items-center gap-2">
+                {isPositive ? <ArrowUp className="w-6 h-6" /> : <ArrowDown className="w-6 h-6" />}
                 <span className="text-2xl font-bold">
                   {isPositive ? '+' : ''}{asset.change_percent?.toFixed(2)}%
                 </span>
-                <span className="text-lg">({isPositive ? '+' : ''}{asset.change?.toFixed(2)})</span>
               </div>
             </div>
           </div>
 
-          {/* PRO Stock Chart - Candlesticks, Intraday, Indicatori */}
+          {/* PRO Chart Component */}
           <div className="p-6">
             <ProStockChart
               symbol={asset.symbol}
