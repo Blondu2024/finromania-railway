@@ -252,7 +252,7 @@ export default function StockDetailPage() {
         symbol={symbol}
         type={type}
         isPro={isPro}
-        token={localStorage.getItem('auth_token')}
+        token={token}
       />
 
       {/* Price Info */}
