@@ -413,20 +413,31 @@ export default function GlobalMarketsPage() {
   
   // Check subscription for delay badge
   const [subscriptionLevel, setSubscriptionLevel] = useState('free');
+  const [isPro, setIsPro] = useState(false);
   
   useEffect(() => {
-    if (user) {
+    if (user && token) {
       fetch(`${API_URL}/api/subscriptions/status`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
-        .then(data => setSubscriptionLevel(data?.subscription?.subscription_level || 'free'))
-        .catch(() => setSubscriptionLevel('free'));
+        .then(data => {
+          const level = data?.subscription?.subscription_level || 'free';
+          const is_pro = data?.subscription?.is_pro || false;
+          setSubscriptionLevel(level);
+          setIsPro(is_pro);
+          console.log('[GlobalMarkets] Subscription:', level, 'isPro:', is_pro);
+        })
+        .catch((err) => {
+          console.error('[GlobalMarkets] Failed to fetch subscription:', err);
+          setSubscriptionLevel('free');
+          setIsPro(false);
+        });
     }
-  }, [user]);
+  }, [user, token]);
   
   // Delay info cu update frequency AGRESIV pentru PRO
-  const delayInfo = subscriptionLevel === 'pro'
+  const delayInfo = isPro
     ? { text: 'LIVE Update 3s', color: 'bg-green-500', description: 'Date actualizate la 3 secunde (PRO)', frequency: '3s' }
     : { text: 'Update 30s', color: 'bg-yellow-500', description: 'Actualizare la 30 secunde', frequency: '30s' };
 
@@ -531,8 +542,8 @@ export default function GlobalMarketsPage() {
         <AssetDetailModal 
           asset={selectedAsset} 
           onClose={handleCloseModal}
-          isPro={subscriptionLevel === 'pro'}
-          token={localStorage.getItem('finromania_token')}
+          isPro={isPro}
+          token={token}
         />
       )}
 
@@ -547,7 +558,7 @@ export default function GlobalMarketsPage() {
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               🌍 Piețe Globale
             </h1>
-            <Badge className={`${delayInfo.color} text-white ${subscriptionLevel === 'pro' ? 'animate-pulse' : ''}`}>
+            <Badge className={`${delayInfo.color} text-white ${isPro ? 'animate-pulse' : ''}`}>
               <Zap className="w-3 h-3 mr-1" />
               {delayInfo.text}
             </Badge>
@@ -560,7 +571,7 @@ export default function GlobalMarketsPage() {
           </div>
           <p className="text-muted-foreground">
             {delayInfo.description} • Auto-refresh la {delayInfo.frequency}
-            {subscriptionLevel === 'free' && (
+            {!isPro && (
               <Link to="/pricing" className="text-amber-600 hover:underline ml-2">
                 → PRO: Update la 5s!
               </Link>
