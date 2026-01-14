@@ -423,7 +423,6 @@ function AppRouter() {
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/portfolio-bvb" element={<PortfolioBVBPage />} />
         <Route path="/incearca-pro" element={<TryProPage />} />
-        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </Suspense>
   );
