@@ -410,7 +410,7 @@ export default function GlobalMarketsPage() {
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [showReminder, setShowReminder] = useState(false);
   const [companionOpen, setCompanionOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   
   // Check subscription for delay badge
   const [subscriptionLevel, setSubscriptionLevel] = useState('free');
