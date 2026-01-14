@@ -109,13 +109,15 @@ export default function ProStockChart({ symbol, type = 'bvb', isPro = false, tok
     try {
       let url;
       if (intv && isPro) {
-        // Intraday data (PRO only)
-        url = `${API_URL}/api/data/intraday/${type}/${encodeURIComponent(symbol)}?interval=${intv}`;
+        // Intraday data (PRO only) - EODHD API
+        url = type === 'bvb'
+          ? `${API_URL}/api/bvb/intraday/${encodeURIComponent(symbol)}?interval=${intv}`
+          : `${API_URL}/api/data/intraday/global/${encodeURIComponent(symbol)}?interval=${intv}`;
       } else {
         // Daily/historical data
         const mappedPeriod = mapPeriodToYFinance(tf);
         url = type === 'bvb'
-          ? `${API_URL}/api/stocks/bvb/${encodeURIComponent(symbol)}?period=${mappedPeriod}`
+          ? `${API_URL}/api/bvb/chart/${encodeURIComponent(symbol)}?period=${mappedPeriod}`
           : `${API_URL}/api/global/chart/${encodeURIComponent(symbol)}?period=${mappedPeriod}`;
       }
       
