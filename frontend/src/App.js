@@ -61,6 +61,7 @@ const DisclaimerPage = lazy(() => import('./pages/DisclaimerPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
 const FiscalCalculatorPage = lazy(() => import('./pages/FiscalCalculatorPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
@@ -422,6 +423,7 @@ function AppRouter() {
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/portfolio-bvb" element={<PortfolioBVBPage />} />
         <Route path="/incearca-pro" element={<TryProPage />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </Suspense>
   );
