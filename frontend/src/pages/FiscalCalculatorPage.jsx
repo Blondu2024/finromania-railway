@@ -258,22 +258,53 @@ export default function FiscalCalculatorPage() {
 
   // Show paywall for non-PRO users
   if (!isPro) {
+    // Structured data pentru Calculator (chiar dacă e PRO-only)
+    const calcStructuredData = {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Calculator Fiscal România - PF vs SRL 2025",
+      "description": "Calculator fiscal profesional pentru alegerea între PF, PFA și SRL în România. Legislație 2025, calcul impozite, CASS, economii fiscale.",
+      "url": "https://finromania.ro/calculator-fiscal",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "featureList": ["Calcul impozit PF 10%", "Calcul SRL Micro 1-3%", "Comparație economii", "Legislație 2025"],
+      "inLanguage": "ro",
+      "areaServed": "RO"
+    };
+    
     return (
       <>
         <SEO 
-          title="Calculator Fiscal PRO | FinRomania"
-          description="Calculator fiscal profesional pentru investiții la bursă. Funcție PRO exclusivă."
+          title="Calculator Fiscal România 2025 - PF vs SRL | FinRomania"
+          description="Calculator fiscal gratuit pentru România: compară impozite PF, PFA, SRL. Legislație 2025, calcul CASS, CAS, economii fiscale. Află care formă juridică e optimă pentru tine."
+          keywords="calculator fiscal românia 2025, pf vs srl, impozit dividende, microîntreprindere, pfa impozit, calculator impozit venit, legislație fiscală 2025, CASS 2025"
+          structuredData={calcStructuredData}
         />
         <ProPaywall feature="Calculatorul Fiscal cu AI" />
       </>
     );
   }
 
+  // Structured data pentru versiunea PRO
+  const proStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Calculator Fiscal PRO - Investiții BVB",
+    "description": "Calculator fiscal avansat pentru investiții la Bursa București. Compară PF vs SRL pentru acțiuni BVB. Impozit 1-3% optimizat.",
+    "url": "https://finromania.ro/calculator-fiscal",
+    "applicationCategory": "FinanceApplication",
+    "featureList": ["Calcul impozit BVB", "PF vs SRL comparație", "Optimizare fiscală", "AI Advisor fiscal"],
+    "inLanguage": "ro",
+    "areaServed": "RO"
+  };
+
   return (
     <>
       <SEO 
-        title="Calculator Fiscal Investiții BVB | FinRomania"
-        description="Calculează impozitele pe câștiguri din acțiuni BVB. Compară PF vs PFA vs SRL. Impozit 1-3% pentru BVB!"
+        title="Calculator Fiscal Investiții BVB 2025 - PF vs SRL | FinRomania"
+        description="Calculator fiscal pentru investiții la Bursa București (BVB). Compară impozite PF vs PFA vs SRL pentru câștiguri din acțiuni. Legislație 2025, impozit 1-3% pentru trading BVB."
+        keywords="calculator fiscal bvb, impozit acțiuni românia, pf vs srl trading, fiscal bursă bucurești, impozit dividende bvb, optimizare fiscală trading"
+        structuredData={proStructuredData}
       />
       
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
