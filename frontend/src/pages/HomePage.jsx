@@ -1,18 +1,16 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, memo, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, BarChart3, Globe, BookOpen, Calculator, Search, PieChart, Target, Award, Zap, Crown, Activity, Briefcase } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, BarChart3, Globe, Calculator, Award, Zap, Crown } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import NewsletterSignup from '../components/NewsletterSignup';
-import VerticalScroller from '../components/VerticalScroller';
 import SEO from '../components/SEO';
-import FearGreedIndex from '../components/FearGreedIndex';
 import { useAuth } from '../context/AuthContext';
 import FeatureCard from '../components/FeatureCard';
 import QuickCalculator from '../components/QuickCalculator';
-import TrustBadges from '../components/TrustBadges';
+import { cachedFetch } from '../utils/apiCache';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -187,20 +185,14 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const [bvbRes, globalRes, newsRes, currRes] = await Promise.all([
-        fetch(`${API_URL}/api/stocks/bvb`),
-        fetch(`${API_URL}/api/stocks/global`),
-        fetch(`${API_URL}/api/news?limit=12`),
-        fetch(`${API_URL}/api/currencies`)
-      ]);
-      
+      // Use cached fetch for better performance
       const [bvb, global, newsData, curr] = await Promise.all([
-        bvbRes.json(),
-        globalRes.json(),
-        newsRes.json(),
-        currRes.json()
+        cachedFetch(`${API_URL}/api/stocks/bvb`),
+        cachedFetch(`${API_URL}/api/stocks/global`),
+        cachedFetch(`${API_URL}/api/news?limit=12`),
+        cachedFetch(`${API_URL}/api/currencies`)
       ]);
       
       setBvbStocks(bvb);
@@ -213,7 +205,7 @@ export default function HomePage() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
