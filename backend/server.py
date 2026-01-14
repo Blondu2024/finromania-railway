@@ -54,6 +54,7 @@ from routes.ai_fiscal import router as ai_fiscal_router
 from routes.portfolio_bvb import router as portfolio_bvb_router
 from routes.intraday_data import router as intraday_router
 from routes.admin import router as admin_router_new
+from routes.bvb_charts import router as bvb_charts_router
 
 # Configure logging
 logging.basicConfig(
