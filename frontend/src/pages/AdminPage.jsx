@@ -136,6 +136,7 @@ export default function AdminPage() {
                   <div>
                     <p className="text-sm text-muted-foreground">Total Users</p>
                     <p className="text-2xl font-bold">{stats.total_users}</p>
+                    <p className="text-xs text-green-600">+{stats.recent_signups_7d} în ultimele 7 zile</p>
                   </div>
                 </div>
               </CardContent>
@@ -148,6 +149,7 @@ export default function AdminPage() {
                   <div>
                     <p className="text-sm text-muted-foreground">PRO Users</p>
                     <p className="text-2xl font-bold">{stats.pro_users}</p>
+                    <p className="text-xs text-amber-600">{stats.pro_percentage}% din total</p>
                   </div>
                 </div>
               </CardContent>
@@ -158,8 +160,9 @@ export default function AdminPage() {
                 <div className="flex items-center gap-3">
                   <TrendingUp className="w-8 h-8 text-green-500" />
                   <div>
-                    <p className="text-sm text-muted-foreground">FREE Users</p>
-                    <p className="text-2xl font-bold">{stats.free_users}</p>
+                    <p className="text-sm text-muted-foreground">Active Users (7d)</p>
+                    <p className="text-2xl font-bold">{stats.active_users_7d}</p>
+                    <p className="text-xs text-muted-foreground">{stats.free_users} FREE</p>
                   </div>
                 </div>
               </CardContent>
@@ -168,8 +171,9 @@ export default function AdminPage() {
             <Card>
               <CardContent className="p-6">
                 <div>
-                  <p className="text-sm text-muted-foreground">PRO %</p>
-                  <p className="text-2xl font-bold text-amber-600">{stats.pro_percentage}%</p>
+                  <p className="text-sm text-muted-foreground">AI Queries Total</p>
+                  <p className="text-2xl font-bold text-purple-600">{stats.total_ai_queries}</p>
+                  <p className="text-xs text-muted-foreground">Toate întrebările AI</p>
                 </div>
               </CardContent>
             </Card>
