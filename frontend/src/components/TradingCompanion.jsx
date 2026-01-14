@@ -224,6 +224,11 @@ const TradingCompanion = ({
           content: data.response,
           disclaimer: data.disclaimer
         }]);
+        
+        // Refresh AI limits after successful query
+        if (user && token && subscriptionLevel !== 'pro') {
+          setAiQueriesRemaining(prev => Math.max(0, (prev || 5) - 1));
+        }
       } else if (res.status === 429) {
         // AI limit reached
         const errorData = await res.json();
