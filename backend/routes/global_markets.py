@@ -177,8 +177,16 @@ async def get_forex():
 
 @router.get("/overview")
 async def get_global_overview():
-    """Get complete global market overview"""
+    """Get complete global market overview with caching"""
     try:
+        # Check cache first (30 seconds TTL)
+        cache_key = "global_overview"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            logger.info("Returning cached global overview")
+            return cached_data
+        
+        logger.info("Fetching fresh global market data...")
         all_assets = {}
         
         # Fetch all categories
@@ -207,7 +215,7 @@ async def get_global_overview():
             "crypto": {"name": "₿ Crypto", "open": True, "hours": "24/7"},
         }
         
-        return {
+        result = {
             "indices": all_assets.get("indices", []),
             "commodities": all_assets.get("commodities", []),
             "crypto": all_assets.get("crypto", []),
@@ -221,6 +229,12 @@ async def get_global_overview():
             "market_status": market_status,
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
+        
+        # Cache for 30 seconds
+        cache.set(cache_key, result, ttl_seconds=30)
+        logger.info(f"Cached global overview ({len(all_items)} assets)")
+        
+        return result
     except Exception as e:
         logger.error(f"Error fetching global overview: {e}")
         raise HTTPException(status_code=500, detail=str(e))
