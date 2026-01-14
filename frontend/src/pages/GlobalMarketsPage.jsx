@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   Globe, TrendingUp, TrendingDown, RefreshCw, Clock, Flame,
-  DollarSign, Coins, BarChart3, Zap, Building2, Timer,
-  ChevronRight, Sparkles, Activity, X, Calendar, ArrowUp, ArrowDown
+  DollarSign, Coins, BarChart3, Zap, Timer,
+  ChevronRight, Sparkles, Activity, X, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -19,6 +19,7 @@ import SEO from '../components/SEO';
 import TradingCompanion, { TradingReminder, shouldShowReminder, markReminderShown } from '../components/TradingCompanion';
 import { useAuth } from '../context/AuthContext';
 import ProStockChart from '../components/ProStockChart';
+import { cachedFetch } from '../utils/apiCache';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -441,20 +442,17 @@ export default function GlobalMarketsPage() {
     ? { text: 'LIVE Update 3s', color: 'bg-green-500', description: 'Date actualizate la 3 secunde (PRO)', frequency: '3s' }
     : { text: 'Update 30s', color: 'bg-yellow-500', description: 'Actualizare la 30 secunde', frequency: '30s' };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/api/global/overview`);
-      if (res.ok) {
-        const result = await res.json();
-        setData(result);
-      }
+      const result = await cachedFetch(`${API_URL}/api/global/overview`);
+      setData(result);
     } catch (err) {
       console.error('Error fetching global data:', err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
