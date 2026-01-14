@@ -391,3 +391,177 @@ The FinRomania 2.0 frontend is **FULLY FUNCTIONAL** for FREE users. All P0 (crit
 - Admin dashboard properly restricted to admin users only
 - Authentication flow is production-ready
 
+
+## 📊 ProStockChart Component Testing Results - 2026-01-14
+
+### Test Execution Summary
+- **Date:** 2026-01-14 01:18 UTC
+- **Tester:** Testing Subagent
+- **Test Scope:** ProStockChart component integration in Global Markets page
+- **Component Location:** `/app/frontend/src/components/ProStockChart.jsx`
+
+### ❌ CRITICAL ISSUE FOUND: API Endpoint Mismatch
+
+#### Issue Description
+The ProStockChart component IS integrated in the GlobalMarketsPage modal (line 116), BUT it cannot fetch data due to an API endpoint mismatch.
+
+#### Root Cause Analysis
+
+**Frontend (ProStockChart.jsx line 104):**
+```javascript
+url = `${API_URL}/api/stocks/global/${symbol}/details?period=${tf}`;
+```
+
+**Backend Available Endpoint:**
+```
+/api/global/chart/{symbol}  (from routes/global_markets.py line 228)
+```
+
+**The Problem:**
+- ProStockChart calls: `/api/stocks/global/{symbol}/details`
+- Backend provides: `/api/global/chart/{symbol}`
+- Result: 404 Not Found → Component shows "Nu există date" (No data)
+
+#### Test Results
+
+✅ **WORKING:**
+1. ProStockChart component exists at correct location
+2. Component is imported in GlobalMarketsPage.jsx (line 21)
+3. Component is rendered in AssetDetailModal (line 116-121)
+4. Modal opens when clicking on assets
+5. Component structure is correct (timeframes, chart types, indicators)
+
+❌ **NOT WORKING:**
+1. **CRITICAL:** API endpoint mismatch prevents data fetching
+2. Component shows "Nu există date" instead of chart UI
+3. Timeframe buttons (1D, 1S, 1L, 3L, 6L, 1A) not visible
+4. Chart type buttons (Candles, Line) not visible
+5. Intraday buttons (1min, 5min, 15min, 30min, 1H) not visible
+6. PRO upgrade prompt not visible
+7. RSI and Volume indicators not visible
+
+#### Backend Logs Evidence
+```
+yfinance - ERROR - ^GSPC: Period '1m' is invalid, must be one of: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
+```
+
+#### Screenshots Captured
+1. `global_markets_page.png` - Global Markets page loaded successfully
+2. `asset_modal_opened.png` - Modal opens but shows TradingCompanion overlay
+3. `after_closing_trading_companion.png` - Modal shows "Nu există date"
+4. `prostockchart_final_check.png` - Confirmed no chart UI elements visible
+
+### 🔧 Required Fix
+
+**File:** `/app/frontend/src/components/ProStockChart.jsx`
+**Line:** 104
+**Change:**
+```javascript
+// BEFORE (WRONG):
+url = `${API_URL}/api/stocks/global/${encodeURIComponent(symbol)}/details?period=${tf}`;
+
+// AFTER (CORRECT):
+url = `${API_URL}/api/global/chart/${encodeURIComponent(symbol)}?period=${tf}`;
+```
+
+### 📋 Additional Issues Found
+
+1. **Period Parameter Mismatch:**
+   - ProStockChart uses: '1m', '1w', '1m', '3m', '6m', '1y'
+   - yfinance expects: '1d', '5d', '1mo', '3mo', '6mo', '1y'
+   - Need to map ProStockChart periods to yfinance periods
+
+2. **TradingCompanion Modal Interference:**
+   - TradingCompanion modal appears over asset detail modal
+   - Blocks view of ProStockChart component
+   - Should be dismissed or prevented when asset modal is open
+
+### ✅ Component Features Verified (Code Review)
+
+The ProStockChart component has all required features:
+
+**Daily Timeframes (FREE + PRO):**
+- 1D, 1S (1 week), 1L (1 month), 3L, 6L, 1A (1 year)
+
+**Intraday Timeframes (PRO only):**
+- 1min, 5min, 15min, 30min, 1H
+- Lock icons (🔒) for FREE users
+- Alert prompt for FREE users trying to access
+
+**Chart Types:**
+- Candlestick (default)
+- Line
+- Area
+
+**Indicators (PRO only):**
+- RSI (14 period)
+- Volume bars with color coding
+
+**PRO Features:**
+- Upgrade prompt card for FREE users
+- Link to /pricing page
+- Clear feature list
+
+### 🎯 Recommendations for Main Agent
+
+**PRIORITY 1 - CRITICAL FIX:**
+1. Fix API endpoint in ProStockChart.jsx line 104
+   - Change from `/api/stocks/global/{symbol}/details` to `/api/global/chart/{symbol}`
+
+**PRIORITY 2 - Period Mapping:**
+2. Add period mapping function in ProStockChart.jsx:
+   ```javascript
+   const mapPeriodToYFinance = (period) => {
+     const mapping = {
+       '1d': '1d',
+       '1w': '5d',
+       '1m': '1mo',
+       '3m': '3mo',
+       '6m': '6mo',
+       '1y': '1y'
+     };
+     return mapping[period] || '1mo';
+   };
+   ```
+
+**PRIORITY 3 - TradingCompanion:**
+3. Prevent TradingCompanion modal from appearing when asset detail modal is open
+   - Add modal state check in TradingCompanion component
+
+**PRIORITY 4 - BVB Endpoint:**
+4. Verify BVB endpoint exists: `/api/stocks/bvb/{symbol}/details`
+   - ProStockChart also calls this for BVB stocks
+
+### 📊 Test Coverage
+
+**Tested:**
+- ✅ Component file exists
+- ✅ Component integration in GlobalMarketsPage
+- ✅ Modal opening functionality
+- ✅ Component structure (code review)
+- ✅ Backend endpoint availability
+- ✅ Console error monitoring
+- ✅ API call failure detection
+
+**Not Tested (blocked by API issue):**
+- ❌ Chart rendering with real data
+- ❌ Timeframe button functionality
+- ❌ Chart type switching
+- ❌ Intraday button PRO gate
+- ❌ RSI indicator display
+- ❌ Volume indicator display
+- ❌ PRO upgrade prompt display
+
+### 🎉 Conclusion
+
+**Component Status:** ✅ Implemented but ❌ NOT Functional
+
+The ProStockChart component is:
+- ✅ Properly coded with all required features
+- ✅ Correctly integrated in the GlobalMarketsPage modal
+- ❌ **BLOCKED by API endpoint mismatch**
+
+Once the API endpoint is fixed, the component should work as designed with professional-grade charts similar to Plus500/TradingView.
+
+**Estimated Fix Time:** 5-10 minutes (simple endpoint URL change)
+
