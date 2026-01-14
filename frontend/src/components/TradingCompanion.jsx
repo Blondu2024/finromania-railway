@@ -136,9 +136,9 @@ const TradingCompanion = ({
         .then(res => res.json())
         .then(data => {
           const level = data?.subscription?.subscription_level || 'free';
-          const aiUsed = data?.ai_limits?.queries_used_today || 0;
-          const aiLimit = data?.ai_limits?.daily_limit || 5;
-          const remaining = level === 'pro' ? -1 : Math.max(0, aiLimit - aiUsed);
+          const aiUsed = data?.ai_queries?.used_today || 0;
+          const aiLimit = data?.ai_queries?.limit || 5;
+          const remaining = data?.ai_queries?.remaining || 0;
           
           setSubscriptionLevel(level);
           setAiQueriesRemaining(remaining);
