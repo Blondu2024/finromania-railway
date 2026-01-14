@@ -257,7 +257,7 @@ class FirebaseAuthTester:
             return False
         
         # Test 1: Intraday data endpoint (PRO only)
-        url = f"{self.base_url}/api/data/intraday/bvb/TLV?interval=5m"
+        url = f"{self.base_url}/api/intraday/bvb/TLV?interval=5m"
         headers = {
             'Authorization': f'Bearer {self.admin_session_token}',
             'Content-Type': 'application/json'
