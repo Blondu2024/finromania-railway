@@ -56,7 +56,7 @@ export default function PricingPage() {
     }
   };
 
-  const handleActivatePro = async (plan) => {
+  const handleActivatePro = async (packageId) => {
     if (!user || !token) {
       window.location.href = '/login';
       return;
@@ -64,20 +64,34 @@ export default function PricingPage() {
 
     setLoadingCheckout(true);
     try {
-      // For now, use manual activation
-      const response = await fetch(`${API_URL}/api/subscriptions/activate-pro`, {
+      // Get current origin for Stripe redirects
+      const originUrl = window.location.origin;
+      
+      // Create Stripe checkout session
+      const response = await fetch(`${API_URL}/api/payments/checkout`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({
+          package_id: packageId,
+          origin_url: originUrl
+        })
       });
 
       if (response.ok) {
-        alert('Abonament PRO activat cu succes!');
-        window.location.reload();
+        const data = await response.json();
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        const error = await response.json();
+        alert(`Eroare: ${error.detail}`);
+        setLoadingCheckout(false);
       }
     } catch (error) {
-      console.error('Error activating PRO:', error);
-      alert('Eroare la activarea PRO');
-    } finally {
+      console.error('Error creating checkout:', error);
+      alert('Eroare la inițializarea plății');
       setLoadingCheckout(false);
     }
   };
