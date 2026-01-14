@@ -469,6 +469,11 @@ export default function GlobalMarketsPage() {
   const handleRefresh = () => {
     setRefreshing(true);
     fetchData();
+    
+    // Visual feedback - clear cache pentru fresh data
+    if (window.apiCache) {
+      window.apiCache.clearByPrefix(API_URL);
+    }
   };
 
   const handleAssetClick = useCallback((asset) => {
