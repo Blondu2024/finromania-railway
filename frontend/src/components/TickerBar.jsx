@@ -24,7 +24,8 @@ export default function TickerBar() {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 60000);
+    // Update la 10 secunde pentru senzație LIVE
+    const interval = setInterval(fetchData, 10000);
     return () => clearInterval(interval);
   }, []);
 
