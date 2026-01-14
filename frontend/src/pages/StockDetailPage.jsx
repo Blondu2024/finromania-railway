@@ -16,7 +16,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function StockDetailPage() {
   const { type, symbol } = useParams();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,15 +29,22 @@ export default function StockDetailPage() {
   const [isPro, setIsPro] = useState(false);
   
   useEffect(() => {
-    if (user) {
+    if (user && token) {
       fetch(`${API_URL}/api/subscriptions/status`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+        headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
-        .then(data => setIsPro(data?.subscription?.is_pro || false))
-        .catch(() => setIsPro(false));
+        .then(data => {
+          const is_pro = data?.subscription?.is_pro || false;
+          setIsPro(is_pro);
+          console.log('[StockDetail] isPro:', is_pro);
+        })
+        .catch((err) => {
+          console.error('[StockDetail] Failed to fetch subscription:', err);
+          setIsPro(false);
+        });
     }
-  }, [user]);
+  }, [user, token]);
 
   // Show reminder on first load (check only, don't mark as shown yet)
   useEffect(() => {
