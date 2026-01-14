@@ -122,8 +122,33 @@ const TradingCompanion = ({
   const [conversation, setConversation] = useState([]);
   const [loading, setLoading] = useState(false);
   const [tips, setTips] = useState([]);
+  const [aiQueriesRemaining, setAiQueriesRemaining] = useState(null);
+  const [subscriptionLevel, setSubscriptionLevel] = useState('free');
   const messagesEndRef = useRef(null);
   const { user, token } = useAuth();
+
+  // Fetch AI limits when component opens
+  useEffect(() => {
+    if (isOpen && user && token) {
+      fetch(`${API_URL}/api/subscriptions/status`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          const level = data?.subscription?.subscription_level || 'free';
+          const aiUsed = data?.ai_limits?.queries_used_today || 0;
+          const aiLimit = data?.ai_limits?.daily_limit || 5;
+          const remaining = level === 'pro' ? -1 : Math.max(0, aiLimit - aiUsed);
+          
+          setSubscriptionLevel(level);
+          setAiQueriesRemaining(remaining);
+          console.log('[TradingCompanion] AI Queries Remaining:', remaining, 'Level:', level);
+        })
+        .catch(err => {
+          console.error('[TradingCompanion] Failed to fetch limits:', err);
+        });
+    }
+  }, [isOpen, user, token]);
 
   // Handle forceOpen prop
   useEffect(() => {
