@@ -54,21 +54,27 @@ FOREX = {
 
 
 def fetch_ticker_data(symbol: str, info: dict) -> dict:
-    """Fetch data for a single ticker"""
+    """Fetch LIVE data for a single ticker cu 1-minute interval"""
     try:
         ticker = yf.Ticker(symbol)
-        hist = ticker.history(period="5d")
         
+        # Get 1-day history with 1-minute interval for LIVE data
+        hist = ticker.history(period="1d", interval="1m")
+        
+        if hist.empty:
+            # Fallback to daily if intraday fails
+            hist = ticker.history(period="2d")
+            
         if hist.empty:
             return None
             
         current_price = hist['Close'].iloc[-1]
-        prev_close = hist['Close'].iloc[-2] if len(hist) > 1 else current_price
+        prev_close = hist['Close'].iloc[0] if len(hist) > 1 else current_price
         change = current_price - prev_close
         change_percent = (change / prev_close) * 100 if prev_close else 0
         
-        # Get more data for sparkline
-        week_data = hist['Close'].tolist()[-5:]
+        # Get sparkline data (last 30 minutes for smooth line)
+        sparkline_data = hist['Close'].tail(30).tolist() if len(hist) >= 30 else hist['Close'].tolist()
         
         return {
             "symbol": symbol,
@@ -81,8 +87,9 @@ def fetch_ticker_data(symbol: str, info: dict) -> dict:
             "change": float(round(change, 2)),
             "change_percent": float(round(change_percent, 2)),
             "prev_close": float(round(prev_close, 2)),
-            "sparkline": [float(round(p, 2)) for p in week_data],
-            "is_positive": bool(change_percent >= 0)
+            "sparkline": [float(round(p, 2)) for p in sparkline_data[-5:]],  # Last 5 points
+            "is_positive": bool(change_percent >= 0),
+            "last_update": hist.index[-1].isoformat() if not hist.empty else None
         }
     except Exception as e:
         logger.error(f"Error fetching {symbol}: {e}")
