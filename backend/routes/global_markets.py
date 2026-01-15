@@ -36,11 +36,11 @@ COMMODITIES = {
 }
 
 CRYPTO = {
-    "BTC-USD": {"name": "Bitcoin", "flag": "₿", "category": "crypto"},
-    "ETH-USD": {"name": "Ethereum", "flag": "Ξ", "category": "crypto"},
-    "BNB-USD": {"name": "Binance Coin", "flag": "🔸", "category": "crypto"},
-    "SOL-USD": {"name": "Solana", "flag": "◎", "category": "crypto"},
-    "XRP-USD": {"name": "XRP", "flag": "✕", "category": "crypto"},
+    "BTC-USD": {"name": "Bitcoin", "flag": "₿", "category": "crypto", "use_yfinance": True},
+    "ETH-USD": {"name": "Ethereum", "flag": "Ξ", "category": "crypto", "use_yfinance": True},
+    "BNB-USD": {"name": "Binance Coin", "flag": "🔸", "category": "crypto", "use_yfinance": True},
+    "SOL-USD": {"name": "Solana", "flag": "◎", "category": "crypto", "use_yfinance": True},
+    "XRP-USD": {"name": "XRP", "flag": "✕", "category": "crypto", "use_yfinance": True},
 }
 
 FOREX = {
@@ -192,9 +192,14 @@ async def get_global_overview():
         logger.info("Fetching LIVE global market data (no cache)...")
         all_assets = {}
         
-        # Fetch all categories - FOLOSIM EODHD REAL-TIME cu AWAIT!
+        # Fetch all categories - EODHD pentru US, yfinance pentru crypto
         for symbol, info in {**GLOBAL_INDICES, **COMMODITIES, **CRYPTO, **FOREX}.items():
-            data = await fetch_ticker_data_eodhd(symbol, info)
+            # Folosește yfinance pentru crypto (EODHD nu are)
+            if info.get("use_yfinance"):
+                data = await fetch_ticker_yfinance(symbol, info)
+            else:
+                data = await fetch_ticker_data_eodhd(symbol, info)
+            
             if data:
                 category = info["category"]
                 if category not in all_assets:
