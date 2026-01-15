@@ -44,10 +44,10 @@ CRYPTO = {
 }
 
 FOREX = {
-    "EURUSD=X": {"name": "EUR/USD", "flag": "🇪🇺/🇺🇸", "category": "forex"},
-    "GBPUSD=X": {"name": "GBP/USD", "flag": "🇬🇧/🇺🇸", "category": "forex"},
-    "USDJPY=X": {"name": "USD/JPY", "flag": "🇺🇸/🇯🇵", "category": "forex"},
-    "USDCHF=X": {"name": "USD/CHF", "flag": "🇺🇸/🇨🇭", "category": "forex"},
+    "EURUSD=X": {"name": "EUR/USD", "flag": "🇪🇺/🇺🇸", "category": "forex", "use_yfinance": True},
+    "GBPUSD=X": {"name": "GBP/USD", "flag": "🇬🇧/🇺🇸", "category": "forex", "use_yfinance": True},
+    "USDJPY=X": {"name": "USD/JPY", "flag": "🇺🇸/🇯🇵", "category": "forex", "use_yfinance": True},
+    "USDCHF=X": {"name": "USD/CHF", "flag": "🇺🇸/🇨🇭", "category": "forex", "use_yfinance": True},
 }
 
 
