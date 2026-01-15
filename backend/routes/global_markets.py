@@ -51,6 +51,43 @@ FOREX = {
 }
 
 
+async def fetch_ticker_yfinance(symbol: str, info: dict) -> dict:
+    """Fallback pentru crypto/commodities cu yfinance"""
+    try:
+        ticker = yf.Ticker(symbol)
+        hist = ticker.history(period="1d", interval="5m")
+        
+        if hist.empty:
+            hist = ticker.history(period="2d")
+            
+        if hist.empty:
+            return None
+            
+        current_price = hist['Close'].iloc[-1]
+        prev_close = hist['Close'].iloc[0] if len(hist) > 1 else current_price
+        change = current_price - prev_close
+        change_percent = (change / prev_close) * 100 if prev_close else 0
+        
+        return {
+            "symbol": symbol,
+            "name": info["name"],
+            "flag": info.get("flag", "📊"),
+            "country": info.get("country", ""),
+            "category": info.get("category", ""),
+            "unit": info.get("unit", ""),
+            "price": float(round(current_price, 2)),
+            "change": float(round(change, 2)),
+            "change_percent": float(round(change_percent, 2)),
+            "prev_close": float(round(prev_close, 2)),
+            "sparkline": [],
+            "is_positive": change_percent >= 0,
+            "source": "yfinance"
+        }
+    except Exception as e:
+        logger.error(f"yfinance error for {symbol}: {e}")
+        return None
+
+
 async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
     """Fetch REAL-TIME data from EODHD API ($100/month) - <1s delay!"""
     import httpx
