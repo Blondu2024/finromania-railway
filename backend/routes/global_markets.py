@@ -51,7 +51,7 @@ FOREX = {
 }
 
 
-def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
+async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
     """Fetch REAL-TIME data from EODHD API ($100/month) - <1s delay!"""
     import httpx
     import os
@@ -66,13 +66,9 @@ def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
         url = f"https://eodhd.com/api/real-time/{symbol}"
         params = {"api_token": api_key, "fmt": "json"}
         
-        import asyncio
-        async def fetch():
-            async with httpx.AsyncClient() as client:
-                response = await client.get(url, params=params, timeout=5)
-                return response.json() if response.status_code == 200 else None
-        
-        data = asyncio.run(fetch())
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, params=params, timeout=5)
+            data = response.json() if response.status_code == 200 else None
         
         if not data:
             return None
@@ -196,9 +192,9 @@ async def get_global_overview():
         logger.info("Fetching LIVE global market data (no cache)...")
         all_assets = {}
         
-        # Fetch all categories - FOLOSIM EODHD REAL-TIME!
+        # Fetch all categories - FOLOSIM EODHD REAL-TIME cu AWAIT!
         for symbol, info in {**GLOBAL_INDICES, **COMMODITIES, **CRYPTO, **FOREX}.items():
-            data = fetch_ticker_data_eodhd(symbol, info)
+            data = await fetch_ticker_data_eodhd(symbol, info)
             if data:
                 category = info["category"]
                 if category not in all_assets:
