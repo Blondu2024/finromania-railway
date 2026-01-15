@@ -27,12 +27,12 @@ GLOBAL_INDICES = {
 }
 
 COMMODITIES = {
-    "CL=F": {"name": "Petrol WTI", "flag": "🛢️", "category": "commodities", "unit": "USD/bbl"},
-    "BZ=F": {"name": "Petrol Brent", "flag": "🛢️", "category": "commodities", "unit": "USD/bbl"},
-    "GC=F": {"name": "Aur", "flag": "🥇", "category": "commodities", "unit": "USD/oz"},
-    "SI=F": {"name": "Argint", "flag": "🥈", "category": "commodities", "unit": "USD/oz"},
-    "NG=F": {"name": "Gaze Naturale", "flag": "🔥", "category": "commodities", "unit": "USD/MMBtu"},
-    "HG=F": {"name": "Cupru", "flag": "🔶", "category": "commodities", "unit": "USD/lb"},
+    "CL=F": {"name": "Petrol WTI", "flag": "🛢️", "category": "commodities", "unit": "USD/bbl", "use_yfinance": True},
+    "BZ=F": {"name": "Petrol Brent", "flag": "🛢️", "category": "commodities", "unit": "USD/bbl", "use_yfinance": True},
+    "GC=F": {"name": "Aur", "flag": "🥇", "category": "commodities", "unit": "USD/oz", "use_yfinance": True},
+    "SI=F": {"name": "Argint", "flag": "🥈", "category": "commodities", "unit": "USD/oz", "use_yfinance": True},
+    "NG=F": {"name": "Gaze Naturale", "flag": "🔥", "category": "commodities", "unit": "USD/MMBtu", "use_yfinance": True},
+    "HG=F": {"name": "Cupru", "flag": "🔶", "category": "commodities", "unit": "USD/lb", "use_yfinance": True},
 }
 
 CRYPTO = {
