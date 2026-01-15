@@ -184,19 +184,12 @@ async def get_forex():
 
 @router.get("/overview")
 async def get_global_overview():
-    """Get complete global market overview with caching"""
+    """Get complete global market overview cu date LIVE (NO CACHE pentru real-time)"""
     try:
-        # Check cache first (30 seconds TTL)
-        cache_key = "global_overview"
-        cached_data = cache.get(cache_key)
-        if cached_data:
-            logger.info("Returning cached global overview")
-            return cached_data
-        
-        logger.info("Fetching fresh global market data...")
+        logger.info("Fetching LIVE global market data (no cache)...")
         all_assets = {}
         
-        # Fetch all categories
+        # Fetch all categories - NO CACHE pentru date fresh!
         for symbol, info in {**GLOBAL_INDICES, **COMMODITIES, **CRYPTO, **FOREX}.items():
             data = fetch_ticker_data(symbol, info)
             if data:
@@ -237,9 +230,8 @@ async def get_global_overview():
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
-        # Cache pentru 10 secunde (permite refresh mai frecvent)
-        cache.set(cache_key, result, ttl_seconds=10)
-        logger.info(f"Cached global overview ({len(all_items)} assets) for 10s")
+        # NO CACHE - pentru date LIVE!
+        logger.info(f"Returning LIVE data ({len(all_items)} assets)")
         
         return result
     except Exception as e:
