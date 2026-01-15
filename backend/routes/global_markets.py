@@ -80,11 +80,22 @@ async def fetch_ticker_yfinance(symbol: str, info: dict) -> dict:
             "change_percent": float(round(change_percent, 2)),
             "prev_close": float(round(prev_close, 2)),
             "sparkline": [],
-            "is_positive": change_percent >= 0,
+            "is_positive": bool(change_percent >= 0),
             "source": "yfinance"
         }
     except Exception as e:
         logger.error(f"yfinance error for {symbol}: {e}")
+
+
+async def fetch_ticker_data(symbol: str, info: dict) -> dict:
+    """Unified function - route la EODHD sau yfinance based on asset type"""
+    # Folosește yfinance pentru crypto și commodities (EODHD nu le suportă)
+    if info.get("use_yfinance"):
+        return await fetch_ticker_yfinance(symbol, info)
+    else:
+        # Folosește EODHD pentru US indices și forex (real-time <50ms!)
+        return await fetch_ticker_data_eodhd(symbol, info)
+
         return None
 
 
@@ -127,7 +138,7 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
             "change_percent": round(change_percent, 2),
             "prev_close": round(prev_close, 2),
             "sparkline": [],  # Optional: can add intraday sparkline
-            "is_positive": change_percent >= 0,
+            "is_positive": bool(change_percent >= 0),
             "last_update": datetime.fromtimestamp(data.get("timestamp", 0)).isoformat(),
             "source": "eodhd_realtime"
         }
@@ -142,7 +153,7 @@ async def get_global_indices():
     try:
         results = []
         for symbol, info in GLOBAL_INDICES.items():
-            data = fetch_ticker_data(symbol, info)
+            data = await fetch_ticker_data(symbol, info)
             if data:
                 results.append(data)
         
@@ -165,7 +176,7 @@ async def get_commodities():
     try:
         results = []
         for symbol, info in COMMODITIES.items():
-            data = fetch_ticker_data(symbol, info)
+            data = await fetch_ticker_data(symbol, info)
             if data:
                 results.append(data)
         
@@ -185,7 +196,7 @@ async def get_crypto():
     try:
         results = []
         for symbol, info in CRYPTO.items():
-            data = fetch_ticker_data(symbol, info)
+            data = await fetch_ticker_data(symbol, info)
             if data:
                 results.append(data)
         
@@ -208,7 +219,7 @@ async def get_forex():
     try:
         results = []
         for symbol, info in FOREX.items():
-            data = fetch_ticker_data(symbol, info)
+            data = await fetch_ticker_data(symbol, info)
             if data:
                 results.append(data)
         
