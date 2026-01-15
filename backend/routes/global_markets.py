@@ -9,23 +9,21 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/global", tags=["Global Markets"])
 cache = get_cache()
 
-# Global indices and assets configuration
+# Global indices - EODHD symbols pentru real-time data
 GLOBAL_INDICES = {
-    # US Markets
-    "^GSPC": {"name": "S&P 500", "country": "USA", "flag": "🇺🇸", "category": "indices"},
-    "^IXIC": {"name": "NASDAQ", "country": "USA", "flag": "🇺🇸", "category": "indices"},
-    "^DJI": {"name": "Dow Jones", "country": "USA", "flag": "🇺🇸", "category": "indices"},
+    # US Markets - folosim ETF-uri pentru real-time (SPY = S&P 500, QQQ = NASDAQ, DIA = Dow)
+    "SPY.US": {"name": "S&P 500", "country": "USA", "flag": "🇺🇸", "category": "indices"},
+    "QQQ.US": {"name": "NASDAQ", "country": "USA", "flag": "🇺🇸", "category": "indices"},
+    "DIA.US": {"name": "Dow Jones", "country": "USA", "flag": "🇺🇸", "category": "indices"},
     
     # European Markets
-    "^GDAXI": {"name": "DAX", "country": "Germania", "flag": "🇩🇪", "category": "indices"},
-    "^FTSE": {"name": "FTSE 100", "country": "UK", "flag": "🇬🇧", "category": "indices"},
-    "^FCHI": {"name": "CAC 40", "country": "Franța", "flag": "🇫🇷", "category": "indices"},
-    "^STOXX50E": {"name": "Euro Stoxx 50", "country": "Europa", "flag": "🇪🇺", "category": "indices"},
+    "EWG.US": {"name": "DAX (Germany ETF)", "country": "Germania", "flag": "🇩🇪", "category": "indices"},
+    "EWU.US": {"name": "FTSE 100 (UK ETF)", "country": "UK", "flag": "🇬🇧", "category": "indices"},
+    "EWQ.US": {"name": "CAC 40 (France ETF)", "country": "Franța", "flag": "🇫🇷", "category": "indices"},
     
     # Asian Markets  
-    "^N225": {"name": "Nikkei 225", "country": "Japonia", "flag": "🇯🇵", "category": "indices"},
-    "^HSI": {"name": "Hang Seng", "country": "Hong Kong", "flag": "🇭🇰", "category": "indices"},
-    "000001.SS": {"name": "Shanghai", "country": "China", "flag": "🇨🇳", "category": "indices"},
+    "EWJ.US": {"name": "Nikkei 225 (Japan ETF)", "country": "Japonia", "flag": "🇯🇵", "category": "indices"},
+    "EWH.US": {"name": "Hang Seng (HK ETF)", "country": "Hong Kong", "flag": "🇭🇰", "category": "indices"},
 }
 
 COMMODITIES = {
@@ -53,28 +51,36 @@ FOREX = {
 }
 
 
-def fetch_ticker_data(symbol: str, info: dict) -> dict:
-    """Fetch LIVE data for a single ticker cu 1-minute interval"""
+def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
+    """Fetch REAL-TIME data from EODHD API ($100/month) - <1s delay!"""
+    import httpx
+    import os
+    
+    api_key = os.environ.get("EODHD_API_KEY")
+    if not api_key:
+        logger.warning(f"EODHD API key not found, skipping {symbol}")
+        return None
+    
     try:
-        ticker = yf.Ticker(symbol)
+        # EODHD real-time endpoint
+        url = f"https://eodhd.com/api/real-time/{symbol}"
+        params = {"api_token": api_key, "fmt": "json"}
         
-        # Get 1-day history with 1-minute interval for LIVE data
-        hist = ticker.history(period="1d", interval="1m")
+        import asyncio
+        async def fetch():
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, params=params, timeout=5)
+                return response.json() if response.status_code == 200 else None
         
-        if hist.empty:
-            # Fallback to daily if intraday fails
-            hist = ticker.history(period="2d")
-            
-        if hist.empty:
+        data = asyncio.run(fetch())
+        
+        if not data:
             return None
-            
-        current_price = hist['Close'].iloc[-1]
-        prev_close = hist['Close'].iloc[0] if len(hist) > 1 else current_price
-        change = current_price - prev_close
-        change_percent = (change / prev_close) * 100 if prev_close else 0
         
-        # Get sparkline data (last 30 minutes for smooth line)
-        sparkline_data = hist['Close'].tail(30).tolist() if len(hist) >= 30 else hist['Close'].tolist()
+        current_price = float(data.get("close", 0))
+        prev_close = float(data.get("previousClose", current_price))
+        change = float(data.get("change", 0))
+        change_percent = float(data.get("change_p", 0))
         
         return {
             "symbol": symbol,
@@ -83,16 +89,17 @@ def fetch_ticker_data(symbol: str, info: dict) -> dict:
             "country": info.get("country", ""),
             "category": info.get("category", ""),
             "unit": info.get("unit", ""),
-            "price": float(round(current_price, 2)),
-            "change": float(round(change, 2)),
-            "change_percent": float(round(change_percent, 2)),
-            "prev_close": float(round(prev_close, 2)),
-            "sparkline": [float(round(p, 2)) for p in sparkline_data[-5:]],  # Last 5 points
-            "is_positive": bool(change_percent >= 0),
-            "last_update": hist.index[-1].isoformat() if not hist.empty else None
+            "price": round(current_price, 2),
+            "change": round(change, 2),
+            "change_percent": round(change_percent, 2),
+            "prev_close": round(prev_close, 2),
+            "sparkline": [],  # Optional: can add intraday sparkline
+            "is_positive": change_percent >= 0,
+            "last_update": datetime.fromtimestamp(data.get("timestamp", 0)).isoformat(),
+            "source": "eodhd_realtime"
         }
     except Exception as e:
-        logger.error(f"Error fetching {symbol}: {e}")
+        logger.error(f"EODHD error for {symbol}: {e}")
         return None
 
 
@@ -189,9 +196,9 @@ async def get_global_overview():
         logger.info("Fetching LIVE global market data (no cache)...")
         all_assets = {}
         
-        # Fetch all categories - NO CACHE pentru date fresh!
+        # Fetch all categories - FOLOSIM EODHD REAL-TIME!
         for symbol, info in {**GLOBAL_INDICES, **COMMODITIES, **CRYPTO, **FOREX}.items():
-            data = fetch_ticker_data(symbol, info)
+            data = fetch_ticker_data_eodhd(symbol, info)
             if data:
                 category = info["category"]
                 if category not in all_assets:
