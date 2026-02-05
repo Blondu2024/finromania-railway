@@ -118,8 +118,11 @@ async def get_bvb_indices(response: Response):
 
 
 @router.get("/top-movers")
-async def get_top_movers():
+async def get_top_movers(response: Response):
     """Get top gainers, losers, and most traded stocks"""
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    
     try:
         db = await get_database()
         
