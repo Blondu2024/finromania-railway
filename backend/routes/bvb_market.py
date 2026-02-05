@@ -1,5 +1,5 @@
 """BVB Market Data - Indici, Top Movers, Statistici"""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from typing import List, Dict, Optional
 import logging
 import yfinance as yf
@@ -54,8 +54,12 @@ BVB_INDEX_FALLBACK = {
 
 
 @router.get("/indices")
-async def get_bvb_indices():
+async def get_bvb_indices(response: Response):
     """Get all BVB indices with current values"""
+    # Prevent caching for live data
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    
     try:
         indices = []
         
