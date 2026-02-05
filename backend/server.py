@@ -268,8 +268,12 @@ async def get_data_sources():
 # ============================================
 
 @api_router.get("/stocks/global", response_model=List[IndexResponse])
-async def get_global_indices():
+async def get_global_indices(response: Response):
     """Obține toți indicii globali"""
+    # Prevent caching for live data
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    
     try:
         db = await get_database()
         indices = await db.stocks_global.find({}, {"_id": 0}).limit(100).to_list(100)
