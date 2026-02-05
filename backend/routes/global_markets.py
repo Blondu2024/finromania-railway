@@ -1,5 +1,5 @@
 """Global Markets API - Indici, Comodități, Crypto"""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from datetime import datetime, timezone
 import yfinance as yf
 import logging
@@ -234,8 +234,13 @@ async def get_forex():
 
 
 @router.get("/overview")
-async def get_global_overview():
+async def get_global_overview(response: Response):
     """Get complete global market overview cu date LIVE (NO CACHE pentru real-time)"""
+    # Prevent ALL caching - critical for live data!
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    
     try:
         logger.info("Fetching LIVE global market data (no cache)...")
         all_assets = {}

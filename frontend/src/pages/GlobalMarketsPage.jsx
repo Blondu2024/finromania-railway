@@ -19,7 +19,6 @@ import SEO from '../components/SEO';
 import TradingCompanion, { TradingReminder, shouldShowReminder, markReminderShown } from '../components/TradingCompanion';
 import { useAuth } from '../context/AuthContext';
 import ProStockChart from '../components/ProStockChart';
-import { cachedFetch } from '../utils/apiCache';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -444,12 +443,19 @@ export default function GlobalMarketsPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      // NO CACHE - fetch direct pentru date LIVE!
-      const res = await fetch(`${API_URL}/api/global/overview`);
+      // CACHE BUSTING - timestamp forțează browser să facă request nou
+      const timestamp = Date.now();
+      const res = await fetch(`${API_URL}/api/global/overview?_t=${timestamp}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (res.ok) {
         const result = await res.json();
         setData(result);
-        console.log('[GlobalMarkets] Fetched LIVE data, assets:', result.indices?.length || 0);
+        console.log('[GlobalMarkets] Fetched LIVE data at', new Date().toLocaleTimeString(), '- assets:', result.indices?.length || 0);
       }
     } catch (err) {
       console.error('Error fetching global data:', err);
