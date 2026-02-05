@@ -601,11 +601,18 @@ export default function StocksPage() {
 
   const fetchAllData = async () => {
     try {
+      // CACHE BUSTING pentru date LIVE
+      const timestamp = Date.now();
+      const fetchOptions = {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      };
+      
       const [stocksRes, indicesRes, moversRes, sectorsRes] = await Promise.all([
-        fetch(`${API_URL}/api/stocks/bvb`),
-        fetch(`${API_URL}/api/bvb/indices`),
-        fetch(`${API_URL}/api/bvb/top-movers`),
-        fetch(`${API_URL}/api/bvb/sectors`)
+        fetch(`${API_URL}/api/stocks/bvb?_t=${timestamp}`, fetchOptions),
+        fetch(`${API_URL}/api/bvb/indices?_t=${timestamp}`, fetchOptions),
+        fetch(`${API_URL}/api/bvb/top-movers?_t=${timestamp}`, fetchOptions),
+        fetch(`${API_URL}/api/bvb/sectors?_t=${timestamp}`, fetchOptions)
       ]);
       
       const stocksData = await stocksRes.json();
@@ -617,6 +624,8 @@ export default function StocksPage() {
       setIndices(indicesData.indices || []);
       setTopMovers(moversData);
       setSectors(sectorsData.sectors || []);
+      
+      console.log('[StocksPage] Fetched LIVE data at', new Date().toLocaleTimeString());
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {

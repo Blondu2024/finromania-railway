@@ -11,13 +11,21 @@ export default function TickerBar() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // CACHE BUSTING - timestamp forțează request nou
+        const timestamp = Date.now();
+        const fetchOptions = {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+        };
+        
         const [globalRes, bvbRes] = await Promise.all([
-          fetch(`${API_URL}/api/stocks/global`),
-          fetch(`${API_URL}/api/stocks/bvb`)
+          fetch(`${API_URL}/api/stocks/global?_t=${timestamp}`, fetchOptions),
+          fetch(`${API_URL}/api/stocks/bvb?_t=${timestamp}`, fetchOptions)
         ]);
         const [global, bvb] = await Promise.all([globalRes.json(), bvbRes.json()]);
         setIndices(global);
         setBvbStocks(bvb.slice(0, 5)); // Top 5 BVB
+        console.log('[TickerBar] Updated at', new Date().toLocaleTimeString());
       } catch (error) {
         console.error('Error fetching ticker data:', error);
       }
