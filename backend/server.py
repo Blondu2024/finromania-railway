@@ -191,8 +191,12 @@ async def health_check():
 # ============================================
 
 @api_router.get("/stocks/bvb", response_model=List[StockResponse])
-async def get_bvb_stocks():
+async def get_bvb_stocks(response: Response):
     """Obține toate acțiunile BVB"""
+    # Prevent caching for live data
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    
     try:
         db = await get_database()
         stocks = await db.stocks_bvb.find({}, {"_id": 0}).limit(100).to_list(100)
