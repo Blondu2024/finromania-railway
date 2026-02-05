@@ -444,8 +444,13 @@ export default function GlobalMarketsPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const result = await cachedFetch(`${API_URL}/api/global/overview`);
-      setData(result);
+      // NO CACHE - fetch direct pentru date LIVE!
+      const res = await fetch(`${API_URL}/api/global/overview`);
+      if (res.ok) {
+        const result = await res.json();
+        setData(result);
+        console.log('[GlobalMarkets] Fetched LIVE data, assets:', result.indices?.length || 0);
+      }
     } catch (err) {
       console.error('Error fetching global data:', err);
     } finally {
@@ -468,12 +473,8 @@ export default function GlobalMarketsPage() {
 
   const handleRefresh = () => {
     setRefreshing(true);
+    setData(null); // Clear old data
     fetchData();
-    
-    // Visual feedback - clear cache pentru fresh data
-    if (window.apiCache) {
-      window.apiCache.clearByPrefix(API_URL);
-    }
   };
 
   const handleAssetClick = useCallback((asset) => {

@@ -190,18 +190,26 @@ export default function HomePage() {
 
   const fetchData = useCallback(async () => {
     try {
-      // Use cached fetch for better performance
+      // NO CACHE - fetch direct pentru date LIVE!
+      const [bvbRes, globalRes, newsRes, currRes] = await Promise.all([
+        fetch(`${API_URL}/api/stocks/bvb`),
+        fetch(`${API_URL}/api/stocks/global`),
+        fetch(`${API_URL}/api/news?limit=12`),
+        fetch(`${API_URL}/api/currencies`)
+      ]);
+      
       const [bvb, global, newsData, curr] = await Promise.all([
-        cachedFetch(`${API_URL}/api/stocks/bvb`),
-        cachedFetch(`${API_URL}/api/stocks/global`),
-        cachedFetch(`${API_URL}/api/news?limit=12`),
-        cachedFetch(`${API_URL}/api/currencies`)
+        bvbRes.json(),
+        globalRes.json(),
+        newsRes.json(),
+        currRes.json()
       ]);
       
       setBvbStocks(bvb);
       setGlobalIndices(global);
       setNews(newsData);
       setCurrencies(curr);
+      console.log('[HomePage] Fetched LIVE data');
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
