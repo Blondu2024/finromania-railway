@@ -590,7 +590,7 @@ export default function GlobalMarketsPage() {
             {delayInfo.description} • Auto-refresh la {delayInfo.frequency}
             {!isPro && (
               <Link to="/pricing" className="text-amber-600 hover:underline ml-2">
-                → PRO: Update la 5s!
+                → PRO: Refresh mai rapid!
               </Link>
             )}
           </p>
