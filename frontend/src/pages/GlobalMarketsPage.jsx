@@ -469,11 +469,11 @@ export default function GlobalMarketsPage() {
   useEffect(() => {
     fetchData();
     
-    // Refresh agresiv: 10 secunde pentru TOȚI (pentru senzație live)
-    // Cache backend va optimiza API calls
-    const interval = setInterval(fetchData, 10000);
+    // Refresh la 60 secunde - datele EODHD au 15min delay oricum
+    // Nu are sens să facem refresh mai des
+    const interval = setInterval(fetchData, 60000);
     
-    console.log('[GlobalMarkets] Auto-refresh every 10s');
+    console.log('[GlobalMarkets] Auto-refresh every 60s (EODHD 15min delay plan)');
     
     return () => clearInterval(interval);
   }, [fetchData]);
