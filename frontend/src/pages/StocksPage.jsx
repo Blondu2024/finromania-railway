@@ -720,7 +720,7 @@ export default function StocksPage() {
             {delayInfo.description}
             {subscriptionLevel === 'free' && (
               <Link to="/pricing" className="text-amber-600 hover:underline ml-2">
-                → PRO: 15min delay
+                → PRO: Refresh mai rapid!
               </Link>
             )}
           </p>
