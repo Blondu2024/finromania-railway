@@ -100,7 +100,7 @@ async def fetch_ticker_data(symbol: str, info: dict) -> dict:
 
 
 async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
-    """Fetch REAL-TIME data from EODHD API ($100/month) - <1s delay!"""
+    """Fetch data from EODHD API (EOD+Intraday $29.99/month) - 15min delay"""
     import httpx
     import os
     
@@ -110,7 +110,7 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
         return None
     
     try:
-        # EODHD real-time endpoint
+        # EODHD real-time endpoint (15min delayed for $29.99 plan)
         url = f"https://eodhd.com/api/real-time/{symbol}"
         params = {"api_token": api_key, "fmt": "json"}
         
@@ -140,7 +140,7 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
             "sparkline": [],  # Optional: can add intraday sparkline
             "is_positive": bool(change_percent >= 0),
             "last_update": datetime.fromtimestamp(data.get("timestamp", 0)).isoformat(),
-            "source": "eodhd_realtime"
+            "source": "eodhd_15min_delay"
         }
     except Exception as e:
         logger.error(f"EODHD error for {symbol}: {e}")
