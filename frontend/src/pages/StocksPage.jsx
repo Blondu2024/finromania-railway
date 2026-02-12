@@ -594,10 +594,10 @@ export default function StocksPage() {
     }
   }, [user, token]);
   
-  // Delay info - BVB data refresh
+  // Delay info - BVB data refresh (EODHD 15min delay plan)
   const delayInfo = isPro
-    ? { text: 'Update 15s', color: 'bg-green-500', description: 'Date BVB actualizate la 15 secunde (PRO)', refresh: 15000 }
-    : { text: 'Update 60s', color: 'bg-yellow-500', description: 'Date BVB actualizate la 60 secunde (Gratuit)', refresh: 60000 };
+    ? { text: '15min Delay', color: 'bg-blue-500', description: 'Date BVB cu 15 minute întârziere (PRO)', refresh: 30000 }
+    : { text: '15min Delay', color: 'bg-yellow-500', description: 'Date BVB cu 15 minute întârziere', refresh: 60000 };
 
   const fetchAllData = async () => {
     try {
