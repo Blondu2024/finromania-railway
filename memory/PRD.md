@@ -5,7 +5,7 @@ FinRomania 2.0 is a comprehensive financial platform for the Romanian market, pr
 
 ## Original Problem Statement
 Build a professional financial platform that:
-1. Provides LIVE market data from BVB (Bucharest Stock Exchange) and global markets
+1. Provides market data from BVB (Bucharest Stock Exchange) and global markets
 2. Offers a fiscal calculator for tax optimization (PF vs. SRL)
 3. Implements a PRO subscription model with Stripe
 4. Features an AI advisor with usage limits
@@ -19,9 +19,15 @@ Build a professional financial platform that:
 - **Auth**: Firebase Authentication
 - **Payments**: Stripe (LIVE keys configured)
 - **Data Sources**: 
-  - EODHD API ($100/month) - Real-time US indices
+  - EODHD API (EOD+Intraday $29.99/month) - **15 minute delayed** data
   - yfinance - Crypto, commodities, forex
   - BVB scraper/mock data
+
+## Data Delay Information
+**IMPORTANT**: EODHD plan changed from $100 All-In-One to $29.99 EOD+Intraday
+- All market data has **15 minute delay** (not real-time)
+- UI badges updated to show "15min Delay"
+- Auto-refresh intervals optimized (60s for global, 30-60s for BVB)
 
 ## Core Features
 
@@ -29,7 +35,7 @@ Build a professional financial platform that:
 - [x] Homepage with navigation and feature showcase
 - [x] Global Markets Page (/global) with live heatmap, sentiment gauge, market status
 - [x] BVB Stocks Page (/stocks) with Market Pulse, indices, heatmap, stock table
-- [x] Ticker Bar with auto-refresh (10s)
+- [x] Ticker Bar with auto-refresh (30s)
 - [x] User authentication (Firebase)
 - [x] PRO subscription with Stripe (monthly/annual)
 - [x] Admin Dashboard with user management
@@ -37,12 +43,11 @@ Build a professional financial platform that:
 - [x] Fiscal Calculator (PRO feature)
 - [x] SEO optimization (sitemap, robots.txt, meta tags)
 
-### P0 - LIVE Data Fix (COMPLETED - Feb 5, 2026)
-- [x] Removed frontend caching that prevented live data display
-- [x] Added cache-busting timestamps to all fetch requests
-- [x] Added no-cache headers to all live data APIs
-- [x] Auto-refresh working at configured intervals
-- [x] All 17 backend tests passing (100%)
+### Completed Updates (Feb 12, 2026)
+- [x] Updated UI to show "15min Delay" instead of "LIVE"
+- [x] Optimized refresh intervals (60s global, 30s ticker)
+- [x] Updated backend comments to reflect $29.99 plan
+- [x] Changed source tag from "eodhd_realtime" to "eodhd_15min_delay"
 
 ### P1 - Pending
 - [ ] Full Quiz System implementation
@@ -54,25 +59,11 @@ Build a professional financial platform that:
 - [ ] PWA improvements
 - [ ] Push notifications
 
-## API Endpoints
-
-### Live Data (with no-cache headers)
-- `GET /api/global/overview` - Complete global market data
-- `GET /api/stocks/bvb` - All BVB stocks
-- `GET /api/stocks/global` - Global indices for ticker
-- `GET /api/bvb/indices` - BVB indices (BET, BETTR, etc.)
-- `GET /api/bvb/top-movers` - Gainers, losers, most traded
-
-### User & Subscription
-- `POST /api/auth/login` - User login
-- `GET /api/subscriptions/status` - Check PRO status
-- `POST /api/stripe/create-checkout-session` - Start payment
-
 ## Data Refresh Intervals
-- Ticker Bar: 10 seconds
-- Global Markets: 10 seconds  
+- Ticker Bar: 30 seconds
+- Global Markets: 60 seconds  
 - BVB (Free): 60 seconds
-- BVB (PRO): 15 seconds
+- BVB (PRO): 30 seconds
 
 ## Test Coverage
 - Backend: 100% (17/17 tests passing)
