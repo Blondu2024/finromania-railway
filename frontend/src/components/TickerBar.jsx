@@ -32,8 +32,8 @@ export default function TickerBar() {
     };
 
     fetchData();
-    // Update la 10 secunde pentru senzație LIVE
-    const interval = setInterval(fetchData, 10000);
+    // Update la 30 secunde - datele EODHD au 15min delay oricum
+    const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);
 
