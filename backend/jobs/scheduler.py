@@ -42,13 +42,22 @@ async def update_global_indices_job():
         logger.error(f"❌ [JOB] Error updating global indices: {e}")
 
 async def fetch_news_job():
-    """Job: Fetch and store news"""
+    """Job: Fetch and store Romanian news"""
     try:
-        logger.info("🔄 [JOB] Starting news fetch...")
+        logger.info("🔄 [JOB] Starting Romanian news fetch...")
         count = await news_service.fetch_and_store_news()
-        logger.info(f"✅ [JOB] News fetched: {count} new articles")
+        logger.info(f"✅ [JOB] Romanian news fetched: {count} new articles")
     except Exception as e:
-        logger.error(f"❌ [JOB] Error fetching news: {e}")
+        logger.error(f"❌ [JOB] Error fetching Romanian news: {e}")
+
+async def fetch_international_news_job():
+    """Job: Fetch and store international news"""
+    try:
+        logger.info("🔄 [JOB] Starting international news fetch...")
+        count = await news_service.fetch_and_store_international_news()
+        logger.info(f"✅ [JOB] International news fetched: {count} new articles")
+    except Exception as e:
+        logger.error(f"❌ [JOB] Error fetching international news: {e}")
 
 async def update_currency_rates_job():
     """Job: Update currency rates"""
