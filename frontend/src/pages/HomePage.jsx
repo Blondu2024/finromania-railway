@@ -464,13 +464,14 @@ export default function HomePage() {
         <div className="grid lg:grid-cols-4 gap-6">
           {/* News - Left side */}
           <div className="lg:col-span-3 space-y-6">
+            {/* News Header */}
             <div className="flex justify-between items-center">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
                   <Newspaper className="w-6 h-6 text-purple-600" />
                   Ultimele Știri Financiare
                 </h2>
-                <p className="text-muted-foreground mt-1">Actualizate automat din surse românești</p>
+                <p className="text-muted-foreground mt-1">Știri din România și surse internaționale</p>
               </div>
               <Link to="/news">
                 <Button variant="ghost" size="sm">
@@ -479,10 +480,31 @@ export default function HomePage() {
               </Link>
             </div>
             
-            <div className="space-y-4">
-              {news.slice(0, 12).map(article => (
-                <NewsCard key={article.id} article={article} />
-              ))}
+            {/* News Grid - 2 columns */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Romanian News Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <span className="text-lg">🇷🇴</span>
+                  <h3 className="font-semibold">România & BVB</h3>
+                  <Badge variant="secondary" className="text-xs">{news.length}</Badge>
+                </div>
+                {news.slice(0, 6).map(article => (
+                  <NewsCard key={article.id} article={article} />
+                ))}
+              </div>
+              
+              {/* International News Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <span className="text-lg">🌍</span>
+                  <h3 className="font-semibold">Internațional</h3>
+                  <Badge variant="secondary" className="text-xs">{intlNews.length}</Badge>
+                </div>
+                {intlNews.slice(0, 6).map(article => (
+                  <NewsCard key={article.id} article={article} isInternational />
+                ))}
+              </div>
             </div>
           </div>
 
