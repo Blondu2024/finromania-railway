@@ -294,27 +294,59 @@ async def get_global_indices(response: Response):
 
 @api_router.get("/news", response_model=List[ArticleResponse])
 async def get_news(
-    limit: int = Query(default=20, ge=1, le=100)
+    limit: int = Query(default=20, ge=1, le=100),
+    news_type: str = Query(default="all", enum=["all", "romania", "international"])
 ):
-    """Obține ultimele știri"""
+    """Obține ultimele știri - românești, internaționale sau toate"""
     try:
-        db = await get_database()
-        articles = await db.articles.find(
-            {},
-            {"_id": 0}
-        ).sort("published_at", -1).limit(limit).to_list(limit)
+        articles = await news_service.get_latest_news(limit=limit, news_type=news_type)
         
         if not articles:
             # Dacă nu există date, forțează fetch
-            await news_service.fetch_and_store_news()
-            articles = await db.articles.find(
-                {},
-                {"_id": 0}
-            ).sort("published_at", -1).limit(limit).to_list(limit)
+            if news_type in ['all', 'romania']:
+                await news_service.fetch_and_store_news()
+            if news_type in ['all', 'international']:
+                await news_service.fetch_and_store_international_news()
+            articles = await news_service.get_latest_news(limit=limit, news_type=news_type)
         
         return articles
     except Exception as e:
         logger.error(f"Error getting news: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/news/international", response_model=List[ArticleResponse])
+async def get_international_news(
+    limit: int = Query(default=20, ge=1, le=100)
+):
+    """Obține ultimele știri internaționale (Yahoo, CNBC, Reuters, etc.)"""
+    try:
+        articles = await news_service.get_international_news(limit=limit)
+        
+        if not articles:
+            # Dacă nu există date, forțează fetch
+            await news_service.fetch_and_store_international_news()
+            articles = await news_service.get_international_news(limit=limit)
+        
+        return articles
+    except Exception as e:
+        logger.error(f"Error getting international news: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/news/romania", response_model=List[ArticleResponse])
+async def get_romanian_news(
+    limit: int = Query(default=20, ge=1, le=100)
+):
+    """Obține ultimele știri românești (BVB, economie RO)"""
+    try:
+        articles = await news_service.get_latest_news(limit=limit, news_type='romania')
+        
+        if not articles:
+            await news_service.fetch_and_store_news()
+            articles = await news_service.get_latest_news(limit=limit, news_type='romania')
+        
+        return articles
+    except Exception as e:
+        logger.error(f"Error getting Romanian news: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # ============================================
