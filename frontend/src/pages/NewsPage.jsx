@@ -13,8 +13,9 @@ function NewsCard({ article, isInternational }) {
   const publishedDate = new Date(article.published_at);
   const timeAgo = getTimeAgo(publishedDate, isInternational);
   
+  // Toate știrile se deschid pe platformă
   return (
-    <a href={article.url} target="_blank" rel="noopener noreferrer">
+    <Link to={`/news/${article.id}`}>
       <Card className="hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer">
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row">
@@ -57,7 +58,7 @@ function NewsCard({ article, isInternational }) {
           </div>
         </CardContent>
       </Card>
-    </a>
+    </Link>
   );
 }
 
