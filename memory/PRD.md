@@ -45,6 +45,9 @@ Build a professional financial platform that:
 - [x] Surse internaționale adăugate: Yahoo Finance, CNBC, Reuters, Bloomberg, MarketWatch, Financial Times, Investing.com
 - [x] **UI Update** - Badge "Live" în loc de "15min Delay"
 - [x] Scheduler actualizat pentru știri internaționale (every 15 min)
+- [x] **HomePage actualizată** - arată 2 coloane de știri (România + Internațional)
+- [x] **Articole se deschid pe platformă** - nu mai redirecționează pe site-urile externe
+- [x] Sursa originală afișată în josul fiecărui articol cu link către sursa externă
 
 ### P1 - Pending
 - [ ] Full Quiz System implementation
