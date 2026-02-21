@@ -184,6 +184,7 @@ export default function HomePage() {
   const [bvbStocks, setBvbStocks] = useState([]);
   const [globalIndices, setGlobalIndices] = useState([]);
   const [news, setNews] = useState([]);
+  const [intlNews, setIntlNews] = useState([]);
   const [currencies, setCurrencies] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -191,23 +192,26 @@ export default function HomePage() {
   const fetchData = useCallback(async () => {
     try {
       // NO CACHE - fetch direct pentru date LIVE!
-      const [bvbRes, globalRes, newsRes, currRes] = await Promise.all([
+      const [bvbRes, globalRes, newsRes, intlNewsRes, currRes] = await Promise.all([
         fetch(`${API_URL}/api/stocks/bvb`),
         fetch(`${API_URL}/api/stocks/global`),
-        fetch(`${API_URL}/api/news?limit=12`),
+        fetch(`${API_URL}/api/news/romania?limit=6`),
+        fetch(`${API_URL}/api/news/international?limit=6`),
         fetch(`${API_URL}/api/currencies`)
       ]);
       
-      const [bvb, global, newsData, curr] = await Promise.all([
+      const [bvb, global, newsData, intlNewsData, curr] = await Promise.all([
         bvbRes.json(),
         globalRes.json(),
         newsRes.json(),
+        intlNewsRes.json(),
         currRes.json()
       ]);
       
       setBvbStocks(bvb);
       setGlobalIndices(global);
-      setNews(newsData);
+      setNews(Array.isArray(newsData) ? newsData : []);
+      setIntlNews(Array.isArray(intlNewsData) ? intlNewsData : []);
       setCurrencies(curr);
       console.log('[HomePage] Fetched LIVE data');
     } catch (error) {
