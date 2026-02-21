@@ -84,10 +84,44 @@ class NewsService:
             logger.error(f"Error fetching international news: {e}")
             return 0
     
-    async def get_latest_news(self, limit: int = 20) -> List[Dict]:
-        """Obține ultimele știri din DB"""
+    async def get_latest_news(self, limit: int = 20, news_type: str = 'all') -> List[Dict]:
+        """Obține ultimele știri din DB
+        
+        Args:
+            limit: numărul maxim de știri
+            news_type: 'romania', 'international', sau 'all'
+        """
         db = await get_database()
-        cursor = db.articles.find(
+        
+        if news_type == 'international':
+            cursor = db.articles_international.find(
+                {},
+                {"_id": 0}
+            ).sort('published_at', -1).limit(limit)
+            return await cursor.to_list(length=limit)
+        elif news_type == 'romania':
+            cursor = db.articles.find(
+                {},
+                {"_id": 0}
+            ).sort('published_at', -1).limit(limit)
+            return await cursor.to_list(length=limit)
+        else:
+            # Get both and merge
+            ro_cursor = db.articles.find({}, {"_id": 0}).sort('published_at', -1).limit(limit // 2)
+            intl_cursor = db.articles_international.find({}, {"_id": 0}).sort('published_at', -1).limit(limit // 2)
+            
+            ro_articles = await ro_cursor.to_list(length=limit // 2)
+            intl_articles = await intl_cursor.to_list(length=limit // 2)
+            
+            # Merge and sort by date
+            all_articles = ro_articles + intl_articles
+            all_articles.sort(key=lambda x: x.get('published_at', ''), reverse=True)
+            return all_articles[:limit]
+    
+    async def get_international_news(self, limit: int = 20) -> List[Dict]:
+        """Obține ultimele știri internaționale"""
+        db = await get_database()
+        cursor = db.articles_international.find(
             {},
             {"_id": 0}
         ).sort('published_at', -1).limit(limit)
