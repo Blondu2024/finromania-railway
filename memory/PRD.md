@@ -48,6 +48,8 @@ Build a professional financial platform that:
 - [x] **HomePage actualizată** - arată 2 coloane de știri (România + Internațional)
 - [x] **Articole se deschid pe platformă** - nu mai redirecționează pe site-urile externe
 - [x] Sursa originală afișată în josul fiecărui articol cu link către sursa externă
+- [x] **Scraping pentru articole internaționale** - conținut complet extras de la CNBC, Yahoo Finance, etc.
+- [x] Configurații de scraping pentru: CNBC, Yahoo Finance, Reuters, Bloomberg, MarketWatch, Investing.com, Financial Times
 
 ### P1 - Pending
 - [ ] Full Quiz System implementation
