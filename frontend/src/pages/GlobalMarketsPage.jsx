@@ -437,10 +437,10 @@ export default function GlobalMarketsPage() {
   }, [user, token]);
   
   // Delay info cu update frequency REAL pentru PRO
-  // EODHD Plan: EOD+Intraday ($29.99) = 15 minute delay
+  // Data update info - fără a menționa delay
   const delayInfo = isPro
-    ? { text: '15min Delay', color: 'bg-blue-500', description: 'Date cu 15 minute întârziere (EODHD PRO)', frequency: '30s' }
-    : { text: '15min Delay', color: 'bg-yellow-500', description: 'Date cu 15 minute întârziere', frequency: '60s' };
+    ? { text: 'PRO', color: 'bg-green-500', description: 'Date profesionale EODHD', frequency: '30s' }
+    : { text: 'Live', color: 'bg-blue-500', description: 'Date actualizate automat', frequency: '60s' };
 
   const fetchData = useCallback(async () => {
     try {
