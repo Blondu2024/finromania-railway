@@ -48,6 +48,42 @@ class ArticleScraper:
             'content_selector': 'div.article-content, div.entry-content, article .content',
             'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement'],
             'image_selector': 'article img, meta[property="og:image"]'
+        },
+        # ===== INTERNATIONAL SOURCES =====
+        'cnbc.com': {
+            'content_selector': 'div.ArticleBody-articleBody, .ArticleBody, article .group, [data-module="ArticleBody"]',
+            'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement', '.RelatedContent', '.InlineVideo', '.Promo'],
+            'image_selector': 'meta[property="og:image"], .InlineImage img'
+        },
+        'finance.yahoo.com': {
+            'content_selector': 'div.caas-body, .article-body, article .body, [data-test="article-body"]',
+            'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement', '.caas-da', '.related'],
+            'image_selector': 'meta[property="og:image"], .caas-img img'
+        },
+        'reuters.com': {
+            'content_selector': 'div.article-body, article .body, [data-testid="article-body"]',
+            'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement', '.related-articles'],
+            'image_selector': 'meta[property="og:image"], .article-image img'
+        },
+        'bloomberg.com': {
+            'content_selector': 'div.body-content, article .body, .article-body',
+            'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement', '.paywall'],
+            'image_selector': 'meta[property="og:image"]'
+        },
+        'marketwatch.com': {
+            'content_selector': 'div.article__body, .article-wrap, article .content',
+            'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement', '.related'],
+            'image_selector': 'meta[property="og:image"], .article__figure img'
+        },
+        'investing.com': {
+            'content_selector': 'div.articlePage, article .WYSIWYG, .article-content',
+            'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement', '.relatedArticles'],
+            'image_selector': 'meta[property="og:image"], .articlePage img'
+        },
+        'ft.com': {
+            'content_selector': 'div.article-body, article .body, .article__content-body',
+            'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement', '.o-ads'],
+            'image_selector': 'meta[property="og:image"]'
         }
     }
     
