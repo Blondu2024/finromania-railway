@@ -4,16 +4,18 @@ import logging
 from datetime import datetime
 import uuid
 from apis.romanian_rss_client import romanian_rss_client
+from apis.international_rss_client import international_rss_client
 from apis.article_scraper import article_scraper
 from config.database import get_database
 
 logger = logging.getLogger(__name__)
 
 class NewsService:
-    """Service pentru știri din surse românești"""
+    """Service pentru știri din surse românești și internaționale"""
     
     def __init__(self):
-        self.rss_client = romanian_rss_client
+        self.ro_rss_client = romanian_rss_client
+        self.intl_rss_client = international_rss_client
         self.scraper = article_scraper
     
     async def fetch_and_store_news(self) -> int:
@@ -22,7 +24,7 @@ class NewsService:
             logger.info("🔄 Fetching Romanian news from RSS sources...")
             
             # Get news from Romanian RSS sources
-            articles = self.rss_client.fetch_all_news(limit_per_source=15)
+            articles = self.ro_rss_client.fetch_all_news(limit_per_source=15)
             
             if not articles:
                 logger.warning("No Romanian news fetched")
@@ -38,6 +40,7 @@ class NewsService:
                 if not existing:
                     article['created_at'] = datetime.utcnow().isoformat()
                     article['full_content_scraped'] = False
+                    article['news_type'] = 'romania'  # Tag for Romanian news
                     await db.articles.insert_one(article)
                     count += 1
             
@@ -46,6 +49,39 @@ class NewsService:
             
         except Exception as e:
             logger.error(f"Error fetching Romanian news: {e}")
+            return 0
+    
+    async def fetch_and_store_international_news(self) -> int:
+        """Fetch știri internaționale și salvează în DB"""
+        try:
+            logger.info("🔄 Fetching International news from RSS sources...")
+            
+            # Get news from international RSS sources
+            articles = self.intl_rss_client.fetch_all_news(limit_per_source=10)
+            
+            if not articles:
+                logger.warning("No international news fetched")
+                return 0
+            
+            db = await get_database()
+            count = 0
+            
+            for article in articles:
+                # Check dacă există deja (by URL)
+                existing = await db.articles_international.find_one({'url': article['url']})
+                
+                if not existing:
+                    article['created_at'] = datetime.utcnow().isoformat()
+                    article['full_content_scraped'] = False
+                    article['news_type'] = 'international'
+                    await db.articles_international.insert_one(article)
+                    count += 1
+            
+            logger.info(f"✅ Stored {count} new international articles")
+            return count
+            
+        except Exception as e:
+            logger.error(f"Error fetching international news: {e}")
             return 0
     
     async def get_latest_news(self, limit: int = 20) -> List[Dict]:
