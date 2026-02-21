@@ -19,15 +19,12 @@ Build a professional financial platform that:
 - **Auth**: Firebase Authentication
 - **Payments**: Stripe (LIVE keys configured)
 - **Data Sources**: 
-  - EODHD API (EOD+Intraday $29.99/month) - **15 minute delayed** data
+  - EODHD API (EOD+Intraday $29.99/month)
   - yfinance - Crypto, commodities, forex
   - BVB scraper/mock data
-
-## Data Delay Information
-**IMPORTANT**: EODHD plan changed from $100 All-In-One to $29.99 EOD+Intraday
-- All market data has **15 minute delay** (not real-time)
-- UI badges updated to show "15min Delay"
-- Auto-refresh intervals optimized (60s for global, 30-60s for BVB)
+- **News Sources**:
+  - Romanian: ZF, Profit.ro, Capital, Economica
+  - International: Yahoo Finance, CNBC, Reuters, Bloomberg, MarketWatch, Financial Times, Investing.com
 
 ## Core Features
 
@@ -43,11 +40,11 @@ Build a professional financial platform that:
 - [x] Fiscal Calculator (PRO feature)
 - [x] SEO optimization (sitemap, robots.txt, meta tags)
 
-### Completed Updates (Feb 12, 2026)
-- [x] Updated UI to show "15min Delay" instead of "LIVE"
-- [x] Optimized refresh intervals (60s global, 30s ticker)
-- [x] Updated backend comments to reflect $29.99 plan
-- [x] Changed source tag from "eodhd_realtime" to "eodhd_15min_delay"
+### Completed Updates (Feb 21, 2026)
+- [x] **News System cu 2 taburi** - România & BVB + Internațional
+- [x] Surse internaționale adăugate: Yahoo Finance, CNBC, Reuters, Bloomberg, MarketWatch, Financial Times, Investing.com
+- [x] **UI Update** - Badge "Live" în loc de "15min Delay"
+- [x] Scheduler actualizat pentru știri internaționale (every 15 min)
 
 ### P1 - Pending
 - [ ] Full Quiz System implementation
@@ -59,19 +56,30 @@ Build a professional financial platform that:
 - [ ] PWA improvements
 - [ ] Push notifications
 
+## API Endpoints
+
+### News
+- `GET /api/news?news_type=all|romania|international` - Știri combinate sau separate
+- `GET /api/news/romania` - Știri românești (ZF, Profit.ro, etc.)
+- `GET /api/news/international` - Știri internaționale (Yahoo, CNBC, Reuters, etc.)
+
+### Market Data
+- `GET /api/global/overview` - Complete global market data
+- `GET /api/stocks/bvb` - All BVB stocks
+- `GET /api/stocks/global` - Global indices for ticker
+- `GET /api/bvb/indices` - BVB indices (BET, BETTR, etc.)
+
 ## Data Refresh Intervals
 - Ticker Bar: 30 seconds
 - Global Markets: 60 seconds  
-- BVB (Free): 60 seconds
-- BVB (PRO): 30 seconds
+- BVB: 60 seconds (FREE) / 30 seconds (PRO)
+- News: 15 minutes
 
-## Test Coverage
-- Backend: 100% (17/17 tests passing)
-- Test file: `/app/backend/tests/test_live_data_cache.py`
-- Latest report: `/app/test_reports/iteration_6.json`
-
-## Known Issues
-None critical. All P0 issues resolved.
+## Files Created/Modified
+- `/app/backend/apis/international_rss_client.py` - NEW: Client RSS internațional
+- `/app/backend/services/news_service.py` - MODIFIED: Suport pentru știri internaționale
+- `/app/backend/jobs/scheduler.py` - MODIFIED: Job nou pentru știri internaționale
+- `/app/frontend/src/pages/NewsPage.jsx` - MODIFIED: UI cu 2 taburi
 
 ## Contact
 Platform URL: https://financero.preview.emergentagent.com
