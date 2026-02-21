@@ -51,7 +51,7 @@ const StockCard = memo(function StockCard({ stock, type = 'bvb' }) {
 });
 
 // Memoized News Card
-const NewsCard = memo(function NewsCard({ article }) {
+const NewsCard = memo(function NewsCard({ article, isInternational }) {
   return (
     <Link to={`/news/${article.id}`}>
       <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
@@ -71,8 +71,9 @@ const NewsCard = memo(function NewsCard({ article }) {
               <p className="text-sm text-muted-foreground line-clamp-2">{article.description}</p>
               <div className="flex items-center mt-2 text-xs text-muted-foreground">
                 <span>{article.source?.name}</span>
+                {isInternational && <Badge variant="outline" className="ml-2 text-xs py-0">EN</Badge>}
                 <span className="mx-2">•</span>
-                <span>{new Date(article.published_at).toLocaleDateString('ro-RO')}</span>
+                <span>{new Date(article.published_at).toLocaleDateString(isInternational ? 'en-US' : 'ro-RO')}</span>
               </div>
             </div>
           </div>
