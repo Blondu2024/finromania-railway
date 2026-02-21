@@ -144,8 +144,8 @@ class NewsService:
         if not article:
             return None
         
-        # Dacă nu avem conținutul complet, facem scraping (doar pentru românești)
-        if collection_name == 'articles' and not article.get('full_content_scraped') and article.get('url'):
+        # Scraping pentru conținut complet (pentru TOATE articolele)
+        if not article.get('full_content_scraped') and article.get('url'):
             try:
                 logger.info(f"Scraping full content for article: {article_id}")
                 scraped_data = self.scraper.scrape_article(article['url'])
@@ -162,7 +162,9 @@ class NewsService:
                     if not article.get('image_url') and scraped_data.get('image_url'):
                         update_data['image_url'] = scraped_data['image_url']
                     
-                    await db.articles.update_one(
+                    # Update în colecția corectă
+                    target_collection = db.articles if collection_name == 'articles' else db.articles_international
+                    await target_collection.update_one(
                         {'id': article_id},
                         {'$set': update_data}
                     )
@@ -176,7 +178,8 @@ class NewsService:
                     logger.info(f"✅ Successfully scraped full content for: {article_id}")
                 else:
                     # Marcăm că am încercat să facem scraping
-                    await db.articles.update_one(
+                    target_collection = db.articles if collection_name == 'articles' else db.articles_international
+                    await target_collection.update_one(
                         {'id': article_id},
                         {'$set': {'full_content_scraped': True, 'scrape_failed': True}}
                     )
