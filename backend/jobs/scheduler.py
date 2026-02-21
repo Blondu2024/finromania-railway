@@ -92,16 +92,25 @@ def start_scheduler():
             replace_existing=True
         )
         
-        # Job 3: Fetch news (every 15 minutes)
+        # Job 3: Fetch Romanian news (every 15 minutes)
         scheduler.add_job(
             fetch_news_job,
             trigger=IntervalTrigger(minutes=settings.SCRAPING_INTERVAL_MINUTES),
             id='fetch_news',
-            name='Fetch News',
+            name='Fetch Romanian News',
             replace_existing=True
         )
         
-        # Job 4: Update currency rates (every 1 hour)
+        # Job 4: Fetch International news (every 15 minutes)
+        scheduler.add_job(
+            fetch_international_news_job,
+            trigger=IntervalTrigger(minutes=settings.SCRAPING_INTERVAL_MINUTES),
+            id='fetch_international_news',
+            name='Fetch International News',
+            replace_existing=True
+        )
+        
+        # Job 5: Update currency rates (every 1 hour)
         scheduler.add_job(
             update_currency_rates_job,
             trigger=IntervalTrigger(hours=settings.CURRENCY_UPDATE_INTERVAL_HOURS),
@@ -115,13 +124,15 @@ def start_scheduler():
         logger.info("✅ Scheduler started with all jobs!")
         logger.info(f"   • BVB stocks: every {settings.STOCK_UPDATE_INTERVAL_MINUTES} min")
         logger.info(f"   • Global indices: every {settings.STOCK_UPDATE_INTERVAL_MINUTES} min")
-        logger.info(f"   • News: every {settings.SCRAPING_INTERVAL_MINUTES} min")
+        logger.info(f"   • Romanian news: every {settings.SCRAPING_INTERVAL_MINUTES} min")
+        logger.info(f"   • International news: every {settings.SCRAPING_INTERVAL_MINUTES} min")
         logger.info(f"   • Currency rates: every {settings.CURRENCY_UPDATE_INTERVAL_HOURS} hour")
         
         # Run all jobs once immediately
         asyncio.create_task(update_bvb_stocks_job())
         asyncio.create_task(update_global_indices_job())
         asyncio.create_task(fetch_news_job())
+        asyncio.create_task(fetch_international_news_job())
         asyncio.create_task(update_currency_rates_job())
         
     except Exception as e:
