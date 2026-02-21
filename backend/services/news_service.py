@@ -129,15 +129,23 @@ class NewsService:
         return await cursor.to_list(length=limit)
     
     async def get_article_by_id(self, article_id: str) -> Optional[Dict]:
-        """Obține un articol specific și extrage conținutul complet dacă nu există"""
+        """Obține un articol specific (românesc sau internațional)"""
         db = await get_database()
+        
+        # Caută în articole românești
         article = await db.articles.find_one({'id': article_id}, {"_id": 0})
+        collection_name = 'articles'
+        
+        # Dacă nu găsim, căutăm în articole internaționale
+        if not article:
+            article = await db.articles_international.find_one({'id': article_id}, {"_id": 0})
+            collection_name = 'articles_international'
         
         if not article:
             return None
         
-        # Dacă nu avem conținutul complet, facem scraping
-        if not article.get('full_content_scraped') and article.get('url'):
+        # Dacă nu avem conținutul complet, facem scraping (doar pentru românești)
+        if collection_name == 'articles' and not article.get('full_content_scraped') and article.get('url'):
             try:
                 logger.info(f"Scraping full content for article: {article_id}")
                 scraped_data = self.scraper.scrape_article(article['url'])
