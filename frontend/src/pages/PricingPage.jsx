@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
+import EarlyAdopterBanner from '../components/EarlyAdopterBanner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
