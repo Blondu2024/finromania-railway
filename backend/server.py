@@ -190,6 +190,43 @@ async def health_check():
     return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
 
 # ============================================
+# FEEDBACK ENDPOINT (BETA)
+# ============================================
+
+class FeedbackRequest(BaseModel):
+    type: str  # bug, idea, question
+    message: str
+    email: str = "anonim"
+    page: str = "/"
+    timestamp: str = None
+    userAgent: str = None
+
+@api_router.post("/feedback")
+async def submit_feedback(feedback: FeedbackRequest):
+    """Primește feedback de la utilizatori pentru versiunea BETA"""
+    try:
+        db = await get_database()
+        
+        feedback_doc = {
+            "type": feedback.type,
+            "message": feedback.message,
+            "email": feedback.email,
+            "page": feedback.page,
+            "timestamp": feedback.timestamp or datetime.now(timezone.utc).isoformat(),
+            "user_agent": feedback.userAgent,
+            "status": "new",  # new, reviewed, resolved
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.feedback.insert_one(feedback_doc)
+        logger.info(f"📝 New BETA feedback received: {feedback.type} from {feedback.email}")
+        
+        return {"success": True, "message": "Feedback primit! Mulțumim!"}
+    except Exception as e:
+        logger.error(f"Error saving feedback: {e}")
+        raise HTTPException(status_code=500, detail="Eroare la salvarea feedback-ului")
+
+# ============================================
 # STOCKS - BVB (Romania)
 # ============================================
 
