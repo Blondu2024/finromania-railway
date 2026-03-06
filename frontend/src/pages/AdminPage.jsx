@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Crown, Users, TrendingUp } from 'lucide-react';
+import { Shield, Crown, Users, TrendingUp, MessageSquare, Bug, Lightbulb, HelpCircle, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -18,11 +18,17 @@ export default function AdminPage() {
   const [subLevel, setSubLevel] = useState('pro');
   const [days, setDays] = useState(30);
   const [loading, setLoading] = useState(false);
+  
+  // Feedback state
+  const [activeTab, setActiveTab] = useState('users'); // users | feedback
+  const [feedback, setFeedback] = useState([]);
+  const [feedbackFilter, setFeedbackFilter] = useState({ status: '', type: '' });
 
   useEffect(() => {
     if (user && token && user.is_admin) {
       fetchStats();
       fetchUsers();
+      fetchFeedback();
     }
   }, [user, token]);
 
@@ -53,6 +59,56 @@ export default function AdminPage() {
       console.error(err);
     }
   };
+  
+  const fetchFeedback = async () => {
+    try {
+      let url = `${API_URL}/api/admin/feedback`;
+      const params = new URLSearchParams();
+      if (feedbackFilter.status) params.append('status', feedbackFilter.status);
+      if (feedbackFilter.type) params.append('feedback_type', feedbackFilter.type);
+      if (params.toString()) url += `?${params.toString()}`;
+      
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFeedback(data.feedback || []);
+      }
+    } catch (err) {
+      console.error('Error fetching feedback:', err);
+    }
+  };
+  
+  const updateFeedbackStatus = async (feedbackId, newStatus) => {
+    try {
+      const res = await fetch(`${API_URL}/api/admin/feedback/${feedbackId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      
+      if (res.ok) {
+        fetchFeedback();
+        fetchStats();
+      } else {
+        const err = await res.json();
+        alert(`❌ Eroare: ${err.detail}`);
+      }
+    } catch (err) {
+      alert(`❌ Eroare: ${err.message}`);
+    }
+  };
+  
+  // Re-fetch feedback when filter changes
+  useEffect(() => {
+    if (user && token && user.is_admin && activeTab === 'feedback') {
+      fetchFeedback();
+    }
+  }, [feedbackFilter, activeTab]);
 
   const handleSetSubscription = async (e) => {
     e.preventDefault();
@@ -177,10 +233,49 @@ export default function AdminPage() {
                 </div>
               </CardContent>
             </Card>
+            
+            <Card className="cursor-pointer hover:ring-2 hover:ring-orange-400 transition-all" onClick={() => setActiveTab('feedback')}>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="w-8 h-8 text-orange-500" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Feedback BETA</p>
+                    <p className="text-2xl font-bold">{stats.total_feedback || 0}</p>
+                    <p className="text-xs text-orange-600">{stats.new_feedback || 0} noi</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
-        {/* Set Subscription Form */}
+        {/* Tabs Navigation */}
+        <div className="flex gap-2 border-b pb-2">
+          <Button
+            variant={activeTab === 'users' ? 'default' : 'ghost'}
+            onClick={() => setActiveTab('users')}
+            data-testid="admin-tab-users"
+          >
+            <Users className="w-4 h-4 mr-2" />
+            Utilizatori
+          </Button>
+          <Button
+            variant={activeTab === 'feedback' ? 'default' : 'ghost'}
+            onClick={() => setActiveTab('feedback')}
+            data-testid="admin-tab-feedback"
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Feedback BETA
+            {stats?.new_feedback > 0 && (
+              <Badge className="ml-2 bg-orange-500 text-white">{stats.new_feedback}</Badge>
+            )}
+          </Button>
+        </div>
+
+        {/* Tab Content: Users */}
+        {activeTab === 'users' && (
+          <>
+            {/* Set Subscription Form */}
         <Card>
           <CardHeader>
             <CardTitle>Setează Subscription pentru User</CardTitle>
@@ -356,6 +451,157 @@ export default function AdminPage() {
             </div>
           </CardContent>
         </Card>
+          </>
+        )}
+
+        {/* Tab Content: Feedback */}
+        {activeTab === 'feedback' && (
+          <Card data-testid="feedback-management-section">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
+                Gestionare Feedback BETA ({feedback.length})
+              </CardTitle>
+              
+              {/* Filters */}
+              <div className="flex flex-wrap gap-4 mt-4">
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm">Status:</Label>
+                  <select
+                    value={feedbackFilter.status}
+                    onChange={(e) => setFeedbackFilter(prev => ({ ...prev, status: e.target.value }))}
+                    className="p-2 border rounded-md text-sm"
+                    data-testid="feedback-filter-status"
+                  >
+                    <option value="">Toate</option>
+                    <option value="new">🔴 Nou</option>
+                    <option value="in_progress">🟡 În Lucru</option>
+                    <option value="resolved">🟢 Rezolvat</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm">Tip:</Label>
+                  <select
+                    value={feedbackFilter.type}
+                    onChange={(e) => setFeedbackFilter(prev => ({ ...prev, type: e.target.value }))}
+                    className="p-2 border rounded-md text-sm"
+                    data-testid="feedback-filter-type"
+                  >
+                    <option value="">Toate</option>
+                    <option value="bug">🐛 Bug</option>
+                    <option value="idea">💡 Idee</option>
+                    <option value="question">❓ Întrebare</option>
+                  </select>
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent>
+              {feedback.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>Nu există feedback încă.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {feedback.map((item) => (
+                    <div 
+                      key={item.id} 
+                      className={`p-4 rounded-lg border transition-colors ${
+                        item.status === 'new' ? 'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800' :
+                        item.status === 'in_progress' ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800' :
+                        'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800'
+                      }`}
+                      data-testid={`feedback-item-${item.id}`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          {/* Header row */}
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
+                            {/* Type badge */}
+                            <Badge className={
+                              item.type === 'bug' ? 'bg-red-500' :
+                              item.type === 'idea' ? 'bg-blue-500' :
+                              'bg-gray-500'
+                            }>
+                              {item.type === 'bug' && <Bug className="w-3 h-3 mr-1" />}
+                              {item.type === 'idea' && <Lightbulb className="w-3 h-3 mr-1" />}
+                              {item.type === 'question' && <HelpCircle className="w-3 h-3 mr-1" />}
+                              {item.type === 'bug' ? 'Bug' : item.type === 'idea' ? 'Idee' : 'Întrebare'}
+                            </Badge>
+                            
+                            {/* Status badge */}
+                            <Badge variant="outline" className={
+                              item.status === 'new' ? 'border-red-400 text-red-600' :
+                              item.status === 'in_progress' ? 'border-yellow-400 text-yellow-600' :
+                              'border-green-400 text-green-600'
+                            }>
+                              {item.status === 'new' && <AlertCircle className="w-3 h-3 mr-1" />}
+                              {item.status === 'in_progress' && <Clock className="w-3 h-3 mr-1" />}
+                              {item.status === 'resolved' && <CheckCircle className="w-3 h-3 mr-1" />}
+                              {item.status === 'new' ? 'Nou' : item.status === 'in_progress' ? 'În Lucru' : 'Rezolvat'}
+                            </Badge>
+                            
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(item.created_at).toLocaleString('ro-RO')}
+                            </span>
+                          </div>
+                          
+                          {/* Message */}
+                          <p className="text-sm mb-2 whitespace-pre-wrap">{item.message}</p>
+                          
+                          {/* Meta info */}
+                          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                            <span>📧 {item.email}</span>
+                            {item.page && <span>📄 {item.page}</span>}
+                          </div>
+                        </div>
+                        
+                        {/* Action buttons */}
+                        <div className="flex flex-col gap-1">
+                          {item.status !== 'new' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs border-red-300 text-red-600 hover:bg-red-50"
+                              onClick={() => updateFeedbackStatus(item.id, 'new')}
+                              data-testid={`feedback-status-new-${item.id}`}
+                            >
+                              🔴 Nou
+                            </Button>
+                          )}
+                          {item.status !== 'in_progress' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs border-yellow-300 text-yellow-600 hover:bg-yellow-50"
+                              onClick={() => updateFeedbackStatus(item.id, 'in_progress')}
+                              data-testid={`feedback-status-progress-${item.id}`}
+                            >
+                              🟡 În Lucru
+                            </Button>
+                          )}
+                          {item.status !== 'resolved' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs border-green-300 text-green-600 hover:bg-green-50"
+                              onClick={() => updateFeedbackStatus(item.id, 'resolved')}
+                              data-testid={`feedback-status-resolved-${item.id}`}
+                            >
+                              🟢 Rezolvat
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </>
   );

@@ -1,5 +1,5 @@
 """
-Admin Panel - Manage Users & Subscriptions
+Admin Panel - Manage Users & Subscriptions & Feedback
 """
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
@@ -7,6 +7,7 @@ from datetime import datetime, timezone, timedelta
 from typing import List, Optional
 from config.database import get_database
 from routes.auth import require_auth
+from bson import ObjectId
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -126,6 +127,10 @@ async def get_admin_stats(admin: dict = Depends(require_admin)):
     ai_usage = await db.users.aggregate(ai_queries_pipeline).to_list(1)
     total_ai_queries = ai_usage[0]["total_queries"] if ai_usage else 0
     
+    # Feedback stats
+    total_feedback = await db.feedback.count_documents({})
+    new_feedback = await db.feedback.count_documents({"status": "new"})
+    
     return {
         "total_users": total_users,
         "pro_users": pro_users,
@@ -133,5 +138,82 @@ async def get_admin_stats(admin: dict = Depends(require_admin)):
         "recent_signups_7d": recent_signups,
         "active_users_7d": active_users,
         "total_ai_queries": total_ai_queries,
-        "pro_percentage": round((pro_users / total_users * 100) if total_users > 0 else 0, 1)
+        "pro_percentage": round((pro_users / total_users * 100) if total_users > 0 else 0, 1),
+        "total_feedback": total_feedback,
+        "new_feedback": new_feedback
     }
+
+
+# ============================================
+# FEEDBACK MANAGEMENT
+# ============================================
+
+class UpdateFeedbackRequest(BaseModel):
+    status: str  # new, in_progress, resolved
+
+
+@router.get("/feedback")
+async def get_all_feedback(
+    status: Optional[str] = None,
+    feedback_type: Optional[str] = None,
+    admin: dict = Depends(require_admin)
+):
+    """Lista tuturor feedback-urilor cu filtrare opțională"""
+    db = await get_database()
+    
+    # Build query filter
+    query = {}
+    if status:
+        query["status"] = status
+    if feedback_type:
+        query["type"] = feedback_type
+    
+    feedback_items = await db.feedback.find(query).sort("created_at", -1).limit(200).to_list(200)
+    
+    # Convert ObjectId to string for JSON serialization
+    for item in feedback_items:
+        item["id"] = str(item.pop("_id"))
+    
+    return {
+        "feedback": feedback_items,
+        "total": len(feedback_items)
+    }
+
+
+@router.put("/feedback/{feedback_id}")
+async def update_feedback_status(
+    feedback_id: str,
+    request: UpdateFeedbackRequest,
+    admin: dict = Depends(require_admin)
+):
+    """Actualizează statusul unui feedback"""
+    db = await get_database()
+    
+    valid_statuses = ["new", "in_progress", "resolved"]
+    if request.status not in valid_statuses:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Status invalid. Opțiuni: {', '.join(valid_statuses)}"
+        )
+    
+    try:
+        result = await db.feedback.update_one(
+            {"_id": ObjectId(feedback_id)},
+            {
+                "$set": {
+                    "status": request.status,
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_by": admin["email"]
+                }
+            }
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Feedback not found")
+        
+        return {
+            "success": True,
+            "message": f"Feedback actualizat: {request.status}"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"ID invalid: {str(e)}")

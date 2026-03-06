@@ -1,0 +1,169 @@
+<analysis>original_problem_statement:
+The user's vision is to build FinRomania 2.0, a comprehensive financial platform for the Romanian market.
+
+**PRODUCT REQUIREMENTS (Evolved from User's Strategic Plan):**
+1.  **Homepage Layout:** Must be professional, highlighting core offerings like BVB & Global market data, a Fiscal Calculator, and educational resources.
+2.  **News System:** Must include both Romanian news and international news (from sources like Yahoo Finance, CNBC, Reuters). All articles should be viewable *within* the platform, not on external sites. International news should also appear on the homepage.
+3.  **Data Source:** Use the user's **EODHD EOD+Intraday - All World Extended (9.99/month) plan**, which provides data with a 15-minute delay. The UI should reflect this professionally without using negative terms like delay.
+4.  **Early Adopter Program:** The first 100 users to register should receive 3 months of PRO access for free. A public-facing counter showing the remaining slots is required on the Homepage and Pricing page.
+5.  **Expiration Notifications:** Users on the Early Adopter plan should receive in-app notifications 7 days before their free trial expires.
+6.  **SEO & Indexing:** The platform must be optimized for search engines. A dynamic/comprehensive sitemap is needed to ensure all pages (hundreds of stocks, news articles, etc.) are indexed by Google, not just the 8 static pages previously indexed.
+7.  **BETA Version Indicators:** The site should clearly display that it's in a BETA phase, including a disclaimer and an easy way for users to submit feedback (bugs or suggestions).
+8.  **Admin Feedback Dashboard:** The administrator needs a section in the  dashboard to view, manage, and prioritize feedback submitted by users.
+9.  **AI Integration & Monetization:** Implement an AI advisor with a 5 free questions per day model for FREE users and unlimited for PRO.
+10. **Monetization & PRO Features:** Establish a PRO subscription (49 lei/month) using Stripe. Key PRO features include faster data refresh and unlimited AI queries.
+11. **Admin Dashboard:** An admin panel for the user to manage users, view stats, and grant/revoke PRO access.
+
+**User's preferred language**: Romanian. The next agent MUST respond in Romanian.
+
+**what currently exists?**
+The application is a full-stack platform (React, FastAPI, MongoDB) that has addressed its most critical live data issue. The frontend and backend now work in tandem to prevent browser caching, ensuring data freshness according to the user's EODHD plan. The platform has been enhanced with several new features: a dual-source news system (Romanian & International) with on-demand content scraping, a complete Early Adopter program to grant the first 100 users free PRO access, a backend system for subscription expiration notifications, a dynamic sitemap to improve SEO, and prominent BETA indicators with a functional user feedback submission system. Stripe integration for payments and the admin dashboard are also in place.
+
+**Last working item**:
+-   Last item agent was working: The user pointed out that while they can submit feedback, there's no way for the admin to view it. The agent began implementing a **Feedback Management section within the Admin Dashboard**. It has explored the relevant files (, ) but has not yet written the code to create the new UI components or the necessary backend API endpoints to fetch and manage the feedback data.
+-   Status: IN PROGRESS
+-   Agent Testing Done: N
+-   Which testing method agent to use? Both. Create the backend API to list/update feedback, test it with . Then build the frontend component in  and verify with the screenshot tool.
+-   User Testing Done: N
+
+**All Pending/In progress Issue list**:
+-   Issue 1: Implement Admin Dashboard for Feedback Management (P0)
+-   Issue 2: Pages Do Not Load Correctly on Mobile (P1)
+-   Issue 3: Slow Page Load Times (P2)
+
+  **Issues Detail:**
+  - **Issue 1:**
+     - **Description:** Users can submit feedback, but it's only stored in the database. The admin has no UI to view, filter, or manage these submissions. This makes the feedback feature incomplete.
+     - **Next debug checklist:**
+        1.  Create a new API endpoint in  (e.g., ) to securely fetch all feedback submissions from the database.
+        2.  Create another endpoint (e.g., ) to update the status of a feedback item (e.g., New, In Progress, Resolved).
+        3.  In , add a new tab or section for Feedback Management.
+        4.  Create a component to fetch data from the new admin endpoint and display it in a table.
+        5.  Add UI elements (buttons, dropdowns) to the table to allow the admin to change the status of each feedback item.
+     - **Why fix this issue and what will be achieved with the fix?** This will complete the feedback loop, allowing the user (as admin) to act on valuable user input, prioritize bug fixes, and improve the platform.
+     - **Status:**  IN PROGRESS
+     - **Is recurring issue?** N
+     - **Should Test frontend/backend/both after fix?** Both
+     - **Blocked on other issue:** None.
+  - **Issue 2:**
+     - **Description:** An earlier user complaint was that pages don't load correctly on mobile. While fixing the caching issue (Issue #1 from the previous fork) might have helped, this has not been explicitly tested.
+     - **Next debug checklist:**
+        1.  Use the screenshot tool with a mobile viewport for key pages like , , and .
+        2.  Check for layout issues, overflowing content, or components that don't render correctly.
+        3.  Inspect the console logs from the screenshot tool for any mobile-specific JavaScript errors.
+     - **Status:** NOT STARTED
+     - **Is recurring issue?** Y
+     - **Should Test frontend/backend/both after fix?** Frontend
+     - **Blocked on other issue:** None.
+  - **Issue 3:**
+     - **Description:** The user has previously complained about slow page loads. Backend data fetching was optimized with , but a full frontend performance analysis has not been done.
+     - **Status:** NOT STARTED
+     - **Is recurring issue?** Y
+     - **Should Test frontend/backend/both after fix?** Both
+     - **Blocked on other issue:** None.
+
+**In progress Task List**:
+-   **Task 1:  Build Feedback Management UI in Admin Dashboard (P0)**
+     - **Where to resume:** Start by creating the backend API endpoints in  to get and update feedback entries.
+     - **What will be achieved with this?** A fully functional feedback system, from user submission to admin management.
+     - **Status:**  IN PROGRESS
+     - **Should Test frontend/backend/both after fix?** Both
+     - **Blocked on something:** Nothing.
+
+**Upcoming and Future Tasks**
+*   **Upcoming Tasks:**
+    *   **(P1) Implement Full Quiz System:** Build the backend logic and frontend UI for the quiz system to unlock PRO features.
+    *   **(P2) Implement 3 Straturi Portfolio:** Build the functionality for the 3-tiered portfolio strategy.
+*   **Future Tasks:**
+    *   Add Revolut Business as a payment option.
+    *   Allow users to filter news by source (e.g., show only Bloomberg).
+    *   Implement sending expiration notification emails (currently only in-app notifications are built).
+
+**Completed work in this session**
+-   **Live Data/Caching Fix (P0 Resolved):** Solved the critical issue of stale frontend data by implementing backend  headers and frontend cache-busting timestamps. Verified with  and .
+-   **EODHD Plan Adjustment:** Updated the UI and refresh logic to align with the user's new 9.99/month plan (15-min delay). Changed negative delay labels to positive Live labels at the user's request.
+-   **International News Feed:** Implemented a full-stack feature to fetch, store, and display international news from sources like CNBC and Reuters, separate from the existing Romanian news.
+-   **Internal Article Viewing:** Rerouted all news links to open within an  on the platform, rather than linking externally.
+-   **On-Demand Content Scraping:** Implemented a backend web scraper that fetches the full content of international articles on-demand when a user visits the article page, solving the incomplete content issue.
+-   **Early Adopter Program:** Built the complete system to grant the first 100 users 3 months of free PRO access, including a backend mechanism and a frontend banner with a live counter.
+-   **Subscription Expiration Notifications:** Created the backend job and API to generate in-app notifications for users whose trials are expiring. Created the frontend  component placeholder.
+-   **Dynamic SEO Sitemap:** Replaced the static 8-page  with a script-generated one containing over 270 URLs, including all stocks and news articles, and updated  accordingly.
+-   **Beta Feedback System:** Added a BETA badge, a disclaimer banner, and a floating feedback button that opens a modal for users to submit feedback, which is saved to the database.
+
+**Known issue recurrence from previous fork**
+  - **Issue recurrence in previous fork:** Data not being live.
+  - **Recurrence count:** 5+
+  - **Status:** RESOLVED (Root cause was identified as browser caching and fixed with cache-busting headers and query params).
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **Cache Busting:** The core technique used to solve the stale data issue. A combination of backend  headers and frontend unique query parameters () ensures the browser always fetches fresh data for critical APIs.
+-   **On-Demand Scraping:** Instead of scraping all articles in the background, the system now scrapes an article's full content only when a user first requests to view it. The scraped content is then saved to the database to serve subsequent requests instantly.
+-   **Dynamic Sitemap Generation:** A Python script runs to query the database for all relevant content (stocks, news, lessons) and generates a comprehensive static  file, which is crucial for SEO.
+
+**key DB schema**
+  - **users:** 
+  - **articles_romanian:** 
+  - **articles_international:** 
+  - **notifications:** 
+  - **feedback:** 
+
+**All files of reference**
+-   : Needs to be modified to add the feedback management UI.
+-   : Needs to be modified to add the feedback management API endpoints.
+-   : The component that handles feedback submission.
+-   : Main server file where all new routes were registered.
+-   : Displays the early adopter banner and the new two-column news layout.
+-   : Contains the core logic for fetching, storing, and scraping news.
+
+**key api endpoints**
+-   : Returns the status of the early adopter program (slots remaining, etc.).
+-   : Submits user feedback.
+-   : Fetches the latest international news.
+-   : Fetches the detail of a single article (from either Romanian or International collection) and triggers scraping if needed.
+-   : Fetches unread notifications for the logged-in user.
+-   : (NEEDS TO BE CREATED) Fetches all user feedback for the admin dashboard.
+-   : (NEEDS TO BE CREATED) Updates the status of a feedback item.
+
+**Critical Info for New Agent**
+-   **User is Highly Engaged:** The user provides rapid, specific feedback and new feature requests. Be prepared to pivot and implement new ideas quickly.
+-   **EODHD Plan is 15-Min Delay:** The data is NOT real-time. The UI should reflect this professionally. The user prefers positive framing (Live, Professional Data) over negative framing (15min Delay).
+-   **Admin-Facing Features:** The current task is to build a UI for the admin. Remember to secure the corresponding API endpoints to ensure only users with the  role can access them.
+
+**documents and test reports created in this job**
+-   : Test report confirming the live data/caching fix.
+-   : The Product Requirements Document, which was created and updated throughout the session.
+-   : A guide created for the user on how to submit the new sitemap to Google Search Console.
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User:** (Asks to implement the Early Adopter PRO program for the first 100 users). (COMPLETED)
+2.  **User:** (Asks to prepare an expiration email/notification for the free trial). (COMPLETED - in-app system built)
+3.  **User:** (Reports that Google has only indexed 8 pages and asks for a fix). (COMPLETED - dynamic sitemap generated)
+4.  **User:** (Reports the sitemap fix isn't working on the live domain). (COMPLETED - agent switched to a static sitemap generation strategy that will work post-deploy).
+5.  **User:** (Asks to add BETA indicators and a way for users to give feedback). (COMPLETED)
+6.  **User:** (Tests the feedback modal screenshot).
+7.  **User:** (Asks where the submitted feedback goes, pointing out the missing admin view). (PENDING - This initiated the current task).
+8.  **User:** (Wants a section in the Admin Dashboard to manage feedback). (IN PROGRESS - Current task).
+
+**Project Health Check:**
+-   **Healthy:** The project is no longer blocked by the critical data freshness issue. The user is happy with the progress and is actively collaborating on building out new, valuable features.
+
+**3rd Party Integrations**
+*   **EODHD (All-In-One Plan):** API key is in . Used for market data with a 15-minute delay.
+*   **Firebase Authentication:** Primary authentication provider.
+*   **Stripe (Payments):** **LIVE keys** are configured in .
+*   **OpenAI GPT (AI Advisor):** Uses Emergent LLM Key.
+
+**Testing status**
+  - Testing agent used after significant changes: YES (For the caching fix)
+  - Troubleshoot agent used after agent stuck in loop: NO
+  - Test files created: None
+  - Known regressions: None.
+
+**Credentials to test flow:**
+-   **Admin User:**  (Password is unknown, user logs in via Google Auth). Logging in as this user is required to test the Admin Dashboard.
+
+**What agent forgot to execute**
+- The agent has not yet explicitly tested the mobile responsiveness issues after fixing the caching problem, which was a pending issue from the previous handoff. This should be addressed after the current task.</analysis>
