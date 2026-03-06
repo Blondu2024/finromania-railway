@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Skeleton } from './components/ui/skeleton';
 import { initializePushNotifications } from './utils/pushNotifications';
+import NotificationBell, { CriticalNotificationBanner } from './components/NotificationBell';
 import './App.css';
 
 // Initialize Service Worker for Push Notifications
