@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import FeatureCard from '../components/FeatureCard';
 import QuickCalculator from '../components/QuickCalculator';
 import FearGreedIndex from '../components/FearGreedIndex';
+import EarlyAdopterBanner from '../components/EarlyAdopterBanner';
 import { cachedFetch } from '../utils/apiCache';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
