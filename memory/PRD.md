@@ -41,6 +41,14 @@ Build a professional financial platform that:
 - [x] SEO optimization (sitemap, robots.txt, meta tags)
 
 ### Completed Updates (Mar 6, 2026)
+- [x] **Admin Feedback Management Dashboard** ✅ NEW
+  - Tab "Feedback BETA" în Admin Dashboard
+  - Afișare toate feedback-urile cu filtrare (status: new/in_progress/resolved, tip: bug/idea/question)
+  - Butoane pentru schimbarea statusului fiecărui feedback
+  - Backend API: `GET /api/admin/feedback`, `PUT /api/admin/feedback/{id}`
+  - Statistici feedback în cardurile dashboard-ului
+  - Toate endpoint-urile admin protejate cu autentificare
+
 - [x] **Early Adopter Program** - Primii 100 useri primesc PRO gratuit pentru 3 luni
 - [x] Counter live pe Homepage și Pricing: "100/100 locuri disponibile"
 - [x] Auto-upgrade la înregistrare pentru primii 100 useri
@@ -60,6 +68,11 @@ Build a professional financial platform that:
   - robots.txt actualizat pentru Google
   - Structured Data (Schema.org) pentru toate tipurile de pagini
   - Domeniu actualizat la finromania.ro
+- [x] **Beta Feedback System**:
+  - Buton BETA floating în colțul din dreapta jos
+  - Modal pentru trimitere feedback (Bug, Sugestie, Întrebare)
+  - API public: `POST /api/feedback`
+  - Stocare în MongoDB collection "feedback"
 
 ### Completed Updates (Feb 21, 2026)
 - [x] **News System cu 2 taburi** - România & BVB + Internațional
@@ -83,6 +96,16 @@ Build a professional financial platform that:
 - [ ] Push notifications
 
 ## API Endpoints
+
+### Admin
+- `GET /api/admin/feedback` - Lista feedback-uri (admin only)
+- `PUT /api/admin/feedback/{id}` - Actualizează status feedback (admin only)
+- `GET /api/admin/users` - Lista utilizatori (admin only)
+- `GET /api/admin/stats` - Statistici dashboard (admin only)
+- `POST /api/admin/set-subscription` - Setare subscription manual (admin only)
+
+### Feedback
+- `POST /api/feedback` - Trimitere feedback public (bug/idea/question)
 
 ### News
 - `GET /api/news?news_type=all|romania|international` - Știri combinate sau separate
