@@ -57,6 +57,7 @@ from routes.admin import router as admin_router_new
 from routes.bvb_charts import router as bvb_charts_router
 from routes.stripe_payments import router as stripe_payments_router
 from routes.early_adopter import router as early_adopter_router
+from routes.notifications import router as notifications_router
 
 # Configure logging
 logging.basicConfig(
