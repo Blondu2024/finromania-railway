@@ -125,7 +125,12 @@ async def create_session(data: SessionRequest, response: Response):
         else:
             # Create new user
             user_id = f"user_{uuid.uuid4().hex[:12]}"
-            await db.users.insert_one({
+            
+            # Check Early Adopter availability
+            early_adopter_count = await db.users.count_documents({"is_early_adopter": True})
+            is_early_adopter = early_adopter_count < 100  # Primii 100 useri
+            
+            new_user_data = {
                 "user_id": user_id,
                 "email": user_data["email"],
                 "name": user_data["name"],
@@ -133,7 +138,24 @@ async def create_session(data: SessionRequest, response: Response):
                 "is_admin": False,
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "last_login": datetime.now(timezone.utc).isoformat()
-            })
+            }
+            
+            # Auto-activate Early Adopter PRO pentru primii 100 useri
+            if is_early_adopter:
+                slot_number = early_adopter_count + 1
+                expires_at = datetime.now(timezone.utc) + timedelta(days=90)  # 3 luni
+                new_user_data.update({
+                    "is_early_adopter": True,
+                    "early_adopter_slot": slot_number,
+                    "early_adopter_activated_at": datetime.now(timezone.utc).isoformat(),
+                    "subscription_level": "pro",
+                    "subscription_expires_at": expires_at.isoformat(),
+                    "subscription_source": "early_adopter",
+                    "unlocked_levels": ["beginner", "intermediate", "advanced"]
+                })
+                logger.info(f"🎉 New Early Adopter #{slot_number}: {user_data['email']}")
+            
+            await db.users.insert_one(new_user_data)
         
         # Store session
         expires_at = datetime.now(timezone.utc) + timedelta(days=7)
