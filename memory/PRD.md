@@ -47,6 +47,13 @@ Build a professional financial platform that:
 - [x] API endpoints: `/api/early-adopter/status`, `/api/early-adopter/claim`
 - [x] Banner atractiv cu gradient orange/roșu și urgency messages
 - [x] Beneficii afișate: AI nelimitat, toate nivelurile, Calculator Fiscal PRO
+- [x] **Sistem de Notificări pentru Expirare**:
+  - Job zilnic la 9:00 AM verifică expirările
+  - Notificări la 7 zile, 3 zile, 1 zi înainte de expirare
+  - Auto-downgrade la FREE când expiră
+  - NotificationBell în header pentru utilizatori logați
+  - CriticalNotificationBanner pentru alerte urgente
+  - API: `/api/notifications`, `/api/notifications/count`
 
 ### Completed Updates (Feb 21, 2026)
 - [x] **News System cu 2 taburi** - România & BVB + Internațional
