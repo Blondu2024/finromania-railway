@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { Skeleton } from './components/ui/skeleton';
 import { initializePushNotifications } from './utils/pushNotifications';
 import NotificationBell, { CriticalNotificationBanner } from './components/NotificationBell';
+import FeedbackButton, { BetaDisclaimer, BetaBadge } from './components/BetaFeedback';
 import './App.css';
 
 // Initialize Service Worker for Push Notifications
