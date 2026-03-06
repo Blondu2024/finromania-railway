@@ -5,6 +5,9 @@ from typing import List, Dict, Optional
 from datetime import datetime, timezone
 from config.database import get_database
 from routes.auth import require_auth
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/trading-school", tags=["trading_school"])
 
@@ -1586,10 +1589,15 @@ async def get_progress(user: dict = Depends(require_auth)):
         }
     
     completed = progress.get("lessons", {})
-    completed_count = sum(1 for l in completed.values() if l.get("completed"))
+    # Only include lessons that are actually completed (passed = True)
+    completed_lesson_ids = [
+        lesson_id for lesson_id, data in completed.items() 
+        if data.get("completed")
+    ]
+    completed_count = len(completed_lesson_ids)
     
     return {
-        "completed_lessons": list(completed.keys()),
+        "completed_lessons": completed_lesson_ids,
         "total_lessons": len(TRADING_LESSONS),
         "progress_percent": (completed_count / len(TRADING_LESSONS)) * 100,
         "lessons_detail": completed,

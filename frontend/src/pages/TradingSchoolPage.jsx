@@ -10,7 +10,7 @@ import { Link, useNavigate } from 'react-router-dom';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function TradingSchoolPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
   const [lessons, setLessons] = useState([]);
   const [progress, setProgress] = useState(null);
@@ -18,7 +18,7 @@ export default function TradingSchoolPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [user, token]); // Re-fetch when user/token changes
 
   const fetchData = async () => {
     try {
@@ -28,9 +28,11 @@ export default function TradingSchoolPage() {
         setLessons(data.lessons || []);
       }
 
-      if (user) {
+      if (user && token) {
         const progressRes = await fetch(`${API_URL}/api/trading-school/progress`, {
-          credentials: 'include'
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         if (progressRes.ok) {
           const progressData = await progressRes.json();
