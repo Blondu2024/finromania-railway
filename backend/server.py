@@ -577,6 +577,7 @@ app.include_router(stripe_payments_router)  # Already has /api/payments prefix
 app.include_router(admin_router_new)  # Already has /api/admin prefix
 app.include_router(early_adopter_router, prefix="/api")  # Early Adopter Program
 app.include_router(notifications_router, prefix="/api")  # Notifications
+app.include_router(sitemap_router)  # Sitemap & robots.txt (no prefix, at root)
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest
