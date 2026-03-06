@@ -573,6 +573,7 @@ app.include_router(intraday_router, prefix="/api")
 app.include_router(bvb_charts_router)  # Already has /api/bvb prefix
 app.include_router(stripe_payments_router)  # Already has /api/payments prefix
 app.include_router(admin_router_new)  # Already has /api/admin prefix
+app.include_router(early_adopter_router, prefix="/api")  # Early Adopter Program
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest
