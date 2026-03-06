@@ -3,10 +3,12 @@ import asyncio
 import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime
 from services.stock_service import StockService
 from services.news_service import NewsService
 from services.currency_service import CurrencyService
+from services.notification_service import notification_service
 from config.settings import settings
 
 logging.basicConfig(
