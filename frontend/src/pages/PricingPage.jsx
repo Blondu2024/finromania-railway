@@ -120,6 +120,9 @@ export default function PricingPage() {
           </p>
         </div>
 
+        {/* Early Adopter Banner - înainte de a cere bani */}
+        <EarlyAdopterBanner variant="full" />
+
         {/* Current Status */}
         {user && subscriptionStatus && (
           <Card className={isPro ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30' : 'bg-slate-100 dark:bg-slate-800'}>
