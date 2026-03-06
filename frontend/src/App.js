@@ -510,6 +510,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className={`min-h-screen bg-background ${darkMode ? 'dark' : ''}`}>
+          <BetaDisclaimer />
           <CriticalNotificationBanner />
           <Navigation darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
           <Suspense fallback={<TickerLoader />}>
@@ -527,6 +528,8 @@ function App() {
           <Suspense fallback={null}>
             <InteractiveTour />
           </Suspense>
+          {/* Feedback Button - BETA */}
+          <FeedbackButton />
         </div>
       </Router>
     </AuthProvider>
