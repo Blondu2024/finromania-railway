@@ -54,6 +54,12 @@ Build a professional financial platform that:
   - NotificationBell în header pentru utilizatori logați
   - CriticalNotificationBanner pentru alerte urgente
   - API: `/api/notifications`, `/api/notifications/count`
+- [x] **SEO & Sitemap Dinamic**:
+  - Sitemap generat automat: `/api/sitemap.xml` cu 271+ URL-uri
+  - Include: pagini statice, acțiuni BVB, indici globali, știri, lecții
+  - robots.txt actualizat pentru Google
+  - Structured Data (Schema.org) pentru toate tipurile de pagini
+  - Domeniu actualizat la finromania.ro
 
 ### Completed Updates (Feb 21, 2026)
 - [x] **News System cu 2 taburi** - România & BVB + Internațional
