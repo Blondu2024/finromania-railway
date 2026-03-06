@@ -40,6 +40,14 @@ Build a professional financial platform that:
 - [x] Fiscal Calculator (PRO feature)
 - [x] SEO optimization (sitemap, robots.txt, meta tags)
 
+### Completed Updates (Mar 6, 2026)
+- [x] **Early Adopter Program** - Primii 100 useri primesc PRO gratuit pentru 3 luni
+- [x] Counter live pe Homepage și Pricing: "100/100 locuri disponibile"
+- [x] Auto-upgrade la înregistrare pentru primii 100 useri
+- [x] API endpoints: `/api/early-adopter/status`, `/api/early-adopter/claim`
+- [x] Banner atractiv cu gradient orange/roșu și urgency messages
+- [x] Beneficii afișate: AI nelimitat, toate nivelurile, Calculator Fiscal PRO
+
 ### Completed Updates (Feb 21, 2026)
 - [x] **News System cu 2 taburi** - România & BVB + Internațional
 - [x] Surse internaționale adăugate: Yahoo Finance, CNBC, Reuters, Bloomberg, MarketWatch, Financial Times, Investing.com
