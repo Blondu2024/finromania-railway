@@ -508,6 +508,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className={`min-h-screen bg-background ${darkMode ? 'dark' : ''}`}>
+          <CriticalNotificationBanner />
           <Navigation darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
           <Suspense fallback={<TickerLoader />}>
             <TickerBar />
