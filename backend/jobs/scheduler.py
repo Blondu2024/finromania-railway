@@ -73,6 +73,15 @@ async def update_currency_rates_job():
     except Exception as e:
         logger.error(f"❌ [JOB] Error updating currency rates: {e}")
 
+async def check_subscription_expirations_job():
+    """Job: Check Early Adopter subscriptions expiring and send notifications"""
+    try:
+        logger.info("🔄 [JOB] Checking subscription expirations...")
+        results = await notification_service.check_expiring_subscriptions()
+        logger.info(f"✅ [JOB] Expiration check complete: 7d={results['7_days']}, 3d={results['3_days']}, 1d={results['1_day']}, expired={results['expired']}")
+    except Exception as e:
+        logger.error(f"❌ [JOB] Error checking expirations: {e}")
+
 def start_scheduler():
     """Start all scheduled jobs"""
     try:
