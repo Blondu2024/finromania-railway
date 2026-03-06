@@ -212,6 +212,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
         <Link to="/" className="flex items-center space-x-2 mr-4">
           <BarChart3 className="h-6 w-6 text-blue-600" />
           <span className="font-bold text-xl hidden sm:inline">FinRomania</span>
+          <BetaBadge />
         </Link>
         
         {/* Search Bar - Lazy */}
