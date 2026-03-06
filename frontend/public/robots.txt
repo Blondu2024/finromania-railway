@@ -1,11 +1,12 @@
 # FinRomania.ro - Robots.txt
 # Platform financiar pentru România
+# Actualizat: 2026-03-06
 
 User-agent: *
 Allow: /
 
-# Sitemap dinamic (generat automat cu toate paginile)
-Sitemap: https://finromania.ro/api/sitemap.xml
+# Sitemap
+Sitemap: https://finromania.ro/sitemap.xml
 
 # Pagini cu date live - permite crawling frecvent
 Allow: /stocks
@@ -17,13 +18,10 @@ Allow: /calculator-fiscal
 Disallow: /admin
 Disallow: /login
 Disallow: /auth/
-Disallow: /payment-success
-Disallow: /payment-cancel
 
 # Blochează parametrii de tracking
 Disallow: /*?_t=
 Disallow: /*?token=
-Disallow: /*?ref=
 
 # Crawl-delay pentru a nu supraîncărca serverul
 Crawl-delay: 1
