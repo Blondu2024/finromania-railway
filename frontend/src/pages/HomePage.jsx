@@ -258,6 +258,9 @@ export default function HomePage() {
         {/* Hero Section */}
         <HeroSection user={user} />
 
+        {/* Early Adopter Banner - Prominent Position */}
+        <EarlyAdopterBanner variant="full" />
+
         {/* Fear & Greed Index - Prominent Position */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
