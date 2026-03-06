@@ -80,7 +80,7 @@ export const SEO = ({
       "name": "FinRomania",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://financero.preview.emergentagent.com/logo.png"
+        "url": "https://finromania.ro/logo.png"
       }
     },
     "datePublished": publishedTime,
