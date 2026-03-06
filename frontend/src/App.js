@@ -218,6 +218,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
           <Suspense fallback={<SearchLoader />}>
             <SearchBar />
           </Suspense>
+          <NotificationBell />
           <UserMenu />
         </div>
         
