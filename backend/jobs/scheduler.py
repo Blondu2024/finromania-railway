@@ -130,6 +130,15 @@ def start_scheduler():
             replace_existing=True
         )
         
+        # Job 6: Check subscription expirations (daily at 9 AM)
+        scheduler.add_job(
+            check_subscription_expirations_job,
+            trigger=CronTrigger(hour=9, minute=0),  # Rulează zilnic la 9:00
+            id='check_subscription_expirations',
+            name='Check Subscription Expirations',
+            replace_existing=True
+        )
+        
         # Start scheduler
         scheduler.start()
         logger.info("✅ Scheduler started with all jobs!")
@@ -138,6 +147,7 @@ def start_scheduler():
         logger.info(f"   • Romanian news: every {settings.SCRAPING_INTERVAL_MINUTES} min")
         logger.info(f"   • International news: every {settings.SCRAPING_INTERVAL_MINUTES} min")
         logger.info(f"   • Currency rates: every {settings.CURRENCY_UPDATE_INTERVAL_HOURS} hour")
+        logger.info(f"   • Subscription expirations: daily at 9:00 AM")
         
         # Run all jobs once immediately
         asyncio.create_task(update_bvb_stocks_job())
@@ -145,6 +155,7 @@ def start_scheduler():
         asyncio.create_task(fetch_news_job())
         asyncio.create_task(fetch_international_news_job())
         asyncio.create_task(update_currency_rates_job())
+        asyncio.create_task(check_subscription_expirations_job())  # Check on startup too
         
     except Exception as e:
         logger.error(f"Error starting scheduler: {e}")
