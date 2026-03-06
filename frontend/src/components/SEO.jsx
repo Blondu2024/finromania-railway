@@ -4,8 +4,8 @@ export const SEO = ({
   title = 'FinRomania - Platformă Educațională de Trading',
   description = 'Prima platformă educațională de trading din România. Învață trading gratuit cu 17 lecții interactive, date live BVB, AI Advisor, și instrumente profesionale - 100% în română!',
   keywords = 'trading romania, bursa bucuresti, bvb, invatare trading, cursuri trading gratuite, actiuni romanesti, analiza tehnica, investitii romania, educational trading',
-  image = 'https://financero.preview.emergentagent.com/og-image.jpg',
-  url = 'https://financero.preview.emergentagent.com',
+  image = 'https://finromania.ro/og-image.jpg',
+  url = 'https://finromania.ro',
   type = 'website',
   author = 'FinRomania',
   publishedTime,
@@ -23,12 +23,12 @@ export const SEO = ({
     "@type": "WebSite",
     "name": "FinRomania",
     "alternateName": "FinRomania - Educație Financiară Gratuită",
-    "url": "https://financero.preview.emergentagent.com",
+    "url": "https://finromania.ro",
     "description": "Prima platformă din România cu educație financiară gratuită și date live de pe bursă",
     "inLanguage": "ro-RO",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://financero.preview.emergentagent.com/search?q={search_term_string}",
+      "target": "https://finromania.ro/search?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
@@ -38,8 +38,8 @@ export const SEO = ({
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "FinRomania",
-    "url": "https://financero.preview.emergentagent.com",
-    "logo": "https://financero.preview.emergentagent.com/logo.png",
+    "url": "https://finromania.ro",
+    "logo": "https://finromania.ro/logo.png",
     "description": "Platformă de educație financiară și date bursiere pentru România",
     "areaServed": "RO",
     "knowsLanguage": "ro",
