@@ -233,6 +233,89 @@ class EODHDClient:
             logger.error(f"Error searching stocks: {e}")
             return []
     
+    async def get_fundamentals(self, symbol: str) -> Optional[Dict]:
+        """Get fundamental data for a stock (P/E, ROE, EPS, etc.)"""
+        if not self.api_key:
+            return None
+            
+        try:
+            async with httpx.AsyncClient() as client:
+                url = f"{self.BASE_URL}/fundamentals/{symbol}.RO"
+                params = {
+                    "api_token": self.api_key,
+                    "fmt": "json"
+                }
+                
+                response = await client.get(url, params=params, timeout=15)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Extract key fundamental metrics
+                    highlights = data.get("Highlights", {})
+                    valuation = data.get("Valuation", {})
+                    financials = data.get("Financials", {})
+                    balance_sheet = financials.get("Balance_Sheet", {}).get("yearly", {})
+                    
+                    # Get most recent balance sheet data
+                    latest_bs = {}
+                    if balance_sheet:
+                        latest_year = sorted(balance_sheet.keys())[-1] if balance_sheet else None
+                        if latest_year:
+                            latest_bs = balance_sheet.get(latest_year, {})
+                    
+                    # Calculate debt/equity if data available
+                    total_debt = float(latest_bs.get("totalDebt", 0) or 0)
+                    total_equity = float(latest_bs.get("totalStockholderEquity", 0) or 0)
+                    debt_equity = round(total_debt / total_equity, 2) if total_equity > 0 else None
+                    
+                    return {
+                        "symbol": symbol,
+                        "pe_ratio": highlights.get("PERatio"),
+                        "pb_ratio": valuation.get("PriceBookMRQ"),
+                        "ps_ratio": valuation.get("PriceSalesTTM"),
+                        "roe": highlights.get("ReturnOnEquityTTM"),
+                        "roi": highlights.get("ReturnOnAssetsTTM"),
+                        "eps": highlights.get("EarningsShare"),
+                        "eps_growth": highlights.get("QuarterlyEarningsGrowthYOY"),
+                        "revenue_growth": highlights.get("QuarterlyRevenueGrowthYOY"),
+                        "dividend_yield": highlights.get("DividendYield"),
+                        "dividend_share": highlights.get("DividendShare"),
+                        "profit_margin": highlights.get("ProfitMargin"),
+                        "operating_margin": highlights.get("OperatingMarginTTM"),
+                        "debt_equity": debt_equity,
+                        "market_cap": highlights.get("MarketCapitalization"),
+                        "ev": valuation.get("EnterpriseValue"),
+                        "beta": highlights.get("Beta"),
+                        "52_week_high": highlights.get("52WeekHigh"),
+                        "52_week_low": highlights.get("52WeekLow"),
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                else:
+                    logger.error(f"EODHD fundamentals API error for {symbol}: {response.status_code}")
+                    return None
+                    
+        except Exception as e:
+            logger.error(f"Error fetching fundamentals for {symbol}: {e}")
+            return None
+    
+    async def get_all_bvb_fundamentals(self) -> List[Dict]:
+        """Get fundamental data for all BVB stocks"""
+        if not self.api_key:
+            return []
+        
+        fundamentals = []
+        for symbol in self.BVB_STOCKS.keys():
+            data = await self.get_fundamentals(symbol)
+            if data:
+                # Add stock info
+                stock_info = self.BVB_STOCKS.get(symbol, {})
+                data["name"] = stock_info.get("name", symbol)
+                data["sector"] = stock_info.get("sector", "N/A")
+                fundamentals.append(data)
+        
+        return fundamentals
+    
     async def test_connection(self) -> bool:
         """Test if the API key is valid"""
         if not self.api_key:
@@ -242,7 +325,7 @@ class EODHDClient:
             # Test with a simple request
             quote = await self.get_stock_quote("TLV")
             return quote is not None
-        except:
+        except Exception:
             return False
 
 
