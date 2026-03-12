@@ -9,6 +9,7 @@ import AddToWatchlistButton from '../components/AddToWatchlistButton';
 import SocialShare from '../components/SocialShare';
 import AdvancedStockChart from '../components/AdvancedStockChart';
 import ProStockChart from '../components/ProStockChart';
+import AITechnicalAnalysis from '../components/AITechnicalAnalysis';
 import TradingCompanion, { TradingReminder, shouldShowReminder, markReminderShown } from '../components/TradingCompanion';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
@@ -279,6 +280,15 @@ export default function StockDetailPage() {
         isPro={isPro}
         token={token}
       />
+
+      {/* AI Technical Analysis - Only for BVB stocks */}
+      {type === 'bvb' && (
+        <AITechnicalAnalysis
+          symbol={symbol}
+          isPro={isPro}
+          token={token}
+        />
+      )}
 
       {/* Price Info */}
       {history.length > 0 && (
