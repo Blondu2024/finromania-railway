@@ -291,15 +291,15 @@ async def analyze_stock(request: AnalysisRequest, user: dict = Depends(require_a
         
         # Get historical data
         period_days = {
-            "1w": 7, "1m": 30, "3m": 90, "6m": 180, "1y": 365
+            "1w": 10, "1m": 35, "3m": 100, "6m": 200, "1y": 400
         }
-        days = period_days.get(request.period, 30)
+        days = period_days.get(request.period, 35)
         
-        # Fetch from stocks_history or use EODHD
+        # Fetch from EODHD
         from apis.eodhd_client import get_eodhd_client
         eodhd = get_eodhd_client()
         
-        history = await eodhd.get_stock_history(request.symbol, days=days)
+        history = await eodhd.get_historical_data(request.symbol, days=days)
         
         if not history or len(history) < 5:
             raise HTTPException(status_code=404, detail=f"Nu sunt suficiente date pentru {request.symbol}")
