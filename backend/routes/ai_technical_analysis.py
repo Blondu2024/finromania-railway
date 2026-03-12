@@ -197,35 +197,34 @@ def generate_signal(rsi: float, trend: Dict, current_price: float, support: floa
     }
 
 
-AI_ANALYSIS_PROMPT = """Tu ești un analist tehnic profesionist pentru piața de capital din România (BVB).
-Analizează următoarele date tehnice și oferă o interpretare CONCISĂ și UTILĂ pentru investitori.
+AI_ANALYSIS_PROMPT = """Ești un analist tehnic profesionist pentru BVB. Analizează TOȚI indicatorii de mai jos și oferă o SINTEZĂ completă.
 
-DATELE TEHNICE:
-- Simbol: {symbol}
-- Preț curent: {current_price} RON
-- Perioadă analizată: {period}
+📊 DATELE TEHNICE pentru {symbol}:
+• Preț curent: {current_price} RON
+• Perioadă: {period}
 
-INDICATORI:
-- Suport: {support} RON
-- Rezistență: {resistance} RON
-- RSI (14): {rsi}
-- MA20: {ma20} RON
-- MA50: {ma50} RON
-- Trend: {trend_direction} (putere: {trend_strength}%)
-- Variație pe termen scurt: {short_change}%
-- Variație pe termen mediu: {medium_change}%
+📈 INDICATORI CALCULAȚI:
+• Suport: {support} RON | Rezistență: {resistance} RON
+• RSI (14): {rsi} {rsi_status}
+• MA20: {ma20} RON | MA50: {ma50} RON
+• Trend: {trend_direction} (putere {trend_strength}%)
+• Variație scurtă: {short_change}% | Variație medie: {medium_change}%
 
-SEMNAL GENERAT: {signal} (încredere: {confidence}%)
-Motive: {reasons}
+⚡ SEMNAL ALGORITMIC: {signal} (încredere {confidence}%)
+Factori: {reasons}
 
-INSTRUCȚIUNI:
-1. Scrie în română, maxim 150 cuvinte
-2. Explică în termeni simpli ce indică datele
-3. Menționează nivelurile cheie de urmărit
-4. Oferă un sfat practic (dar nu garantat)
-5. Adaugă un disclaimer scurt că nu e sfat financiar
+INSTRUCȚIUNI DE RĂSPUNS:
+1. Analizează TOȚI indicatorii împreună, nu doar unul
+2. Explică cum se corelează indicatorii între ei (ex: RSI + Trend + MA)
+3. Identifică CONFLUENȚA semnalelor (când mai mulți indici arată același lucru = semnal mai puternic)
+4. Menționează:
+   - Ce confirmă semnalul (ex: "RSI la 35 + trend bullish + preț aproape de suport = oportunitate")
+   - Ce contrazice sau trebuie urmărit (ex: "dar MA50 e încă peste preț")
+5. Oferă NIVELURI CHEIE concrete de urmărit
+6. Concluzie clară în 1-2 propoziții
+7. Disclaimer scurt
 
-Răspunde DIRECT, fără introduceri."""
+Scrie în română, maxim 200 cuvinte, stil direct și profesionist."""
 
 
 async def generate_ai_interpretation(analysis_data: Dict) -> str:
@@ -241,6 +240,22 @@ async def generate_ai_interpretation(analysis_data: Dict) -> str:
         import uuid
         session_id = f"analysis_{uuid.uuid4().hex[:8]}"
         
+        # Determine RSI status
+        rsi = analysis_data.get("rsi")
+        if rsi:
+            if rsi < 30:
+                rsi_status = "(SUPRAVÂNDUT - potențial de creștere)"
+            elif rsi > 70:
+                rsi_status = "(SUPRACUMPĂRAT - risc de corecție)"
+            elif rsi < 40:
+                rsi_status = "(zona de cumpărare)"
+            elif rsi > 60:
+                rsi_status = "(zona de vânzare)"
+            else:
+                rsi_status = "(neutru)"
+        else:
+            rsi_status = ""
+        
         prompt = AI_ANALYSIS_PROMPT.format(
             symbol=analysis_data.get("symbol", "N/A"),
             current_price=analysis_data.get("current_price", "N/A"),
@@ -248,6 +263,7 @@ async def generate_ai_interpretation(analysis_data: Dict) -> str:
             support=analysis_data.get("support", "N/A"),
             resistance=analysis_data.get("resistance", "N/A"),
             rsi=analysis_data.get("rsi", "N/A"),
+            rsi_status=rsi_status,
             ma20=analysis_data.get("ma20", "N/A"),
             ma50=analysis_data.get("ma50", "N/A"),
             trend_direction=analysis_data.get("trend_direction", "neutru"),
