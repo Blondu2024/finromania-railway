@@ -52,15 +52,21 @@ export default function FinAssistant() {
         const data = await res.json();
         setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
       } else {
-        setMessages(prev => [...prev, { 
-          role: 'assistant', 
-          content: 'Scuze, am întâmpinat o eroare. Te rog încearcă din nou.' 
-        }]);
+        // Try to get error details
+        let errorMsg = 'Scuze, am întâmpinat o eroare. Te rog încearcă din nou.';
+        try {
+          const errorData = await res.json();
+          console.error('Assistant API error:', res.status, errorData);
+        } catch (e) {
+          console.error('Assistant API error:', res.status);
+        }
+        setMessages(prev => [...prev, { role: 'assistant', content: errorMsg }]);
       }
     } catch (err) {
+      console.error('Assistant connection error:', err);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'Nu m-am putut conecta. Verifică conexiunea la internet.' 
+        content: 'Nu m-am putut conecta la server. Verifică conexiunea la internet și încearcă din nou.' 
       }]);
     } finally {
       setLoading(false);
@@ -74,7 +80,7 @@ export default function FinAssistant() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - moved higher to avoid BETA badge */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -82,7 +88,7 @@ export default function FinAssistant() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow group"
+            className="fixed bottom-24 right-6 z-50 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow group"
             data-testid="assistant-open-btn"
           >
             <Bot className="w-7 h-7 text-white" />
@@ -97,14 +103,14 @@ export default function FinAssistant() {
         )}
       </AnimatePresence>
 
-      {/* Chat Window */}
+      {/* Chat Window - positioned higher */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-50 w-[360px] h-[500px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
+            className="fixed bottom-24 right-6 z-50 w-[360px] h-[500px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
             data-testid="assistant-chat-window"
           >
             {/* Header */}

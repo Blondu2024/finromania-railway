@@ -138,11 +138,11 @@ async def get_assistant_response(user_message: str) -> str:
 
 
 @router.post("/assistant")
-async def ask_assistant(request: AssistantRequest, user: dict = Depends(get_current_user)):
+async def ask_assistant(request: AssistantRequest):
     """
     FinRomania Assistant - The platform guide bot
     Helps users discover features and navigate the platform
-    Free for all users (doesn't count against AI limit)
+    Free for ALL users (no authentication required)
     """
     if not request.message or len(request.message.strip()) < 2:
         raise HTTPException(status_code=400, detail="Te rog scrie o întrebare.")
@@ -151,12 +151,15 @@ async def ask_assistant(request: AssistantRequest, user: dict = Depends(get_curr
     answer = await get_assistant_response(request.message)
     
     # Log the interaction (for improving the bot)
-    db = await get_database()
-    await db.assistant_logs.insert_one({
-        "user_id": user.get("user_id") if user else "anonymous",
-        "message": request.message[:500],
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    })
+    try:
+        db = await get_database()
+        await db.assistant_logs.insert_one({
+            "user_id": "anonymous",
+            "message": request.message[:500],
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Failed to log assistant interaction: {e}")
     
     return {
         "message": request.message,
