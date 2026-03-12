@@ -51,30 +51,29 @@ const StockCard = memo(function StockCard({ stock, type = 'bvb' }) {
   );
 });
 
-// Memoized News Card
+// Memoized News Card - Compact horizontal layout
 const NewsCard = memo(function NewsCard({ article, isInternational }) {
   return (
     <Link to={`/news/${article.id}`}>
-      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-        <CardContent className="p-4">
-          <div className="flex gap-4">
+      <Card className="hover:shadow-md transition-shadow cursor-pointer">
+        <CardContent className="p-3">
+          <div className="flex gap-3 items-start">
             {article.image_url && (
               <img 
                 src={article.image_url} 
                 alt="" 
-                className="w-20 h-20 object-cover rounded-md flex-shrink-0"
+                className="w-16 h-16 object-cover rounded flex-shrink-0"
                 loading="lazy"
                 onError={(e) => e.target.style.display = 'none'}
               />
             )}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold line-clamp-2 mb-1">{article.title}</h3>
-              <p className="text-sm text-muted-foreground line-clamp-2">{article.description}</p>
-              <div className="flex items-center mt-2 text-xs text-muted-foreground">
-                <span>{article.source?.name}</span>
-                {isInternational && <Badge variant="outline" className="ml-2 text-xs py-0">EN</Badge>}
-                <span className="mx-2">•</span>
-                <span>{new Date(article.published_at).toLocaleDateString(isInternational ? 'en-US' : 'ro-RO')}</span>
+              <h3 className="font-medium text-sm line-clamp-2 leading-tight">{article.title}</h3>
+              <div className="flex items-center mt-1.5 text-xs text-muted-foreground">
+                <span className="truncate">{article.source?.name}</span>
+                {isInternational && <Badge variant="outline" className="ml-1.5 text-[10px] py-0 px-1">EN</Badge>}
+                <span className="mx-1.5">•</span>
+                <span className="flex-shrink-0">{new Date(article.published_at).toLocaleDateString(isInternational ? 'en-US' : 'ro-RO')}</span>
               </div>
             </div>
           </div>
@@ -486,12 +485,12 @@ export default function HomePage() {
             </div>
             
             {/* News Grid - 2 columns */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-4">
               {/* Romanian News Column */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <div className="flex items-center gap-2 pb-2 border-b">
                   <span className="text-lg">🇷🇴</span>
-                  <h3 className="font-semibold">România & BVB</h3>
+                  <h3 className="font-semibold text-sm">România & BVB</h3>
                   <Badge variant="secondary" className="text-xs">{news.length}</Badge>
                 </div>
                 {news.slice(0, 6).map(article => (
@@ -500,10 +499,10 @@ export default function HomePage() {
               </div>
               
               {/* International News Column */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <div className="flex items-center gap-2 pb-2 border-b">
                   <span className="text-lg">🌍</span>
-                  <h3 className="font-semibold">Internațional</h3>
+                  <h3 className="font-semibold text-sm">Internațional</h3>
                   <Badge variant="secondary" className="text-xs">{intlNews.length}</Badge>
                 </div>
                 {intlNews.slice(0, 6).map(article => (
