@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Filter, TrendingUp, TrendingDown, BarChart3, Zap, Search,
-  ChevronRight, Sliders, Rocket, Target, Building2, DollarSign, Activity
+  ChevronRight, Sliders, Rocket, Target, Building2, DollarSign, Activity,
+  Crown, Lock, PieChart
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -12,6 +13,7 @@ import { Badge } from '../components/ui/badge';
 import { Skeleton } from '../components/ui/skeleton';
 import { Slider } from '../components/ui/slider';
 import SEO from '../components/SEO';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -185,13 +187,202 @@ const CustomFilterPanel = ({ onApply }) => {
   );
 };
 
+// PRO Filter Panel - Fundamental Indicators
+const ProFilterPanel = ({ onApply, isPro, onUpgrade }) => {
+  const [peRange, setPeRange] = useState([0, 30]);
+  const [roeRange, setRoeRange] = useState([0, 30]);
+  const [minDividend, setMinDividend] = useState('');
+  const [maxDebt, setMaxDebt] = useState('');
+
+  const handleApply = () => {
+    onApply({
+      min_pe: peRange[0] > 0 ? peRange[0] : null,
+      max_pe: peRange[1] < 30 ? peRange[1] : null,
+      min_roe: roeRange[0] > 0 ? roeRange[0] : null,
+      max_roe: roeRange[1] < 30 ? roeRange[1] : null,
+      min_dividend_yield: minDividend ? parseFloat(minDividend) : null,
+      max_debt_equity: maxDebt ? parseFloat(maxDebt) : null,
+      sort_by: 'roe',
+      sort_order: 'desc',
+      limit: 50
+    });
+  };
+
+  if (!isPro) {
+    return (
+      <Card className="border-2 border-dashed border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Crown className="w-5 h-5 text-amber-500" />
+            Screener PRO
+            <Badge className="bg-amber-500">PRO</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-center py-4">
+            <Lock className="w-12 h-12 mx-auto text-amber-400 mb-3" />
+            <p className="font-semibold mb-2">Indicatori Fundamentali</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Accesează P/E, ROE, EPS, Marjă Profit, Grad Îndatorare și multe altele
+            </p>
+            <ul className="text-sm text-left space-y-2 mb-4">
+              <li className="flex items-center gap-2">
+                <PieChart className="w-4 h-4 text-amber-500" />
+                P/E Ratio, P/Book Value
+              </li>
+              <li className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-green-500" />
+                ROE, ROI, EPS
+              </li>
+              <li className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-blue-500" />
+                Randament Dividend
+              </li>
+              <li className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-purple-500" />
+                Marjă Profit, Grad Îndatorare
+              </li>
+            </ul>
+            <Button onClick={onUpgrade} className="w-full bg-gradient-to-r from-amber-500 to-orange-500">
+              <Crown className="w-4 h-4 mr-2" />
+              Upgrade la PRO - 49 lei/lună
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50">
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Crown className="w-5 h-5 text-amber-500" />
+          Screener PRO
+          <Badge className="bg-amber-500">ACTIV</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        {/* P/E Range */}
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            P/E Ratio: {peRange[0]} - {peRange[1]}
+          </label>
+          <Slider
+            value={peRange}
+            onValueChange={setPeRange}
+            min={0}
+            max={30}
+            step={0.5}
+            className="mt-2"
+          />
+        </div>
+
+        {/* ROE Range */}
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            ROE (%): {roeRange[0]} - {roeRange[1]}
+          </label>
+          <Slider
+            value={roeRange}
+            onValueChange={setRoeRange}
+            min={0}
+            max={30}
+            step={1}
+            className="mt-2"
+          />
+        </div>
+
+        {/* Dividend Yield */}
+        <div>
+          <label className="text-sm font-medium mb-2 block">Randament Dividend Min (%)</label>
+          <Input
+            type="number"
+            value={minDividend}
+            onChange={(e) => setMinDividend(e.target.value)}
+            placeholder="Ex: 5"
+          />
+        </div>
+
+        {/* Debt/Equity */}
+        <div>
+          <label className="text-sm font-medium mb-2 block">Îndatorare Max (Debt/Equity)</label>
+          <Input
+            type="number"
+            value={maxDebt}
+            onChange={(e) => setMaxDebt(e.target.value)}
+            placeholder="Ex: 0.5"
+            step="0.1"
+          />
+        </div>
+
+        <Button onClick={handleApply} className="w-full bg-gradient-to-r from-amber-500 to-orange-500">
+          <Filter className="w-4 h-4 mr-2" />
+          Aplică Filtre PRO
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+// PRO Stock Row with fundamental data
+const ProStockRow = ({ stock, index }) => {
+  const isPositive = (stock.change_percent || 0) >= 0;
+  
+  return (
+    <motion.tr
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.03 }}
+      className="hover:bg-muted/50"
+    >
+      <td className="p-3">
+        <Link to={`/stocks/bvb/${stock.symbol}`} className="font-bold text-blue-600 hover:underline">
+          {stock.symbol}
+        </Link>
+      </td>
+      <td className="p-3 text-right font-medium">
+        {stock.price?.toFixed(2)} RON
+      </td>
+      <td className="p-3 text-right">
+        <span className={isPositive ? 'text-green-600' : 'text-red-600'}>
+          {isPositive ? '+' : ''}{stock.change_percent?.toFixed(2)}%
+        </span>
+      </td>
+      <td className="p-3 text-right font-medium text-purple-600">
+        {stock.pe_ratio?.toFixed(1) || '-'}
+      </td>
+      <td className="p-3 text-right text-blue-600">
+        {stock.pb_ratio?.toFixed(2) || '-'}
+      </td>
+      <td className="p-3 text-right text-green-600 font-medium">
+        {stock.roe ? `${stock.roe.toFixed(1)}%` : '-'}
+      </td>
+      <td className="p-3 text-right">
+        {stock.eps?.toFixed(2) || '-'}
+      </td>
+      <td className="p-3 text-right text-amber-600">
+        {stock.dividend_yield ? `${stock.dividend_yield.toFixed(1)}%` : '-'}
+      </td>
+      <td className="p-3 text-right text-red-600">
+        {stock.debt_equity?.toFixed(2) || '-'}
+      </td>
+    </motion.tr>
+  );
+};
+
 export default function StockScreenerPage() {
+  const { user, token } = useAuth();
   const [screeners, setScreeners] = useState([]);
   const [activeScreener, setActiveScreener] = useState(null);
   const [results, setResults] = useState([]);
+  const [proResults, setProResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [resultsLoading, setResultsLoading] = useState(false);
   const [stats, setStats] = useState(null);
+  const [showProResults, setShowProResults] = useState(false);
+  
+  const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
 
   // Fetch predefined screeners
   useEffect(() => {
@@ -224,6 +415,7 @@ export default function StockScreenerPage() {
   const runScreener = async (screenerId) => {
     setResultsLoading(true);
     setActiveScreener(screenerId);
+    setShowProResults(false);
     
     try {
       const res = await fetch(`${API_URL}/api/screener/run/${screenerId}`);
@@ -242,6 +434,7 @@ export default function StockScreenerPage() {
   const runCustomScreener = async (filters) => {
     setResultsLoading(true);
     setActiveScreener('custom');
+    setShowProResults(false);
     
     try {
       const res = await fetch(`${API_URL}/api/screener/custom`, {
@@ -258,6 +451,38 @@ export default function StockScreenerPage() {
     } finally {
       setResultsLoading(false);
     }
+  };
+
+  // Run PRO screener
+  const runProScreener = async (filters) => {
+    if (!isPro) return;
+    
+    setResultsLoading(true);
+    setActiveScreener('pro');
+    setShowProResults(true);
+    
+    try {
+      const res = await fetch(`${API_URL}/api/screener/pro/filter`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(filters)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setProResults(data.results || []);
+      }
+    } catch (err) {
+      console.error('Error running PRO screener:', err);
+    } finally {
+      setResultsLoading(false);
+    }
+  };
+
+  const handleUpgrade = () => {
+    window.location.href = '/pricing';
   };
 
   if (loading) {
@@ -349,7 +574,7 @@ export default function StockScreenerPage() {
 
             {/* Results */}
             <AnimatePresence mode="wait">
-              {(results.length > 0 || resultsLoading) && (
+              {(results.length > 0 || proResults.length > 0 || resultsLoading) && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -358,9 +583,21 @@ export default function StockScreenerPage() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
-                        <span>📊 Rezultate ({results.length} acțiuni)</span>
-                        {activeScreener && activeScreener !== 'custom' && (
+                        <span>
+                          {showProResults ? (
+                            <span className="flex items-center gap-2">
+                              <Crown className="w-5 h-5 text-amber-500" />
+                              Rezultate PRO ({proResults.length} acțiuni)
+                            </span>
+                          ) : (
+                            `📊 Rezultate (${results.length} acțiuni)`
+                          )}
+                        </span>
+                        {activeScreener && activeScreener !== 'custom' && activeScreener !== 'pro' && (
                           <Badge>{screeners.find(s => s.id === activeScreener)?.name}</Badge>
+                        )}
+                        {activeScreener === 'pro' && (
+                          <Badge className="bg-amber-500">PRO</Badge>
                         )}
                       </CardTitle>
                     </CardHeader>
@@ -368,6 +605,29 @@ export default function StockScreenerPage() {
                       {resultsLoading ? (
                         <div className="space-y-2">
                           {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12" />)}
+                        </div>
+                      ) : showProResults ? (
+                        <div className="overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b text-sm text-muted-foreground">
+                                <th className="p-3 text-left">Simbol</th>
+                                <th className="p-3 text-right">Preț</th>
+                                <th className="p-3 text-right">Var %</th>
+                                <th className="p-3 text-right">P/E</th>
+                                <th className="p-3 text-right">P/B</th>
+                                <th className="p-3 text-right">ROE</th>
+                                <th className="p-3 text-right">EPS</th>
+                                <th className="p-3 text-right">Div %</th>
+                                <th className="p-3 text-right">D/E</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {proResults.map((stock, idx) => (
+                                <ProStockRow key={stock.symbol} stock={stock} index={idx} />
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       ) : (
                         <div className="overflow-x-auto">
@@ -398,8 +658,9 @@ export default function StockScreenerPage() {
           </div>
 
           {/* Right Sidebar - Custom Filters */}
-          <div>
+          <div className="space-y-6">
             <CustomFilterPanel onApply={runCustomScreener} />
+            <ProFilterPanel onApply={runProScreener} isPro={isPro} onUpgrade={handleUpgrade} />
           </div>
         </div>
       </div>

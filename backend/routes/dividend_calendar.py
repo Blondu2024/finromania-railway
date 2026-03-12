@@ -1,10 +1,14 @@
 """Dividend Calendar & Events API pentru FinRomania"""
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi.responses import StreamingResponse
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
 import logging
+import io
+import csv
 
 from config.database import get_database
+from routes.auth import require_auth
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/calendar", tags=["Calendar"])
@@ -380,4 +384,180 @@ async def get_dividend_kings():
         
     except Exception as e:
         logger.error(f"Error fetching dividend kings: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================
+# PRO FEATURE: EXPORT TO CSV/XLS
+# ============================================
+
+@router.get("/export/dividends")
+async def export_dividends_csv(user: dict = Depends(require_auth)):
+    """
+    PRO Feature: Export dividend calendar to CSV
+    Can be opened in Excel
+    """
+    if user.get("subscription_level") not in ["pro", "premium"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Export necesită abonament PRO. Upgrade pentru acces."
+        )
+    
+    try:
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Header
+        writer.writerow([
+            "Simbol", "Companie", "Dividend/Acțiune (RON)", "Randament (%)",
+            "Data Ex-Dividend", "Data Înregistrare", "Data Plată", "Status"
+        ])
+        
+        # Data
+        for d in BVB_DIVIDENDS_2024:
+            writer.writerow([
+                d["symbol"],
+                d["name"],
+                d["dividend_per_share"],
+                d["dividend_yield"],
+                d["ex_date"],
+                d["record_date"],
+                d["payment_date"],
+                "Plătit" if d["status"] == "paid" else "Estimat"
+            ])
+        
+        output.seek(0)
+        
+        # Return as downloadable CSV
+        return StreamingResponse(
+            io.BytesIO(output.getvalue().encode('utf-8-sig')),  # UTF-8 BOM for Excel
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename=dividende_bvb_{datetime.now().strftime('%Y%m%d')}.csv"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting dividends: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/export/events")
+async def export_events_csv(user: dict = Depends(require_auth)):
+    """
+    PRO Feature: Export corporate events to CSV
+    """
+    if user.get("subscription_level") not in ["pro", "premium"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Export necesită abonament PRO. Upgrade pentru acces."
+        )
+    
+    try:
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Header
+        writer.writerow([
+            "Tip", "Simbol", "Companie", "Titlu", "Data", "Ora", "Descriere"
+        ])
+        
+        # Data
+        type_labels = {"aga": "AGA", "report": "Raport", "ipo": "IPO"}
+        for e in BVB_EVENTS:
+            writer.writerow([
+                type_labels.get(e["type"], e["type"]),
+                e["symbol"],
+                e["name"],
+                e["title"],
+                e["date"],
+                e.get("time", ""),
+                e["description"]
+            ])
+        
+        output.seek(0)
+        
+        return StreamingResponse(
+            io.BytesIO(output.getvalue().encode('utf-8-sig')),
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename=evenimente_bvb_{datetime.now().strftime('%Y%m%d')}.csv"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting events: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/export/all")
+async def export_all_calendar_csv(user: dict = Depends(require_auth)):
+    """
+    PRO Feature: Export complete calendar (dividends + events) to CSV
+    """
+    if user.get("subscription_level") not in ["pro", "premium"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Export necesită abonament PRO. Upgrade pentru acces."
+        )
+    
+    try:
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Dividends section
+        writer.writerow(["=== CALENDAR DIVIDENDE BVB ==="])
+        writer.writerow([])
+        writer.writerow([
+            "Simbol", "Companie", "Dividend/Acțiune (RON)", "Randament (%)",
+            "Data Ex-Dividend", "Data Plată", "Status"
+        ])
+        
+        for d in sorted(BVB_DIVIDENDS_2024, key=lambda x: x["ex_date"]):
+            writer.writerow([
+                d["symbol"],
+                d["name"],
+                d["dividend_per_share"],
+                d["dividend_yield"],
+                d["ex_date"],
+                d["payment_date"],
+                "Plătit" if d["status"] == "paid" else "Estimat"
+            ])
+        
+        writer.writerow([])
+        writer.writerow([])
+        
+        # Events section
+        writer.writerow(["=== EVENIMENTE CORPORATIVE ==="])
+        writer.writerow([])
+        writer.writerow(["Tip", "Simbol", "Companie", "Titlu", "Data", "Descriere"])
+        
+        type_labels = {"aga": "AGA", "report": "Raport", "ipo": "IPO"}
+        for e in sorted(BVB_EVENTS, key=lambda x: x["date"]):
+            writer.writerow([
+                type_labels.get(e["type"], e["type"]),
+                e["symbol"],
+                e["name"],
+                e["title"],
+                e["date"],
+                e["description"]
+            ])
+        
+        writer.writerow([])
+        writer.writerow([f"Generat la: {datetime.now().strftime('%Y-%m-%d %H:%M')}"])
+        writer.writerow(["Sursa: FinRomania.ro"])
+        
+        output.seek(0)
+        
+        return StreamingResponse(
+            io.BytesIO(output.getvalue().encode('utf-8-sig')),
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename=calendar_complet_bvb_{datetime.now().strftime('%Y%m%d')}.csv"
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting calendar: {e}")
         raise HTTPException(status_code=500, detail=str(e))

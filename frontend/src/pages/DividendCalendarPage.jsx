@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Calendar, DollarSign, TrendingUp, Clock, Crown, CalendarDays,
-  Filter, ChevronRight, Banknote, Building2, FileText
+  Filter, ChevronRight, Banknote, Building2, FileText, Download, Lock
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -11,6 +11,7 @@ import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Skeleton } from '../components/ui/skeleton';
 import SEO from '../components/SEO';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -172,11 +173,15 @@ const DividendKings = ({ kings }) => (
 );
 
 export default function DividendCalendarPage() {
+  const { user, token } = useAuth();
   const [dividends, setDividends] = useState([]);
   const [events, setEvents] = useState([]);
   const [kings, setKings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
+  const [exporting, setExporting] = useState(false);
+  
+  const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -212,6 +217,41 @@ export default function DividendCalendarPage() {
   const upcomingDividends = dividends.filter(d => d.status !== 'paid');
   const paidDividends = dividends.filter(d => d.status === 'paid');
 
+  const handleExport = async (type) => {
+    if (!isPro) {
+      window.location.href = '/pricing';
+      return;
+    }
+    
+    setExporting(true);
+    try {
+      const endpoint = type === 'all' ? 'all' : type === 'dividends' ? 'dividends' : 'events';
+      const response = await fetch(`${API_URL}/api/calendar/export/${endpoint}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `calendar_bvb_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+      } else {
+        alert('Eroare la export. Verifică abonamentul PRO.');
+      }
+    } catch (err) {
+      console.error('Export error:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -240,7 +280,31 @@ export default function DividendCalendarPage() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
             📅 Calendar Dividende & Evenimente
           </h1>
-          <p className="text-muted-foreground">Toate datele importante pentru investitorii BVB</p>
+          <p className="text-muted-foreground mb-4">Toate datele importante pentru investitorii BVB</p>
+          
+          {/* Export Button */}
+          <div className="flex justify-center gap-2">
+            {isPro ? (
+              <Button 
+                onClick={() => handleExport('all')} 
+                disabled={exporting}
+                className="bg-gradient-to-r from-amber-500 to-orange-500"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {exporting ? 'Export...' : 'Export Excel (CSV)'}
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => window.location.href = '/pricing'}
+                variant="outline"
+                className="border-amber-400"
+              >
+                <Lock className="w-4 h-4 mr-2" />
+                Export Excel
+                <Badge className="ml-2 bg-amber-500">PRO</Badge>
+              </Button>
+            )}
+          </div>
         </motion.div>
 
         {/* Stats Cards */}
