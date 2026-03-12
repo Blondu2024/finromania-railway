@@ -9,6 +9,7 @@ import { Skeleton } from './components/ui/skeleton';
 import { initializePushNotifications } from './utils/pushNotifications';
 import NotificationBell, { CriticalNotificationBanner } from './components/NotificationBell';
 import FeedbackButton, { BetaDisclaimer, BetaBadge } from './components/BetaFeedback';
+import FinAssistant from './components/FinAssistant';
 import './App.css';
 
 // Initialize Service Worker for Push Notifications
@@ -530,6 +531,8 @@ function App() {
           </Suspense>
           {/* Feedback Button - BETA */}
           <FeedbackButton />
+          {/* FinRomania Assistant - Platform Guide Bot */}
+          <FinAssistant />
         </div>
       </Router>
     </AuthProvider>

@@ -28,7 +28,159 @@ class AdviceRequest(BaseModel):
     stock_type: Optional[str] = None  # 'bvb' or 'global'
     question: Optional[str] = None
 
+class AssistantRequest(BaseModel):
+    message: str
+
+
+# ============================================
+# FINROMANIA ASSISTANT - Platform Guide Bot
+# ============================================
+
+FINROMANIA_KNOWLEDGE = """
+Tu ești **FinRomania Assistant** - asistentul virtual al platformei FinRomania.ro, cea mai completă platformă de investiții pentru piața românească.
+
+## CUNOȘTINȚELE TALE DESPRE PLATFORMĂ:
+
+### 📊 PAGINI PRINCIPALE:
+1. **Homepage** (/) - Știri România + Internațional, ticker cu prețuri live, Early Adopter banner
+2. **Acțiuni BVB** (/stocks) - Toate acțiunile de pe Bursa de Valori București cu prețuri live
+3. **Piețe Globale** (/global) - Indici mondiali, crypto, mărfuri, forex
+4. **Știri** (/news) - Tab România (ZF, Profit.ro) + Tab Internațional (CNBC, Reuters, Yahoo Finance)
+5. **Screener** (/screener) - Filtrare acțiuni după criterii + Screener PRO cu P/E, ROE, EPS
+6. **Calendar Dividende** (/calendar) - Calendar cu dividende BVB, export XLS (PRO)
+7. **Trading School** (/trading-school) - 25 lecții educative cu quiz-uri
+8. **Calculator Fiscal** (/calculator) - Comparație PF vs SRL pentru impozite (PRO)
+9. **AI Advisor** (/ai-advisor) - Consilier AI pentru întrebări despre investiții
+10. **Portofoliu** (/portfolio) - Gestionare portofoliu personal
+11. **Watchlist** (/watchlist) - Urmărire acțiuni favorite cu alerte de preț
+
+### ⭐ FUNCȚII WATCHLIST (pentru alerte de preț):
+- Accesează **Watchlist** din meniu (pictograma ⭐)
+- Apasă **+ Adaugă** pentru a adăuga o acțiune
+- Pentru fiecare acțiune poți seta **alertă de preț** (când prețul ajunge la valoarea dorită)
+- Vei primi **notificare** când prețul atinge nivelul setat
+
+### 🔍 SCREENER (găsire acțiuni):
+**Screener Basic (gratuit):**
+- Filtrare după preț, variație %, volum
+- Screener-e rapide: Top Creșteri, Top Scăderi, Blue Chips, Volume Mari
+
+**Screener PRO (abonament):**
+- Indicatori fundamentali: P/E, P/B, ROE, EPS, Dividend Yield
+- Filtrare avansată după toți indicatorii
+- Export rezultate
+
+### 📅 CALENDAR DIVIDENDE:
+- Vezi toate dividendele plătite și viitoare de companiile BVB
+- **Export XLS** (PRO) - descarcă calendarul în Excel
+- Tab Evenimente - AGA-uri și rapoarte financiare
+
+### 🎓 TRADING SCHOOL:
+- 25 de lecții gratuite pentru începători
+- Quiz la finalul fiecărei lecții
+- Certificat de absolvire după toate lecțiile
+- Subiecte: Ce e o acțiune, Analiza tehnică, Dividende, ETF-uri, etc.
+
+### 💰 ABONAMENT PRO (49 lei/lună):
+**Include:**
+- Screener PRO cu indicatori fundamentali
+- Export Calendar XLS
+- Calculator Fiscal PF vs SRL
+- AI Advisor nelimitat (vs 10 întrebări/lună gratuit)
+- Fără reclame
+
+**Early Adopter:** Primii 100 utilizatori primesc PRO GRATUIT 3 luni!
+
+### 🔔 NOTIFICĂRI:
+- **Alerte preț** - din Watchlist când o acțiune atinge prețul setat
+- **Expirare abonament** - 7 zile înainte de expirare PRO
+
+### 📱 ACCES MOBIL:
+- Platforma este **responsive** - funcționează pe telefon din browser
+- Nu există aplicație separată, dar site-ul e optimizat pentru mobil
+
+## REGULI DE RĂSPUNS:
+1. Răspunzi DOAR în română
+2. Ești prietenos și concis
+3. Ghidezi utilizatorul pas cu pas când întreabă "cum fac să..."
+4. Dacă funcția nu există, spui clar "Această funcție nu e disponibilă încă"
+5. Pentru întrebări despre investiții specifice, redirecționează către AI Advisor (/ai-advisor)
+6. Menționezi dacă o funcție e PRO sau gratuită
+7. Maximum 150 cuvinte per răspuns
+"""
+
 import uuid
+
+async def get_assistant_response(user_message: str) -> str:
+    """Get AI Assistant response using platform knowledge"""
+    if not HAS_AI:
+        return "Asistentul FinRomania nu este disponibil momentan. Te rog încearcă mai târziu."
+    
+    api_key = os.environ.get("EMERGENT_UNIVERSAL_KEY")
+    if not api_key:
+        return "Configurare AI lipsă."
+    
+    try:
+        session_id = f"assistant_{uuid.uuid4().hex[:8]}"
+        
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=session_id,
+            system_message=FINROMANIA_KNOWLEDGE
+        )
+        
+        user_msg = UserMessage(text=user_message)
+        response = await chat.send_message(user_msg)
+        return response
+    except Exception as e:
+        logger.error(f"Assistant AI error: {e}")
+        return "Nu am putut procesa întrebarea. Te rog încearcă din nou."
+
+
+@router.post("/assistant")
+async def ask_assistant(request: AssistantRequest, user: dict = Depends(get_current_user)):
+    """
+    FinRomania Assistant - The platform guide bot
+    Helps users discover features and navigate the platform
+    Free for all users (doesn't count against AI limit)
+    """
+    if not request.message or len(request.message.strip()) < 2:
+        raise HTTPException(status_code=400, detail="Te rog scrie o întrebare.")
+    
+    # Get response from AI
+    answer = await get_assistant_response(request.message)
+    
+    # Log the interaction (for improving the bot)
+    db = await get_database()
+    await db.assistant_logs.insert_one({
+        "user_id": user.get("user_id") if user else "anonymous",
+        "message": request.message[:500],
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return {
+        "message": request.message,
+        "response": answer,
+        "bot_name": "FinRomania Assistant"
+    }
+
+
+@router.get("/assistant/suggestions")
+async def get_assistant_suggestions():
+    """Get suggested questions for the assistant"""
+    return {
+        "suggestions": [
+            "Cum setez o alertă de preț pentru o acțiune?",
+            "Unde găsesc acțiunile cu cele mai mari dividende?",
+            "Ce este Screener PRO și ce include?",
+            "Cum devin utilizator PRO?",
+            "Unde văd știrile internaționale?",
+            "Cum export calendarul de dividende în Excel?",
+            "Ce lecții are Trading School?",
+            "Cum compar impozitele PF vs SRL?",
+        ]
+    }
+
 
 async def check_ai_limit(user: dict) -> tuple[bool, int, int]:
     """Check if user has reached AI limit. Returns (can_use, used, remaining)"""
