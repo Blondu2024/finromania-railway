@@ -529,9 +529,7 @@ function App() {
           <Suspense fallback={null}>
             <InteractiveTour />
           </Suspense>
-          {/* Feedback Button - BETA */}
-          <FeedbackButton />
-          {/* FinRomania Assistant - Platform Guide Bot */}
+          {/* FinRomania Assistant - Platform Guide Bot + Feedback */}
           <FinAssistant />
         </div>
       </Router>
