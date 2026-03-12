@@ -249,6 +249,62 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                 </div>
               </div>
 
+              {/* Volume & Market Context Section */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Volume Analysis */}
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+                    <BarChart3 className="w-3 h-3 text-blue-500" /> Volum
+                  </p>
+                  <p className="text-lg font-bold">
+                    {analysis.analysis?.volume_ratio?.toFixed(2)}x
+                    <span className="text-xs ml-1 font-normal text-muted-foreground">vs medie</span>
+                  </p>
+                  <p className={`text-xs mt-1 ${
+                    analysis.analysis?.volume_status === 'FOARTE_MARE' ? 'text-orange-600' :
+                    analysis.analysis?.volume_status === 'MARE' ? 'text-green-600' :
+                    analysis.analysis?.volume_status === 'FOARTE_MIC' ? 'text-red-600' : 'text-gray-500'
+                  }`}>
+                    {analysis.analysis?.volume_alert}
+                  </p>
+                </div>
+
+                {/* Market Context */}
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+                    <TrendingUp className="w-3 h-3 text-purple-500" /> Piața BVB
+                  </p>
+                  <p className={`text-lg font-bold ${
+                    analysis.analysis?.bet_change > 0 ? 'text-green-600' :
+                    analysis.analysis?.bet_change < 0 ? 'text-red-600' : 'text-gray-600'
+                  }`}>
+                    {analysis.analysis?.bet_change !== null ? `${analysis.analysis?.bet_change > 0 ? '+' : ''}${analysis.analysis?.bet_change?.toFixed(2)}%` : 'N/A'}
+                  </p>
+                  <p className="text-xs mt-1 text-muted-foreground">
+                    {analysis.analysis?.market_description || analysis.analysis?.market_sentiment}
+                  </p>
+                </div>
+
+                {/* Liquidity */}
+                <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+                    <Zap className="w-3 h-3 text-cyan-500" /> Lichiditate
+                  </p>
+                  <p className="text-lg font-bold">
+                    {analysis.analysis?.liquidity_score}/5
+                    <span className={`text-xs ml-2 px-1.5 py-0.5 rounded ${
+                      analysis.analysis?.liquidity_score >= 4 ? 'bg-green-100 text-green-700' :
+                      analysis.analysis?.liquidity_score >= 3 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {analysis.analysis?.liquidity_tier}
+                    </span>
+                  </p>
+                  <p className="text-xs mt-1 text-muted-foreground">
+                    {analysis.analysis?.liquidity_description}
+                  </p>
+                </div>
+              </div>
+
               {/* Moving Averages */}
               <div className="flex flex-wrap gap-2">
                 {analysis.analysis?.ma20 && (
@@ -277,6 +333,21 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                       <li key={idx} className="flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                         {reason}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Warnings */}
+              {analysis.analysis?.warnings?.length > 0 && (
+                <div className="bg-orange-50 dark:bg-orange-950/20 p-3 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <p className="text-xs text-orange-700 dark:text-orange-400 font-medium mb-2">⚠️ Avertismente:</p>
+                  <ul className="text-sm space-y-1 text-orange-700 dark:text-orange-300">
+                    {analysis.analysis.warnings.map((warning, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                        {warning}
                       </li>
                     ))}
                   </ul>

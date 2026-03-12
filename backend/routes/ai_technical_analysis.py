@@ -30,7 +30,7 @@ class AnalysisRequest(BaseModel):
 def calculate_support_resistance(prices: List[float], window: int = 5) -> Dict:
     """Calculate support and resistance levels using local min/max"""
     if len(prices) < window * 2:
-        return {"support": None, "resistance": None}
+        return {"support": None, "resistance": None, "support_levels": [], "resistance_levels": []}
     
     supports = []
     resistances = []
@@ -52,6 +52,209 @@ def calculate_support_resistance(prices: List[float], window: int = 5) -> Dict:
         "resistance": resistance,
         "support_levels": sorted(set([round(s, 2) for s in supports[-5:]]))[:3],
         "resistance_levels": sorted(set([round(r, 2) for r in resistances[-5:]]), reverse=True)[:3]
+    }
+
+
+def analyze_volume(volumes: List[int], current_volume: int) -> Dict:
+    """Analyze volume patterns - CRUCIAL for BVB"""
+    if not volumes or len(volumes) < 5:
+        return {"status": "insufficient_data"}
+    
+    avg_volume = np.mean(volumes)
+    avg_volume_20 = np.mean(volumes[-20:]) if len(volumes) >= 20 else avg_volume
+    
+    # Volume ratio (current vs average)
+    volume_ratio = current_volume / avg_volume if avg_volume > 0 else 1
+    volume_ratio_20 = current_volume / avg_volume_20 if avg_volume_20 > 0 else 1
+    
+    # Detect volume spikes (days with 2x+ average volume)
+    volume_spikes = sum(1 for v in volumes[-10:] if v > avg_volume * 2)
+    
+    # Volume trend (increasing or decreasing)
+    if len(volumes) >= 10:
+        recent_avg = np.mean(volumes[-5:])
+        older_avg = np.mean(volumes[-10:-5])
+        volume_trend = "crescător" if recent_avg > older_avg * 1.2 else "descrescător" if recent_avg < older_avg * 0.8 else "stabil"
+    else:
+        volume_trend = "stabil"
+    
+    # Determine volume status
+    if volume_ratio >= 3:
+        status = "FOARTE_MARE"
+        alert = "⚠️ Volum excepțional! Verifică știrile!"
+    elif volume_ratio >= 2:
+        status = "MARE"
+        alert = "📈 Volum semnificativ peste medie"
+    elif volume_ratio >= 1.5:
+        status = "PESTE_MEDIE"
+        alert = "Volum ușor peste medie"
+    elif volume_ratio <= 0.5:
+        status = "FOARTE_MIC"
+        alert = "⚠️ Volum foarte mic - lichiditate redusă!"
+    elif volume_ratio <= 0.7:
+        status = "MIC"
+        alert = "Volum sub medie"
+    else:
+        status = "NORMAL"
+        alert = "Volum în parametri normali"
+    
+    return {
+        "current": current_volume,
+        "average": round(avg_volume),
+        "average_20d": round(avg_volume_20),
+        "ratio": round(volume_ratio, 2),
+        "ratio_20d": round(volume_ratio_20, 2),
+        "status": status,
+        "alert": alert,
+        "trend": volume_trend,
+        "spikes_10d": volume_spikes,
+        "is_confirmation": volume_ratio >= 1.2  # Volume confirms price movement
+    }
+
+
+def calculate_liquidity_score(avg_volume: float, avg_value: float, spread_estimate: float = None) -> Dict:
+    """Calculate liquidity score for BVB stocks"""
+    # BVB liquidity tiers based on average daily volume
+    if avg_volume >= 100000:
+        tier = "FOARTE_LICHIDĂ"
+        score = 5
+        description = "Poți intra/ieși ușor cu sume mari"
+    elif avg_volume >= 50000:
+        tier = "LICHIDĂ"
+        score = 4
+        description = "Lichiditate bună pentru majoritatea investitorilor"
+    elif avg_volume >= 20000:
+        tier = "MEDIE"
+        score = 3
+        description = "OK pentru sume moderate, atenție la ordine mari"
+    elif avg_volume >= 5000:
+        tier = "SCĂZUTĂ"
+        score = 2
+        description = "⚠️ Lichiditate redusă, spread poate fi mare"
+    else:
+        tier = "FOARTE_SCĂZUTĂ"
+        score = 1
+        description = "⚠️ Foarte greu de tranzacționat, risc mare"
+    
+    return {
+        "tier": tier,
+        "score": score,
+        "max_score": 5,
+        "description": description,
+        "avg_daily_volume": round(avg_volume),
+        "recommendation": "OK" if score >= 3 else "ATENȚIE" if score == 2 else "EVITĂ"
+    }
+
+
+async def get_market_context(db) -> Dict:
+    """Get overall BVB market context (BET index, sentiment)"""
+    try:
+        # Try to get BET index data first
+        bet_data = await db.indices_bvb.find_one({"symbol": "BET"}, {"_id": 0})
+        
+        bet_change = None
+        
+        if bet_data and bet_data.get("change_percent") is not None:
+            bet_change = bet_data.get("change_percent", 0)
+        else:
+            # Fallback: Calculate market sentiment from all BVB stocks average
+            cursor = db.stocks_bvb.find({}, {"_id": 0, "change_percent": 1, "symbol": 1})
+            stocks = await cursor.to_list(length=100)
+            
+            if stocks:
+                changes = [s.get("change_percent", 0) for s in stocks if s.get("change_percent") is not None]
+                if changes:
+                    bet_change = sum(changes) / len(changes)
+                    logger.info(f"Calculated market avg from {len(changes)} stocks: {bet_change:.2f}%")
+        
+        if bet_change is not None:
+            bet_change = round(bet_change, 2)
+            
+            if bet_change >= 1.5:
+                sentiment = "FOARTE_BULLISH"
+                description = "Piața BVB e în creștere puternică"
+            elif bet_change >= 0.5:
+                sentiment = "BULLISH"
+                description = "Piața BVB e pozitivă"
+            elif bet_change <= -1.5:
+                sentiment = "FOARTE_BEARISH"
+                description = "Piața BVB e în scădere puternică"
+            elif bet_change <= -0.5:
+                sentiment = "BEARISH"
+                description = "Piața BVB e negativă"
+            else:
+                sentiment = "NEUTRU"
+                description = "Piața BVB e stabilă"
+            
+            return {
+                "bet_value": bet_data.get("value") if bet_data else None,
+                "bet_change": bet_change,
+                "sentiment": sentiment,
+                "description": description,
+                "recommendation": "Contextul favorizează cumpărarea" if bet_change > 0.3 else "Contextul favorizează prudența" if bet_change < -0.3 else "Context neutru"
+            }
+    except Exception as e:
+        logger.error(f"Error getting market context: {e}")
+    
+    return {
+        "bet_change": 0,
+        "sentiment": "NEUTRU",
+        "description": "Date piață indisponibile momentan"
+    }
+
+
+def analyze_price_action(prices: List[float], volumes: List[int]) -> Dict:
+    """Analyze price action patterns with volume confirmation"""
+    if len(prices) < 5 or len(volumes) < 5:
+        return {"pattern": "insufficient_data"}
+    
+    # Last 5 days analysis
+    last_5_prices = prices[-5:]
+    last_5_volumes = volumes[-5:]
+    avg_volume = np.mean(volumes)
+    
+    # Detect patterns
+    patterns = []
+    
+    # Higher highs and higher lows (uptrend)
+    if all(last_5_prices[i] >= last_5_prices[i-1] * 0.99 for i in range(1, 5)):
+        patterns.append("TREND_ASCENDENT")
+    
+    # Lower highs and lower lows (downtrend)
+    if all(last_5_prices[i] <= last_5_prices[i-1] * 1.01 for i in range(1, 5)):
+        patterns.append("TREND_DESCENDENT")
+    
+    # Volume spike with price increase (accumulation)
+    if last_5_volumes[-1] > avg_volume * 1.5 and last_5_prices[-1] > last_5_prices[-2]:
+        patterns.append("ACUMULARE")
+    
+    # Volume spike with price decrease (distribution)
+    if last_5_volumes[-1] > avg_volume * 1.5 and last_5_prices[-1] < last_5_prices[-2]:
+        patterns.append("DISTRIBUȚIE")
+    
+    # Breakout detection
+    max_20 = max(prices[-20:]) if len(prices) >= 20 else max(prices)
+    min_20 = min(prices[-20:]) if len(prices) >= 20 else min(prices)
+    current = prices[-1]
+    
+    if current >= max_20 * 0.98:
+        patterns.append("APROAPE_DE_MAXIM")
+    if current <= min_20 * 1.02:
+        patterns.append("APROAPE_DE_MINIM")
+    
+    # Volume-price divergence
+    price_up = prices[-1] > prices[-3]
+    volume_up = volumes[-1] > np.mean(volumes[-5:])
+    
+    if price_up and not volume_up:
+        patterns.append("DIVERGENȚĂ_VOLUM")  # Price up but volume down = weak move
+    
+    return {
+        "patterns": patterns,
+        "last_5_trend": "UP" if last_5_prices[-1] > last_5_prices[0] else "DOWN",
+        "volume_confirms": volume_up if price_up else not volume_up,
+        "near_high": current >= max_20 * 0.95,
+        "near_low": current <= min_20 * 1.05
     }
 
 
@@ -131,10 +334,11 @@ def determine_trend(prices: List[float], ma20: float = None, ma50: float = None)
     }
 
 
-def generate_signal(rsi: float, trend: Dict, current_price: float, support: float, resistance: float) -> Dict:
-    """Generate trading signal based on technical indicators"""
+def generate_signal(rsi: float, trend: Dict, current_price: float, support: float, resistance: float, volume_data: Dict = None, market_context: Dict = None) -> Dict:
+    """Generate trading signal based on ALL technical indicators"""
     score = 50  # Neutral starting point
     reasons = []
+    warnings = []
     
     # RSI analysis
     if rsi:
@@ -171,6 +375,43 @@ def generate_signal(rsi: float, trend: Dict, current_price: float, support: floa
                 score -= 15
                 reasons.append("Aproape de rezistență")
     
+    # VOLUME analysis - CRUCIAL for BVB!
+    if volume_data:
+        vol_ratio = volume_data.get("ratio", 1)
+        vol_status = volume_data.get("status", "NORMAL")
+        
+        # Volume confirms trend
+        if volume_data.get("is_confirmation"):
+            if trend["direction"] == "bullish":
+                score += 10
+                reasons.append("Volum confirmă creșterea")
+            elif trend["direction"] == "bearish":
+                score -= 10
+                reasons.append("Volum confirmă scăderea")
+        else:
+            # Volume divergence warning
+            if trend["direction"] != "neutral":
+                warnings.append("⚠️ Volumul NU confirmă mișcarea de preț")
+        
+        # Volume spike alerts
+        if vol_status == "FOARTE_MARE":
+            warnings.append("🔔 Volum excepțional - verifică știrile!")
+        elif vol_status == "FOARTE_MIC":
+            score -= 5
+            warnings.append("⚠️ Lichiditate foarte scăzută")
+    
+    # MARKET CONTEXT - BET index sentiment
+    if market_context:
+        sentiment = market_context.get("sentiment", "NEUTRU")
+        bet_change = market_context.get("bet_change", 0)
+        
+        if sentiment in ["FOARTE_BULLISH", "BULLISH"]:
+            score += 5
+            reasons.append(f"Piață pozitivă (BET {bet_change:+.1f}%)")
+        elif sentiment in ["FOARTE_BEARISH", "BEARISH"]:
+            score -= 5
+            reasons.append(f"Piață negativă (BET {bet_change:+.1f}%)")
+    
     # Determine signal
     if score >= 70:
         signal = "CUMPĂRĂ"
@@ -193,38 +434,71 @@ def generate_signal(rsi: float, trend: Dict, current_price: float, support: floa
         "signal_color": signal_color,
         "confidence": min(abs(score - 50) * 2, 100),
         "score": score,
-        "reasons": reasons
+        "reasons": reasons,
+        "warnings": warnings
     }
 
 
-AI_ANALYSIS_PROMPT = """Ești un analist tehnic profesionist pentru BVB. Analizează TOȚI indicatorii de mai jos și oferă o SINTEZĂ completă.
+AI_ANALYSIS_PROMPT = """Ești un analist tehnic profesionist pentru BVB (Bursa de Valori București). 
+Analizează TOATE datele de mai jos și oferă o SINTEZĂ completă, profesionistă.
 
-📊 DATELE TEHNICE pentru {symbol}:
+═══════════════════════════════════════════
+📊 ACȚIUNE: {symbol}
+═══════════════════════════════════════════
 • Preț curent: {current_price} RON
-• Perioadă: {period}
+• Perioadă analizată: {period}
 
-📈 INDICATORI CALCULAȚI:
+📈 INDICATORI TEHNICI:
 • Suport: {support} RON | Rezistență: {resistance} RON
 • RSI (14): {rsi} {rsi_status}
 • MA20: {ma20} RON | MA50: {ma50} RON
 • Trend: {trend_direction} (putere {trend_strength}%)
-• Variație scurtă: {short_change}% | Variație medie: {medium_change}%
+• Variație 5 zile: {short_change}% | Variație 20 zile: {medium_change}%
+
+📊 ANALIZA VOLUMULUI (CRUCIAL!):
+• Volum curent: {volume_current} acțiuni
+• Media zilnică: {volume_avg} acțiuni
+• Raport: {volume_ratio}x față de medie
+• Status: {volume_status}
+• Trend volum: {volume_trend}
+• {volume_alert}
+
+🏛️ CONTEXT PIAȚĂ BVB:
+• Indicele BET: {bet_change}%
+• Sentiment: {market_sentiment}
+• {market_description}
+
+📉 PRICE ACTION:
+• Pattern-uri detectate: {patterns}
+• Aproape de maxim 20 zile: {near_high}
+• Aproape de minim 20 zile: {near_low}
+• Volumul confirmă prețul: {volume_confirms}
+
+💧 LICHIDITATE:
+• Scor: {liquidity_score}/5
+• Clasificare: {liquidity_tier}
+• {liquidity_description}
 
 ⚡ SEMNAL ALGORITMIC: {signal} (încredere {confidence}%)
-Factori: {reasons}
+Factori pozitivi/negativi: {reasons}
+Avertismente: {warnings}
 
+═══════════════════════════════════════════
 INSTRUCȚIUNI DE RĂSPUNS:
-1. Analizează TOȚI indicatorii împreună, nu doar unul
-2. Explică cum se corelează indicatorii între ei (ex: RSI + Trend + MA)
-3. Identifică CONFLUENȚA semnalelor (când mai mulți indici arată același lucru = semnal mai puternic)
+═══════════════════════════════════════════
+1. Analizează TOȚI indicatorii ÎMPREUNĂ (RSI + MA + Trend + Volum + Context)
+2. VOLUMUL e crucial pe BVB! O mișcare fără volum = slabă/falsă
+3. Identifică CONFLUENȚA: când mai mulți indicatori arată același lucru
 4. Menționează:
-   - Ce confirmă semnalul (ex: "RSI la 35 + trend bullish + preț aproape de suport = oportunitate")
-   - Ce contrazice sau trebuie urmărit (ex: "dar MA50 e încă peste preț")
-5. Oferă NIVELURI CHEIE concrete de urmărit
-6. Concluzie clară în 1-2 propoziții
+   - Ce confirmă semnalul (ex: "RSI 35 + volum 2x + trend up = semnal puternic")
+   - Ce contrazice sau trebuie urmărit
+   - RISCURI specifice (lichiditate, divergențe)
+5. Dă NIVELURI CONCRETE: "Cumpără sub X, vinde peste Y, stop-loss la Z"
+6. Concluzie clară în 2-3 propoziții
 7. Disclaimer scurt
 
-Scrie în română, maxim 200 cuvinte, stil direct și profesionist."""
+Scrie în română, maxim 250 cuvinte, stil direct și profesionist.
+NU repeta datele - interpretează-le!"""
 
 
 async def generate_ai_interpretation(analysis_data: Dict) -> str:
@@ -270,9 +544,31 @@ async def generate_ai_interpretation(analysis_data: Dict) -> str:
             trend_strength=analysis_data.get("trend_strength", 0),
             short_change=analysis_data.get("short_change", 0),
             medium_change=analysis_data.get("medium_change", 0),
+            # Volume data
+            volume_current=analysis_data.get("volume_current", "N/A"),
+            volume_avg=analysis_data.get("volume_avg", "N/A"),
+            volume_ratio=analysis_data.get("volume_ratio", "N/A"),
+            volume_status=analysis_data.get("volume_status", "N/A"),
+            volume_trend=analysis_data.get("volume_trend", "N/A"),
+            volume_alert=analysis_data.get("volume_alert", ""),
+            # Market context
+            bet_change=analysis_data.get("bet_change", "N/A"),
+            market_sentiment=analysis_data.get("market_sentiment", "N/A"),
+            market_description=analysis_data.get("market_description", ""),
+            # Price action
+            patterns=", ".join(analysis_data.get("patterns", [])) or "Niciun pattern clar",
+            near_high="DA" if analysis_data.get("near_high") else "NU",
+            near_low="DA" if analysis_data.get("near_low") else "NU",
+            volume_confirms="DA ✓" if analysis_data.get("volume_confirms") else "NU ⚠️",
+            # Liquidity
+            liquidity_score=analysis_data.get("liquidity_score", "N/A"),
+            liquidity_tier=analysis_data.get("liquidity_tier", "N/A"),
+            liquidity_description=analysis_data.get("liquidity_description", ""),
+            # Signal
             signal=analysis_data.get("signal", "PĂSTREAZĂ"),
             confidence=analysis_data.get("confidence", 50),
-            reasons=", ".join(analysis_data.get("reasons", []))
+            reasons=", ".join(analysis_data.get("reasons", [])),
+            warnings=", ".join(analysis_data.get("warnings", [])) or "Niciun avertisment"
         )
         
         chat = LlmChat(
@@ -320,25 +616,45 @@ async def analyze_stock(request: AnalysisRequest, user: dict = Depends(require_a
         if not history or len(history) < 5:
             raise HTTPException(status_code=404, detail=f"Nu sunt suficiente date pentru {request.symbol}")
         
-        # Extract closing prices
+        # Extract closing prices and volumes
         prices = [h["close"] for h in history if h.get("close")]
+        volumes = [h.get("volume", 0) for h in history]
         current_price = prices[-1] if prices else 0
+        current_volume = volumes[-1] if volumes else 0
         
-        # Calculate indicators
+        # Calculate ALL indicators
         sr_levels = calculate_support_resistance(prices)
         mas = calculate_moving_averages(prices)
         rsi = calculate_rsi(prices)
         trend = determine_trend(prices, mas.get("ma20"), mas.get("ma50"))
+        
+        # NEW: Volume analysis
+        volume_data = analyze_volume(volumes, current_volume)
+        
+        # NEW: Liquidity score
+        avg_volume = np.mean(volumes) if volumes else 0
+        avg_value = avg_volume * current_price if current_price else 0
+        liquidity = calculate_liquidity_score(avg_volume, avg_value)
+        
+        # NEW: Market context (BET index)
+        market_context = await get_market_context(db)
+        
+        # NEW: Price action patterns
+        price_action = analyze_price_action(prices, volumes)
+        
+        # Generate signal with ALL data
         signal = generate_signal(
             rsi, trend, current_price,
-            sr_levels["support"], sr_levels["resistance"]
+            sr_levels["support"], sr_levels["resistance"],
+            volume_data, market_context
         )
         
-        # Prepare analysis data
+        # Prepare comprehensive analysis data
         analysis_data = {
             "symbol": request.symbol,
             "current_price": current_price,
             "period": f"{days} zile",
+            # Technical indicators
             "support": sr_levels["support"],
             "resistance": sr_levels["resistance"],
             "support_levels": sr_levels["support_levels"],
@@ -351,10 +667,32 @@ async def analyze_stock(request: AnalysisRequest, user: dict = Depends(require_a
             "trend_strength": round(trend["strength"] * 100),
             "short_change": trend["short_term_change"],
             "medium_change": trend["medium_term_change"],
+            # Volume analysis
+            "volume_current": volume_data.get("current"),
+            "volume_avg": volume_data.get("average"),
+            "volume_ratio": volume_data.get("ratio"),
+            "volume_status": volume_data.get("status"),
+            "volume_trend": volume_data.get("trend"),
+            "volume_alert": volume_data.get("alert"),
+            "volume_confirms": price_action.get("volume_confirms"),
+            # Market context
+            "bet_change": market_context.get("bet_change"),
+            "market_sentiment": market_context.get("sentiment"),
+            "market_description": market_context.get("description"),
+            # Price action
+            "patterns": price_action.get("patterns", []),
+            "near_high": price_action.get("near_high"),
+            "near_low": price_action.get("near_low"),
+            # Liquidity
+            "liquidity_score": liquidity.get("score"),
+            "liquidity_tier": liquidity.get("tier"),
+            "liquidity_description": liquidity.get("description"),
+            # Signal
             "signal": signal["signal"],
             "signal_color": signal["signal_color"],
             "confidence": signal["confidence"],
-            "reasons": signal["reasons"]
+            "reasons": signal["reasons"],
+            "warnings": signal.get("warnings", [])
         }
         
         # Generate AI interpretation

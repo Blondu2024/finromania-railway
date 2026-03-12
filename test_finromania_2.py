@@ -16,7 +16,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Any, Optional
 
 class FinRomania2Tester:
-    def __init__(self, base_url="https://finromania-beta.preview.emergentagent.com"):
+    def __init__(self, base_url="https://pro-trading-2.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0

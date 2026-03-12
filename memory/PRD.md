@@ -131,4 +131,4 @@ Build a professional financial platform that:
 - `/app/frontend/src/pages/NewsPage.jsx` - MODIFIED: UI cu 2 taburi
 
 ## Contact
-Platform URL: https://finromania-beta.preview.emergentagent.com
+Platform URL: https://pro-trading-2.preview.emergentagent.com
