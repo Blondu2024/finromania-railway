@@ -99,16 +99,16 @@ def analyze_volume(volumes: List[int], current_volume: int) -> Dict:
         alert = "Volum în parametri normali"
     
     return {
-        "current": current_volume,
-        "average": round(avg_volume),
-        "average_20d": round(avg_volume_20),
-        "ratio": round(volume_ratio, 2),
-        "ratio_20d": round(volume_ratio_20, 2),
+        "current": int(current_volume),
+        "average": int(round(avg_volume)),
+        "average_20d": int(round(avg_volume_20)),
+        "ratio": float(round(volume_ratio, 2)),
+        "ratio_20d": float(round(volume_ratio_20, 2)),
         "status": status,
         "alert": alert,
         "trend": volume_trend,
-        "spikes_10d": volume_spikes,
-        "is_confirmation": volume_ratio >= 1.2  # Volume confirms price movement
+        "spikes_10d": int(volume_spikes),
+        "is_confirmation": bool(volume_ratio >= 1.2)  # Volume confirms price movement
     }
 
 
@@ -252,9 +252,9 @@ def analyze_price_action(prices: List[float], volumes: List[int]) -> Dict:
     return {
         "patterns": patterns,
         "last_5_trend": "UP" if last_5_prices[-1] > last_5_prices[0] else "DOWN",
-        "volume_confirms": volume_up if price_up else not volume_up,
-        "near_high": current >= max_20 * 0.95,
-        "near_low": current <= min_20 * 1.05
+        "volume_confirms": bool(volume_up if price_up else not volume_up),
+        "near_high": bool(current >= max_20 * 0.95),
+        "near_low": bool(current <= min_20 * 1.05)
     }
 
 
@@ -263,11 +263,11 @@ def calculate_moving_averages(prices: List[float]) -> Dict:
     result = {}
     
     if len(prices) >= 20:
-        result["ma20"] = round(np.mean(prices[-20:]), 2)
+        result["ma20"] = float(round(np.mean(prices[-20:]), 2))
     if len(prices) >= 50:
-        result["ma50"] = round(np.mean(prices[-50:]), 2)
+        result["ma50"] = float(round(np.mean(prices[-50:]), 2))
     if len(prices) >= 200:
-        result["ma200"] = round(np.mean(prices[-200:]), 2)
+        result["ma200"] = float(round(np.mean(prices[-200:]), 2))
     
     return result
 
@@ -285,12 +285,12 @@ def calculate_rsi(prices: List[float], period: int = 14) -> Optional[float]:
     avg_loss = np.mean(losses[-period:])
     
     if avg_loss == 0:
-        return 100
+        return 100.0
     
     rs = avg_gain / avg_loss
     rsi = 100 - (100 / (1 + rs))
     
-    return round(rsi, 1)
+    return float(round(rsi, 1))
 
 
 def determine_trend(prices: List[float], ma20: float = None, ma50: float = None) -> Dict:
@@ -328,9 +328,9 @@ def determine_trend(prices: List[float], ma20: float = None, ma50: float = None)
     
     return {
         "direction": direction,
-        "strength": round(strength, 2),
-        "short_term_change": round(short_trend, 2),
-        "medium_term_change": round(medium_trend, 2)
+        "strength": float(round(strength, 2)),
+        "short_term_change": float(round(short_trend, 2)),
+        "medium_term_change": float(round(medium_trend, 2))
     }
 
 
@@ -412,28 +412,28 @@ def generate_signal(rsi: float, trend: Dict, current_price: float, support: floa
             score -= 5
             reasons.append(f"Piață negativă (BET {bet_change:+.1f}%)")
     
-    # Determine signal
+    # Determine signal - NEUTRAL terminology (not investment advice)
     if score >= 70:
-        signal = "CUMPĂRĂ"
+        signal = "FOARTE FAVORABIL"
         signal_color = "green"
     elif score >= 55:
-        signal = "CUMPĂRĂ MODERAT"
+        signal = "FAVORABIL"
         signal_color = "lightgreen"
     elif score <= 30:
-        signal = "VINDE"
+        signal = "FOARTE RISCANT"
         signal_color = "red"
     elif score <= 45:
-        signal = "VINDE MODERAT"
+        signal = "RISCANT"
         signal_color = "orange"
     else:
-        signal = "PĂSTREAZĂ"
+        signal = "NEUTRU"
         signal_color = "gray"
     
     return {
         "signal": signal,
         "signal_color": signal_color,
-        "confidence": min(abs(score - 50) * 2, 100),
-        "score": score,
+        "confidence": int(min(abs(score - 50) * 2, 100)),
+        "score": int(score),
         "reasons": reasons,
         "warnings": warnings
     }
@@ -441,6 +441,11 @@ def generate_signal(rsi: float, trend: Dict, current_price: float, support: floa
 
 AI_ANALYSIS_PROMPT = """Ești un analist tehnic profesionist pentru BVB (Bursa de Valori București). 
 Analizează TOATE datele de mai jos și oferă o SINTEZĂ completă, profesionistă.
+
+IMPORTANT: NU da recomandări de CUMPĂRARE sau VÂNZARE! Folosește doar termeni neutri precum:
+- "Favorabil" sau "Accesibil" pentru situații pozitive
+- "Riscant" sau "Prudență recomandată" pentru situații negative
+- "Neutru" pentru situații echilibrate
 
 ═══════════════════════════════════════════
 📊 ACȚIUNE: {symbol}
@@ -479,7 +484,7 @@ Analizează TOATE datele de mai jos și oferă o SINTEZĂ completă, profesionis
 • Clasificare: {liquidity_tier}
 • {liquidity_description}
 
-⚡ SEMNAL ALGORITMIC: {signal} (încredere {confidence}%)
+⚡ EVALUARE ALGORITMICĂ: {signal} (încredere {confidence}%)
 Factori pozitivi/negativi: {reasons}
 Avertismente: {warnings}
 
@@ -490,15 +495,15 @@ INSTRUCȚIUNI DE RĂSPUNS:
 2. VOLUMUL e crucial pe BVB! O mișcare fără volum = slabă/falsă
 3. Identifică CONFLUENȚA: când mai mulți indicatori arată același lucru
 4. Menționează:
-   - Ce confirmă semnalul (ex: "RSI 35 + volum 2x + trend up = semnal puternic")
-   - Ce contrazice sau trebuie urmărit
+   - Ce face situația favorabilă sau riscantă
+   - Ce trebuie urmărit/monitorizat
    - RISCURI specifice (lichiditate, divergențe)
-5. Dă NIVELURI CONCRETE: "Cumpără sub X, vinde peste Y, stop-loss la Z"
-6. Concluzie clară în 2-3 propoziții
-7. Disclaimer scurt
+5. Oferă NIVELURI de interes: "Nivel favorabil sub X RON, zonă de rezistență la Y RON"
+6. Concluzie clară în 2-3 propoziții despre evaluarea riscului
+7. Disclaimer: "Aceasta este o analiză tehnică educativă, NU o recomandare de investiții."
 
 Scrie în română, maxim 250 cuvinte, stil direct și profesionist.
-NU repeta datele - interpretează-le!"""
+NU folosi cuvintele "cumpără", "vinde", "recomand"!"""
 
 
 async def generate_ai_interpretation(analysis_data: Dict) -> str:

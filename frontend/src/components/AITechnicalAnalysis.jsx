@@ -58,14 +58,14 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
   };
 
   const getSignalIcon = (signal) => {
-    if (signal?.includes('CUMPĂRĂ')) return <TrendingUp className="w-5 h-5" />;
-    if (signal?.includes('VINDE')) return <TrendingDown className="w-5 h-5" />;
+    if (signal?.includes('FAVORABIL')) return <TrendingUp className="w-5 h-5" />;
+    if (signal?.includes('RISCANT')) return <TrendingDown className="w-5 h-5" />;
     return <Minus className="w-5 h-5" />;
   };
 
   const getSignalColor = (signal) => {
-    if (signal?.includes('CUMPĂRĂ')) return 'text-green-600 bg-green-100';
-    if (signal?.includes('VINDE')) return 'text-red-600 bg-red-100';
+    if (signal?.includes('FAVORABIL')) return 'text-green-600 bg-green-100';
+    if (signal?.includes('RISCANT')) return 'text-red-600 bg-red-100';
     return 'text-gray-600 bg-gray-100';
   };
 
@@ -103,7 +103,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
             </li>
             <li className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-green-500" />
-              Semnal CUMPĂRĂ/VINDE/PĂSTREAZĂ
+              Evaluare: FAVORABIL/RISCANT/NEUTRU
             </li>
             <li className="flex items-center gap-2">
               <Brain className="w-4 h-4 text-purple-500" />
@@ -186,13 +186,13 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
               exit={{ opacity: 0, height: 0 }}
               className="space-y-4"
             >
-              {/* Signal Banner */}
+              {/* Evaluation Banner */}
               <div className={`p-4 rounded-xl flex items-center justify-between ${getSignalColor(analysis.analysis?.signal)}`}>
                 <div className="flex items-center gap-3">
                   {getSignalIcon(analysis.analysis?.signal)}
                   <div>
                     <p className="font-bold text-lg">{analysis.analysis?.signal}</p>
-                    <p className="text-sm opacity-80">Încredere: {analysis.analysis?.confidence}%</p>
+                    <p className="text-sm opacity-80">Nivel de încredere: {analysis.analysis?.confidence}%</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -327,7 +327,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
               {/* Reasons */}
               {analysis.analysis?.reasons?.length > 0 && (
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
-                  <p className="text-xs text-muted-foreground mb-2">Motive semnal:</p>
+                  <p className="text-xs text-muted-foreground mb-2">Factori de evaluare:</p>
                   <ul className="text-sm space-y-1">
                     {analysis.analysis.reasons.map((reason, idx) => (
                       <li key={idx} className="flex items-center gap-2">
