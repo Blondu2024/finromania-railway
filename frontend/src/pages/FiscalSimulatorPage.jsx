@@ -124,10 +124,10 @@ export default function FiscalSimulatorPage() {
       {/* Disclaimer */}
       <Alert className="mb-6 bg-amber-50 border-amber-200">
         <AlertTriangle className="h-4 w-4 text-amber-600" />
-        <AlertTitle className="text-amber-800">Scop Educativ</AlertTitle>
+        <AlertTitle className="text-amber-800">Scop Educativ - Reguli 2026</AlertTitle>
         <AlertDescription className="text-amber-700">
-          Acest simulator oferă estimări orientative. Pentru decizii fiscale reale, 
-          consultă obligatoriu un expert contabil autorizat!
+          Acest simulator folosește regulile fiscale pentru <strong>2026</strong> (OUG 89/2025, OUG 8/2026). 
+          Pentru decizii fiscale reale, consultă obligatoriu un expert contabil autorizat!
         </AlertDescription>
       </Alert>
 

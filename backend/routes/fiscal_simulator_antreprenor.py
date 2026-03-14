@@ -14,34 +14,39 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/fiscal-simulator", tags=["fiscal-simulator-antreprenor"])
 
 # ============================================
-# CONSTANTE FISCALE ROMÂNIA 2025
-# SCOP EDUCATIV - ACTUALIZAT IANUARIE 2025
+# CONSTANTE FISCALE ROMÂNIA 2026
+# ACTUALIZAT CONFORM OUG 89/2025, Legea 239/2025, OUG 8/2026
+# SCOP EDUCATIV
 # ============================================
 
 # Praguri importante
-PRAG_TVA = 300000  # RON - prag înregistrare TVA obligatorie
-PRAG_MICRO_EUR = 500000  # EUR - prag maxim venituri micro
+PRAG_TVA = 395000  # RON - prag înregistrare TVA obligatorie (modificat 2026!)
+PRAG_MICRO_EUR = 100000  # EUR - prag maxim venituri micro (redus de la 500k!)
 PRAG_DETINERE_AGREGARE = 25  # % - dacă deții >25% în mai multe firme, veniturile se agregă
 
-# Curs EUR aproximativ
-CURS_EUR = 5.0  # RON/EUR
+# Curs EUR aproximativ (31.12.2025)
+CURS_EUR = 5.10  # RON/EUR
 
-# Impozite micro
-MICRO_CU_ANGAJAT = 1  # %
-MICRO_FARA_ANGAJAT = 3  # %
+# Impozite micro - COTĂ UNICĂ din 2026!
+IMPOZIT_MICRO = 1  # % - cotă unică indiferent de angajați
 
 # Impozit profit standard
 IMPOZIT_PROFIT = 16  # %
+
+# Impozit dividende - MAJORAT în 2026!
+IMPOZIT_DIVIDENDE = 16  # % (de la 8% în 2025!)
 
 # PFA
 PFA_IMPOZIT = 10  # %
 PFA_CASS = 10  # %
 PFA_CAS = 25  # % (opțional)
 
-# CASS
-SALARIU_MINIM = 4050  # RON 2025
+# CASS - MODIFICĂRI 2026
+SALARIU_MINIM_S1 = 4050  # RON (ianuarie-iunie 2026)
+SALARIU_MINIM_S2 = 4325  # RON (iulie-decembrie 2026)
+SALARIU_MINIM = 4050  # RON - folosim cel de la început de an
 CASS_BAZA_MINIMA = 6 * SALARIU_MINIM  # 24,300 RON
-CASS_BAZA_MAXIMA = 60 * SALARIU_MINIM  # 243,000 RON
+CASS_BAZA_MAXIMA = 72 * SALARIU_MINIM  # MAJORAT de la 60 la 72 salarii minime!
 
 # Coduri CAEN cu regim special
 CAEN_SCUTIRI = {
@@ -171,9 +176,15 @@ def calculeaza_impozit_entitate(entitate: EntitateInput) -> RezultatEntitate:
             impozit = 0
             observatii.append("ATENȚIE: Scutirea se aplică doar dacă îndeplinești toate condițiile!")
         else:
-            rata = MICRO_CU_ANGAJAT if entitate.are_angajati else MICRO_FARA_ANGAJAT
+            rata = IMPOZIT_MICRO  # Cotă unică 1% din 2026!
             impozit = venit * rata / 100
-            observatii.append(f"Micro {'1%' if entitate.are_angajati else '3%'} pe cifra de afaceri")
+            observatii.append(f"Micro {IMPOZIT_MICRO}% pe cifra de afaceri (cotă unică din 2026)")
+            
+        # Verifică prag micro 100.000 EUR
+        prag_ron = PRAG_MICRO_EUR * CURS_EUR
+        if venit > prag_ron:
+            observatii.append(f"⚠️ Depășești pragul micro de {PRAG_MICRO_EUR:,} EUR ({prag_ron:,.0f} RON)!")
+            observatii.append("Trebuie să treci la impozit pe profit 16%!")
             
     elif entitate.tip == TipEntitate.SRL_PROFIT:
         if info_caen.get("scutire_profit"):
@@ -223,7 +234,7 @@ def verifica_agregare_micro(entitati: List[EntitateInput]) -> List[AvertismentFi
         avertismente.append(AvertismentFiscal(
             tip="warning",
             titlu="Agregare venituri micro-întreprinderi",
-            descriere=f"Deții >25% în {len(srl_micro_relevante)} SRL-uri micro. Conform legii, veniturile se AGREGĂ pentru verificarea pragului de 500.000 EUR.",
+            descriere=f"Deții >25% în {len(srl_micro_relevante)} SRL-uri micro. Conform legii, veniturile se AGREGĂ pentru verificarea pragului de {PRAG_MICRO_EUR:,} EUR.",
             actiune_recomandata=f"Total agregat: {total_venituri:,.0f} RON. Pragul este {prag_micro_ron:,.0f} RON ({PRAG_MICRO_EUR:,} EUR)."
         ))
         
@@ -231,8 +242,8 @@ def verifica_agregare_micro(entitati: List[EntitateInput]) -> List[AvertismentFi
             avertismente.append(AvertismentFiscal(
                 tip="danger",
                 titlu="⚠️ Depășire prag micro prin agregare!",
-                descriere=f"Veniturile agregate ({total_venituri:,.0f} RON) depășesc pragul micro!",
-                actiune_recomandata="Una sau mai multe firme trebuie să treacă la impozit pe profit 16%. Consultă un expert contabil!"
+                descriere=f"Veniturile agregate ({total_venituri:,.0f} RON) depășesc pragul micro de {PRAG_MICRO_EUR:,} EUR!",
+                actiune_recomandata="Una sau mai multe firme trebuie să treacă la impozit pe profit 16%. Consultă un expert contabil URGENT!"
             ))
     
     return avertismente
@@ -276,12 +287,23 @@ async def get_praguri_fiscale():
             "tva": {
                 "valoare": PRAG_TVA,
                 "moneda": "RON",
-                "descriere": "Prag pentru înregistrare obligatorie TVA"
+                "descriere": "Prag pentru înregistrare obligatorie TVA (MAJORAT în 2026!)"
             },
             "micro": {
                 "valoare": PRAG_MICRO_EUR,
                 "moneda": "EUR",
-                "descriere": "Plafon maxim venituri pentru regim micro-întreprindere"
+                "valoare_ron": int(PRAG_MICRO_EUR * CURS_EUR),
+                "descriere": "Plafon maxim venituri pentru regim micro-întreprindere (REDUS de la 500k în 2026!)"
+            },
+            "impozit_micro": {
+                "valoare": IMPOZIT_MICRO,
+                "unitate": "%",
+                "descriere": "Cotă unică micro din 2026 (elimină diferența 1%/3%)"
+            },
+            "impozit_dividende": {
+                "valoare": IMPOZIT_DIVIDENDE,
+                "unitate": "%",
+                "descriere": "Impozit dividende (MAJORAT de la 8% în 2026!)"
             },
             "agregare": {
                 "valoare": PRAG_DETINERE_AGREGARE,
@@ -292,10 +314,21 @@ async def get_praguri_fiscale():
                 "valoare": CASS_BAZA_MINIMA,
                 "moneda": "RON",
                 "descriere": "Baza minimă anuală pentru calculul CASS (6 salarii minime)"
+            },
+            "cass_maxim": {
+                "valoare": int(CASS_BAZA_MAXIMA),
+                "moneda": "RON",
+                "descriere": "Baza maximă anuală CASS (72 salarii minime - MAJORAT de la 60!)"
+            },
+            "salariu_minim": {
+                "s1_2026": SALARIU_MINIM_S1,
+                "s2_2026": SALARIU_MINIM_S2,
+                "moneda": "RON",
+                "descriere": "Salariu minim brut: 4.050 lei (ian-iun), 4.325 lei (iul-dec)"
             }
         },
-        "actualizat": "Ianuarie 2025",
-        "disclaimer": "Valorile pot suferi modificări legislative. Verificați sursele oficiale ANAF."
+        "actualizat": "2026 (conform OUG 89/2025, Legea 239/2025, OUG 8/2026)",
+        "disclaimer": "Valorile pot suferi modificări legislative. Verificați sursele oficiale ANAF/MFP."
     }
 
 @router.post("/simuleaza", response_model=SimulatorOutput)
