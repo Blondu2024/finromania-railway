@@ -206,6 +206,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
     { path: '/calendar', label: 'Dividende', icon: '🎯' },
     { path: '/screener', label: 'Screener', icon: '🔍' },
     { path: '/converter', label: 'Convertor', icon: '💱' },
+    { path: '/simulator-fiscal', label: 'Simulator Antreprenor', icon: '🏢' },
   ];
 
   return (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, BarChart3, Globe, Calculator, Award, Zap, Crown, Target, PieChart, Briefcase, BookOpen, Search, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, ArrowRight, RefreshCw, GraduationCap, BarChart3, Globe, Calculator, Award, Zap, Crown, Target, PieChart, Briefcase, BookOpen, Search, Activity, Building2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -109,8 +109,8 @@ const HeroSection = memo(function HeroSection({ user }) {
           </p>
         </div>
 
-        {/* 4 Pillars - ORDINEA CORECTĂ pentru prima impresie PRO */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {/* 5 Pillars - ORDINEA CORECTĂ pentru prima impresie PRO */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {/* 1. BVB - PRIMUL (arată că e platformă serioasă) */}
           <Link to="/stocks" className="group">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
@@ -142,12 +142,24 @@ const HeroSection = memo(function HeroSection({ user }) {
                 <Calculator className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">🧮 Calculator Fiscal</h3>
-              <p className="text-sm text-blue-200">Economisește până la 50k+ RON/an</p>
+              <p className="text-sm text-blue-200">Pentru investitori BVB</p>
               <Badge className="mt-2 bg-amber-500/20 text-amber-300 text-xs">PRO</Badge>
             </div>
           </Link>
 
-          {/* 4. EDUCAȚIE - LA FINAL (pentru cei care vor să învețe) */}
+          {/* 4. SIMULATOR ANTREPRENOR - NOU */}
+          <Link to="/simulator-fiscal" className="group">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
+              <div className="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-lg mb-1">🏢 Simulator Fiscal</h3>
+              <p className="text-sm text-blue-200">Pentru antreprenori cu firme</p>
+              <Badge className="mt-2 bg-cyan-500/20 text-cyan-300 text-xs">NOU 2026</Badge>
+            </div>
+          </Link>
+
+          {/* 5. EDUCAȚIE - LA FINAL (pentru cei care vor să învețe) */}
           <Link to="/trading-school" className="group">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
               <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
