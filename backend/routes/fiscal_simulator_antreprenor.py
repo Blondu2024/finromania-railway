@@ -89,12 +89,23 @@ class EntitateInput(BaseModel):
     procent_detinere: float = Field(default=100, ge=0, le=100, description="% deținere în entitate")
     are_angajati: bool = Field(default=False, description="Are cel puțin un angajat")
     platitor_tva: bool = Field(default=False, description="Este plătitor de TVA")
-
+    # CÂMPURI NOI
+    norma_venit_anuala: Optional[float] = Field(default=None, description="Norma de venit ANAF pentru PFA normă")
+    an_infiintare: Optional[int] = Field(default=None, description="Anul înființării firmei")
+    
 class SimulatorInput(BaseModel):
     """Input pentru simulatorul fiscal"""
     entitati: List[EntitateInput] = Field(default=[], description="Lista entităților")
     are_salariu: bool = Field(default=False, description="Are salariu cu CASS plătit")
     salariu_brut_lunar: float = Field(default=0, ge=0, description="Salariu brut lunar RON")
+    # CÂMP NOU - pentru verificare asocieri
+    alte_asocieri_peste_25: bool = Field(default=False, description="Asociat/admin în alte firme cu >25% deținere (neincluse în listă)")
+
+class PasCalcul(BaseModel):
+    """Un pas din explicația calculului"""
+    descriere: str
+    formula: Optional[str] = None
+    rezultat: Optional[str] = None
 
 class AvertismentFiscal(BaseModel):
     """Un avertisment despre situația fiscală"""
@@ -102,6 +113,13 @@ class AvertismentFiscal(BaseModel):
     titlu: str
     descriere: str
     actiune_recomandata: Optional[str] = None
+
+class ComparatieAlternativa(BaseModel):
+    """Comparație cu o alternativă fiscală"""
+    alternativa: str
+    impozit_alternativ: float
+    diferenta: float
+    recomandare: str
 
 class RezultatEntitate(BaseModel):
     """Rezultatul pentru o entitate"""
@@ -113,6 +131,9 @@ class RezultatEntitate(BaseModel):
     regim_tva: str
     scutiri_active: List[str]
     observatii: List[str]
+    # CÂMPURI NOI
+    pasi_calcul: List[PasCalcul] = Field(default=[])
+    comparatii: List[ComparatieAlternativa] = Field(default=[])
 
 class SimulatorOutput(BaseModel):
     """Output-ul simulatorului"""
@@ -121,6 +142,8 @@ class SimulatorOutput(BaseModel):
     total_impozite_estimate: float
     rata_efectiva_globala: float
     avertismente: List[AvertismentFiscal]
+    # CÂMPURI NOI
+    sumar_comparativ: Optional[Dict] = None
     explicatie_ai: Optional[str] = None
     disclaimer: str
 
@@ -134,11 +157,13 @@ def verifica_scutiri_caen(cod_caen: str) -> Dict:
         return CAEN_SCUTIRI[cod_caen]
     return {}
 
-def calculeaza_impozit_entitate(entitate: EntitateInput) -> RezultatEntitate:
-    """Calculează impozitul estimat pentru o entitate"""
+def calculeaza_impozit_entitate(entitate: EntitateInput, an_curent: int = 2026) -> RezultatEntitate:
+    """Calculează impozitul estimat pentru o entitate cu explicații detaliate"""
     venit = entitate.venit_anual_estimat
     scutiri = []
     observatii = []
+    pasi_calcul = []
+    comparatii = []
     impozit = 0
     rata = 0
     regim_tva = "Neînregistrat TVA"
@@ -147,54 +172,173 @@ def calculeaza_impozit_entitate(entitate: EntitateInput) -> RezultatEntitate:
     cod_caen = entitate.cod_caen if entitate.cod_caen and entitate.cod_caen != "none" else None
     info_caen = verifica_scutiri_caen(cod_caen) if cod_caen else {}
     
+    # Verifică dacă e primul an de activitate
+    este_primul_an = entitate.an_infiintare and entitate.an_infiintare == an_curent
+    
     if entitate.tip == TipEntitate.PF:
-        # Persoană fizică - nu plătește impozite pe activitate economică direct
         observatii.append("Ca PF, veniturile din activități economice trebuie declarate prin PFA/PFI sau SRL")
         rata = 0
         impozit = 0
+        pasi_calcul.append(PasCalcul(
+            descriere="Persoană fizică nu poate desfășura direct activități economice",
+            rezultat="Trebuie să alegi PFA, PFI sau SRL"
+        ))
         
-    elif entitate.tip in [TipEntitate.PFA_NORMA, TipEntitate.PFA_REAL]:
+    elif entitate.tip == TipEntitate.PFA_NORMA:
+        # PFA Normă de venit
+        norma = entitate.norma_venit_anuala or venit  # Folosim norma dacă e specificată
         rata = PFA_IMPOZIT
-        if entitate.tip == TipEntitate.PFA_NORMA:
-            observatii.append("PFA Normă de venit - impozit fix pe norma stabilită de ANAF pentru activitate")
-            # La norma, impozitul e pe norma, nu pe venit real
-            impozit = venit * 0.10  # Simplificat pentru educativ
-        else:
-            observatii.append("PFA Sistem Real - 10% pe venitul net (venit - cheltuieli)")
-            impozit = venit * 0.10
+        impozit = norma * rata / 100
+        
+        pasi_calcul.append(PasCalcul(
+            descriere="Pas 1: Identificare normă de venit ANAF",
+            formula=f"Norma = {norma:,.0f} RON (stabilită de ANAF pentru activitate)",
+            rezultat=f"{norma:,.0f} RON"
+        ))
+        pasi_calcul.append(PasCalcul(
+            descriere="Pas 2: Calcul impozit pe venit",
+            formula=f"{norma:,.0f} × {rata}% = {impozit:,.0f} RON",
+            rezultat=f"Impozit: {impozit:,.0f} RON"
+        ))
+        
+        observatii.append(f"PFA Normă de venit - impozit {rata}% aplicat la norma ANAF, NU la venitul real")
+        observatii.append("Avantaj: dacă câștigi mai mult decât norma, nu plătești impozit suplimentar")
+        
+        # Comparație cu SRL
+        impozit_srl = venit * IMPOZIT_MICRO / 100
+        comparatii.append(ComparatieAlternativa(
+            alternativa="SRL Micro",
+            impozit_alternativ=impozit_srl,
+            diferenta=impozit_srl - impozit,
+            recomandare=f"{'SRL ar fi mai avantajos' if impozit_srl < impozit else 'PFA Normă e mai avantajos'} cu {abs(impozit_srl - impozit):,.0f} RON"
+        ))
+        
+    elif entitate.tip == TipEntitate.PFA_REAL:
+        rata = PFA_IMPOZIT
+        cheltuieli_estimate = venit * 0.30  # Estimăm 30% cheltuieli
+        venit_net = venit - cheltuieli_estimate
+        impozit = venit_net * rata / 100
+        
+        pasi_calcul.append(PasCalcul(
+            descriere="Pas 1: Calcul venit net (venit - cheltuieli deductibile)",
+            formula=f"{venit:,.0f} - {cheltuieli_estimate:,.0f} (est. 30%) = {venit_net:,.0f} RON",
+            rezultat=f"Venit net: {venit_net:,.0f} RON"
+        ))
+        pasi_calcul.append(PasCalcul(
+            descriere="Pas 2: Calcul impozit pe venit net",
+            formula=f"{venit_net:,.0f} × {rata}% = {impozit:,.0f} RON",
+            rezultat=f"Impozit: {impozit:,.0f} RON"
+        ))
+        
+        observatii.append("PFA Sistem Real - plătești impozit pe venitul NET (după cheltuieli)")
         observatii.append("CASS 10% datorat dacă veniturile depășesc 6 salarii minime/an")
+        
+        # Comparație cu normă
+        norma_estimata = venit * 0.5
+        impozit_norma = norma_estimata * rata / 100
+        comparatii.append(ComparatieAlternativa(
+            alternativa="PFA Normă (dacă norma e ~50% din venit)",
+            impozit_alternativ=impozit_norma,
+            diferenta=impozit_norma - impozit,
+            recomandare="Verifică norma ANAF pentru activitatea ta"
+        ))
         
     elif entitate.tip == TipEntitate.PFI:
         rata = PFA_IMPOZIT
         impozit = venit * rata / 100
+        
+        pasi_calcul.append(PasCalcul(
+            descriere="Pas 1: Baza de impozitare = venitul brut",
+            formula=f"Venit: {venit:,.0f} RON",
+            rezultat=f"{venit:,.0f} RON"
+        ))
+        pasi_calcul.append(PasCalcul(
+            descriere="Pas 2: Calcul impozit",
+            formula=f"{venit:,.0f} × {rata}% = {impozit:,.0f} RON",
+            rezultat=f"Impozit: {impozit:,.0f} RON"
+        ))
+        
         observatii.append("PFI (Profesie liberală) - 10% impozit + CASS 10%")
         
     elif entitate.tip == TipEntitate.SRL_MICRO:
+        prag_ron = PRAG_MICRO_EUR * CURS_EUR
+        
         if info_caen.get("scutire_profit"):
             scutiri.append(f"Scutire impozit profit - {info_caen.get('conditii', '')}")
             rata = 0
             impozit = 0
-            observatii.append("ATENȚIE: Scutirea se aplică doar dacă îndeplinești toate condițiile!")
+            pasi_calcul.append(PasCalcul(
+                descriere="Cod CAEN cu scutire de impozit",
+                formula=f"Scutire: {info_caen.get('conditii', '')}",
+                rezultat="Impozit: 0 RON (dacă îndeplinești condițiile)"
+            ))
+            observatii.append("ATENȚIE: Scutirea se aplică doar dacă îndeplinești TOATE condițiile!")
         else:
-            rata = IMPOZIT_MICRO  # Cotă unică 1% din 2026!
+            rata = IMPOZIT_MICRO
             impozit = venit * rata / 100
+            
+            pasi_calcul.append(PasCalcul(
+                descriere="Pas 1: Verificare eligibilitate micro",
+                formula=f"Venit {venit:,.0f} RON < Prag {prag_ron:,.0f} RON?",
+                rezultat="DA - eligibil micro" if venit <= prag_ron else "NU - depășit prag!"
+            ))
+            pasi_calcul.append(PasCalcul(
+                descriere="Pas 2: Calcul impozit micro (cotă unică 2026)",
+                formula=f"{venit:,.0f} × {rata}% = {impozit:,.0f} RON",
+                rezultat=f"Impozit: {impozit:,.0f} RON"
+            ))
+            
             observatii.append(f"Micro {IMPOZIT_MICRO}% pe cifra de afaceri (cotă unică din 2026)")
             
-        # Verifică prag micro 100.000 EUR
-        prag_ron = PRAG_MICRO_EUR * CURS_EUR
+            if este_primul_an:
+                observatii.append("✅ Primul an de activitate - poți alege micro indiferent de estimări")
+            
         if venit > prag_ron:
-            observatii.append(f"⚠️ Depășești pragul micro de {PRAG_MICRO_EUR:,} EUR ({prag_ron:,.0f} RON)!")
+            observatii.append(f"⚠️ ATENȚIE: Depășești pragul micro de {PRAG_MICRO_EUR:,} EUR!")
             observatii.append("Trebuie să treci la impozit pe profit 16%!")
             
+            # Recalculăm ca SRL profit
+            impozit_profit = venit * 0.20 * IMPOZIT_PROFIT / 100
+            comparatii.append(ComparatieAlternativa(
+                alternativa="SRL Profit (obligatoriu la depășire)",
+                impozit_alternativ=impozit_profit,
+                diferenta=impozit_profit - impozit,
+                recomandare=f"La depășirea pragului vei plăti ~{impozit_profit:,.0f} RON (16% pe profit)"
+            ))
+            
     elif entitate.tip == TipEntitate.SRL_PROFIT:
+        profit_estimat = venit * 0.20  # 20% marjă de profit
+        
         if info_caen.get("scutire_profit"):
             scutiri.append(f"Scutire impozit profit - {info_caen.get('conditii', '')}")
             rata = 0
             impozit = 0
         else:
             rata = IMPOZIT_PROFIT
-            impozit = venit * 0.20 * rata / 100  # Presupunem 20% profit din venit
-            observatii.append("16% impozit pe profit (estimat 20% marjă de profit)")
+            impozit = profit_estimat * rata / 100
+            
+            pasi_calcul.append(PasCalcul(
+                descriere="Pas 1: Estimare profit (venit - cheltuieli)",
+                formula=f"{venit:,.0f} × 20% marjă = {profit_estimat:,.0f} RON profit",
+                rezultat=f"Profit estimat: {profit_estimat:,.0f} RON"
+            ))
+            pasi_calcul.append(PasCalcul(
+                descriere="Pas 2: Calcul impozit pe profit",
+                formula=f"{profit_estimat:,.0f} × {rata}% = {impozit:,.0f} RON",
+                rezultat=f"Impozit: {impozit:,.0f} RON"
+            ))
+            
+            observatii.append(f"{rata}% impozit pe profit (calculat pe marjă estimată 20%)")
+            
+        # Comparație cu micro (dacă ar fi eligibil)
+        if venit <= PRAG_MICRO_EUR * CURS_EUR:
+            impozit_micro = venit * IMPOZIT_MICRO / 100
+            comparatii.append(ComparatieAlternativa(
+                alternativa="SRL Micro (dacă ești eligibil)",
+                impozit_alternativ=impozit_micro,
+                diferenta=impozit_micro - impozit,
+                recomandare=f"{'Micro ar fi mai avantajos' if impozit_micro < impozit else 'Profit e mai avantajos'}"
+            ))
     
     # Verifică TVA
     if entitate.platitor_tva:
@@ -214,10 +358,12 @@ def calculeaza_impozit_entitate(entitate: EntitateInput) -> RezultatEntitate:
         rata_impozitare=rata,
         regim_tva=regim_tva,
         scutiri_active=scutiri,
-        observatii=observatii
+        observatii=observatii,
+        pasi_calcul=pasi_calcul,
+        comparatii=comparatii
     )
 
-def verifica_agregare_micro(entitati: List[EntitateInput]) -> List[AvertismentFiscal]:
+def verifica_agregare_micro(entitati: List[EntitateInput], alte_asocieri: bool = False) -> List[AvertismentFiscal]:
     """Verifică regula agregării veniturilor pentru micro"""
     avertismente = []
     
@@ -226,6 +372,23 @@ def verifica_agregare_micro(entitati: List[EntitateInput]) -> List[AvertismentFi
         e for e in entitati 
         if e.tip == TipEntitate.SRL_MICRO and e.procent_detinere > PRAG_DETINERE_AGREGARE
     ]
+    
+    # Avertizare dacă are alte asocieri nedeclarate
+    if alte_asocieri:
+        avertismente.append(AvertismentFiscal(
+            tip="danger",
+            titlu="⚠️ Asocieri suplimentare cu >25% deținere!",
+            descriere="Ai indicat că ești asociat/administrator în ALTE firme cu peste 25% deținere care NU sunt incluse în această simulare.",
+            actiune_recomandata="IMPORTANT: Veniturile din TOATE firmele cu >25% deținere se agregă pentru pragul micro! Adaugă toate firmele sau consultă un contabil."
+        ))
+    
+    if len(srl_micro_relevante) >= 1 and alte_asocieri:
+        avertismente.append(AvertismentFiscal(
+            tip="warning",
+            titlu="Risc de depășire prag micro",
+            descriere="Având asocieri în alte firme, veniturile totale agregate pot depăși pragul de 100.000 EUR!",
+            actiune_recomandata="Verifică suma tuturor veniturilor din firmele unde deții >25%."
+        ))
     
     if len(srl_micro_relevante) > 1:
         total_venituri = sum(e.venit_anual_estimat for e in srl_micro_relevante)
@@ -346,8 +509,11 @@ async def simuleaza_situatie_fiscala(input_data: SimulatorInput):
             rezultat = calculeaza_impozit_entitate(entitate)
             rezultate_entitati.append(rezultat)
         
-        # Verifică reguli de agregare
-        avertismente.extend(verifica_agregare_micro(input_data.entitati))
+        # Verifică reguli de agregare (inclusiv alte asocieri)
+        avertismente.extend(verifica_agregare_micro(
+            input_data.entitati, 
+            alte_asocieri=input_data.alte_asocieri_peste_25
+        ))
         
         # Verifică TVA
         avertismente.extend(verifica_tva_global(input_data.entitati))
@@ -359,11 +525,12 @@ async def simuleaza_situatie_fiscala(input_data: SimulatorInput):
                 if e.tip in [TipEntitate.PFA_NORMA, TipEntitate.PFA_REAL, TipEntitate.PFI]
             )
             if total_venituri_pfa > CASS_BAZA_MINIMA:
+                cass_estimat = min(total_venituri_pfa, CASS_BAZA_MAXIMA) * 0.10
                 avertismente.append(AvertismentFiscal(
                     tip="info",
                     titlu="CASS datorat din PFA/PFI",
                     descriere=f"Veniturile din PFA/PFI depășesc {CASS_BAZA_MINIMA:,} RON. Datorezi CASS 10%.",
-                    actiune_recomandata=f"CASS estimat: {min(total_venituri_pfa, CASS_BAZA_MAXIMA) * 0.10:,.0f} RON/an"
+                    actiune_recomandata=f"CASS estimat: {cass_estimat:,.0f} RON/an (max {CASS_BAZA_MAXIMA:,.0f} RON bază)"
                 ))
         
         # Calculează totaluri
@@ -371,13 +538,22 @@ async def simuleaza_situatie_fiscala(input_data: SimulatorInput):
         total_impozite = sum(r.impozit_estimat for r in rezultate_entitati)
         rata_efectiva = (total_impozite / total_venituri * 100) if total_venituri > 0 else 0
         
+        # Sumar comparativ global
+        sumar_comparativ = {
+            "total_ca_micro": sum(e.venit_anual_estimat for e in input_data.entitati) * IMPOZIT_MICRO / 100,
+            "total_ca_profit": sum(e.venit_anual_estimat for e in input_data.entitati) * 0.20 * IMPOZIT_PROFIT / 100,
+            "total_ca_pfa": sum(e.venit_anual_estimat for e in input_data.entitati) * PFA_IMPOZIT / 100,
+            "economie_vs_profit": (sum(e.venit_anual_estimat for e in input_data.entitati) * 0.20 * IMPOZIT_PROFIT / 100) - total_impozite
+        }
+        
         return SimulatorOutput(
             entitati=rezultate_entitati,
             total_venituri=round(total_venituri, 2),
             total_impozite_estimate=round(total_impozite, 2),
             rata_efectiva_globala=round(rata_efectiva, 2),
             avertismente=avertismente,
-            explicatie_ai=None,  # Va fi populat separat dacă user-ul cere
+            sumar_comparativ=sumar_comparativ,
+            explicatie_ai=None,
             disclaimer="""
 ⚠️ DISCLAIMER IMPORTANT:
 Acest simulator are SCOP EXCLUSIV EDUCATIV și informativ.

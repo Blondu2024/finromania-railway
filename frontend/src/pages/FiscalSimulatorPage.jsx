@@ -37,10 +37,11 @@ const CAEN_CODES = [
 
 export default function FiscalSimulatorPage() {
   const [entities, setEntities] = useState([
-    { tip: 'srl_micro', nume: '', cod_caen: 'none', venit_anual_estimat: 0, procent_detinere: 100, are_angajati: false, platitor_tva: false }
+    { tip: 'srl_micro', nume: '', cod_caen: 'none', venit_anual_estimat: 0, procent_detinere: 100, are_angajati: false, platitor_tva: false, norma_venit_anuala: 0, an_infiintare: null }
   ]);
   const [areSalariu, setAreSalariu] = useState(false);
   const [salariuBrut, setSalariuBrut] = useState(0);
+  const [alteAsocieri, setAlteAsocieri] = useState(false);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -53,7 +54,9 @@ export default function FiscalSimulatorPage() {
       venit_anual_estimat: 0,
       procent_detinere: 100,
       are_angajati: false,
-      platitor_tva: false
+      platitor_tva: false,
+      norma_venit_anuala: 0,
+      an_infiintare: null
     }]);
   };
 
@@ -77,7 +80,8 @@ export default function FiscalSimulatorPage() {
         body: JSON.stringify({
           entitati: entities,
           are_salariu: areSalariu,
-          salariu_brut_lunar: salariuBrut
+          salariu_brut_lunar: salariuBrut,
+          alte_asocieri_peste_25: alteAsocieri
         })
       });
       
@@ -224,6 +228,36 @@ export default function FiscalSimulatorPage() {
                   />
                 </div>
 
+                {/* Câmpuri condiționale */}
+                {entity.tip === 'pfa_norma' && (
+                  <div className="space-y-2">
+                    <Label>Norma de Venit ANAF (RON/an)</Label>
+                    <Input 
+                      type="number"
+                      min="0"
+                      placeholder="Norma stabilită de ANAF"
+                      value={entity.norma_venit_anuala || ''}
+                      onChange={(e) => updateEntity(index, 'norma_venit_anuala', parseFloat(e.target.value) || 0)}
+                    />
+                    <p className="text-xs text-muted-foreground">Lasă 0 dacă nu știi - se va folosi venitul estimat</p>
+                  </div>
+                )}
+
+                {(entity.tip === 'srl_micro' || entity.tip === 'srl_profit') && (
+                  <div className="space-y-2">
+                    <Label>An Înființare</Label>
+                    <Input 
+                      type="number"
+                      min="2000"
+                      max="2026"
+                      placeholder="ex: 2024"
+                      value={entity.an_infiintare || ''}
+                      onChange={(e) => updateEntity(index, 'an_infiintare', parseInt(e.target.value) || null)}
+                    />
+                    <p className="text-xs text-muted-foreground">Important pentru regimul fiscal în primul an</p>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between pt-6">
                   <div className="flex items-center space-x-2">
                     <Switch 
@@ -248,6 +282,30 @@ export default function FiscalSimulatorPage() {
             <Plus className="w-4 h-4 mr-2" />
             Adaugă Entitate
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Întrebare critică despre asocieri */}
+      <Card className="mb-6 border-amber-300 bg-amber-50 dark:bg-amber-950/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+            <AlertTriangle className="w-5 h-5" />
+            Întrebare Importantă
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-amber-800 dark:text-amber-300">Ești asociat/administrator în ALTE firme cu peste 25% deținere?</Label>
+              <p className="text-sm text-amber-700 dark:text-amber-400">
+                (Firme care NU sunt incluse în lista de mai sus)
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Acest lucru afectează calculul agregat pentru pragul micro de 100.000 EUR!
+              </p>
+            </div>
+            <Switch checked={alteAsocieri} onCheckedChange={setAlteAsocieri} />
+          </div>
         </CardContent>
       </Card>
 
@@ -372,7 +430,7 @@ export default function FiscalSimulatorPage() {
                     <span className="font-medium">TVA:</span> {e.regim_tva}
                   </p>
                   
-                  {e.scutiri_active.length > 0 && (
+                  {e.scutiri_active && e.scutiri_active.length > 0 && (
                     <div className="mb-2">
                       {e.scutiri_active.map((s, j) => (
                         <Badge key={j} variant="secondary" className="mr-1 mb-1 text-green-600">
@@ -381,9 +439,40 @@ export default function FiscalSimulatorPage() {
                       ))}
                     </div>
                   )}
+
+                  {/* Pași de calcul - NOU */}
+                  {e.pasi_calcul && e.pasi_calcul.length > 0 && (
+                    <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                      <p className="text-xs font-medium text-muted-foreground mb-2">Cum s-a calculat:</p>
+                      <div className="space-y-1">
+                        {e.pasi_calcul.map((pas, j) => (
+                          <div key={j} className="text-xs">
+                            <span className="font-medium">{pas.descriere}</span>
+                            {pas.formula && <span className="text-blue-600 ml-2">{pas.formula}</span>}
+                            {pas.rezultat && <span className="text-green-600 ml-2">→ {pas.rezultat}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Comparații - NOU */}
+                  {e.comparatii && e.comparatii.length > 0 && (
+                    <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
+                      <p className="text-xs font-medium text-purple-700 dark:text-purple-400 mb-2">Comparație cu alternative:</p>
+                      {e.comparatii.map((c, j) => (
+                        <div key={j} className="text-xs flex justify-between items-center py-1 border-b border-purple-100 last:border-0">
+                          <span>{c.alternativa}</span>
+                          <span className={c.diferenta < 0 ? 'text-green-600' : 'text-red-600'}>
+                            {c.diferenta < 0 ? '↓' : '↑'} {Math.abs(c.diferenta).toLocaleString('ro-RO')} RON
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   
-                  {e.observatii.length > 0 && (
-                    <ul className="text-sm text-muted-foreground list-disc list-inside">
+                  {e.observatii && e.observatii.length > 0 && (
+                    <ul className="text-sm text-muted-foreground list-disc list-inside mt-3">
                       {e.observatii.map((o, j) => (
                         <li key={j}>{o}</li>
                       ))}
@@ -393,6 +482,36 @@ export default function FiscalSimulatorPage() {
               ))}
             </CardContent>
           </Card>
+
+          {/* Sumar Comparativ Global - NOU */}
+          {result.sumar_comparativ && (
+            <Card className="border-purple-200 bg-purple-50 dark:bg-purple-950/20">
+              <CardHeader>
+                <CardTitle className="text-purple-700 dark:text-purple-400">Sumar Comparativ</CardTitle>
+                <CardDescription>Dacă toate veniturile ar fi pe un singur regim</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded">
+                    <p className="text-xs text-muted-foreground">Ca Micro (1%)</p>
+                    <p className="font-bold">{result.sumar_comparativ.total_ca_micro?.toLocaleString('ro-RO')} RON</p>
+                  </div>
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded">
+                    <p className="text-xs text-muted-foreground">Ca Profit (16%)</p>
+                    <p className="font-bold">{result.sumar_comparativ.total_ca_profit?.toLocaleString('ro-RO')} RON</p>
+                  </div>
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded">
+                    <p className="text-xs text-muted-foreground">Ca PFA (10%)</p>
+                    <p className="font-bold">{result.sumar_comparativ.total_ca_pfa?.toLocaleString('ro-RO')} RON</p>
+                  </div>
+                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded">
+                    <p className="text-xs text-green-700 dark:text-green-400">Economie vs Profit</p>
+                    <p className="font-bold text-green-600">{result.sumar_comparativ.economie_vs_profit?.toLocaleString('ro-RO')} RON</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Disclaimer */}
           <Alert className="bg-gray-100 dark:bg-gray-900">
