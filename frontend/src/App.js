@@ -67,6 +67,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
 const FiscalCalculatorPage = lazy(() => import('./pages/FiscalCalculatorPage'));
+const FiscalSimulatorPage = lazy(() => import('./pages/FiscalSimulatorPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const PortfolioBVBPage = lazy(() => import('./pages/PortfolioBVBPage'));
 const TryProPage = lazy(() => import('./pages/TryProPage'));
@@ -426,6 +427,7 @@ function AppRouter() {
         <Route path="/global" element={<GlobalMarketsPage />} />
         <Route path="/quiz/:level" element={<QuizPage />} />
         <Route path="/calculator-fiscal" element={<FiscalCalculatorPage />} />
+        <Route path="/simulator-fiscal" element={<FiscalSimulatorPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/portfolio-bvb" element={<PortfolioBVBPage />} />
         <Route path="/incearca-pro" element={<TryProPage />} />

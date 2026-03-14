@@ -51,6 +51,7 @@ from routes.quiz import router as quiz_router
 from routes.ai_advisor_pro import router as ai_advisor_pro_router
 from routes.fiscal_calculator import router as fiscal_calculator_router
 from routes.ai_fiscal import router as ai_fiscal_router
+from routes.fiscal_simulator_antreprenor import router as fiscal_simulator_router
 from routes.portfolio_bvb import router as portfolio_bvb_router
 from routes.intraday_data import router as intraday_router
 from routes.admin import router as admin_router_new
@@ -608,6 +609,7 @@ app.include_router(quiz_router, prefix="/api")
 app.include_router(ai_advisor_pro_router, prefix="/api")
 app.include_router(fiscal_calculator_router, prefix="/api")
 app.include_router(ai_fiscal_router, prefix="/api")
+app.include_router(fiscal_simulator_router, prefix="/api")  # Simulator Fiscal Antreprenor
 app.include_router(portfolio_bvb_router, prefix="/api")
 app.include_router(intraday_router, prefix="/api")
 app.include_router(bvb_charts_router)  # Already has /api/bvb prefix
