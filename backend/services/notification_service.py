@@ -52,6 +52,23 @@ class NotificationService:
             "action_text": "Explorează",
             "priority": "low",
             "icon": "gift"
+        },
+        # PRICE ALERTS - NOU
+        "price_alert_above": {
+            "title": "🔔 Alertă preț - {symbol}",
+            "message": "{symbol} a ajuns la {price} RON (peste {target} RON)",
+            "action_url": "/stocks/bvb/{symbol}",
+            "action_text": "Vezi detalii",
+            "priority": "high",
+            "icon": "trending-up"
+        },
+        "price_alert_below": {
+            "title": "🔔 Alertă preț - {symbol}",
+            "message": "{symbol} a scăzut la {price} RON (sub {target} RON)",
+            "action_url": "/stocks/bvb/{symbol}",
+            "action_text": "Vezi detalii",
+            "priority": "high",
+            "icon": "trending-down"
         }
     }
     
@@ -248,6 +265,153 @@ class NotificationService:
             logger.info(f"Early Adopter expired for user {user['user_id']}")
         
         return results
+
+    async def check_price_alerts(self) -> dict:
+        """Verifică toate alertele de preț și trimite notificări"""
+        db = await get_database()
+        
+        results = {
+            "alerts_checked": 0,
+            "notifications_sent": 0,
+            "errors": 0
+        }
+        
+        try:
+            # Obține toate watchlist-urile cu alerte active
+            watchlists = await db.watchlists.find({
+                "items": {"$exists": True, "$ne": []}
+            }).to_list(1000)
+            
+            for watchlist in watchlists:
+                user_id = watchlist.get("user_id")
+                if not user_id:
+                    continue
+                
+                for item in watchlist.get("items", []):
+                    symbol = item.get("symbol")
+                    alert_above = item.get("alert_above")
+                    alert_below = item.get("alert_below")
+                    
+                    # Skip dacă nu are alerte setate
+                    if not alert_above and not alert_below:
+                        continue
+                    
+                    results["alerts_checked"] += 1
+                    
+                    # Obține prețul curent
+                    stock = await db.stocks_bvb.find_one(
+                        {"symbol": symbol},
+                        {"_id": 0, "price": 1, "name": 1}
+                    )
+                    
+                    if not stock or not stock.get("price"):
+                        continue
+                    
+                    price = stock["price"]
+                    
+                    # Verifică alerta "above"
+                    if alert_above and price >= alert_above:
+                        # Verifică dacă am trimis deja notificare pentru această alertă
+                        alert_key = f"price_alert_above_{symbol}_{alert_above}"
+                        existing = await db.notifications.find_one({
+                            "user_id": user_id,
+                            "custom_data.alert_key": alert_key,
+                            "read": False
+                        })
+                        
+                        if not existing:
+                            await self.create_price_alert_notification(
+                                user_id=user_id,
+                                symbol=symbol,
+                                alert_type="above",
+                                target_price=alert_above,
+                                current_price=price,
+                                stock_name=stock.get("name", symbol)
+                            )
+                            results["notifications_sent"] += 1
+                            logger.info(f"Price alert (above) sent: {symbol} at {price} >= {alert_above}")
+                    
+                    # Verifică alerta "below"
+                    if alert_below and price <= alert_below:
+                        alert_key = f"price_alert_below_{symbol}_{alert_below}"
+                        existing = await db.notifications.find_one({
+                            "user_id": user_id,
+                            "custom_data.alert_key": alert_key,
+                            "read": False
+                        })
+                        
+                        if not existing:
+                            await self.create_price_alert_notification(
+                                user_id=user_id,
+                                symbol=symbol,
+                                alert_type="below",
+                                target_price=alert_below,
+                                current_price=price,
+                                stock_name=stock.get("name", symbol)
+                            )
+                            results["notifications_sent"] += 1
+                            logger.info(f"Price alert (below) sent: {symbol} at {price} <= {alert_below}")
+            
+            logger.info(f"Price alerts check complete: {results}")
+            
+        except Exception as e:
+            logger.error(f"Error checking price alerts: {e}")
+            results["errors"] += 1
+        
+        return results
+
+    async def create_price_alert_notification(
+        self,
+        user_id: str,
+        symbol: str,
+        alert_type: str,  # "above" or "below"
+        target_price: float,
+        current_price: float,
+        stock_name: str = None
+    ) -> dict:
+        """Creează notificare pentru alertă de preț"""
+        db = await get_database()
+        
+        notification_type = f"price_alert_{alert_type}"
+        template = self.NOTIFICATION_TYPES.get(notification_type, {})
+        
+        # Formatare mesaj cu date reale
+        title = template.get("title", "🔔 Alertă preț").format(symbol=symbol)
+        message = template.get("message", "").format(
+            symbol=symbol,
+            price=f"{current_price:.2f}",
+            target=f"{target_price:.2f}"
+        )
+        
+        alert_key = f"price_alert_{alert_type}_{symbol}_{target_price}"
+        
+        notification = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "type": notification_type,
+            "title": title,
+            "message": message,
+            "action_url": f"/stocks/bvb/{symbol}",
+            "action_text": "Vezi acțiunea",
+            "priority": "high",
+            "icon": "trending-up" if alert_type == "above" else "trending-down",
+            "read": False,
+            "email_sent": False,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "custom_data": {
+                "symbol": symbol,
+                "stock_name": stock_name,
+                "alert_type": alert_type,
+                "target_price": target_price,
+                "triggered_price": current_price,
+                "alert_key": alert_key
+            }
+        }
+        
+        await db.notifications.insert_one(notification)
+        logger.info(f"Created price alert notification for {user_id}: {symbol} {alert_type} {target_price}")
+        
+        return notification
 
 
 notification_service = NotificationService()

@@ -82,6 +82,15 @@ async def check_subscription_expirations_job():
     except Exception as e:
         logger.error(f"❌ [JOB] Error checking expirations: {e}")
 
+async def check_price_alerts_job():
+    """Job: Check price alerts and send notifications"""
+    try:
+        logger.info("🔄 [JOB] Checking price alerts...")
+        results = await notification_service.check_price_alerts()
+        logger.info(f"✅ [JOB] Price alerts check complete: checked={results['alerts_checked']}, sent={results['notifications_sent']}")
+    except Exception as e:
+        logger.error(f"❌ [JOB] Error checking price alerts: {e}")
+
 def start_scheduler():
     """Start all scheduled jobs"""
     try:
@@ -139,6 +148,15 @@ def start_scheduler():
             replace_existing=True
         )
         
+        # Job 7: Check price alerts (every 5 minutes - after stock update)
+        scheduler.add_job(
+            check_price_alerts_job,
+            trigger=IntervalTrigger(minutes=5),  # Verifică alertele la fiecare 5 minute
+            id='check_price_alerts',
+            name='Check Price Alerts',
+            replace_existing=True
+        )
+        
         # Start scheduler
         scheduler.start()
         logger.info("✅ Scheduler started with all jobs!")
@@ -148,6 +166,7 @@ def start_scheduler():
         logger.info(f"   • International news: every {settings.SCRAPING_INTERVAL_MINUTES} min")
         logger.info(f"   • Currency rates: every {settings.CURRENCY_UPDATE_INTERVAL_HOURS} hour")
         logger.info(f"   • Subscription expirations: daily at 9:00 AM")
+        logger.info(f"   • Price alerts: every 5 min")
         
         # Run all jobs once immediately
         asyncio.create_task(update_bvb_stocks_job())
@@ -156,6 +175,7 @@ def start_scheduler():
         asyncio.create_task(fetch_international_news_job())
         asyncio.create_task(update_currency_rates_job())
         asyncio.create_task(check_subscription_expirations_job())  # Check on startup too
+        asyncio.create_task(check_price_alerts_job())  # Check price alerts on startup
         
     except Exception as e:
         logger.error(f"Error starting scheduler: {e}")
