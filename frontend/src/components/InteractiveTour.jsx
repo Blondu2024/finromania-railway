@@ -20,7 +20,7 @@ const tourSteps = [
     title: 'Explorează FinRomania 🇷🇴',
     description: 'Îți arătăm platforma în 2 minute — educație, date și instrumente pentru decizii informate.',
     icon: Sparkles,
-    gradient: 'from-slate-700 via-blue-800 to-slate-900',
+    gradient: 'from-slate-900 via-slate-900 to-slate-900',
   },
   
   // ========== NAVIGATION MENU - DESKTOP ==========
