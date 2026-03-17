@@ -61,6 +61,7 @@ from routes.early_adopter import router as early_adopter_router
 from routes.notifications import router as notifications_router
 from routes.sitemap import router as sitemap_router
 from routes.ai_technical_analysis import router as ai_technical_analysis_router
+from routes.daily_summary import router as daily_summary_router
 
 # Configure logging
 logging.basicConfig(
@@ -619,6 +620,7 @@ app.include_router(early_adopter_router, prefix="/api")  # Early Adopter Program
 app.include_router(notifications_router, prefix="/api")  # Notifications
 app.include_router(sitemap_router, prefix="/api")  # Sitemap generator
 app.include_router(ai_technical_analysis_router)  # AI Technical Analysis PRO
+app.include_router(daily_summary_router, prefix="/api")  # Daily Market Summary Email
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest

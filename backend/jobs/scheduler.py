@@ -9,6 +9,7 @@ from services.stock_service import StockService
 from services.news_service import NewsService
 from services.currency_service import CurrencyService
 from services.notification_service import notification_service
+from services.daily_summary_service import daily_summary_service
 from config.settings import settings
 
 logging.basicConfig(
@@ -91,6 +92,15 @@ async def check_price_alerts_job():
     except Exception as e:
         logger.error(f"❌ [JOB] Error checking price alerts: {e}")
 
+async def send_daily_summary_job():
+    """Job: Send daily market summary email to subscribers"""
+    try:
+        logger.info("📧 [JOB] Sending daily market summary...")
+        results = await daily_summary_service.send_to_all_subscribers()
+        logger.info(f"✅ [JOB] Daily summary complete: sent={results['sent']}, failed={results['failed']}, skipped={results['skipped']}")
+    except Exception as e:
+        logger.error(f"❌ [JOB] Error sending daily summary: {e}")
+
 def start_scheduler():
     """Start all scheduled jobs"""
     try:
@@ -157,6 +167,15 @@ def start_scheduler():
             replace_existing=True
         )
         
+        # Job 8: Send daily summary email (daily at 18:15 Bucharest time - after market close)
+        scheduler.add_job(
+            send_daily_summary_job,
+            trigger=CronTrigger(hour=18, minute=15),  # 18:15 local time
+            id='send_daily_summary',
+            name='Send Daily Market Summary',
+            replace_existing=True
+        )
+        
         # Start scheduler
         scheduler.start()
         logger.info("✅ Scheduler started with all jobs!")
@@ -167,6 +186,7 @@ def start_scheduler():
         logger.info(f"   • Currency rates: every {settings.CURRENCY_UPDATE_INTERVAL_HOURS} hour")
         logger.info(f"   • Subscription expirations: daily at 9:00 AM")
         logger.info(f"   • Price alerts: every 5 min")
+        logger.info(f"   • Daily summary email: daily at 18:15")
         
         # Run all jobs once immediately
         asyncio.create_task(update_bvb_stocks_job())
