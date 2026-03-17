@@ -88,8 +88,8 @@ const NewsCard = memo(function NewsCard({ article, isInternational }) {
 // ============================================
 const HeroSection = memo(function HeroSection({ user }) {
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-slate-900 text-white p-6 md:p-10">
-      {/* Fără blur-uri decorative - look clean */}
+    <section className="relative overflow-hidden rounded-2xl bg-black text-white p-6 md:p-10" style={{ background: '#000000' }}>
+      {/* Fundal negru solid - fara gradient */}
       
       <div className="relative z-10">
         {/* Main Message */}
@@ -101,10 +101,10 @@ const HeroSection = memo(function HeroSection({ user }) {
           <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">
             Înțelege Piața <span className="text-blue-400">Înainte</span> să Investești
           </h1>
-          <p className="text-lg md:text-xl text-blue-200 max-w-2xl mx-auto mb-2">
+          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-2">
             Educație · Analiză · Date Live · Instrumente Profesionale
           </p>
-          <p className="text-base text-blue-300/80 max-w-xl mx-auto">
+          <p className="text-base text-gray-400 max-w-xl mx-auto">
             Platforma românească de educație financiară cu date reale BVB și Global.
           </p>
         </div>
@@ -118,7 +118,7 @@ const HeroSection = memo(function HeroSection({ user }) {
                 <TrendingUp className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">📈 Bursa BVB</h3>
-              <p className="text-sm text-blue-200">50+ acțiuni, date live, delay 15min</p>
+              <p className="text-sm text-gray-300">50+ acțiuni, date live, delay 15min</p>
               <Badge className="mt-2 bg-green-500/20 text-green-300 text-xs">LIVE DATA</Badge>
             </div>
           </Link>
@@ -130,7 +130,7 @@ const HeroSection = memo(function HeroSection({ user }) {
                 <Globe className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">🌍 Piețe Globale</h3>
-              <p className="text-sm text-blue-200">US, EU, Asia - delay doar 1 secundă!</p>
+              <p className="text-sm text-gray-300">US, EU, Asia - delay doar 1 secundă!</p>
               <Badge className="mt-2 bg-purple-500/20 text-purple-300 text-xs animate-pulse">1s DELAY</Badge>
             </div>
           </Link>
@@ -142,7 +142,7 @@ const HeroSection = memo(function HeroSection({ user }) {
                 <Calculator className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">🧮 Calculator Fiscal</h3>
-              <p className="text-sm text-blue-200">Pentru investitori BVB</p>
+              <p className="text-sm text-gray-300">Pentru investitori BVB</p>
               <Badge className="mt-2 bg-amber-500/20 text-amber-300 text-xs">PRO</Badge>
             </div>
           </Link>
@@ -154,7 +154,7 @@ const HeroSection = memo(function HeroSection({ user }) {
                 <Building2 className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">🏢 Simulator Fiscal</h3>
-              <p className="text-sm text-blue-200">Pentru antreprenori cu firme</p>
+              <p className="text-sm text-gray-300">Pentru antreprenori cu firme</p>
               <Badge className="mt-2 bg-cyan-500/20 text-cyan-300 text-xs">NOU 2026</Badge>
             </div>
           </Link>
@@ -166,7 +166,7 @@ const HeroSection = memo(function HeroSection({ user }) {
                 <GraduationCap className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg mb-1">🎓 Educație</h3>
-              <p className="text-sm text-blue-200">Cursuri gratuite pentru toți</p>
+              <p className="text-sm text-gray-300">Cursuri gratuite pentru toți</p>
               <Badge className="mt-2 bg-blue-500/20 text-blue-300 text-xs">GRATUIT</Badge>
             </div>
           </Link>
