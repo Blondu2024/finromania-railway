@@ -9,6 +9,12 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional
 from config.database import get_database
 
+LUNI_RO = {
+    1: "ianuarie", 2: "februarie", 3: "martie", 4: "aprilie",
+    5: "mai", 6: "iunie", 7: "iulie", 8: "august",
+    9: "septembrie", 10: "octombrie", 11: "noiembrie", 12: "decembrie"
+}
+
 logger = logging.getLogger(__name__)
 
 # Configure Resend
@@ -54,7 +60,7 @@ class DailySummaryService:
         news = await db.news_ro.find({}, {"_id": 0, "title": 1, "source": 1}).sort("published_at", -1).limit(5).to_list(5)
         
         return {
-            "date": datetime.now(timezone.utc).strftime("%d %B %Y"),
+            "date": datetime.now(timezone.utc).strftime("%d ") + LUNI_RO[datetime.now(timezone.utc).month] + datetime.now(timezone.utc).strftime(" %Y"),
             "total_stocks": len(stocks),
             "avg_change": round(avg_change, 2),
             "sentiment": {
@@ -71,60 +77,57 @@ class DailySummaryService:
     async def generate_ai_summary(self, market_data: Dict) -> str:
         """Generează rezumatul AI folosind Emergent LLM"""
         try:
-            from emergentintegrations.llm.chat import chat, LlmModel
+            from emergentintegrations.llm.chat import LlmChat, UserMessage
             
             # Construiește contextul pentru AI
             context = f"""
-Ești un analist financiar care scrie rezumate zilnice pentru investitori români.
-Scrie un rezumat SCURT și PROFESIONIST al zilei pe BVB.
-
 DATE PIAȚĂ {market_data['date']}:
 
-📊 STATISTICI GENERALE:
+STATISTICI GENERALE:
 - Total acțiuni analizate: {market_data['total_stocks']}
 - Variație medie piață: {market_data['avg_change']:+.2f}%
 - Acțiuni în creștere: {market_data['sentiment']['positive']}
 - Acțiuni în scădere: {market_data['sentiment']['negative']}
 
-🚀 TOP 3 CREȘTERI:
+TOP 3 CREȘTERI:
 """
             for s in market_data['top_gainers']:
                 context += f"- {s.get('symbol')} ({s.get('name', '')}): {s.get('change_percent', 0):+.2f}% | {s.get('price', 0):.2f} RON\n"
             
-            context += "\n📉 TOP 3 SCĂDERI:\n"
+            context += "\nTOP 3 SCĂDERI:\n"
             for s in market_data['top_losers']:
                 context += f"- {s.get('symbol')} ({s.get('name', '')}): {s.get('change_percent', 0):+.2f}% | {s.get('price', 0):.2f} RON\n"
             
-            context += "\n📈 CEL MAI TRANZACȚIONATE (VOLUM):\n"
+            context += "\nCEL MAI TRANZACȚIONATE (VOLUM):\n"
             for s in market_data['top_volume']:
                 vol = s.get('volume', 0)
                 vol_str = f"{vol/1000000:.1f}M" if vol >= 1000000 else f"{vol/1000:.0f}K"
-                context += f"- {s.get('symbol')}: {vol_str} acțiuni\n"
+                context += f"- {s.get('symbol')}: {vol_str} acțiuni | {s.get('price', 0):.2f} RON\n"
             
             if market_data.get('news'):
-                context += "\n📰 ȘTIRI RECENTE:\n"
+                context += "\nȘTIRI RECENTE:\n"
                 for n in market_data['news'][:3]:
                     context += f"- {n.get('title', '')}\n"
             
-            context += """
+            system_prompt = """Ești un analist financiar profesionist care scrie rezumate de piață pentru investitori români.
+Scrie un rezumat de 150-200 cuvinte în română.
+Începe cu sentimentul general al pieței.
+Menționează TOP performerii și ce ar fi putut cauza mișcările.
+Folosește CIFRE EXACTE mereu (volume, prețuri, procente) - NU cuvinte vagi ca "semnificativ", "considerabil".
+Încheie cu o perspectivă pentru mâine (generală, fără predicții concrete).
+Ton: profesionist dar accesibil.
+NU da sfaturi de investiții specifice."""
 
-INSTRUCȚIUNI:
-1. Scrie un rezumat de 150-200 cuvinte în română
-2. Începe cu sentimentul general al pieței
-3. Menționează TOP performerii și ce ar fi putut cauza mișcările
-4. Încheie cu o perspectivă pentru mâine (generală, fără predicții concrete)
-5. Ton: profesionist dar accesibil
-6. NU da sfaturi de investiții specifice
-"""
+            chat = LlmChat(
+                api_key=os.environ.get("EMERGENT_UNIVERSAL_KEY"),
+                session_id=f"daily_summary_{market_data['date']}",
+                system_message=system_prompt
+            ).with_model("openai", "gpt-4o")
             
-            response = await chat(
-                model=LlmModel.GPT4O,
-                system_prompt="Ești un analist financiar profesionist care scrie rezumate de piață pentru investitori români.",
-                user_prompt=context,
-                api_key=os.environ.get("EMERGENT_UNIVERSAL_KEY")
-            )
+            user_message = UserMessage(text=context)
+            response = await chat.send_message(user_message)
             
-            return response.message
+            return response
             
         except Exception as e:
             logger.error(f"Error generating AI summary: {e}")
@@ -135,17 +138,47 @@ INSTRUCȚIUNI:
         """Rezumat simplu fără AI (fallback)"""
         sentiment = "pozitiv" if market_data['avg_change'] > 0 else "negativ" if market_data['avg_change'] < 0 else "neutru"
         
+        top_vol = market_data['top_volume'][0]
+        vol = top_vol.get('volume', 0)
+        vol_str = f"{vol/1000000:.1f}M" if vol >= 1000000 else f"{vol/1000:.0f}K"
+        
         summary = f"""Piața BVB a încheiat ziua cu un sentiment {sentiment}, cu o variație medie de {market_data['avg_change']:+.2f}%.
 
 Din {market_data['total_stocks']} acțiuni analizate, {market_data['sentiment']['positive']} au închis în creștere, iar {market_data['sentiment']['negative']} în scădere.
 
 Cele mai bune performanțe au fost înregistrate de {market_data['top_gainers'][0].get('symbol')} ({market_data['top_gainers'][0].get('change_percent', 0):+.2f}%), {market_data['top_gainers'][1].get('symbol')} ({market_data['top_gainers'][1].get('change_percent', 0):+.2f}%) și {market_data['top_gainers'][2].get('symbol')} ({market_data['top_gainers'][2].get('change_percent', 0):+.2f}%).
 
-Cea mai mare lichiditate a fost pe {market_data['top_volume'][0].get('symbol')}, cu un volum de tranzacționare semnificativ."""
+Cea mai mare lichiditate a fost pe {top_vol.get('symbol')}, cu un volum de {vol_str} acțiuni tranzacționate."""
         
         return summary
     
-    def _generate_email_html(self, market_data: Dict, ai_summary: str, is_pro: bool = False) -> str:
+    async def get_user_watchlist_data(self, user_id: str) -> List[Dict]:
+        """Obține datele watchlist-ului unui user cu prețuri curente"""
+        db = await get_database()
+        watchlist = await db.watchlists.find_one(
+            {"user_id": user_id}, {"_id": 0}
+        )
+        if not watchlist or not watchlist.get("items"):
+            return []
+        
+        symbols = [item["symbol"] for item in watchlist["items"]]
+        stocks = await db.stocks_bvb.find(
+            {"symbol": {"$in": symbols}}, {"_id": 0}
+        ).to_list(100)
+        stock_map = {s["symbol"]: s for s in stocks}
+        
+        results = []
+        for item in watchlist["items"]:
+            s = stock_map.get(item["symbol"])
+            if s:
+                results.append({
+                    "symbol": s.get("symbol"),
+                    "price": s.get("price", 0),
+                    "change_percent": s.get("change_percent", 0)
+                })
+        return results
+
+    def _generate_email_html(self, market_data: Dict, ai_summary: str, is_pro: bool = False, watchlist_data: List[Dict] = None) -> str:
         """Generează HTML-ul pentru email"""
         
         # Header
@@ -230,6 +263,30 @@ Cea mai mare lichiditate a fost pe {market_data['top_volume'][0].get('symbol')},
         </div>
 """
         
+        # Secțiunea personalizată Watchlist
+        if watchlist_data:
+            html += """
+        <!-- Watchlist Personal -->
+        <div style="padding: 0 20px 20px 20px; background-color: #f0fdf4; border-top: 2px solid #22c55e; margin: 0 20px; border-radius: 8px;">
+            <h2 style="color: #15803d; font-size: 14px; margin: 0; padding: 15px 0 10px 0;">⭐ Din watchlist-ul tău</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+"""
+            for w in watchlist_data:
+                change = w.get('change_percent', 0)
+                color = '#16a34a' if change >= 0 else '#dc2626'
+                icon = '✅' if change >= 0 else '🔻'
+                html += f"""
+                <tr style="border-bottom: 1px solid #dcfce7;">
+                    <td style="padding: 6px 0; font-weight: bold; color: #1e3a5f;">{w.get('symbol')}</td>
+                    <td style="padding: 6px 0; text-align: right; color: {color}; font-weight: bold;">{change:+.2f}% {icon}</td>
+                    <td style="padding: 6px 0; text-align: right; color: #64748b; font-size: 12px;">{w.get('price', 0):.2f} RON</td>
+                </tr>
+"""
+            html += """
+            </table>
+        </div>
+"""
+        
         # CTA pentru non-PRO
         if not is_pro:
             html += """
@@ -265,7 +322,7 @@ Cea mai mare lichiditate a fost pe {market_data['top_volume'][0].get('symbol')},
 """
         return html
     
-    async def send_daily_summary(self, user_email: str, user_name: str = None, is_pro: bool = False) -> bool:
+    async def send_daily_summary(self, user_email: str, user_name: str = None, is_pro: bool = False, user_id: str = None) -> bool:
         """Trimite rezumatul zilnic către un user"""
         try:
             # Colectează datele
@@ -277,15 +334,19 @@ Cea mai mare lichiditate a fost pe {market_data['top_volume'][0].get('symbol')},
             # Generează rezumatul AI
             ai_summary = await self.generate_ai_summary(market_data)
             
+            # Obține watchlist-ul userului
+            watchlist_data = []
+            if user_id:
+                watchlist_data = await self.get_user_watchlist_data(user_id)
+            
             # Generează HTML
-            html = self._generate_email_html(market_data, ai_summary, is_pro)
+            html = self._generate_email_html(market_data, ai_summary, is_pro, watchlist_data)
             
             # Trimite email
-            # Folosim domeniul de test Resend pentru început
             params = {
-                "from": self.from_email_test,  # Schimbă în self.from_email când ai domeniu verificat
+                "from": self.from_email,
                 "to": [user_email],
-                "subject": f"📊 Rezumatul Zilei BVB - {market_data['date']}",
+                "subject": f"Rezumatul Zilei BVB - {market_data['date']}",
                 "html": html
             }
             
@@ -307,7 +368,7 @@ Cea mai mare lichiditate a fost pe {market_data['top_volume'][0].get('symbol')},
             subscribers = await db.users.find({
                 "daily_summary_enabled": True,
                 "email": {"$exists": True, "$ne": ""}
-            }, {"_id": 0, "email": 1, "name": 1, "subscription_level": 1}).to_list(500)
+            }, {"_id": 0, "email": 1, "name": 1, "subscription_level": 1, "user_id": 1}).to_list(500)
             
             logger.info(f"Found {len(subscribers)} subscribers for daily summary")
             
@@ -322,7 +383,8 @@ Cea mai mare lichiditate a fost pe {market_data['top_volume'][0].get('symbol')},
                 success = await self.send_daily_summary(
                     user_email=email,
                     user_name=user.get("name"),
-                    is_pro=is_pro
+                    is_pro=is_pro,
+                    user_id=user.get("user_id")
                 )
                 
                 if success:

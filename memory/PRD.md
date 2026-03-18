@@ -31,7 +31,12 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - Trading School / Education section
 
 ## Completed Bug Fixes (This Session - March 2026)
-- [x] Fixed blue gradient overlay on homepage (HeroSection + InteractiveTour welcome screen)
+- [x] Fixed blue gradient overlay on homepage (HeroSection + InteractiveTour welcome screen) → bg-black solid
+- [x] Email date now in Romanian ("18 martie 2026" instead of "18 March 2026")
+- [x] AI summary uses exact numbers (no vague words like "semnificativ")
+- [x] Fixed AI LLM integration import (was using old `chat()` function, now uses `LlmChat` class correctly)
+- [x] Added personalized watchlist section to daily email (shows user's tracked stocks with % change)
+- [x] Changed email sender to verified domain (finromania.ro)
 
 ## Pending Issues
 - [ ] P1: Charts not loading on BVB stock pages (EODHD free plan limitation)
