@@ -71,6 +71,7 @@ const FiscalSimulatorPage = lazy(() => import('./pages/FiscalSimulatorPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const PortfolioBVBPage = lazy(() => import('./pages/PortfolioBVBPage'));
 const TryProPage = lazy(() => import('./pages/TryProPage'));
+const DailySummaryPage = lazy(() => import('./pages/DailySummaryPage'));
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
 
 // Lazy load heavy components
@@ -194,6 +195,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
     { path: '/global', label: 'Piețe Globale', icon: '🌍' },
     { path: '/calculator-fiscal', label: 'Calculator Fiscal', icon: '🧮' },
     { path: '/news', label: 'Știri', icon: '📰' },
+    { path: '/rezumat-zilnic', label: 'Rezumat', icon: '📊' },
   ];
 
   // Grouped menu items
@@ -432,6 +434,7 @@ function AppRouter() {
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/portfolio-bvb" element={<PortfolioBVBPage />} />
         <Route path="/incearca-pro" element={<TryProPage />} />
+        <Route path="/rezumat-zilnic" element={<DailySummaryPage />} />
         <Route path="/payment/success" element={<PaymentSuccessPage />} />
       </Routes>
     </Suspense>
