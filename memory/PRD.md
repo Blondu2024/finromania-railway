@@ -37,6 +37,10 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] Fixed AI LLM integration import (was using old `chat()` function, now uses `LlmChat` class correctly)
 - [x] Added personalized watchlist section to daily email (shows user's tracked stocks with % change)
 - [x] Changed email sender to verified domain (finromania.ro)
+- [x] Created "/rezumat-zilnic" page with full daily summary + navbar button
+- [x] Changed PRO from "first 100 users" to "FREE for ALL until June 5, 2026"
+- [x] Hidden PRO upsell banners/cards for PRO users (EarlyAdopterBanner + homepage CTA)
+- [x] Added subscription_level to UserResponse model for frontend awareness
 
 ## Pending Issues
 - [ ] P1: Charts not loading on BVB stock pages (EODHD free plan limitation)

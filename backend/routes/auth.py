@@ -24,6 +24,9 @@ class UserResponse(BaseModel):
     picture: Optional[str] = None
     created_at: Optional[str] = None
     is_admin: bool = False
+    subscription_level: Optional[str] = None
+    is_early_adopter: bool = False
+    subscription_expires_at: Optional[str] = None
 
 class SessionRequest(BaseModel):
     session_id: str
@@ -127,8 +130,9 @@ async def create_session(data: SessionRequest, response: Response):
             user_id = f"user_{uuid.uuid4().hex[:12]}"
             
             # Check Early Adopter availability
-            early_adopter_count = await db.users.count_documents({"is_early_adopter": True})
-            is_early_adopter = early_adopter_count < 100  # Primii 100 useri
+            # PRO GRATUIT pentru TOȚI userii până pe 5 iunie 2026
+            free_pro_deadline = datetime(2026, 6, 5, tzinfo=timezone.utc)
+            is_free_pro_period = datetime.now(timezone.utc) < free_pro_deadline
             
             new_user_data = {
                 "user_id": user_id,
@@ -140,20 +144,16 @@ async def create_session(data: SessionRequest, response: Response):
                 "last_login": datetime.now(timezone.utc).isoformat()
             }
             
-            # Auto-activate Early Adopter PRO pentru primii 100 useri
-            if is_early_adopter:
-                slot_number = early_adopter_count + 1
-                expires_at = datetime.now(timezone.utc) + timedelta(days=90)  # 3 luni
+            # Auto-activate PRO gratuit pentru toți userii până pe 5 iunie 2026
+            if is_free_pro_period:
                 new_user_data.update({
                     "is_early_adopter": True,
-                    "early_adopter_slot": slot_number,
-                    "early_adopter_activated_at": datetime.now(timezone.utc).isoformat(),
                     "subscription_level": "pro",
-                    "subscription_expires_at": expires_at.isoformat(),
-                    "subscription_source": "early_adopter",
+                    "subscription_expires_at": free_pro_deadline.isoformat(),
+                    "subscription_source": "free_pro_june2026",
                     "unlocked_levels": ["beginner", "intermediate", "advanced"]
                 })
-                logger.info(f"🎉 New Early Adopter #{slot_number}: {user_data['email']}")
+                logger.info(f"🎉 New FREE PRO user (until June 5): {user_data['email']}")
             
             await db.users.insert_one(new_user_data)
         

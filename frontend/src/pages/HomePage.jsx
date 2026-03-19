@@ -424,11 +424,12 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Quick Calculator + CTA Încearcă PRO */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Quick Calculator + CTA Încearcă PRO (doar pentru non-PRO) */}
+        <div className={`grid grid-cols-1 ${!user?.subscription_level || user?.subscription_level === 'free' ? 'lg:grid-cols-2' : ''} gap-6`}>
           <QuickCalculator user={user} />
           
-          {/* CTA Încearcă PRO */}
+          {/* CTA Încearcă PRO - ascuns daca userul are deja PRO */}
+          {(!user?.subscription_level || user?.subscription_level === 'free') && (
           <Link to="/incearca-pro">
             <Card className="h-full bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 text-white hover:shadow-2xl transition-all cursor-pointer">
               <CardContent className="p-8 flex flex-col items-center justify-center h-full text-center">
@@ -443,6 +444,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </Link>
+          )}
         </div>
 
         {/* BVB Stocks - Vertical Auto-Scroll */}
