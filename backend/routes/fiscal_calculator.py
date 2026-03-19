@@ -26,8 +26,10 @@ SALARIU_MINIM_BRUT = 4050  # RON/lună (de la 1 ianuarie 2025)
 
 # Prag CASS pentru venituri din investiții
 # CASS se datorează dacă venitul TOTAL din investiții > 6 salarii minime brute
-CASS_PRAG_MINIM = 6 * SALARIU_MINIM_BRUT  # 24.300 RON (baza minimă de calcul 2025)
-CASS_PRAG_MAXIM = 12 * SALARIU_MINIM_BRUT  # 48.600 RON (baza maximă pentru calcul CASS minim)
+# Praguri: 6, 12, 24 salarii minime (baze de calcul CASS)
+CASS_PRAG_6 = 6 * SALARIU_MINIM_BRUT   # 24.300 RON
+CASS_PRAG_12 = 12 * SALARIU_MINIM_BRUT  # 48.600 RON
+CASS_PRAG_24 = 24 * SALARIU_MINIM_BRUT  # 97.200 RON
 
 # === IMPOZITE BVB (Titluri listate în România) ===
 # Conform Codului Fiscal 2025
@@ -167,20 +169,25 @@ def calcul_pf_bvb(input_data: CalculFiscalInput) -> ScenariuFiscal:
     nota_div = f"10% reținut la sursă (2025): {impozit_div:,.0f} RON"
     
     # === CASS ===
+    # CASS se aplică TUTUROR investitorilor (inclusiv salariați) pe veniturile din investiții
+    # Praguri 2025: 6, 12, 24 salarii minime brute
     cass = 0
     nota_cass = ""
     
-    if not input_data.are_alte_venituri_cass:
-        # Trebuie să plătești CASS dacă nu ai alte surse de venit
-        if venit_total > CASS_PRAG_MINIM:
-            # Baza de calcul CASS = minim 6 salarii minime (24.300 RON în 2025)
-            baza_cass = max(CASS_PRAG_MINIM, min(venit_total, CASS_PRAG_MAXIM))
-            cass = baza_cass * CASS_RATE
-            nota_cass = f"CASS 10% pe baza de {baza_cass:,.0f} RON = {cass:,.0f} RON"
-        else:
-            nota_cass = f"CASS: 0 RON (venit sub pragul de {CASS_PRAG_MINIM:,.0f} RON)"
+    if venit_total <= CASS_PRAG_6:
+        nota_cass = f"CASS: 0 RON (venit {venit_total:,.0f} RON sub pragul de {CASS_PRAG_6:,.0f} RON = 6 salarii minime)"
+    elif venit_total <= CASS_PRAG_12:
+        baza_cass = CASS_PRAG_6
+        cass = baza_cass * CASS_RATE
+        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (6 salarii minime) = {cass:,.0f} RON"
+    elif venit_total <= CASS_PRAG_24:
+        baza_cass = CASS_PRAG_12
+        cass = baza_cass * CASS_RATE
+        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (12 salarii minime) = {cass:,.0f} RON"
     else:
-        nota_cass = "CASS: 0 RON (plătit din salariu/alte venituri)"
+        baza_cass = CASS_PRAG_24
+        cass = baza_cass * CASS_RATE
+        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (24 salarii minime, plafonat) = {cass:,.0f} RON"
     
     total_taxe = impozit_castig + impozit_div + cass
     venit_net = venit_total - total_taxe
@@ -266,18 +273,24 @@ def calcul_pf_international(input_data: CalculFiscalInput) -> ScenariuFiscal:
         nota_div += " (credit fiscal acoperă impozitul RO)"
     
     # === CASS ===
+    # CASS se aplică TUTUROR investitorilor pe veniturile din investiții
     cass = 0
     nota_cass = ""
     
-    if not input_data.are_alte_venituri_cass:
-        if venit_total > CASS_PRAG_MINIM:
-            baza_cass = max(CASS_PRAG_MINIM, min(venit_total, CASS_PRAG_MINIM * 4))
-            cass = baza_cass * CASS_RATE
-            nota_cass = f"CASS 10% pe baza de {baza_cass:,.0f} RON = {cass:,.0f} RON"
-        else:
-            nota_cass = f"CASS: 0 RON (venit sub pragul de {CASS_PRAG_MINIM:,.0f} RON)"
+    if venit_total <= CASS_PRAG_6:
+        nota_cass = f"CASS: 0 RON (venit {venit_total:,.0f} RON sub pragul de {CASS_PRAG_6:,.0f} RON = 6 salarii minime)"
+    elif venit_total <= CASS_PRAG_12:
+        baza_cass = CASS_PRAG_6
+        cass = baza_cass * CASS_RATE
+        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (6 salarii minime) = {cass:,.0f} RON"
+    elif venit_total <= CASS_PRAG_24:
+        baza_cass = CASS_PRAG_12
+        cass = baza_cass * CASS_RATE
+        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (12 salarii minime) = {cass:,.0f} RON"
     else:
-        nota_cass = "CASS: 0 RON (plătit din salariu/alte venituri)"
+        baza_cass = CASS_PRAG_24
+        cass = baza_cass * CASS_RATE
+        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (24 salarii minime, plafonat) = {cass:,.0f} RON"
     
     total_taxe = impozit_castig + impozit_div_total + cass
     venit_net = venit_total - total_taxe
@@ -493,8 +506,8 @@ De ce? Legislația română oferă un regim fiscal FOARTE avantajos pentru inves
 
 **Economie folosind PF:** până la **{economie:,.0f} RON/an**
 
-⚠️ **CASS**: Dacă NU ai salariu și câștigurile depășesc {CASS_PRAG_MINIM:,.0f} RON/an (2025), 
-vei datora CASS (10% din baza de calcul).
+⚠️ **CASS**: Dacă câștigurile din investiții depășesc {CASS_PRAG_6:,.0f} RON/an (6 salarii minime, 2025), 
+vei datora CASS (10% din baza de calcul: 6, 12 sau 24 salarii minime). Se aplică și salariaților!
 
 ⚠️ **IMPORTANT 2026**: Impozitele pe BVB vor crește! (1%→3%, 3%→6%, dividende 10%→16%)
 
@@ -638,10 +651,10 @@ async def get_constante_fiscale():
         },
         "cass": {
             "rata": "10%",
-            "prag_activare": f"{CASS_PRAG_MINIM:,} RON/an (6 × salariu minim 2025)",
-            "baza_calcul_minima": f"{CASS_PRAG_MINIM:,} RON",
-            "baza_calcul_maxima": f"{CASS_PRAG_MAXIM:,} RON",
-            "nota": "Se datorează doar dacă NU ai alte venituri cu CASS (ex: salariu)"
+            "prag_6_salarii": f"{CASS_PRAG_6:,} RON/an (6 × salariu minim 2025)",
+            "prag_12_salarii": f"{CASS_PRAG_12:,} RON/an (12 × salariu minim 2025)",
+            "prag_24_salarii": f"{CASS_PRAG_24:,} RON/an (24 × salariu minim 2025, plafon maxim)",
+            "nota": "CASS se aplică TUTUROR investitorilor (inclusiv salariaților) pe veniturile din investiții peste pragul de 6 salarii minime"
         },
         "micro_srl": {
             "cu_angajat": "1%",
