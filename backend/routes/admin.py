@@ -144,6 +144,53 @@ async def get_admin_stats(admin: dict = Depends(require_admin)):
     }
 
 
+
+@router.post("/upgrade-all-to-pro")
+async def upgrade_all_users_to_pro(admin: dict = Depends(require_admin)):
+    """Upgrade toți userii la PRO până pe 5 iunie 2026"""
+    db = await get_database()
+    deadline = datetime(2026, 6, 5, tzinfo=timezone.utc).isoformat()
+    
+    # Upgrade non-PRO users
+    result = await db.users.update_many(
+        {"$or": [
+            {"subscription_level": {"$ne": "pro"}},
+            {"subscription_level": {"$exists": False}}
+        ]},
+        {"$set": {
+            "subscription_level": "pro",
+            "subscription_expires_at": deadline,
+            "subscription_source": "free_pro_june2026",
+            "is_early_adopter": True,
+            "unlocked_levels": ["beginner", "intermediate", "advanced"]
+        }}
+    )
+    
+    # Extend existing PRO that expire before June 5
+    result2 = await db.users.update_many(
+        {
+            "subscription_level": "pro",
+            "subscription_expires_at": {"$lt": deadline}
+        },
+        {"$set": {
+            "subscription_expires_at": deadline,
+            "subscription_source": "free_pro_june2026"
+        }}
+    )
+    
+    total = await db.users.count_documents({})
+    pro_now = await db.users.count_documents({"subscription_level": "pro"})
+    
+    return {
+        "success": True,
+        "upgraded": result.modified_count,
+        "extended": result2.modified_count,
+        "total_users": total,
+        "pro_users": pro_now,
+        "message": f"Toți {pro_now} useri au acum PRO până pe 5 iunie 2026"
+    }
+
+
 # ============================================
 # FEEDBACK MANAGEMENT
 # ============================================

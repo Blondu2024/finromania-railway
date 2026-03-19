@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [subLevel, setSubLevel] = useState('pro');
   const [days, setDays] = useState(30);
   const [loading, setLoading] = useState(false);
+  const [upgradeResult, setUpgradeResult] = useState(null);
   
   // Feedback state
   const [activeTab, setActiveTab] = useState('users'); // users | feedback
@@ -247,6 +248,52 @@ export default function AdminPage() {
               </CardContent>
             </Card>
           </div>
+        )}
+
+        {/* Upgrade All to PRO Button */}
+        {stats && stats.free_users > 0 && (
+          <Card className="border-green-500/50 bg-green-500/5" data-testid="upgrade-all-pro-card">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-sm">{stats.free_users} useri sunt inca FREE</p>
+                <p className="text-xs text-muted-foreground">Upgrade toti la PRO gratuit pana pe 5 iunie 2026</p>
+              </div>
+              <Button 
+                size="sm"
+                className="bg-green-600 hover:bg-green-700"
+                data-testid="upgrade-all-btn"
+                disabled={loading}
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const res = await fetch(`${API_URL}/api/admin/upgrade-all-to-pro`, {
+                      method: 'POST',
+                      headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await res.json();
+                    setUpgradeResult(data);
+                    fetchStats();
+                    fetchUsers();
+                  } catch (err) {
+                    console.error(err);
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                <Crown className="w-4 h-4 mr-1" />
+                Upgrade Toti la PRO
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {upgradeResult && (
+          <Card className="border-green-500 bg-green-500/10">
+            <CardContent className="p-3 text-sm text-green-700 dark:text-green-400">
+              {upgradeResult.message}
+            </CardContent>
+          </Card>
         )}
 
         {/* Tabs Navigation */}
