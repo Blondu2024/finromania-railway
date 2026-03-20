@@ -1,4 +1,4 @@
-"""CRON Jobs Scheduler pentru actualizare automată"""
+"""CRON Jobs Scheduler pentru actualizare automata"""
 import asyncio
 import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -10,6 +10,7 @@ from services.news_service import NewsService
 from services.currency_service import CurrencyService
 from services.notification_service import notification_service
 from services.daily_summary_service import daily_summary_service
+from apis.bvb_scraper import update_bvb_stocks_from_scrape
 from config.settings import settings
 
 logging.basicConfig(
@@ -27,13 +28,13 @@ currency_service = CurrencyService()
 scheduler = AsyncIOScheduler()
 
 async def update_bvb_stocks_job():
-    """Job: Update BVB stocks"""
+    """Job: Update BVB stocks from real bvb.ro data"""
     try:
-        logger.info("🔄 [JOB] Starting BVB stocks update...")
-        count = await stock_service.update_bvb_stocks()
-        logger.info(f"✅ [JOB] BVB stocks updated: {count} stocks")
+        logger.info("🔄 [JOB] Scraping BVB stocks from bvb.ro...")
+        count = await update_bvb_stocks_from_scrape()
+        logger.info(f"✅ [JOB] BVB stocks updated from bvb.ro: {count} stocks")
     except Exception as e:
-        logger.error(f"❌ [JOB] Error updating BVB stocks: {e}")
+        logger.error(f"❌ [JOB] Error scraping BVB stocks: {e}")
 
 async def update_global_indices_job():
     """Job: Update global indices"""
@@ -104,10 +105,10 @@ async def send_daily_summary_job():
 def start_scheduler():
     """Start all scheduled jobs"""
     try:
-        # Job 1: Update BVB stocks (every 5 minutes)
+        # Job 1: Update BVB stocks via scraping (every 15 minutes - real data from bvb.ro)
         scheduler.add_job(
             update_bvb_stocks_job,
-            trigger=IntervalTrigger(minutes=settings.STOCK_UPDATE_INTERVAL_MINUTES),
+            trigger=IntervalTrigger(minutes=15),
             id='update_bvb_stocks',
             name='Update BVB Stocks',
             replace_existing=True
