@@ -154,30 +154,84 @@ class StockService:
                 # Get REAL historical data from EODHD
                 history_data = await self.eodhd_client.get_historical_data(symbol, period, days)
                 
-                if not history_data:
-                    logger.warning(f"No historical data for {symbol}")
-                    return None
-                
-                stock_info = EODHDClient.BVB_STOCKS.get(symbol, {"name": symbol, "sector": "N/A"})
-                
-                return {
-                    'symbol': symbol,
-                    'name': stock_info["name"],
-                    'description': f"Acțiune listată la Bursa de Valori București (BVB).",
-                    'currency': 'RON',
-                    'exchange': 'BVB',
-                    'history': history_data,
-                    'period': period,
-                    'is_mock': False,
-                    'last_updated': datetime.now(timezone.utc).isoformat()
-                }
-            else:
-                # Fallback to mock data
-                return self._get_bvb_mock_history(symbol)
+                if history_data:
+                    stock_info = EODHDClient.BVB_STOCKS.get(symbol, {"name": symbol, "sector": "N/A"})
+                    return {
+                        'symbol': symbol,
+                        'name': stock_info["name"],
+                        'description': f"Acțiune listată la Bursa de Valori București (BVB).",
+                        'currency': 'RON',
+                        'exchange': 'BVB',
+                        'history': history_data,
+                        'period': period,
+                        'is_mock': False,
+                        'last_updated': datetime.now(timezone.utc).isoformat()
+                    }
+                else:
+                    logger.warning(f"No EODHD historical data for {symbol}, falling back to DB data")
+            
+            # Fallback: get stock from DB and generate mock history
+            db = await get_database()
+            stock = await db.stocks_bvb.find_one({"symbol": symbol.upper()}, {"_id": 0})
+            
+            if stock:
+                return self._generate_fallback_history(stock, period)
+            
+            # Last resort: try mock data
+            return self._get_bvb_mock_history(symbol)
             
         except Exception as e:
             logger.error(f"Error getting BVB history for {symbol}: {e}")
+            # Try DB fallback even on exception
+            try:
+                db = await get_database()
+                stock = await db.stocks_bvb.find_one({"symbol": symbol.upper()}, {"_id": 0})
+                if stock:
+                    return self._generate_fallback_history(stock, period)
+            except:
+                pass
             return None
+    
+    def _generate_fallback_history(self, stock: Dict, period: str = "1m") -> Dict:
+        """Generate fallback history from DB stock data"""
+        import random
+        base_price = stock.get('price', 1.0)
+        symbol = stock.get('symbol', '')
+        
+        days_map = {"1d": 5, "1w": 7, "1m": 30, "3m": 90, "6m": 180, "1y": 365, "5y": 1825}
+        num_days = days_map.get(period, 30)
+        
+        history_data = []
+        for i in range(num_days, 0, -1):
+            date = datetime.now() - timedelta(days=i)
+            if date.weekday() >= 5:
+                continue
+            variation = random.uniform(-0.03, 0.03)
+            day_price = base_price * (1 + variation * (num_days - i) / num_days)
+            history_data.append({
+                'date': date.strftime('%Y-%m-%d'),
+                'open': round(day_price * 0.995, 4),
+                'high': round(day_price * 1.01, 4),
+                'low': round(day_price * 0.99, 4),
+                'close': round(day_price, 4),
+                'volume': random.randint(50000, 500000)
+            })
+        
+        return {
+            'symbol': symbol,
+            'name': stock.get('name', symbol),
+            'description': f"Acțiune listată la BVB.",
+            'currency': 'RON',
+            'exchange': 'BVB',
+            'history': history_data,
+            'period': period,
+            'is_mock': True,
+            'data_notice': 'Grafic ilustrativ. Datele istorice reale sunt temporar indisponibile.',
+            'price': base_price,
+            'change_percent': stock.get('change_percent', 0),
+            'volume': stock.get('volume', 0),
+            'last_updated': datetime.now(timezone.utc).isoformat()
+        }
     
     def _get_bvb_mock_history(self, symbol: str) -> Optional[Dict]:
         """Generate mock history for BVB stock"""
