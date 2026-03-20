@@ -68,6 +68,8 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
   - BET-FI: 100,481.52 (-0.44%) - LIVE ✅
   - BET-NG: 2,075.20 (+0.27%) - LIVE ✅
   - Fișier nou: /app/backend/apis/tradingview_client.py
+- [x] **Fix grafice Global (AAPL, etc):** Corectat period mapping (1m -> 1mo pentru yfinance)
+- [x] **Fix API Global details:** Adăugat price, change, change_percent în răspuns
 
 ## Pending Issues
 - [x] ~~P0: EODHD integration - scraper removal~~ ✅ DONE

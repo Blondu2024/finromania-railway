@@ -75,8 +75,24 @@ export default function StockDetailPage() {
   const fetchDetails = useCallback(async (period = '1m', days = null) => {
     try {
       setRefreshing(true);
+      
+      // Pentru global, convertim perioada în formatul yfinance (1m -> 1mo, etc.)
+      let apiPeriod = period;
+      if (type === 'global') {
+        const periodMapping = {
+          '1d': '1d',
+          '1w': '5d',
+          '1m': '1mo',
+          '3m': '3mo',
+          '6m': '6mo',
+          '1y': '1y',
+          '5y': '5y'
+        };
+        apiPeriod = periodMapping[period] || '1mo';
+      }
+      
       const endpoint = type === 'global' 
-        ? `${API_URL}/api/stocks/global/${encodeURIComponent(symbol)}/details?period=${period}`
+        ? `${API_URL}/api/stocks/global/${encodeURIComponent(symbol)}/details?period=${apiPeriod}`
         : `${API_URL}/api/stocks/bvb/${symbol}/details?period=${period}${days ? `&days=${days}` : ''}`;
       
       const res = await fetch(endpoint);
