@@ -33,7 +33,6 @@ export default function EducationPage() {
     try {
       const [pkgRes, lessonsRes] = await Promise.all([
         fetch(`${API_URL}/api/education/packages`),
-        fetch(`${API_URL}/api/education/lessons`, { credentials: 'include' })
       ]);
       
       if (pkgRes.ok) {
@@ -58,7 +57,6 @@ export default function EducationPage() {
     try {
       for (let i = 0; i < 5; i++) {
         const res = await fetch(`${API_URL}/api/education/checkout/status/${sessionId}`, {
-          credentials: 'include'
         });
         
         if (res.ok) {
@@ -89,7 +87,6 @@ export default function EducationPage() {
       const res = await fetch(`${API_URL}/api/education/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ 
           origin_url: window.location.origin,
           package_id: packageId 

@@ -43,7 +43,6 @@ export default function RiskAssessmentPage() {
   const fetchExistingProfile = async () => {
     try {
       const res = await fetch(`${API_URL}/api/risk-assessment/my-profile`, {
-        credentials: 'include'
       });
       if (res.ok) {
         const data = await res.json();
@@ -88,7 +87,6 @@ export default function RiskAssessmentPage() {
       const res = await fetch(`${API_URL}/api/risk-assessment/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ answers: formattedAnswers })
       });
 

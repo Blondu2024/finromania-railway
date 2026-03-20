@@ -37,7 +37,6 @@ export default function AIAdvisorPage() {
     setLoading(prev => ({ ...prev, advice: true }));
     try {
       const res = await fetch(`${API_URL}/api/advisor/portfolio-advice`, {
-        credentials: 'include'
       });
       if (res.ok) setPortfolioAdvice(await res.json());
     } catch (error) {
@@ -61,7 +60,6 @@ export default function AIAdvisorPage() {
       const res = await fetch(`${API_URL}/api/advisor/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ question })
       });
       

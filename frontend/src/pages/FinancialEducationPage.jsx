@@ -30,7 +30,6 @@ export default function FinancialEducationPage() {
 
       if (user) {
         const progressRes = await fetch(`${API_URL}/api/financial-education/progress`, {
-          credentials: 'include'
         });
         if (progressRes.ok) {
           const progressData = await progressRes.json();

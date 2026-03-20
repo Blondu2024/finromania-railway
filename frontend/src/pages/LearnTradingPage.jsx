@@ -37,7 +37,6 @@ export default function LearnTradingPage() {
 
       // Fetch portfolio status
       const portfolioRes = await fetch(`${API_URL}/api/portfolio/status`, {
-        credentials: 'include'
       });
 
       if (portfolioRes.ok) {
@@ -59,7 +58,6 @@ export default function LearnTradingPage() {
       const res = await fetch(`${API_URL}/api/portfolio/init`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           experience_level: 'beginner',
           completed_tutorial: false

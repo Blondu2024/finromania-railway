@@ -57,7 +57,6 @@ export default function LessonPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        credentials: 'include',
         body: JSON.stringify({
           lesson_id: lessonId,
           answers: quizAnswers
@@ -68,12 +67,19 @@ export default function LessonPage() {
         const result = await res.json();
         setQuizResult(result);
       } else {
-        const error = await res.json();
-        alert(error.detail || 'Eroare la trimiterea quiz-ului');
+        let errorMsg = 'Eroare la trimiterea quiz-ului';
+        try {
+          const error = await res.json();
+          errorMsg = error.detail || errorMsg;
+        } catch {}
+        if (res.status === 401) {
+          errorMsg = 'Sesiunea a expirat. Te rog reconecteaza-te!';
+        }
+        alert(errorMsg);
       }
     } catch (error) {
       console.error('Error submitting quiz:', error);
-      alert('Eroare de conexiune. Încearcă din nou.');
+      alert('Eroare de conexiune. Incearca din nou.');
     }
   };
 

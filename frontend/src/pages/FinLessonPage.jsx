@@ -80,7 +80,6 @@ export default function FinLessonPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        credentials: 'include',
         body: JSON.stringify({
           lesson_id: lessonId,
           answers: quizAnswers

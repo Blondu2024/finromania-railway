@@ -26,7 +26,6 @@ export default function PortfolioPage() {
   const fetchPortfolio = async () => {
     try {
       const res = await fetch(`${API_URL}/api/portfolio/status`, {
-        credentials: 'include'
       });
 
       if (res.status === 404) {
@@ -51,7 +50,6 @@ export default function PortfolioPage() {
       const res = await fetch(`${API_URL}/api/portfolio/init`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           experience_level: experienceLevel,
           completed_tutorial: true
@@ -74,8 +72,7 @@ export default function PortfolioPage() {
 
     try {
       const res = await fetch(`${API_URL}/api/portfolio/reset`, {
-        method: 'POST',
-        credentials: 'include'
+        method: 'POST'
       });
 
       if (res.ok) {
@@ -89,8 +86,7 @@ export default function PortfolioPage() {
   const closePosition = async (positionId) => {
     try {
       const res = await fetch(`${API_URL}/api/portfolio/close/${positionId}`, {
-        method: 'POST',
-        credentials: 'include'
+        method: 'POST'
       });
 
       if (res.ok) {
