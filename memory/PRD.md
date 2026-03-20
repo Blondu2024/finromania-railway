@@ -74,7 +74,8 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 ## Pending Issues
 - [x] ~~P0: EODHD integration - scraper removal~~ ✅ DONE
 - [x] ~~P1: Charts not loading on BVB stock pages~~ ✅ DONE (real historical data)
-- [ ] P1: "Failed to fetch" error on Fiscal Simulator page
+- [x] ~~P1: Charts not loading on Global stock pages~~ ✅ DONE (fixed period mapping)
+- [x] ~~P1: "Failed to fetch" error on Fiscal Simulator page~~ ✅ WORKS (tested)
 - [ ] P2: Mobile responsiveness issues
 - [ ] P2: Slow page load times
 
