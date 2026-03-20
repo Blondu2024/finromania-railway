@@ -151,57 +151,59 @@ class DailySummaryService:
     async def get_summary_for_display(self) -> Optional[Dict]:
         """
         Obține rezumatul pentru afișare pe site.
-        Returnează rezumatul salvat din DB sau generează unul nou dacă nu există.
+        
+        IMPORTANT: NU generează rezumat nou! Doar returnează ce e salvat în DB.
+        - Dacă există rezumat pentru azi → îl returnează
+        - Dacă nu există pentru azi → returnează cel mai recent rezumat (de ieri)
+        - Dacă nu există deloc → returnează None
+        
+        Rezumatul se generează DOAR de job-ul de la 18:10, nu la cererea utilizatorului!
         """
-        # Încearcă să obțină rezumatul salvat pentru azi
-        saved = await self.get_saved_summary()
+        db = await get_database()
+        
+        # 1. Încearcă să obțină rezumatul pentru azi
+        today_key = self._get_today_date_key()
+        saved = await db.daily_summaries.find_one(
+            {"date_key": today_key},
+            {"_id": 0}
+        )
         
         if saved:
-            logger.info(f"Serving cached summary for {saved.get('date_key')}")
+            logger.info(f"Serving today's summary: {today_key}")
             return {
                 "success": True,
                 "date": saved.get("date_display"),
                 "market_data": saved.get("market_data"),
                 "ai_summary": saved.get("ai_summary"),
                 "cached": True,
+                "is_today": True,
                 "generated_at": saved.get("generated_at")
             }
         
-        # Dacă nu există rezumat salvat, verifică dacă e în timpul programului BVB
-        # și generează unul temporar (dar nu îl salvează - va fi salvat de job la 18:10)
-        logger.warning("No saved summary found, generating temporary one...")
+        # 2. Dacă nu există pentru azi, caută cel mai recent rezumat
+        latest = await db.daily_summaries.find_one(
+            {},
+            {"_id": 0},
+            sort=[("date_key", -1)]  # Cel mai recent
+        )
         
-        market_data = await self.get_market_data()
-        if not market_data:
-            return None
+        if latest:
+            logger.info(f"No summary for today, serving latest: {latest.get('date_key')}")
+            return {
+                "success": True,
+                "date": latest.get("date_display"),
+                "market_data": latest.get("market_data"),
+                "ai_summary": latest.get("ai_summary"),
+                "cached": True,
+                "is_today": False,
+                "from_date": latest.get("date_key"),
+                "generated_at": latest.get("generated_at"),
+                "note": f"Rezumatul din {latest.get('date_display')}. Cel de azi va fi disponibil la 18:10."
+            }
         
-        ai_summary = await self.generate_ai_summary(market_data)
-        
-        return {
-            "success": True,
-            "date": market_data["date"],
-            "market_data": {
-                "bet_change": market_data.get("bet_change"),
-                "avg_change": market_data["avg_change"],
-                "indices": market_data.get("indices", {}),
-                "sentiment": market_data["sentiment"],
-                "top_gainers": [
-                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent")}
-                    for s in market_data["top_gainers"]
-                ],
-                "top_losers": [
-                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent")}
-                    for s in market_data["top_losers"]
-                ],
-                "top_volume": [
-                    {"symbol": s.get("symbol"), "volume": s.get("volume")}
-                    for s in market_data["top_volume"]
-                ]
-            },
-            "ai_summary": ai_summary,
-            "cached": False,
-            "note": "Rezumat temporar - cel oficial se generează la 18:10"
-        }
+        # 3. Nu există niciun rezumat salvat
+        logger.warning("No saved summaries found in database")
+        return None
     
     async def get_market_data(self) -> Dict:
         """Colectează datele de piață pentru rezumat"""

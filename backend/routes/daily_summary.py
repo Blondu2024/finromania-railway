@@ -29,21 +29,26 @@ async def preview_daily_summary():
     """
     Obține rezumatul zilnic pentru afișare.
     
-    LOGICA:
-    1. Dacă există un rezumat salvat pentru azi în DB, îl returnează (RAPID, fără AI)
-    2. Dacă nu există, generează unul temporar (mai lent, apel AI)
+    IMPORTANT: NU generează rezumat nou! Doar returnează ce e salvat în DB.
+    - Rezumatul de azi (dacă există)
+    - Sau cel mai recent rezumat (de ieri/anterioare)
+    - Sau eroare 404 dacă nu există niciun rezumat
     
-    Rezumatul oficial se generează și salvează automat la 18:10 de către job-ul scheduler.
+    Rezumatul oficial se generează automat la 18:10 de către job-ul scheduler.
     """
     try:
-        # Folosește noua metodă care servește din cache
         summary = await daily_summary_service.get_summary_for_display()
         
         if not summary:
-            raise HTTPException(status_code=404, detail="Nu sunt date de piață disponibile")
+            raise HTTPException(
+                status_code=404, 
+                detail="Rezumatul zilei nu este încă disponibil. Va fi generat automat la 18:10 după închiderea bursei."
+            )
         
         return summary
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error getting daily summary: {e}")
         raise HTTPException(status_code=500, detail=str(e))

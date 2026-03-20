@@ -44,10 +44,20 @@ export default function DailySummaryPage() {
   if (error || !data) {
     return (
       <div className="max-w-3xl mx-auto text-center py-16" data-testid="daily-summary-error">
-        <p className="text-muted-foreground">Nu s-a putut încărca rezumatul zilei.</p>
+        <BarChart3 className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+        <h2 className="text-xl font-semibold mb-2">Rezumatul zilei nu este încă disponibil</h2>
+        <p className="text-muted-foreground mb-4">
+          Rezumatul se generează automat la 18:10, după închiderea Bursei de Valori București.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Revino după ora 18:10 pentru a vedea analiza completă a zilei.
+        </p>
       </div>
     );
   }
+
+  // Afișează notă dacă rezumatul nu e de azi
+  const showOldSummaryNote = data.is_today === false && data.note;
 
   const md = data.market_data || {};
   const gainers = md.top_gainers || [];
@@ -61,6 +71,13 @@ export default function DailySummaryPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6" data-testid="daily-summary-page">
+      {/* Notă dacă rezumatul e vechi */}
+      {showOldSummaryNote && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 text-sm text-yellow-800 dark:text-yellow-200">
+          ⚠️ {data.note}
+        </div>
+      )}
+      
       {/* Header cu BET */}
       <div className="flex items-center justify-between">
         <div>
