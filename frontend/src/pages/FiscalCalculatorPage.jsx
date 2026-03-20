@@ -262,12 +262,12 @@ export default function FiscalCalculatorPage() {
     const calcStructuredData = {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Calculator Fiscal România - PF vs SRL 2025",
-      "description": "Calculator fiscal profesional pentru alegerea între PF, PFA și SRL în România. Legislație 2025, calcul impozite, CASS, economii fiscale.",
+      "name": "Calculator Fiscal Romania - PF vs SRL 2026",
+      "description": "Calculator fiscal profesional pentru alegerea între PF, PFA și SRL în România. Legislatie 2026, calcul impozite, CASS, economii fiscale.",
       "url": "https://finromania.ro/calculator-fiscal",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Any",
-      "featureList": ["Calcul impozit PF 10%", "Calcul SRL Micro 1-3%", "Comparație economii", "Legislație 2025"],
+      "featureList": ["Calcul impozit BVB 3-6%", "Calcul SRL Micro 1-3%", "Comparație economii", "Legislatie 2026"],
       "inLanguage": "ro",
       "areaServed": "RO"
     };
@@ -275,9 +275,9 @@ export default function FiscalCalculatorPage() {
     return (
       <>
         <SEO 
-          title="Calculator Fiscal România 2025 - PF vs SRL | FinRomania"
-          description="Calculator fiscal gratuit pentru România: compară impozite PF, PFA, SRL. Legislație 2025, calcul CASS, CAS, economii fiscale. Află care formă juridică e optimă pentru tine."
-          keywords="calculator fiscal românia 2025, pf vs srl, impozit dividende, microîntreprindere, pfa impozit, calculator impozit venit, legislație fiscală 2025, CASS 2025"
+          title="Calculator Fiscal Romania 2026 - PF vs SRL | FinRomania"
+          description="Calculator fiscal gratuit pentru România: compară impozite PF, PFA, SRL. Legislatie 2026, calcul CASS, CAS, economii fiscale. Află care formă juridică e optimă pentru tine."
+          keywords="calculator fiscal romania 2026, pf vs srl, impozit dividende, microîntreprindere, pfa impozit, calculator impozit venit, legislatie fiscala 2026, CASS 2026"
           structuredData={calcStructuredData}
         />
         <ProPaywall feature="Calculatorul Fiscal cu AI" />
@@ -301,8 +301,8 @@ export default function FiscalCalculatorPage() {
   return (
     <>
       <SEO 
-        title="Calculator Fiscal Investiții BVB 2025 - PF vs SRL | FinRomania"
-        description="Calculator fiscal pentru investiții la Bursa București (BVB). Compară impozite PF vs PFA vs SRL pentru câștiguri din acțiuni. Legislație 2025, impozit 1-3% pentru trading BVB."
+        title="Calculator Fiscal Investiții BVB 2026 - PF vs SRL | FinRomania"
+        description="Calculator fiscal pentru investiții la Bursa București (BVB). Compară impozite PF vs PFA vs SRL pentru câștiguri din acțiuni. Legislatie 2026, impozit 3-6% BVB conform Cod Fiscal 2026."
         keywords="calculator fiscal bvb, impozit acțiuni românia, pf vs srl trading, fiscal bursă bucurești, impozit dividende bvb, optimizare fiscală trading"
         structuredData={proStructuredData}
       />
@@ -311,7 +311,7 @@ export default function FiscalCalculatorPage() {
         {/* Hero Section */}
         <div className="text-center space-y-4">
           <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-1">
-            🏆 Actualizat 2024-2025
+            🏆 Actualizat 2026
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold">
             Calculator <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Fiscal BVB</span>

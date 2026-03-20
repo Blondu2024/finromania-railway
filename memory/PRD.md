@@ -36,11 +36,24 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] AI summary uses exact numbers (no vague words like "semnificativ")
 - [x] Fixed AI LLM integration import (was using old `chat()` function, now uses `LlmChat` class correctly)
 - [x] Added personalized watchlist section to daily email (shows user's tracked stocks with % change)
-- [x] Changed email sender to verified domain (finromania.ro)
 - [x] Created "/rezumat-zilnic" page with full daily summary + navbar button
 - [x] Changed PRO from "first 100 users" to "FREE for ALL until June 5, 2026"
 - [x] Hidden PRO upsell banners/cards for PRO users (EarlyAdopterBanner + homepage CTA)
 - [x] Added subscription_level to UserResponse model for frontend awareness
+- [x] Fixed CASS calculation bug: now applies to employees too (was showing 0 CASS for salaried investors)
+- [x] Added 24 minimum salary threshold for CASS (was missing)
+- [x] Fixed quiz/lesson submission error ("Eroare de conexiune") — removed conflicting `credentials: 'include'` from 8 pages
+- [x] Fixed stock detail pages not loading (SNP, TLV, BRD, etc.) — fallback to DB data when EODHD fails
+- [x] Fixed daily email not sending: 0 subscribers + wrong timezone → enabled all users + Europe/Bucharest
+- [x] Added 95/day email limit for Resend free plan
+- [x] **MAJOR: Updated entire Fiscal Calculator from 2025 to 2026 legislation:**
+  - Capital gains BVB: 1%→3% (>1yr), 3%→6% (<1yr)
+  - Dividends: 10%→16%
+  - International: 10%→16%
+  - SRL dividends: 8%→16%
+  - All UI/SEO references updated to 2026
+  - Fixed preview endpoint to accept period/percentage params
+- [x] Added admin "Upgrade All to PRO" button in dashboard
 
 ## Pending Issues
 - [ ] P1: Charts not loading on BVB stock pages (EODHD free plan limitation)

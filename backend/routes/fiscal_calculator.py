@@ -1,5 +1,5 @@
 """
-Calculator Fiscal România - CORECT conform legislației 2024-2025
+Calculator Fiscal Romania - CORECT conform legislatiei 2026
 Optimizare PF vs PFA vs SRL pentru investiții la bursă
 Feature PRO - Diferențiator unic pentru FinRomania
 """
@@ -16,42 +16,40 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/fiscal", tags=["fiscal-calculator"])
 
 # ============================================
-# CONSTANTE FISCALE ROMÂNIA 2025
-# ACTUALIZATE CONFORM LEGISLAȚIEI ÎN VIGOARE
-# ATENȚIE: Modificări planificate pentru 2026!
+# CONSTANTE FISCALE ROMANIA 2026
+# ACTUALIZATE CONFORM LEGISLATIEI IN VIGOARE
+# Surse: Cod Fiscal 2026, ANAF, goldring.ro
 # ============================================
 
-# Salariu minim brut pe economie 2025 (crescut de la 3.700 în 2024)
-SALARIU_MINIM_BRUT = 4050  # RON/lună (de la 1 ianuarie 2025)
+# Salariu minim brut pe economie 2026
+# Ian-Iun 2026: 4.050 RON, Iul-Dec 2026: 4.325 RON
+# Folosim 4.050 RON ca baza pentru CASS (prima jumatate a anului)
+SALARIU_MINIM_BRUT = 4050  # RON/luna (ianuarie-iunie 2026)
 
-# Prag CASS pentru venituri din investiții
-# CASS se datorează dacă venitul TOTAL din investiții > 6 salarii minime brute
+# Prag CASS pentru venituri din investitii
+# CASS se datoreaza daca venitul TOTAL din investitii > 6 salarii minime brute
 # Praguri: 6, 12, 24 salarii minime (baze de calcul CASS)
 CASS_PRAG_6 = 6 * SALARIU_MINIM_BRUT   # 24.300 RON
 CASS_PRAG_12 = 12 * SALARIU_MINIM_BRUT  # 48.600 RON
 CASS_PRAG_24 = 24 * SALARIU_MINIM_BRUT  # 97.200 RON
 
-# === IMPOZITE BVB (Titluri listate în România) ===
-# Conform Codului Fiscal 2025
-# ⚠️ ATENȚIE: Din 1 ianuarie 2026 cresc la 3% și 6%!
-IMPOZIT_BVB_TERMEN_LUNG = 0.01      # 1% - deținere >= 365 zile (2025)
-IMPOZIT_BVB_TERMEN_SCURT = 0.03    # 3% - deținere < 365 zile (2025)
+# === IMPOZITE BVB (Titluri listate in Romania prin brokeri romani) ===
+# Conform Codului Fiscal 2026 (in vigoare de la 1 ianuarie 2026)
+# Impozitul se retine la sursa de catre broker, per tranzactie
+# Pierderile NU se compenseaza cu castigurile
+IMPOZIT_BVB_TERMEN_LUNG = 0.03      # 3% - detinere >= 365 zile (2026)
+IMPOZIT_BVB_TERMEN_SCURT = 0.06     # 6% - detinere < 365 zile (2026)
 
-# Viitor 2026:
-IMPOZIT_BVB_TERMEN_LUNG_2026 = 0.03  # 3% din 2026
-IMPOZIT_BVB_TERMEN_SCURT_2026 = 0.06 # 6% din 2026
-
-# === IMPOZITE PIEȚE INTERNAȚIONALE ===
-IMPOZIT_INTERNATIONAL = 0.10       # 10% pentru piețe străine (câștig capital) - 2025
-IMPOZIT_INTERNATIONAL_2026 = 0.16  # 16% din 1 ianuarie 2026
+# === IMPOZITE PIETE INTERNATIONALE (brokeri nerezidenti) ===
+# eToro, Interactive Brokers, etc. - 16% pe castig NET anual
+# Castiguri minus pierderi, declarat prin Declaratia Unica
+IMPOZIT_INTERNATIONAL = 0.16       # 16% pentru piete straine (2026)
 
 # === DIVIDENDE ===
-# IMPORTANT: Dividendele BVB au crescut la 10% în 2025!
-IMPOZIT_DIVIDENDE_RO = 0.10        # 10% pentru dividende românești (2025, crescut de la 8%)
-IMPOZIT_DIVIDENDE_STRAINE = 0.10   # 10% pentru dividende din străinătate (2025)
-
-# Viitor 2026:
-IMPOZIT_DIVIDENDE_2026 = 0.16      # 16% din 1 ianuarie 2026
+# Impozit pe dividende 2026: 16% (crescut de la 10% in 2025)
+# Retinut la sursa de catre societate
+IMPOZIT_DIVIDENDE_RO = 0.16        # 16% pentru dividende romanesti (2026)
+IMPOZIT_DIVIDENDE_STRAINE = 0.16   # 16% pentru dividende din strainatate (2026)
 
 # Reținere la sursă în alte țări (tratate de evitare a dublei impuneri)
 RETINERE_USA = 0.15               # 15% reținere SUA (cu W-8BEN) sau 30% fără
@@ -83,8 +81,8 @@ class TipPiata(str, Enum):
 
 
 class PerioadaDetinere(str, Enum):
-    SUB_1_AN = "sub_1_an"      # < 365 zile (impozit 3% BVB)
-    PESTE_1_AN = "peste_1_an"  # >= 365 zile (impozit 1% BVB)
+    SUB_1_AN = "sub_1_an"      # < 365 zile (impozit 6% BVB 2026)
+    PESTE_1_AN = "peste_1_an"  # >= 365 zile (impozit 3% BVB 2026)
     MIXT = "mixt"              # Mix de perioade
 
 
@@ -134,43 +132,44 @@ class ComparatieFiscala(BaseModel):
 
 def calcul_pf_bvb(input_data: CalculFiscalInput) -> ScenariuFiscal:
     """
-    Calculează impozitele pentru Persoană Fizică - Investiții BVB
+    Calculeaza impozitele pentru Persoana Fizica - Investitii BVB
     
-    LEGISLAȚIE 2024-2025:
-    - Câștig capital BVB: 1% (>=1 an) sau 3% (<1 an) - reținut la sursă
-    - Dividende: 8% - reținut la sursă
-    - CASS: 10% dacă venit total > 6 salarii minime și NU ai alte surse CASS
+    LEGISLATIE 2026:
+    - Castig capital BVB: 3% (>=1 an) sau 6% (<1 an) - retinut la sursa de broker
+    - Dividende: 16% - retinut la sursa
+    - CASS: 10% daca venit total > 6 salarii minime (se aplica si salariatilor)
+    - Pierderile NU se compenseaza cu castigurile
     """
     castig = input_data.castig_capital_anual
     dividende = input_data.dividende_anuale
     venit_total = castig + dividende
     
-    # === IMPOZIT PE CÂȘTIG DE CAPITAL ===
+    # === IMPOZIT PE CASTIG DE CAPITAL ===
     if input_data.tip_piata == TipPiata.BVB:
         if input_data.perioada_detinere == PerioadaDetinere.PESTE_1_AN:
             impozit_castig = castig * IMPOZIT_BVB_TERMEN_LUNG
-            nota_castig = f"1% (deținere ≥1 an): {impozit_castig:,.0f} RON"
+            nota_castig = f"3% (detinere >=1 an): {impozit_castig:,.0f} RON"
         elif input_data.perioada_detinere == PerioadaDetinere.SUB_1_AN:
             impozit_castig = castig * IMPOZIT_BVB_TERMEN_SCURT
-            nota_castig = f"3% (deținere <1 an): {impozit_castig:,.0f} RON"
+            nota_castig = f"6% (detinere <1 an): {impozit_castig:,.0f} RON"
         else:  # MIXT
             castig_lung = castig * (input_data.procent_termen_lung / 100)
             castig_scurt = castig - castig_lung
             impozit_castig = (castig_lung * IMPOZIT_BVB_TERMEN_LUNG + 
                             castig_scurt * IMPOZIT_BVB_TERMEN_SCURT)
-            nota_castig = f"Mixt: {castig_lung:,.0f} RON × 1% + {castig_scurt:,.0f} RON × 3% = {impozit_castig:,.0f} RON"
+            nota_castig = f"Mixt: {castig_lung:,.0f} RON x 3% + {castig_scurt:,.0f} RON x 6% = {impozit_castig:,.0f} RON"
     else:
-        # Piețe internaționale: 10%
+        # Piete internationale: 16% pe castig NET anual
         impozit_castig = castig * IMPOZIT_INTERNATIONAL
-        nota_castig = f"10% (piețe internaționale): {impozit_castig:,.0f} RON"
+        nota_castig = f"16% (piete internationale, castig net anual): {impozit_castig:,.0f} RON"
     
     # === IMPOZIT PE DIVIDENDE ===
     impozit_div = dividende * IMPOZIT_DIVIDENDE_RO
-    nota_div = f"10% reținut la sursă (2025): {impozit_div:,.0f} RON"
+    nota_div = f"16% retinut la sursa (2026): {impozit_div:,.0f} RON"
     
     # === CASS ===
-    # CASS se aplică TUTUROR investitorilor (inclusiv salariați) pe veniturile din investiții
-    # Praguri 2025: 6, 12, 24 salarii minime brute
+    # CASS se aplica TUTUROR investitorilor (inclusiv salariatilor) pe veniturile din investitii
+    # Praguri 2026: 6, 12, 24 salarii minime brute
     cass = 0
     nota_cass = ""
     
@@ -179,41 +178,41 @@ def calcul_pf_bvb(input_data: CalculFiscalInput) -> ScenariuFiscal:
     elif venit_total <= CASS_PRAG_12:
         baza_cass = CASS_PRAG_6
         cass = baza_cass * CASS_RATE
-        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (6 salarii minime) = {cass:,.0f} RON"
+        nota_cass = f"CASS 10% x {baza_cass:,.0f} RON (6 salarii minime) = {cass:,.0f} RON"
     elif venit_total <= CASS_PRAG_24:
         baza_cass = CASS_PRAG_12
         cass = baza_cass * CASS_RATE
-        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (12 salarii minime) = {cass:,.0f} RON"
+        nota_cass = f"CASS 10% x {baza_cass:,.0f} RON (12 salarii minime) = {cass:,.0f} RON"
     else:
         baza_cass = CASS_PRAG_24
         cass = baza_cass * CASS_RATE
-        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (24 salarii minime, plafonat) = {cass:,.0f} RON"
+        nota_cass = f"CASS 10% x {baza_cass:,.0f} RON (24 salarii minime, plafonat) = {cass:,.0f} RON"
     
     total_taxe = impozit_castig + impozit_div + cass
     venit_net = venit_total - total_taxe
     rata_efectiva = (total_taxe / venit_total * 100) if venit_total > 0 else 0
     
     detalii = [
-        f"Câștig capital: {castig:,.0f} RON",
+        f"Castig capital: {castig:,.0f} RON",
         f"Dividende: {dividende:,.0f} RON",
-        f"Impozit câștig capital: {nota_castig}",
+        f"Impozit castig capital: {nota_castig}",
         f"Impozit dividende: {nota_div}",
         nota_cass
     ]
     
     avantaje = [
-        "✅ Impozit foarte mic pe BVB: 1-3% (2025)",
-        "✅ Reținere la sursă (broker-ul plătește)",
-        "✅ Fără contabilitate sau declarații complexe",
-        "✅ Ideal pentru investitori pasivi",
-        "⚠️ Din 2026: impozit crește la 3-6%"
+        "Impozit redus pe BVB: 3% (>1 an) sau 6% (<1 an)",
+        "Retinere la sursa (brokerul plateste automat)",
+        "Fara contabilitate sau declaratii complexe",
+        "Ideal pentru investitori pasivi",
+        "NOU 2026: Deducere pana la 400 EUR/an pentru investitii"
     ]
     
     dezavantaje = [
-        "❌ Nu poți compensa pierderile cu câștigurile",
-        "❌ CASS obligatoriu dacă nu ai salariu (24.300 RON prag 2025)",
-        "❌ Nu poți deduce nicio cheltuială",
-        "❌ Din 2026: impozite mai mari (3-6% vs 1-3%)"
+        "Nu poti compensa pierderile cu castigurile",
+        "CASS obligatoriu peste 24.300 RON/an (inclusiv salariati)",
+        "Nu poti deduce nicio cheltuiala",
+        "Impozit pe tranzactie, nu pe profit net anual"
     ]
     
     return ScenariuFiscal(
@@ -236,41 +235,41 @@ def calcul_pf_bvb(input_data: CalculFiscalInput) -> ScenariuFiscal:
 
 def calcul_pf_international(input_data: CalculFiscalInput) -> ScenariuFiscal:
     """
-    Calculează impozitele pentru Persoană Fizică - Investiții INTERNAȚIONALE
+    Calculeaza impozitele pentru Persoana Fizica - Investitii INTERNATIONALE
     
-    LEGISLAȚIE 2024-2025 pentru piețe străine:
-    - Câștig capital: 10% (indiferent de perioadă)
-    - Dividende: 10% în România + reținere la sursă în țara emitentului
-    - Pierderile se pot compensa până la 70% din câștiguri
-    - CASS: 10% dacă venit total > 6 salarii minime și NU ai alte surse CASS
-    - Trebuie declarat în Declarația Unică (formularul 212)
+    LEGISLATIE 2026 pentru piete straine (brokeri nerezidenti):
+    - Castig capital: 16% pe castig NET anual (castiguri minus pierderi)
+    - Dividende: 16% in Romania + retinere la sursa in tara emitentului
+    - Pierderile se pot compensa cu castigurile
+    - CASS: 10% daca venit total > 6 salarii minime
+    - Trebuie declarat in Declaratia Unica (formularul 212)
     """
     castig = input_data.castig_capital_anual
     dividende = input_data.dividende_anuale
     venit_total = castig + dividende
     
-    # === IMPOZIT PE CÂȘTIG DE CAPITAL ===
-    # 10% indiferent de perioada de deținere
+    # === IMPOZIT PE CASTIG DE CAPITAL ===
+    # 16% pe castig NET anual (brokeri nerezidenti)
     impozit_castig = castig * IMPOZIT_INTERNATIONAL
-    nota_castig = f"10% câștig capital: {impozit_castig:,.0f} RON"
+    nota_castig = f"16% castig capital net: {impozit_castig:,.0f} RON"
     
-    # === IMPOZIT PE DIVIDENDE INTERNAȚIONALE ===
-    # Reținere la sursă în țara emitentului + impozit în RO
-    # Cu tratate de evitare a dublei impuneri, se acordă credit fiscal
+    # === IMPOZIT PE DIVIDENDE INTERNATIONALE ===
+    # Retinere la sursa in tara emitentului + impozit in RO
+    # Cu tratate de evitare a dublei impuneri, se acorda credit fiscal
     
-    # Exemplu SUA cu W-8BEN: 15% reținut în SUA
+    # Exemplu SUA cu W-8BEN: 15% retinut in SUA
     retinere_sursa = dividende * RETINERE_USA
     
-    # În România se datorează 10%, dar se scade ce s-a plătit în străinătate (credit fiscal)
-    # Dacă s-a reținut 15% în SUA, nu mai datorezi nimic în RO (15% > 10%)
+    # In Romania se datoreaza 16%, dar se scade ce s-a platit in strainatate (credit fiscal)
+    # Daca s-a retinut 15% in SUA, mai datorezi 1% in RO (16% - 15%)
     impozit_div_ro = max(0, dividende * IMPOZIT_DIVIDENDE_STRAINE - retinere_sursa)
     impozit_div_total = retinere_sursa + impozit_div_ro
     
-    nota_div = f"Dividende: {retinere_sursa:,.0f} RON reținut la sursă (15% SUA)"
+    nota_div = f"Dividende: {retinere_sursa:,.0f} RON retinut la sursa (15% SUA)"
     if impozit_div_ro > 0:
-        nota_div += f" + {impozit_div_ro:,.0f} RON în RO"
+        nota_div += f" + {impozit_div_ro:,.0f} RON in RO (diferenta pana la 16%)"
     else:
-        nota_div += " (credit fiscal acoperă impozitul RO)"
+        nota_div += " (credit fiscal acopera impozitul RO)"
     
     # === CASS ===
     # CASS se aplică TUTUROR investitorilor pe veniturile din investiții
@@ -306,19 +305,19 @@ def calcul_pf_international(input_data: CalculFiscalInput) -> ScenariuFiscal:
     ]
     
     avantaje = [
-        "✅ Acces la mii de companii globale",
-        "✅ Diversificare geografică",
-        "✅ Pierderile se pot compensa (70%)",
-        "✅ ETF-uri cu costuri mici",
-        "✅ Credit fiscal pentru dividende (tratate)"
+        "Acces la mii de companii globale",
+        "Diversificare geografica",
+        "Pierderile se compenseaza cu castigurile",
+        "ETF-uri cu costuri mici",
+        "Credit fiscal pentru dividende (tratate)"
     ]
     
     dezavantaje = [
-        "❌ Impozit 10% vs 1-3% pe BVB",
-        "❌ Trebuie să completezi Declarația Unică",
-        "❌ Calcul manual al impozitului",
-        "❌ Complexitate cu reținerea la sursă",
-        "❌ Risc valutar (USD/EUR)"
+        "Impozit 16% vs 3-6% pe BVB",
+        "Trebuie sa completezi Declaratia Unica",
+        "Calcul manual al impozitului",
+        "Complexitate cu retinerea la sursa",
+        "Risc valutar (USD/EUR)"
     ]
     
     return ScenariuFiscal(
@@ -379,7 +378,7 @@ def calcul_pfa_investitii(input_data: CalculFiscalInput) -> ScenariuFiscal:
     
     dezavantaje = [
         "❌ CAS+CASS obligatorii (~35% din bază)",
-        "❌ Impozit 10% vs 1-3% ca PF pe BVB",
+        "Impozit 16% vs 3-6% ca PF pe BVB",
         "❌ Contabilitate lunară obligatorie",
         "❌ NU are sens pentru investiții pasive!",
         "❌ Răspundere cu patrimoniul personal"
@@ -424,11 +423,11 @@ def calcul_srl_micro_investitii(input_data: CalculFiscalInput) -> ScenariuFiscal
     # Profit disponibil pentru dividende
     profit_dupa_impozit = venit_total - impozit_micro
     
-    # Impozit dividende la retragere (8%)
+    # Impozit dividende la retragere (16% din 2026)
     impozit_div = profit_dupa_impozit * IMPOZIT_DIVIDENDE_RO
     
     # Costuri administrative SRL
-    costuri_admin = 8000  # ~650 RON/lună contabilitate + taxe diverse
+    costuri_admin = 8000  # ~650 RON/luna contabilitate + taxe diverse
     
     total_taxe = impozit_micro + impozit_div + costuri_admin
     venit_net = venit_total - total_taxe
@@ -436,25 +435,25 @@ def calcul_srl_micro_investitii(input_data: CalculFiscalInput) -> ScenariuFiscal
     
     detalii = [
         f"Impozit micro ({tip_micro}): {impozit_micro:,.0f} RON",
-        f"Profit după impozit: {profit_dupa_impozit:,.0f} RON",
-        f"Impozit dividende la retragere (8%): {impozit_div:,.0f} RON",
+        f"Profit dupa impozit: {profit_dupa_impozit:,.0f} RON",
+        f"Impozit dividende la retragere (16%): {impozit_div:,.0f} RON",
         f"Costuri admin estimate: {costuri_admin:,.0f} RON/an",
-        f"Impozitare totală: {rata_efectiva:.1f}%"
+        f"Impozitare totala: {rata_efectiva:.1f}%"
     ]
     
     avantaje = [
-        "✅ Răspundere limitată la capitalul social",
-        "✅ Poți lăsa profitul în firmă (fără 8%)",
-        "✅ Credibilitate în business",
-        "✅ Poți deduce toate cheltuielile"
+        "Raspundere limitata la capitalul social",
+        "Poti lasa profitul in firma (fara 16%)",
+        "Credibilitate in business",
+        "Poti deduce toate cheltuielile"
     ]
     
     dezavantaje = [
-        f"❌ Impozitare totală ~{rata_efectiva:.0f}% vs 1-3% ca PF",
-        "❌ Costuri înființare (~2000 RON)",
-        "❌ Contabilitate obligatorie lunară",
-        "❌ Declarații fiscale multiple",
-        "❌ NU are sens pentru investiții pe BVB!"
+        f"Impozitare totala ~{rata_efectiva:.0f}% vs 3-6% ca PF pe BVB",
+        "Costuri infiintare (~2000 RON)",
+        "Contabilitate obligatorie lunara",
+        "Declaratii fiscale multiple",
+        "NU are sens pentru investitii pe BVB!"
     ]
     
     return ScenariuFiscal(
@@ -488,67 +487,62 @@ def genereaza_recomandare(scenarii: List[ScenariuFiscal], input_data: CalculFisc
     # Pentru BVB, PF este APROAPE ÎNTOTDEAUNA cel mai avantajos
     if input_data.tip_piata == TipPiata.BVB:
         explicatie = f"""
-### 🏆 CONCLUZIE PENTRU INVESTIȚII PE BVB:
+### CONCLUZIE PENTRU INVESTITII PE BVB (2026):
 
-**Persoană Fizică este aproape întotdeauna cea mai bună opțiune!**
+**Persoana Fizica este aproape intotdeauna cea mai buna optiune!**
 
-De ce? Legislația română oferă un regim fiscal FOARTE avantajos pentru investitorii pe BVB:
+De ce? Legislatia romana ofera un regim fiscal avantajos pentru investitorii pe BVB:
 
-| Situație | Impozit 2025 | Impozit 2026 |
-|----------|--------------|--------------|
-| Deținere ≥ 1 an | **1%** | **3%** ⚠️ |
-| Deținere < 1 an | **3%** | **6%** ⚠️ |
-| Dividende | **10%** | **16%** ⚠️ |
+| Situatie | Impozit 2026 |
+|----------|------------|
+| Detinere >= 1 an | **3%** |
+| Detinere < 1 an | **6%** |
+| Dividende | **16%** |
 
 **Comparativ:**
 - PFA: ~35-45% (impozit + CAS + CASS)
-- SRL Micro: ~11-13% + costuri administrative
+- SRL Micro: ~19-20% + costuri administrative
 
-**Economie folosind PF:** până la **{economie:,.0f} RON/an**
+**Economie folosind PF:** pana la **{economie:,.0f} RON/an**
 
-⚠️ **CASS**: Dacă câștigurile din investiții depășesc {CASS_PRAG_6:,.0f} RON/an (6 salarii minime, 2025), 
-vei datora CASS (10% din baza de calcul: 6, 12 sau 24 salarii minime). Se aplică și salariaților!
+**CASS**: Daca castigurile din investitii depasesc {CASS_PRAG_6:,.0f} RON/an (6 salarii minime),
+vei datora CASS (10% din baza de calcul: 6, 12 sau 24 salarii minime). Se aplica si salariatilor!
 
-⚠️ **IMPORTANT 2026**: Impozitele pe BVB vor crește! (1%→3%, 3%→6%, dividende 10%→16%)
-
-📋 **Ce trebuie să faci:**
-1. Broker-ul reține automat impozitul pe câștig (1% sau 3%)
-2. Companiile rețin 10% din dividende
-3. Completezi Declarația Unică (212) până în mai pentru CASS (dacă e cazul)
+**Ce trebuie sa faci:**
+1. Brokerul retine automat impozitul pe castig (3% sau 6%)
+2. Companiile retin 16% din dividende
+3. Completezi Declaratia Unica (212) pana in mai pentru CASS (daca e cazul)
 """
     else:  # INTERNATIONAL
-        # Comparație BVB vs International
-        pf_bvb_ipotetic = input_data.castig_capital_anual * 0.02  # Media 2% pentru BVB
-        pf_int = input_data.castig_capital_anual * 0.10  # 10% international
+        # Comparatie BVB vs International
+        pf_bvb_ipotetic = input_data.castig_capital_anual * 0.045  # Media 4.5% pentru BVB (mixt 3-6%)
+        pf_int = input_data.castig_capital_anual * 0.16  # 16% international
         diferenta_bvb_int = pf_int - pf_bvb_ipotetic
         
         explicatie = f"""
-### 🌍 CONCLUZIE PENTRU INVESTIȚII INTERNAȚIONALE:
+### CONCLUZIE PENTRU INVESTITII INTERNATIONALE (2026):
 
-**Impozitarea este mai mare decât pe BVB, dar încă rezonabilă.**
+**Impozitarea este semnificativ mai mare decat pe BVB.**
 
-| Piață | Impozit Câștig 2025 | Impozit Câștig 2026 | Dividende 2025 | Dividende 2026 |
-|-------|---------------------|---------------------|----------------|----------------|
-| 🇷🇴 BVB | **1-3%** | **3-6%** ⚠️ | 10% | 16% ⚠️ |
-| 🇺🇸 USA | **10%** | **16%** ⚠️ | 15% reținut + credit | 15% + credit |
-| 🇪🇺 UE | **10%** | **16%** ⚠️ | 10-25% variază | 10-25% variază |
+| Piata | Impozit Castig 2026 | Dividende 2026 |
+|-------|---------------------|----------------|
+| BVB | **3-6%** | 16% |
+| USA/UE (brokeri straini) | **16%** | 15% retinut + 1% RO |
 
-**Calculul tău (2025):**
-- Câștig capital: {input_data.castig_capital_anual:,.0f} RON × 10% = **{input_data.castig_capital_anual * 0.10:,.0f} RON**
-- Dividende: {input_data.dividende_anuale:,.0f} RON × ~15% = **{input_data.dividende_anuale * 0.15:,.0f} RON** (reținut în SUA)
+**Calculul tau (2026):**
+- Castig capital: {input_data.castig_capital_anual:,.0f} RON x 16% = **{input_data.castig_capital_anual * 0.16:,.0f} RON**
+- Dividende: {input_data.dividende_anuale:,.0f} RON x ~16% = **{input_data.dividende_anuale * 0.16:,.0f} RON**
 
-**💡 Comparație cu BVB:**
-Dacă ai investi aceeași sumă pe BVB, ai plăti ~**{diferenta_bvb_int:,.0f} RON mai puțin** impozit pe câștiguri (2025)!
+**Comparatie cu BVB:**
+Daca ai investi aceeasi suma pe BVB, ai plati ~**{diferenta_bvb_int:,.0f} RON mai putin** impozit pe castiguri!
 
-⚠️ **ATENȚIE 2026**: Impozitele cresc la 16% pentru piețe internaționale!
+**Ce trebuie sa faci:**
+1. Completeaza formularul **W-8BEN** la broker (reduce impozitul SUA de la 30% la 15%)
+2. Depune **Declaratia Unica (212)** pana in mai
+3. Calculeaza si plateste diferenta de impozit (16% - credit fiscal)
+4. Pastreaza toate rapoartele de la broker
 
-📋 **Ce trebuie să faci:**
-1. Completează formularul **W-8BEN** la broker (reduce impozitul SUA de la 30% la 15%)
-2. Depune **Declarația Unică (212)** până în mai
-3. Calculează și plătește diferența de impozit
-4. Păstrează toate rapoartele de la broker
-
-⚠️ **CASS**: Se aplică la fel ca pentru BVB dacă nu ai salariu (prag 24.300 RON în 2025).
+**CASS**: Se aplica la fel ca pentru BVB (prag {CASS_PRAG_6:,.0f} RON, inclusiv salariati).
 """
     
     return cel_mai_bun.tip_entitate, economie, explicatie
@@ -566,7 +560,7 @@ async def calculeaza_impozite(
     """
     Calculează și compară scenariile fiscale pentru investiții.
     DOAR PENTRU UTILIZATORI PRO!
-    ACTUALIZAT conform legislației române 2024-2025.
+    ACTUALIZAT conform legislatiei romane 2026.
     """
     db = await get_database()
     
@@ -627,40 +621,35 @@ async def calculeaza_impozite(
 
 @router.get("/constante")
 async def get_constante_fiscale():
-    """Returnează constantele fiscale actuale pentru BVB (public) - ACTUALIZAT 2025"""
+    """Returneaza constantele fiscale actuale pentru BVB (public) - ACTUALIZAT 2026"""
     return {
-        "an_fiscal": "2025",
-        "ultima_actualizare": "Ianuarie 2025",
+        "an_fiscal": "2026",
+        "ultima_actualizare": "Ianuarie 2026",
         "salariu_minim_brut": SALARIU_MINIM_BRUT,
-        "warning_2026": "⚠️ Din 1 ianuarie 2026 impozitele CRESC: BVB 3-6%, Dividende 16%!",
         "bvb": {
-            "castig_capital_termen_lung": "1% (deținere ≥ 365 zile) - 2025",
-            "castig_capital_termen_scurt": "3% (deținere < 365 zile) - 2025",
-            "castig_capital_2026": "3-6% (crește din 2026!)",
-            "dividende": "10% (reținut la sursă) - 2025",
-            "dividende_2026": "16% (crește din 2026!)",
-            "nota": "Impozitul este reținut automat de broker"
+            "castig_capital_termen_lung": "3% (detinere >= 365 zile)",
+            "castig_capital_termen_scurt": "6% (detinere < 365 zile)",
+            "dividende": "16% (retinut la sursa)",
+            "nota": "Impozitul este retinut automat de broker. Pierderile NU se compenseaza."
         },
         "international": {
-            "castig_capital": "10% - 2025",
-            "castig_capital_2026": "16% (crește din 2026!)",
-            "dividende_sua": "15% reținut la sursă (cu W-8BEN)",
-            "dividende_ue": "10-25% (variază pe țară)",
-            "credit_fiscal": "Se scade impozitul plătit în străinătate",
-            "nota": "Trebuie declarat în Declarația Unică (212)"
+            "castig_capital": "16% (pe castig net anual)",
+            "dividende_sua": "15% retinut la sursa (cu W-8BEN) + 1% diferenta in RO",
+            "dividende_ue": "10-25% (variaza pe tara)",
+            "credit_fiscal": "Se scade impozitul platit in strainatate (max 16%)",
+            "nota": "Trebuie declarat in Declaratia Unica (212). Pierderile SE compenseaza."
         },
         "cass": {
             "rata": "10%",
-            "prag_6_salarii": f"{CASS_PRAG_6:,} RON/an (6 × salariu minim 2025)",
-            "prag_12_salarii": f"{CASS_PRAG_12:,} RON/an (12 × salariu minim 2025)",
-            "prag_24_salarii": f"{CASS_PRAG_24:,} RON/an (24 × salariu minim 2025, plafon maxim)",
-            "nota": "CASS se aplică TUTUROR investitorilor (inclusiv salariaților) pe veniturile din investiții peste pragul de 6 salarii minime"
+            "prag_6_salarii": f"{CASS_PRAG_6:,} RON/an (6 x salariu minim 2026)",
+            "prag_12_salarii": f"{CASS_PRAG_12:,} RON/an (12 x salariu minim 2026)",
+            "prag_24_salarii": f"{CASS_PRAG_24:,} RON/an (24 x salariu minim 2026, plafon maxim)",
+            "nota": "CASS se aplica TUTUROR investitorilor (inclusiv salariatilor) pe veniturile din investitii peste pragul de 6 salarii minime"
         },
         "micro_srl": {
             "cu_angajat": "1%",
             "fara_angajat": "3%",
-            "dividende_la_retragere_2025": "10%",
-            "dividende_la_retragere_2026": "16%",
+            "dividende_la_retragere": "16%",
             "plafon_venituri_eur": MICRO_PLAFON_VENITURI_EUR
         },
         "pfa": {
@@ -668,7 +657,7 @@ async def get_constante_fiscale():
             "cas": "25%",
             "cass": "10%"
         },
-        "disclaimer": "⚠️ Valorile sunt orientative conform legislației în vigoare în 2025. Din 2026 intră în vigoare CREȘTERI MAJORE de impozite! Consultați un contabil CECCAR pentru situația dumneavoastră specifică."
+        "disclaimer": "Valorile sunt orientative conform legislatiei in vigoare in 2026 (Cod Fiscal actualizat). Consultati un contabil CECCAR pentru situatia dumneavoastra specifica."
     }
 
 
@@ -677,21 +666,34 @@ async def get_preview_calcul(
     castig: float = 50000,
     dividende: float = 10000,
     are_salariu: bool = True,
-    piata: str = "bvb"
+    piata: str = "bvb",
+    perioada: str = "mixt",
+    procent_lung: int = 50
 ):
     """
     Preview rapid pentru homepage (public)
-    Arată economiile posibile între PF și alte forme
-    Suportă atât BVB cât și piețe internaționale
+    Arata economiile posibile intre PF si alte forme
+    Suporta atat BVB cat si piete internationale
     """
     tip_piata = TipPiata.INTERNATIONAL if piata == "international" else TipPiata.BVB
+    
+    # Map perioada
+    if perioada == "peste_1_an":
+        per = PerioadaDetinere.PESTE_1_AN
+        pct_lung = 100
+    elif perioada == "sub_1_an":
+        per = PerioadaDetinere.SUB_1_AN
+        pct_lung = 0
+    else:
+        per = PerioadaDetinere.MIXT
+        pct_lung = max(0, min(100, procent_lung))
     
     input_data = CalculFiscalInput(
         castig_capital_anual=castig,
         dividende_anuale=dividende,
         tip_piata=tip_piata,
-        perioada_detinere=PerioadaDetinere.MIXT,
-        procent_termen_lung=50,
+        perioada_detinere=per,
+        procent_termen_lung=pct_lung,
         are_alte_venituri_cass=are_salariu,
         are_angajat_srl=False
     )
@@ -724,19 +726,19 @@ async def get_preview_calcul(
                     "venit_net": round(pf.venit_net),
                     "total_taxe": round(pf.total_taxe),
                     "rata_impozitare": f"{pf.rata_efectiva_impozitare:.1f}%",
-                    "detalii": "1-3% câștig + 8% dividende"
+                    "detalii": "3-6% castig + 16% dividende (2026)"
                 },
                 "pf_international": {
                     "venit_net": round(pf_int.venit_net),
                     "total_taxe": round(pf_int.total_taxe),
                     "rata_impozitare": f"{pf_int.rata_efectiva_impozitare:.1f}%",
-                    "detalii": "10% câștig + 15% dividende (reținere SUA)"
+                    "detalii": "16% castig + 16% dividende (2026)"
                 },
                 "srl_micro": {
                     "venit_net": round(srl.venit_net),
                     "total_taxe": round(srl.total_taxe),
                     "rata_impozitare": f"{srl.rata_efectiva_impozitare:.1f}%",
-                    "detalii": "3% micro + 8% dividende + costuri admin"
+                    "detalii": "1-3% micro + 16% dividende + costuri admin (2026)"
                 }
             },
             "economie_pf_vs_srl": round(economie) if economie > 0 else 0,
@@ -774,19 +776,19 @@ async def get_preview_calcul(
                     "venit_net": round(pf_int.venit_net),
                     "total_taxe": round(pf_int.total_taxe),
                     "rata_impozitare": f"{pf_int.rata_efectiva_impozitare:.1f}%",
-                    "detalii": "10% câștig + 15% dividende (reținere SUA)"
+                    "detalii": "16% castig + 16% dividende (2026)"
                 },
                 "pf_bvb": {
                     "venit_net": round(pf_bvb.venit_net),
                     "total_taxe": round(pf_bvb.total_taxe),
                     "rata_impozitare": f"{pf_bvb.rata_efectiva_impozitare:.1f}%",
-                    "detalii": "1-3% câștig + 8% dividende"
+                    "detalii": "3-6% castig + 16% dividende (2026)"
                 },
                 "srl_micro": {
                     "venit_net": round(srl.venit_net),
                     "total_taxe": round(srl.total_taxe),
                     "rata_impozitare": f"{srl.rata_efectiva_impozitare:.1f}%",
-                    "detalii": "3% micro + 8% dividende + costuri admin"
+                    "detalii": "1-3% micro + 16% dividende + costuri admin (2026)"
                 }
             },
             "economie_pf_vs_srl": round(economie) if economie > 0 else 0,
