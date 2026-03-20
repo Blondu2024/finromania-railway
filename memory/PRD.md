@@ -70,6 +70,12 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
   - Fișier nou: /app/backend/apis/tradingview_client.py
 - [x] **Fix grafice Global (AAPL, etc):** Corectat period mapping (1m -> 1mo pentru yfinance)
 - [x] **Fix API Global details:** Adăugat price, change, change_percent în răspuns
+- [x] **CACHING Rezumat Zilnic (March 20, 2026):**
+  - Rezumatul se generează O SINGURĂ DATĂ pe zi (la 18:10 după închiderea BVB)
+  - Se salvează în MongoDB colecția `daily_summaries`
+  - Toți utilizatorii primesc același rezumat din cache (rapid, fără AI la fiecare request)
+  - Endpoint nou: POST /api/daily-summary/generate pentru forțare manuală
+  - Emailurile folosesc rezumatul salvat (nu regenerează AI pentru fiecare abonat)
 
 ## Pending Issues
 - [x] ~~P0: EODHD integration - scraper removal~~ ✅ DONE

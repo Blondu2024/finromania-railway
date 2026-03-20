@@ -93,13 +93,32 @@ async def check_price_alerts_job():
         logger.error(f"❌ [JOB] Error checking price alerts: {e}")
 
 async def send_daily_summary_job():
-    """Job: Send daily market summary email to subscribers"""
+    """
+    Job: Generează rezumatul zilnic și îl trimite abonaților.
+    
+    FLOW:
+    1. Generează și salvează rezumatul în MongoDB (o singură dată)
+    2. Trimite emailurile către abonați folosind rezumatul salvat
+    
+    Rulează la 18:10 Bucharest time (după închiderea BVB la 18:00)
+    """
     try:
-        logger.info("📧 [JOB] Sending daily market summary...")
+        logger.info("📧 [JOB] Starting daily summary generation...")
+        
+        # Pas 1: Generează și salvează rezumatul în DB
+        summary = await daily_summary_service.generate_and_save_daily_summary()
+        if not summary:
+            logger.error("❌ [JOB] Failed to generate daily summary")
+            return
+        
+        logger.info("✅ [JOB] Daily summary generated and saved to DB")
+        
+        # Pas 2: Trimite emailurile către abonați
         results = await daily_summary_service.send_to_all_subscribers()
-        logger.info(f"✅ [JOB] Daily summary complete: sent={results['sent']}, failed={results['failed']}, skipped={results['skipped']}")
+        logger.info(f"✅ [JOB] Daily summary emails: sent={results['sent']}, failed={results['failed']}, skipped={results['skipped']}")
+        
     except Exception as e:
-        logger.error(f"❌ [JOB] Error sending daily summary: {e}")
+        logger.error(f"❌ [JOB] Error in daily summary job: {e}")
 
 def start_scheduler():
     """Start all scheduled jobs"""

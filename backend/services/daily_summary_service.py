@@ -1,6 +1,7 @@
 """
 Daily Market Summary Service
 Generează și trimite rezumatul zilnic BVB prin email
+IMPORTANT: Rezumatul se generează O SINGURĂ DATĂ pe zi și se salvează în MongoDB
 """
 import os
 import resend
@@ -9,6 +10,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional
 from config.database import get_database
 from apis.eodhd_client import get_eodhd_client
+import pytz
 
 LUNI_RO = {
     1: "ianuarie", 2: "februarie", 3: "martie", 4: "aprilie",
@@ -16,19 +18,190 @@ LUNI_RO = {
     9: "septembrie", 10: "octombrie", 11: "noiembrie", 12: "decembrie"
 }
 
+BUCHAREST_TZ = pytz.timezone('Europe/Bucharest')
+
 logger = logging.getLogger(__name__)
 
 # Configure Resend
 resend.api_key = os.environ.get("RESEND_API_KEY")
 
 class DailySummaryService:
-    """Serviciu pentru generarea și trimiterea rezumatului zilnic BVB"""
+    """
+    Serviciu pentru generarea și trimiterea rezumatului zilnic BVB.
+    
+    FLOW:
+    1. La 18:10 (după închiderea BVB), job-ul generează rezumatul și îl salvează în MongoDB
+    2. Când un utilizator accesează /rezumat-zilnic, se servește rezumatul din DB
+    3. Emailurile se trimit din același rezumat salvat
+    """
     
     def __init__(self):
         self.from_email = "FinRomania <noreply@finromania.ro>"
-        # Folosim domeniul Resend pentru test dacă nu avem domeniu verificat
         self.from_email_test = "FinRomania <onboarding@resend.dev>"
         self.eodhd_client = get_eodhd_client()
+    
+    def _get_today_date_key(self) -> str:
+        """Returnează cheia pentru data de azi în format YYYY-MM-DD (timezone Bucharest)"""
+        now = datetime.now(BUCHAREST_TZ)
+        return now.strftime("%Y-%m-%d")
+    
+    def _get_romanian_date(self) -> str:
+        """Returnează data în format românesc (ex: 20 martie 2026)"""
+        now = datetime.now(BUCHAREST_TZ)
+        return f"{now.day} {LUNI_RO[now.month]} {now.year}"
+    
+    async def get_saved_summary(self, date_key: str = None) -> Optional[Dict]:
+        """
+        Obține rezumatul salvat pentru o anumită dată.
+        Dacă date_key este None, folosește data de azi.
+        """
+        db = await get_database()
+        if date_key is None:
+            date_key = self._get_today_date_key()
+        
+        summary = await db.daily_summaries.find_one(
+            {"date_key": date_key},
+            {"_id": 0}
+        )
+        return summary
+    
+    async def save_summary(self, summary_data: Dict) -> bool:
+        """Salvează rezumatul în MongoDB"""
+        db = await get_database()
+        date_key = self._get_today_date_key()
+        
+        logger.info(f"Saving summary for date_key: {date_key}")
+        
+        # Upsert - actualizează dacă există, creează dacă nu
+        try:
+            result = await db.daily_summaries.update_one(
+                {"date_key": date_key},
+                {"$set": {
+                    "date_key": date_key,
+                    "date_display": summary_data.get("date"),
+                    "market_data": summary_data.get("market_data"),
+                    "ai_summary": summary_data.get("ai_summary"),
+                    "generated_at": datetime.now(timezone.utc),
+                    "emails_sent": 0
+                }},
+                upsert=True
+            )
+            
+            logger.info(f"Save result: matched={result.matched_count}, modified={result.modified_count}, upserted_id={result.upserted_id}")
+            
+            # Verify it was saved
+            saved = await db.daily_summaries.find_one({"date_key": date_key})
+            if saved:
+                logger.info(f"✅ Verified: Summary saved for {date_key}")
+            else:
+                logger.error(f"❌ Verification failed: Summary NOT found for {date_key}")
+            
+            return result.acknowledged
+        except Exception as e:
+            logger.error(f"Error saving summary: {e}")
+            return False
+    
+    async def generate_and_save_daily_summary(self) -> Dict:
+        """
+        Generează rezumatul zilnic și îl salvează în MongoDB.
+        Această funcție se apelează O SINGURĂ DATĂ pe zi de către job-ul scheduler.
+        """
+        logger.info("🔄 Generating daily summary...")
+        
+        # Colectează datele de piață
+        market_data = await self.get_market_data()
+        if not market_data:
+            logger.error("No market data available for summary")
+            return None
+        
+        # Generează rezumatul AI
+        ai_summary = await self.generate_ai_summary(market_data)
+        
+        # Construiește obiectul complet
+        summary = {
+            "success": True,
+            "date": market_data["date"],
+            "market_data": {
+                "bet_change": market_data.get("bet_change"),
+                "avg_change": market_data["avg_change"],
+                "indices": market_data.get("indices", {}),
+                "sentiment": market_data["sentiment"],
+                "top_gainers": [
+                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent"), "price": s.get("price")}
+                    for s in market_data["top_gainers"]
+                ],
+                "top_losers": [
+                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent"), "price": s.get("price")}
+                    for s in market_data["top_losers"]
+                ],
+                "top_volume": [
+                    {"symbol": s.get("symbol"), "volume": s.get("volume"), "price": s.get("price")}
+                    for s in market_data["top_volume"]
+                ]
+            },
+            "ai_summary": ai_summary
+        }
+        
+        # Salvează în MongoDB
+        await self.save_summary(summary)
+        
+        logger.info(f"✅ Daily summary generated and saved for {self._get_today_date_key()}")
+        return summary
+    
+    async def get_summary_for_display(self) -> Optional[Dict]:
+        """
+        Obține rezumatul pentru afișare pe site.
+        Returnează rezumatul salvat din DB sau generează unul nou dacă nu există.
+        """
+        # Încearcă să obțină rezumatul salvat pentru azi
+        saved = await self.get_saved_summary()
+        
+        if saved:
+            logger.info(f"Serving cached summary for {saved.get('date_key')}")
+            return {
+                "success": True,
+                "date": saved.get("date_display"),
+                "market_data": saved.get("market_data"),
+                "ai_summary": saved.get("ai_summary"),
+                "cached": True,
+                "generated_at": saved.get("generated_at")
+            }
+        
+        # Dacă nu există rezumat salvat, verifică dacă e în timpul programului BVB
+        # și generează unul temporar (dar nu îl salvează - va fi salvat de job la 18:10)
+        logger.warning("No saved summary found, generating temporary one...")
+        
+        market_data = await self.get_market_data()
+        if not market_data:
+            return None
+        
+        ai_summary = await self.generate_ai_summary(market_data)
+        
+        return {
+            "success": True,
+            "date": market_data["date"],
+            "market_data": {
+                "bet_change": market_data.get("bet_change"),
+                "avg_change": market_data["avg_change"],
+                "indices": market_data.get("indices", {}),
+                "sentiment": market_data["sentiment"],
+                "top_gainers": [
+                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent")}
+                    for s in market_data["top_gainers"]
+                ],
+                "top_losers": [
+                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent")}
+                    for s in market_data["top_losers"]
+                ],
+                "top_volume": [
+                    {"symbol": s.get("symbol"), "volume": s.get("volume")}
+                    for s in market_data["top_volume"]
+                ]
+            },
+            "ai_summary": ai_summary,
+            "cached": False,
+            "note": "Rezumat temporar - cel oficial se generează la 18:10"
+        }
     
     async def get_market_data(self) -> Dict:
         """Colectează datele de piață pentru rezumat"""
@@ -373,18 +546,28 @@ Cea mai mare lichiditate a fost pe {top_vol.get('symbol')}, cu un volum de {vol_
         return html
     
     async def send_daily_summary(self, user_email: str, user_name: str = None, is_pro: bool = False, user_id: str = None) -> bool:
-        """Trimite rezumatul zilnic către un user"""
+        """
+        Trimite rezumatul zilnic către un user.
+        Folosește rezumatul salvat în DB (nu regenerează AI pentru fiecare email!)
+        """
         try:
-            # Colectează datele
-            market_data = await self.get_market_data()
-            if not market_data:
-                logger.error("No market data available for summary")
+            # Obține rezumatul salvat din DB
+            saved_summary = await self.get_saved_summary()
+            
+            if not saved_summary:
+                logger.error("No saved summary found for today - run generate_and_save_daily_summary first")
                 return False
             
-            # Generează rezumatul AI
-            ai_summary = await self.generate_ai_summary(market_data)
+            market_data = saved_summary.get("market_data", {})
+            ai_summary = saved_summary.get("ai_summary", "")
             
-            # Obține watchlist-ul userului
+            # Adaugă câmpuri necesare pentru email
+            market_data["date"] = saved_summary.get("date_display", self._get_romanian_date())
+            market_data["total_stocks"] = market_data.get("sentiment", {}).get("positive", 0) + \
+                                          market_data.get("sentiment", {}).get("negative", 0) + \
+                                          market_data.get("sentiment", {}).get("neutral", 0)
+            
+            # Obține watchlist-ul userului (personalizat per user)
             watchlist_data = []
             if user_id:
                 watchlist_data = await self.get_user_watchlist_data(user_id)

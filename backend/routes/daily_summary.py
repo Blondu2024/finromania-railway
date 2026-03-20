@@ -27,51 +27,41 @@ class TestEmailRequest(BaseModel):
 @router.get("/preview")
 async def preview_daily_summary():
     """
-    Vizualizează rezumatul zilnic fără a-l trimite.
-    Util pentru preview și testare.
+    Obține rezumatul zilnic pentru afișare.
+    
+    LOGICA:
+    1. Dacă există un rezumat salvat pentru azi în DB, îl returnează (RAPID, fără AI)
+    2. Dacă nu există, generează unul temporar (mai lent, apel AI)
+    
+    Rezumatul oficial se generează și salvează automat la 18:10 de către job-ul scheduler.
     """
     try:
-        # Colectează datele
-        market_data = await daily_summary_service.get_market_data()
-        if not market_data:
+        # Folosește noua metodă care servește din cache
+        summary = await daily_summary_service.get_summary_for_display()
+        
+        if not summary:
             raise HTTPException(status_code=404, detail="Nu sunt date de piață disponibile")
         
-        # Generează rezumatul AI
-        ai_summary = await daily_summary_service.generate_ai_summary(market_data)
+        return summary
         
-        # Extrage indicii BVB
-        indices = market_data.get("indices", {})
-        
-        return {
-            "success": True,
-            "date": market_data["date"],
-            "market_data": {
-                "bet_change": market_data.get("bet_change"),  # Indicele BET real
-                "avg_change": market_data["avg_change"],  # Media calculată (backup)
-                "indices": {
-                    "BET": indices.get("BET", {}),
-                    "BETTR": indices.get("BETTR", {}),
-                    "BETFI": indices.get("BETFI", {}),
-                    "BETNG": indices.get("BETNG", {}),
-                },
-                "sentiment": market_data["sentiment"],
-                "top_gainers": [
-                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent")}
-                    for s in market_data["top_gainers"]
-                ],
-                "top_losers": [
-                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent")}
-                    for s in market_data["top_losers"]
-                ],
-                "top_volume": [
-                    {"symbol": s.get("symbol"), "volume": s.get("volume")}
-                    for s in market_data["top_volume"]
-                ]
-            },
-            "ai_summary": ai_summary
-        }
     except Exception as e:
-        logger.error(f"Error generating preview: {e}")
+        logger.error(f"Error getting daily summary: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/generate")
+async def force_generate_summary():
+    """
+    Forțează generarea și salvarea rezumatului zilnic.
+    Util pentru admin sau pentru testare.
+    """
+    try:
+        summary = await daily_summary_service.generate_and_save_daily_summary()
+        if not summary:
+            raise HTTPException(status_code=500, detail="Nu s-a putut genera rezumatul")
+        return {"success": True, "message": "Rezumat generat și salvat", "date": summary.get("date")}
+    except Exception as e:
+        logger.error(f"Error forcing summary generation: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
