@@ -40,41 +40,35 @@ class DailySummaryService:
         if not stocks:
             return None
         
-        # Obține indicii BVB din serviciul existent (folosește yfinance)
+        # Obține indicii BVB folosind EODHD (TVBETETF pentru variația procentuală)
         indices = {}
         try:
             from routes.bvb_market import BVB_INDICES, BVB_INDEX_FALLBACK
-            import yfinance as yf
+            
+            # Obținem variația reală de la EODHD/TVBETETF
+            bet_change_percent = None
+            try:
+                etf_quote = await self.eodhd_client.get_stock_quote("TVBETETF")
+                if etf_quote and etf_quote.get("change_percent") is not None:
+                    bet_change_percent = etf_quote.get("change_percent")
+                    logger.info(f"Daily Summary: Got BET change from TVBETETF: {bet_change_percent}%")
+            except Exception as e:
+                logger.warning(f"Could not get TVBETETF data: {e}")
             
             for key, info in BVB_INDICES.items():
-                try:
-                    ticker = yf.Ticker(info["symbol"])
-                    hist = ticker.history(period="2d")
-                    
-                    if not hist.empty and len(hist) >= 1:
-                        current = hist['Close'].iloc[-1]
-                        previous = hist['Close'].iloc[-2] if len(hist) > 1 else current
-                        change = current - previous
-                        change_percent = (change / previous * 100) if previous > 0 else 0
-                        
-                        indices[key] = {
-                            "value": round(current, 2),
-                            "change_percent": round(change_percent, 2)
-                        }
-                    else:
-                        # Fallback
-                        fallback = BVB_INDEX_FALLBACK.get(key, {})
-                        indices[key] = {
-                            "value": fallback.get("value", 0),
-                            "change_percent": round(fallback.get("change_percent", 0) * 100, 2)
-                        }
-                except Exception as e:
-                    logger.warning(f"Could not fetch index {key}: {e}")
-                    fallback = BVB_INDEX_FALLBACK.get(key, {})
-                    indices[key] = {
-                        "value": fallback.get("value", 0),
-                        "change_percent": round(fallback.get("change_percent", 0) * 100, 2)
-                    }
+                fallback = BVB_INDEX_FALLBACK.get(key, {})
+                base_value = fallback.get("value", 0)
+                
+                # Folosim variația de la TVBETETF pentru BET și indici similari
+                if bet_change_percent is not None and key in ["BET", "BETTR", "BETXT"]:
+                    change_pct = bet_change_percent
+                else:
+                    change_pct = round(fallback.get("change_percent", 0) * 100, 2)
+                
+                indices[key] = {
+                    "value": base_value,
+                    "change_percent": round(change_pct, 2)
+                }
         except Exception as e:
             logger.warning(f"Could not fetch BVB indices: {e}")
         
