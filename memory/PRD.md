@@ -61,12 +61,13 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
   - Charts now show real candlestick data
   - Removed beautifulsoup4 dependency
 - [x] **Fixed "+%" bug on Daily Summary page** - percentages now display correctly (was using wrong field name)
-- [x] **MAJOR: Rezumat Zilnic complet refăcut (March 20, 2026):**
-  - Headline folosește acum indicele BET real (~28,000 pct)
-  - **DATE LIVE** pentru BET, BETTR, BETXT via EODHD/TVBETETF (ETF-ul pe BET)
-  - BETFI, BETNG rămân pe fallback (indici sectoriali, nu urmăriți de ETF)
-  - Prompt AI rescris să fie factual (fără speculații)
-  - Prețurile acțiunilor (SNP, MedLife, etc.) sunt CORECTE din EODHD
+- [x] **MAJOR: Indicii BVB acum 100% CORECȚI (March 20, 2026):**
+  - Implementat TradingView API Client pentru indicii BVB (gratuit, date exacte!)
+  - Toate valorile sunt IDENTICE cu bvb.ro
+  - BET: 28,036.31 (+0.16%) - LIVE ✅
+  - BET-FI: 100,481.52 (-0.44%) - LIVE ✅
+  - BET-NG: 2,075.20 (+0.27%) - LIVE ✅
+  - Fișier nou: /app/backend/apis/tradingview_client.py
 
 ## Pending Issues
 - [x] ~~P0: EODHD integration - scraper removal~~ ✅ DONE

@@ -40,37 +40,32 @@ class DailySummaryService:
         if not stocks:
             return None
         
-        # Obține indicii BVB folosind EODHD (TVBETETF pentru variația procentuală)
+        # Obține indicii BVB din TradingView (date exacte în timp real)
         indices = {}
         try:
-            from routes.bvb_market import BVB_INDICES, BVB_INDEX_FALLBACK
+            from apis.tradingview_client import get_tradingview_client
             
-            # Obținem variația reală de la EODHD/TVBETETF
-            bet_change_percent = None
-            try:
-                etf_quote = await self.eodhd_client.get_stock_quote("TVBETETF")
-                if etf_quote and etf_quote.get("change_percent") is not None:
-                    bet_change_percent = etf_quote.get("change_percent")
-                    logger.info(f"Daily Summary: Got BET change from TVBETETF: {bet_change_percent}%")
-            except Exception as e:
-                logger.warning(f"Could not get TVBETETF data: {e}")
+            tv_client = get_tradingview_client()
+            tv_indices = await tv_client.get_bvb_indices()
             
-            for key, info in BVB_INDICES.items():
-                fallback = BVB_INDEX_FALLBACK.get(key, {})
-                base_value = fallback.get("value", 0)
-                
-                # Folosim variația de la TVBETETF pentru BET și indici similari
-                if bet_change_percent is not None and key in ["BET", "BETTR", "BETXT"]:
-                    change_pct = bet_change_percent
-                else:
-                    change_pct = round(fallback.get("change_percent", 0) * 100, 2)
-                
-                indices[key] = {
-                    "value": base_value,
-                    "change_percent": round(change_pct, 2)
+            for idx in tv_indices:
+                indices[idx["id"]] = {
+                    "value": idx.get("value"),
+                    "change_percent": idx.get("change_percent"),
+                    "is_live": idx.get("is_live", True)
                 }
+            
+            logger.info(f"Daily Summary: Got {len(indices)} indices from TradingView")
         except Exception as e:
-            logger.warning(f"Could not fetch BVB indices: {e}")
+            logger.warning(f"Could not fetch BVB indices from TradingView: {e}")
+            # Fallback la valorile hardcodate
+            from routes.bvb_market import BVB_INDEX_FALLBACK
+            for key, fallback in BVB_INDEX_FALLBACK.items():
+                indices[key] = {
+                    "value": fallback.get("value", 0),
+                    "change_percent": round(fallback.get("change_percent", 0) * 100, 2),
+                    "is_live": False
+                }
         
         # Sortează pentru top gainers/losers
         sorted_by_change = sorted(stocks, key=lambda x: x.get("change_percent", 0), reverse=True)

@@ -58,87 +58,48 @@ BVB_INDEX_FALLBACK = {
 
 @router.get("/indices")
 async def get_bvb_indices(response: Response):
-    """Get all BVB indices with current values"""
+    """Get all BVB indices with current values from TradingView (real-time data)"""
     # Prevent caching for live data
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     
     try:
-        indices = []
+        # Folosim TradingView pentru date exacte în timp real
+        from apis.tradingview_client import get_tradingview_client
         
-        # Încercăm să obținem variația reală de la EODHD folosind TVBETETF (ETF pe BET)
-        bet_change_percent = None
-        try:
-            from apis.eodhd_client import get_eodhd_client
-            eodhd = get_eodhd_client()
-            
-            # TVBETETF urmărește BET, deci variația procentuală e similară
-            etf_quote = await eodhd.get_stock_quote("TVBETETF")
-            if etf_quote and etf_quote.get("change_percent") is not None:
-                bet_change_percent = etf_quote.get("change_percent")
-                logger.info(f"Got BET change from TVBETETF: {bet_change_percent}%")
-        except Exception as e:
-            logger.warning(f"Could not get TVBETETF data: {e}")
+        tv_client = get_tradingview_client()
+        indices = await tv_client.get_bvb_indices()
         
+        if indices:
+            logger.info(f"Got {len(indices)} indices from TradingView")
+            return {
+                "indices": indices,
+                "source": "TradingView",
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+        
+        # Fallback dacă TradingView nu răspunde
+        logger.warning("TradingView unavailable, using fallback data")
+        fallback_indices = []
         for key, info in BVB_INDICES.items():
-            try:
-                # Try to get real data from yfinance first
-                ticker = yf.Ticker(info["symbol"])
-                hist = ticker.history(period="2d")
-                
-                if not hist.empty and len(hist) >= 1:
-                    current = hist['Close'].iloc[-1]
-                    previous = hist['Close'].iloc[-2] if len(hist) > 1 else current
-                    change = current - previous
-                    change_percent = (change / previous * 100) if previous > 0 else 0
-                    
-                    indices.append({
-                        "id": key,
-                        "symbol": info["symbol"],
-                        "name": info["name"],
-                        "description": info["description"],
-                        "components": info["components"],
-                        "value": round(current, 2),
-                        "change": round(change, 2),
-                        "change_percent": round(change_percent, 2),
-                        "is_live": True,
-                        "timestamp": datetime.now(timezone.utc).isoformat()
-                    })
-                else:
-                    raise ValueError("No data from yfinance")
-                    
-            except Exception as e:
-                # Use fallback with EODHD-derived change percent if available
-                logger.warning(f"Using fallback for {key}: {e}")
-                fallback = BVB_INDEX_FALLBACK.get(key, {})
-                base_value = fallback.get("value", 0)
-                
-                # Folosim variația de la TVBETETF pentru BET și indici similari
-                if bet_change_percent is not None and key in ["BET", "BETTR", "BETXT"]:
-                    change_pct = bet_change_percent
-                    change_val = base_value * (change_pct / 100)
-                    is_live = True  # Date semi-live (valoare estimată, variație reală)
-                else:
-                    change_pct = round(fallback.get("change_percent", 0) * 100, 2)
-                    change_val = fallback.get("change", 0)
-                    is_live = False
-                
-                indices.append({
-                    "id": key,
-                    "symbol": info["symbol"],
-                    "name": info["name"],
-                    "description": info["description"],
-                    "components": info["components"],
-                    "value": base_value,
-                    "change": round(change_val, 2),
-                    "change_percent": round(change_pct, 2),
-                    "is_live": is_live,
-                    "source": "EODHD/TVBETETF" if is_live else "fallback",
-                    "timestamp": datetime.now(timezone.utc).isoformat()
-                })
+            fallback = BVB_INDEX_FALLBACK.get(key, {})
+            fallback_indices.append({
+                "id": key,
+                "symbol": info["symbol"],
+                "name": info["name"],
+                "description": info["description"],
+                "components": info["components"],
+                "value": fallback.get("value", 0),
+                "change": fallback.get("change", 0),
+                "change_percent": round(fallback.get("change_percent", 0) * 100, 2),
+                "is_live": False,
+                "source": "fallback",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            })
         
         return {
-            "indices": indices,
+            "indices": fallback_indices,
+            "source": "fallback",
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
