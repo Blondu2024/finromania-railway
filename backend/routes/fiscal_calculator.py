@@ -58,10 +58,10 @@ RETINERE_EU_MEDIE = 0.15          # Media UE ~15% (variază pe țară)
 # === CASS ===
 CASS_RATE = 0.10  # 10% CASS pe baza de calcul
 
-# === Micro-întreprindere ===
-MICRO_IMPOZIT_CU_ANGAJAT = 0.01    # 1% dacă ai angajat
-MICRO_IMPOZIT_FARA_ANGAJAT = 0.03  # 3% fără angajat
-MICRO_PLAFON_VENITURI_EUR = 500000  # EUR plafon pentru micro
+# === Micro-intreprindere (2026) ===
+# Din 2026: 1% pentru toate micro-intreprinderile (cifra afaceri sub 100.000 EUR)
+MICRO_IMPOZIT = 0.01                # 1% impozit pe venit
+MICRO_PLAFON_VENITURI_EUR = 100000  # EUR plafon pentru micro (2026, redus de la 500.000)
 
 # === PFA ===
 PFA_IMPOZIT_VENIT = 0.10  # 10% impozit pe venit
@@ -409,13 +409,9 @@ def calcul_srl_micro_investitii(input_data: CalculFiscalInput) -> ScenariuFiscal
     """
     venit_total = input_data.castig_capital_anual + input_data.dividende_anuale
     
-    # Rata impozit micro
-    if input_data.are_angajat_srl:
-        rata_micro = MICRO_IMPOZIT_CU_ANGAJAT
-        tip_micro = "1% (cu angajat)"
-    else:
-        rata_micro = MICRO_IMPOZIT_FARA_ANGAJAT
-        tip_micro = "3% (fără angajat)"
+    # Rata impozit micro 2026: 1% pentru toate micro (cifra afaceri < 100.000 EUR)
+    rata_micro = MICRO_IMPOZIT
+    tip_micro = "1% micro (2026)"
     
     # Impozit pe venit micro
     impozit_micro = venit_total * rata_micro
@@ -434,11 +430,11 @@ def calcul_srl_micro_investitii(input_data: CalculFiscalInput) -> ScenariuFiscal
     rata_efectiva = ((impozit_micro + impozit_div) / venit_total * 100) if venit_total > 0 else 0
     
     detalii = [
-        f"Impozit micro ({tip_micro}): {impozit_micro:,.0f} RON",
+        f"Impozit micro (1%): {impozit_micro:,.0f} RON",
         f"Profit dupa impozit: {profit_dupa_impozit:,.0f} RON",
         f"Impozit dividende la retragere (16%): {impozit_div:,.0f} RON",
         f"Costuri admin estimate: {costuri_admin:,.0f} RON/an",
-        f"Impozitare totala: {rata_efectiva:.1f}%"
+        f"Impozitare totala (fara admin): {rata_efectiva:.1f}%"
     ]
     
     avantaje = [
@@ -647,10 +643,10 @@ async def get_constante_fiscale():
             "nota": "CASS se aplica TUTUROR investitorilor (inclusiv salariatilor) pe veniturile din investitii peste pragul de 6 salarii minime"
         },
         "micro_srl": {
-            "cu_angajat": "1%",
-            "fara_angajat": "3%",
+            "impozit_micro": "1%",
             "dividende_la_retragere": "16%",
-            "plafon_venituri_eur": MICRO_PLAFON_VENITURI_EUR
+            "plafon_venituri_eur": MICRO_PLAFON_VENITURI_EUR,
+            "nota": "1% pe venit pentru cifra de afaceri sub 100.000 EUR (2026)"
         },
         "pfa": {
             "impozit_venit": "10%",
@@ -738,7 +734,7 @@ async def get_preview_calcul(
                     "venit_net": round(srl.venit_net),
                     "total_taxe": round(srl.total_taxe),
                     "rata_impozitare": f"{srl.rata_efectiva_impozitare:.1f}%",
-                    "detalii": "1-3% micro + 16% dividende + costuri admin (2026)"
+                    "detalii": "1% micro + 16% dividende + costuri admin (2026)"
                 }
             },
             "economie_pf_vs_srl": round(economie) if economie > 0 else 0,
@@ -788,7 +784,7 @@ async def get_preview_calcul(
                     "venit_net": round(srl.venit_net),
                     "total_taxe": round(srl.total_taxe),
                     "rata_impozitare": f"{srl.rata_efectiva_impozitare:.1f}%",
-                    "detalii": "1-3% micro + 16% dividende + costuri admin (2026)"
+                    "detalii": "1% micro + 16% dividende + costuri admin (2026)"
                 }
             },
             "economie_pf_vs_srl": round(economie) if economie > 0 else 0,
