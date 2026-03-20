@@ -11,7 +11,7 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - Payments: Stripe
 - Email: Resend
 - AI: OpenAI GPT (Emergent LLM Key)
-- Market Data: EODHD (Free Plan)
+- Market Data: **EODHD (Paid Plan - $29/month, 100k requests/day)**
 
 ## What's Been Implemented
 - Homepage with market ticker, hero section, feature cards
@@ -54,9 +54,16 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
   - All UI/SEO references updated to 2026
   - Fixed preview endpoint to accept period/percentage params
 - [x] Added admin "Upgrade All to PRO" button in dashboard
+- [x] **EODHD INTEGRATION COMPLETE (March 20, 2026):**
+  - Removed temporary web scraper (bvb_scraper.py)
+  - Using paid EODHD plan with .RO suffix for BVB stocks
+  - Real-time quotes + historical data working
+  - Charts now show real candlestick data
+  - Removed beautifulsoup4 dependency
 
 ## Pending Issues
-- [ ] P1: Charts not loading on BVB stock pages (EODHD free plan limitation)
+- [x] ~~P0: EODHD integration - scraper removal~~ ✅ DONE
+- [x] ~~P1: Charts not loading on BVB stock pages~~ ✅ DONE (real historical data)
 - [ ] P1: "Failed to fetch" error on Fiscal Simulator page
 - [ ] P2: Mobile responsiveness issues
 - [ ] P2: Slow page load times

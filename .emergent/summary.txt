@@ -4,189 +4,184 @@ The user's vision is to build FinRomania 2.0, a comprehensive financial platform
 **PRODUCT REQUIREMENTS (Evolved from User's Strategic Plan):**
 1.  **Homepage Layout:** Must be professional, highlighting core offerings like BVB & Global market data, a Fiscal Calculator, and educational resources.
 2.  **News System:** Must include both Romanian news and international news, viewable *within* the platform.
-3.  **Data Source:** Use the user's EODHD plan. The user is currently on a **Free Plan**, which is a major constraint.
-4.  **Early Adopter Program:** The first 100 users get 3 months of free PRO access, with a public counter.
+3.  **Data Source:** Use the user's paid EODHD plan.
+4.  **Growth Strategy:** Offer free PRO access to all users until June 5th, 2026, to drive adoption and form user habits.
 5.  **Notifications:** Implement in-app, browser, and email notifications for price alerts, trial expiration, and market summaries.
 6.  **Admin Feedback Dashboard:** An admin section to view and manage user feedback.
 7.  **AI Integration & Monetization:**
     *   An AI assistant (FinRomania Assistant) to guide users.
     *   An AI Technical Analysis feature for PRO users on BVB stock pages.
-8.  **Monetization & PRO Features:** A PRO subscription (49 lei/month) using Stripe.
+8.  **Monetization & PRO Features:** A PRO subscription (49 lei/month) using Stripe, activated after the free period.
 9.  **Fiscal Calculators:**
-    *   A calculator for **investors** comparing PF vs PFA vs SRL for capital gains.
-    *   A more complex, educational **Simulator Fiscal Antreprenor** for users with multiple business entities (SRL, PFA, etc.), incorporating complex Romanian fiscal rules for **2026**.
+    *   A calculator for **investors** comparing PF vs SRL for capital gains, fully updated for **2026** fiscal laws.
+    *   A more complex, educational **Simulator Fiscal Antreprenor** for users with multiple business entities.
 10. **Daily Email Summary:** An AI-generated summary of the BVB market activity sent daily to subscribed users.
+11. **PRO-only Live Chat:** A future feature to build a community for PRO users.
 
 **User's preferred language**: Romanian. The next agent MUST respond in Romanian.
 
 **what currently exists?**
-The application is a React/FastAPI/MongoDB stack. It features user authentication (Firebase), PRO subscriptions (Stripe), an admin dashboard, an AI assistant, and market data from a **free EODHD plan**.
+The application is a React/FastAPI/MongoDB stack. The user now has a **paid EODHD plan**, which is a critical upgrade.
 
-In this session, the agent completed the AI Technical Analysis feature by fixing bugs and changing BUY/SELL terminology to a neutral FAVORABIL/RISCANT. The agent also built two major new features from scratch: a sophisticated Simulator Fiscal Antreprenor for 2026 tax rules and an AI-powered Rezumatul Zilei BVB daily email newsletter using Resend. The in-app price alert notification system was also fixed and is now functional.
+In this session, the agent performed a massive amount of work:
+- **Major Business Logic Change:** Switched the growth model from 100 early adopters to Free PRO for all until June 5th, 2026. This involved backend changes to auto-assign PRO on registration, a new frontend banner, and hiding all PRO upsells for users who already have the subscription. An admin endpoint was also created to migrate existing users.
+- **Critical Data Source Fix:** The agent discovered the previous EODHD key was invalid and ALL platform data was MOCK. The user purchased a paid plan. The agent confirmed the new key works, provides 100k requests/day, and discovered the correct exchange code for Bucharest is  (not ). The agent then created a temporary web scraper from bvb.ro as a solution before being instructed to use the new paid plan.
+- **Fiscal Calculator Overhaul:** The entire calculator was updated to reflect the major Romanian fiscal law changes for **2026**, including new tax rates for BVB gains (3%/6%), dividends (16%), and SRL micro-company tax (corrected from 3% to 1%).
+- **Multiple Bug Fixes:**
+    - Fixed a persistent UI bug (blue gradient on homepage).
+    - Fixed the daily summary email not being sent (zero subscribers, wrong timezone) and added a sending limit.
+    - Fixed a critical Connection Error bug in the educational quizzes by removing  from 8 frontend files.
+- **Feature Enhancements:**
+    - The daily summary email was improved with a Romanian date format, precise data figures in the AI summary, and a personalized watchlist section.
+    - A new dedicated page () was created for the daily summary and linked in the main navbar.
 
 **Last working item**:
--   Last item agent was working: The user reported an annoying transparent blue gradient overlay at the top of the homepage. The agent identified the CSS classes () in  responsible for the gradient and was about to change it to a solid black background.
+-   Last item agent was working: The user purchased a paid EODHD plan and wants to use it for all data, abandoning the web scraper solution. The agent confirmed the new API key works and that the correct exchange code for the Bucharest Stock Exchange is . The agent was about to re-integrate the EODHD client with this new information.
 -   Status: IN PROGRESS
 -   Agent Testing Done: N
--   Which testing method agent to use? screenshot tool
+-   Which testing method agent to use? backend testing agent (to ensure BVB stock data endpoints are now correctly pulling from the paid EODHD API with the  suffix).
 -   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: Fix the blue gradient on the homepage (P0)
--   Issue 2: User-reported bug: Graficul nu se încarcă pe pagina de acțiuni BVB (Chart doesn't load on BVB stock pages). (P1)
--   Issue 3: Failed to fetch error seen on the new Fiscal Simulator page. (P1)
--   Issue 4: Mobile responsiveness issues on some pages. (P2)
--   Issue 5: Slow page load times on some pages. (P2)
+-   Issue 1: Revert the web scraper and integrate the paid EODHD API for all BVB data (P0)
+-   Issue 2: Verify that stock charts now load with real historical data from the paid EODHD plan (P1)
+-   Issue 3: Failed to fetch error on the Fiscal Simulator page (P1)
+-   Issue 4: Mobile responsiveness issues on various pages (P2)
+-   Issue 5: Slow page load times on various pages (P2)
 
-  **Issues Detail:**
-  - **Issue 1:**
-     - **Description:** An unwanted transparent blue gradient appears over the black background at the top of the homepage.
+**Issues Detail:**
+  - **Issue 1: Revert the web scraper and integrate the paid EODHD API for all BVB data (P0)**
+     - **Attempted fixes:** A web scraper () was built as a temporary solution when the EODHD key was invalid. This now needs to be removed.
      - **Next debug checklist:**
-        1. Open .
-        2. In the  component (around line 91), change  to .
-        3. Use the screenshot tool to verify the entire header section is solid black.
-     - **Why fix this issue and what will be achieved with the fix?** The user finds the gradient jenantă (embarrassing). Fixing it will improve the professional look of the homepage.
+        1. Remove the scraper code from .
+        2. Reinstate the  to call .
+        3. Modify  and  to append the  suffix to all BVB stock symbols for all EODHD API calls (quotes, historical, etc.).
+        4. Remove the  file.
+        5. Remove  and  from .
+        6. Test BVB stock endpoints (, ) to confirm they return real, non-mock data from EODHD.
+     - **Why fix this issue and what will be achieved with the fix?** The user has a paid, high-limit data plan which is more reliable and provides more data types (e.g., historical for charts) than the scraper. This will make the platform's data accurate and robust.
      - **Status:**  IN PROGRESS
      - **Is recurring issue?** N
-     - **Should Test frontend/backend/both after fix?** Frontend
-  - **Issue 2:**
-     - **Description:** A user reported that stock charts do not load on BVB stock pages. The user suspects this is due to the limitations of the free EODHD API plan.
+     - **Should Test frontend/backend/both after fix?** Backend
+  - **Issue 2: Verify that stock charts now load with real historical data (P1)**
      - **Next debug checklist:**
-        1. Navigate to a stock detail page (e.g., ).
-        2. Check the browser's developer console for network errors related to the EODHD API calls for chart data.
-        3. If it's an API limitation, a good fix would be to hide the broken chart and display a user-friendly message like: Graficele detaliate sunt disponibile pe un plan superior. Upgrade în curând!
-     - **Why fix this issue and what will be achieved with the fix?** This is a critical bug. A core feature of a financial platform is broken, leading to a poor user experience.
+        1. After Issue 1 is resolved, navigate to a stock detail page (e.g., ).
+        2. Verify that the chart component loads and displays historical data without error.
+        3. Check the browser's developer console for any network errors related to EODHD historical data calls.
+     - **Why fix this issue and what will be achieved with the fix?** This fixes a core feature of a financial platform and leverages the newly purchased paid API plan.
+     - **Status:** BLOCKED
+     - **Is recurring issue?** Y
+     - **Should Test frontend/backend/both after fix?** Frontend
+     - **Blocked on other issue:** Issue 1
+  - **Issue 3: Failed to fetch error on the Fiscal Simulator page (P1)**
+     - **Description:** A Failed to fetch toast error appears on the new Simulator Fiscal Antreprenor page when submitting the form. This was reported in the previous session but never investigated.
+     - **Next debug checklist:**
+        1. Navigate to .
+        2. Open browser developer tools (Network tab).
+        3. Submit the form and identify the failing API call in .
+     - **Why fix this issue and what will be achieved with the fix?** Fixes a broken core feature.
      - **Status:** NOT STARTED
      - **Is recurring issue?** N
-     - **Should Test frontend/backend/both after fix?** Frontend
-  - **Issue 3:**
-     - **Description:** In a screenshot provided by the user (Message 343), a Failed to fetch toast error is visible on the new Fiscal Simulator page. The agent checked the backend and saw no errors but did not investigate the frontend.
-     - **Next debug checklist:**
-        1. Open the  page.
-        2. Open the browser's developer tools and go to the Network tab.
-        3. Fill out and submit the form.
-        4. Identify which API call is failing and inspect the error. It's likely an issue with the  call in .
-     - **Why fix this issue and what will be achieved with the fix?** A core new feature is not working correctly.
-     - **Status:** NOT STARTED
-     - **Is recurring issue?** N
-     - **Should Test frontend/backend/both after fix?** Frontend
+     - **Should Test frontend/backend/both after fix?** Both
 
 **In progress Task List**:
--   **Task 1:  Fix Homepage Gradient UI (P0)**
-     - **Where to resume:** Resume at  to apply the CSS class change.
-     - **What will be achieved with this?** A cleaner, more professional homepage design as requested by the user.
+  - **Task 1: Use Paid EODHD Plan for BVB Data (P0)**
+     - **Where to resume:** Resume work in , , and .
+     - **What will be achieved with this?** The platform will use the user's reliable, paid data source for all BVB stock data, ensuring accuracy and enabling features like historical charts. The temporary scraper will be removed.
      - **Status:**  IN PROGRESS
-     - **Should Test frontend/backend/both after fix?** Frontend
+     - **Should Test frontend/backend/both after fix?** Backend
      - **Blocked on something:** Nothing.
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   **(P1) Add Subscribe to Daily Summary UI:** The backend and email sending for the Rezumatul Zilei BVB are complete. A checkbox needs to be added in the user's settings/profile page to allow them to opt-in.
-    *   **(P1) Verify Resend Domain:** The user was given DNS records to add to their domain registrar to verify their domain with Resend. The next agent should check if the domain is verified and update the from email address in .
-    *   **(P2) Get User Feedback on New Fiscal Simulator:** The user is asking an expert (Flavius) to test the new Simulator Fiscal Antreprenor. The agent should be prepared to make adjustments based on this expert feedback.
+    *   **(P1) Build PRO-only Live Chat:** The user has shown interest in creating a live chat for PRO users, with options for general rooms or per-stock chats.
+    *   **(P1) Add Subscribe to Daily Summary UI:** The backend/email job is complete, but a checkbox is needed in the user's settings/profile page to allow them to opt-in/out.
+    *   **(P2) Verify Resend Domain:** The user was given DNS records to verify their domain with Resend. The agent should check if this is done and update the from email address in .
+    *   **(P2) Get User Feedback on Simulator Fiscal Antreprenor:** The user is having an expert test the new simulator. The agent should be prepared for feedback.
 *   **Future Tasks:**
     *   Add Hot Stocks Section to Homepage.
-    *   Implement 3 Straturi Portfolio strategy feature.
-    *   Implement sending expiration notification emails (currently only in-app).
-    *   Build a native mobile app.
+    -   Implement 3 Straturi Portfolio strategy feature.
+    -   Implement sending trial expiration notification emails.
+    -   Build a native mobile app.
 
 **Completed work in this session**
--   **Enhanced AI Technical Analysis Feature:**
-    -   Fixed a  serialization error and a bug where market context returned .
-    -   Changed the BUY/SELL terminology to a more neutral FAVORABIL/RISCANT to avoid giving financial advice.
-    -   Fully tested with the backend testing agent.
--   **Created Simulator Fiscal Antreprenor (New Feature):**
-    -   Built a completely new, separate calculator for entrepreneurs with complex situations (multiple firms, PFA, PFI).
-    -   The simulator uses a KYC-style questionnaire and applies fiscal rules for the year **2026**, including logic for revenue aggregation, CAEN code exemptions, and TVA thresholds.
-    -   Improved iteratively with user feedback to include fields for incorporation year, cross-holdings, and detailed step-by-step calculation explanations in the results.
--   **Implemented Rezumatul Zilei BVB Email (New Feature):**
-    -   Integrated the **Resend** email service with the provided API key.
-    -   Created an automated daily job (18:15) that uses an LLM to generate a market summary and emails it to subscribed users.
--   **Fixed In-App Price Alert Notifications:**
-    -   Implemented a background job that runs every 5 minutes to check for triggered price alerts and successfully creates in-app notifications for users.
+- **Data Source Overhaul:** Identified critical data integrity issues (all data was mock). Guided user to purchase a paid EODHD plan and confirmed it works.
+- **Fiscal Calculator Updated to 2026:** Fully updated the investor calculator with 2026 fiscal laws (BVB tax 3%/6%, dividend tax 16%, SRL micro tax 1%, etc.).
+- **Business Model Pivot:** Implemented Free PRO for All until June 5th, replacing the 100 Early Adopters model. Included backend logic, new UI banners, and hiding upsells for PRO users.
+- **Daily Summary Email Fixed & Enhanced:** Fixed emails not sending (zero subscribers, wrong timezone), added a daily sending limit, and enhanced content with Romanian dates, exact figures, and a personalized watchlist section.
+- **New Page: Rezumat Zilnic:** Created a dedicated page for the daily summary, accessible from the navbar.
+- **Critical Bugfix (Quizzes):** Fixed Connection Error on all educational quizzes by removing a conflicting  property from fetch calls across 8 files.
+- **Admin Tooling:** Added a bulk-upgrade button to the admin dashboard to migrate existing users to the new PRO plan.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1: Mobile Responsiveness**
-    - **Debug checklist:** Use screenshot tool with mobile viewport on key pages (, , , ) to identify and fix layout issues.
--   **Issue 2: Slow Page Load Times**
-    - **Debug checklist:** Analyze frontend bundle size and backend query performance.
+- **Issue 1: Failed to fetch on Fiscal Simulator page**
+    - Debug checklist: See Issue 3 in All Pending/In progress Issue list.
+- **Issue 2: Mobile Responsiveness**
+    - Debug checklist: Use screenshot tool with mobile viewport on key pages (, , , ).
+- **Issue 3: Slow Page Load Times**
+    - Debug checklist: Analyze frontend bundle size and backend query performance.
 
 **Known issue recurrence from previous fork**
 - **Issue recurrence in previous fork:** Mobile responsiveness and slow page loads.
-- **Recurrence count:** 2+
+- **Recurrence count:** 3
 - **Status:** NOT STARTED
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Background Job Scheduling (APScheduler):** Used for checking price alerts (every 5 mins) and sending the daily summary email (daily at 18:15).
--   **External API Integration (Resend):** Integrated for sending transactional emails (Rezumatul Zilei BVB).
--   **Complex Business Logic:** The new fiscal simulator required translating complex, multi-variable Romanian fiscal laws for 2026 into Python code.
--   **AI-Powered Content Generation:** The daily summary email uses an LLM to create a narrative from raw market data.
+- **API Client Resilience:** Fallback mechanisms when an external API (EODHD) fails, serving data from a local cache/DB to prevent broken pages.
+- **API Exchange Suffixes:** Understanding that different data providers use different exchange codes (e.g.,  vs  for Bucharest).
+- **Web Scraping:** Use of  and  to extract data from a website when an API is unavailable (this solution is being deprecated).
+- **Cron Job Timezones:** Correctly configuring  with  to run jobs in a specific timezone () instead of default UTC.
+- **CORS Debugging:** Identifying and fixing browser security issues caused by the interaction of , Bearer tokens, and .
 
 **key DB schema**
--   **users:**  (added for email opt-in)
--   **notifications:**  (e.g., 'PRICE_ALERT_ABOVE', 'PRICE_ALERT_BELOW')
+-   **users:** The  ('free'/'pro'),  (datetime), and  (bool) fields are now central to the user experience.
 
 **changes in tech stack**
--   No changes to the core stack.
+-   The core data source has been upgraded from a non-functional free EODHD plan to a **paid, high-volume plan**. This is a major technical and strategic shift.
 
 **All files of reference**
--   : Contains the CSS for the gradient that needs to be fixed.
--   : Core logic for the new simulator.
--   : Frontend for the new simulator.
--   : Logic for the daily email summary.
--   : Contains the price alert background job logic.
+-   : Needs scraper logic reverted to EODHD.
+-   : Needs  suffix logic added.
+-   : Needs to use the EODHD client instead of the scraper.
+-   : To be deleted.
+-   : Contains the new, correct 2026 tax logic.
+-   : Contains the unfixed Failed to fetch bug.
 
 **Areas that need refactoring**:
--   The user is on a free EODHD plan but the platform is commercial. This creates a licensing risk and technical limitations (like broken charts). The code should gracefully handle API failures from this free plan, perhaps by showing informative messages to the user instead of broken components.
+- The entire web scraping implementation (, dependencies, scheduler integration) must be removed and replaced by the correct EODHD integration.
+- The main  file has several routes defined directly. These could be moved to their own dedicated files in the  directory for better organization.
 
 **key api endpoints**
--   : **(NEW)** Runs the simulation for the entrepreneur calculator.
--   : **(NEW)** Returns the fiscal thresholds for 2026.
--   : **(NEW)** Subscribes a user to the daily email.
--   : **(NEW)** Unsubscribes a user.
--   : **(NEW)** Previews the daily summary email content.
--   : **(NEW)** Manually triggers the price alert check.
+- : (NEW) Upgrades all free users to PRO until the cutoff date.
+- : A key endpoint that was broken and now must be fixed to use the paid EODHD plan.
+- : Now uses 2026 fiscal logic.
 
 **Critical Info for New Agent**
--   **User is Extremely Cost-Sensitive:** The user is bootstrapping and hesitant to upgrade paid plans (EODHD, Emergent). Prioritize free solutions where possible. The limitations of the **free EODHD plan** are the likely cause of the chart loading bug. Be prepared to handle API errors gracefully.
--   **Licensing Risk:** The user is running a commercial platform (with paying users) on personal/free API plans (EODHD). Do not prompt the user about this again, but be aware that API access could be revoked.
--   **Separation of Concerns:** The user prefers new features to be built as separate, non-interfering components. The creation of the new simulator as a distinct feature was a successful approach.
--   **Two User Personas:** The platform now serves two distinct audiences: **investors** (original calculator, market data) and **entrepreneurs** (new fiscal simulator).
+- **USE THE PAID EODHD PLAN:** The user has purchased a paid EODHD plan (9/month). The temporary web scraper solution **must be removed**. All BVB data should now come from EODHD.
+- **EODHD SUFFIX IS :** The correct EODHD exchange code for Bucharest is  (e.g., ), not . This must be applied to all BVB API calls to EODHD.
+- **User is hands-on and values accuracy:** The user is technically savvy, provides detailed feedback, and has a very low tolerance for incorrect data (e.g., mock data, outdated tax laws). Credibility is key.
+- **Current Business Strategy:** The platform is in a growth phase, offering Free PRO for All until June 5th, 2026 to build a user base.
 
 **documents and test reports created in this job**
 -    (Updated)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Asks to implement email notifications. (Completed with Resend)
-2.  **User:** Proposes a brilliant idea: an AI-generated daily market summary email. (Completed)
-3.  **User:** Provides the Resend API key. (Agent used it for implementation)
-4.  **Agent:** Informs the user the email was sent and they need to add DNS records to verify their domain. (Pending user action)
-5.  **User:** Points out an annoying blue gradient on the homepage and asks for it to be removed. (PENDING - Current )
-6.  **Agent:** Identifies the cause of the gradient. (In Progress)
+1.  **User:** Asks for a ~45-second ad script for Facebook. (Completed)
+2.  **User:** Reports that stock data is not loading on the SNP page, providing a screenshot. (Agent found the root cause: invalid EODHD key, all data was mock).
+3.  **User:** Decides to buy the 9/month EODHD plan and asks the agent to use it at full capacity, abandoning the scraper solution. (PENDING - Current ).
+4.  **User:** Reports the daily summary is wrong and people have noticed, providing a screenshot showing BVB data. (Agent confirmed data was mock due to the invalid key).
+5.  **User:** Reports that the daily summary emails are not being sent, with a screenshot from Resend showing the last email was on March 17th. (Agent fixed the issue: zero subscribers and wrong timezone).
+6.  **User:** Agrees to manually enable emails for users and notes the 100 emails/day free limit on Resend. (Agent implemented a hard limit in the code).
+7.  **User:** Asks to update the Fiscal Calculator to 2026 rules, providing his own calculations as a starting point. (Completed).
+8.  **User:** Points out a mistake in the agent's 2026 calculation: the SRL Micro tax should be 1%, not 3%. (Agent corrected it).
+9.  **User:** Asks for an exact Facebook post text based on the agent's suggestion. (Completed).
+10. **User:** Gives feedback on a suggested Facebook post, asking for the agent to create the exact text. (Completed).
 
 **Project Health Check:**
--   **Mocked:** Fundamental data for the stock screener is mocked, as the API plan does not support it.
--   **Broken:** The stock charts are reportedly not loading, likely due to free API plan limitations. The new fiscal simulator page has a Failed to fetch error.
-
-**3rd Party Integrations**
-*   **EODHD (Financial Data):** Currently on a **Free Plan**. This is a major constraint.
-*   **Firebase Authentication:** Primary authentication provider.
-*   **Stripe (Payments):** Live keys are configured.
-*   **OpenAI GPT (AI Advisor & Analysis):** Uses Emergent LLM Key.
-*   **Resend (Email):** **(NEW)** Integrated for sending the daily summary email. Free tier (100 emails/day). API key is in the env.
-
-**Testing status**
-- Testing agent used after significant changes: YES (for the AI Technical Analysis feature)
-- Troubleshoot agent used after agent stuck in loop: NO
-- Test files created: []
-- Known regressions: [The stock chart loading bug may be a regression or a newly discovered issue due to API plan limits.]
-
-**Credentials to test flow:**
--   **Admin User:**  (Login via Google Auth).
-
-**What agent forgot to execute**
--   The agent built the backend and email service for the Daily Summary but did not add the corresponding subscribe checkbox on the frontend for users to opt-in.
--   The agent noticed a Failed to fetch error in a user-provided screenshot of the new fiscal simulator but did not investigate or debug it.</analysis>
+- **Broken:**
+    - Stock data fetching is broken because it's still using the temporary scraper/old logic. It needs to be switched to the new, paid EODHD API.
+    - The Failed to fetch error persists on the Fiscal Simulator page.
+- **Mocked:** The platform is no</analysis>
