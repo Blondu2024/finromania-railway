@@ -16,67 +16,81 @@ router = APIRouter(prefix="/api/calendar", tags=["Calendar"])
 
 # ============================================
 # SAMPLE DIVIDEND & EVENTS DATA
-# Based on real BVB companies
+# Updated: March 2026 - Based on TradeVille estimates
+# Source: https://www.bursa.ro/tradeville-3-6-procente-media-randamentelor-dividendelor
 # ============================================
 
 BVB_DIVIDENDS_2024 = [
+    # ========== 2024 - PLĂTITE ==========
     {
         "symbol": "TLV",
         "name": "Banca Transilvania",
-        "dividend_per_share": 0.12,
+        "dividend_per_share": 1.27,
         "currency": "RON",
-        "ex_date": "2024-06-15",
-        "payment_date": "2024-07-01",
-        "record_date": "2024-06-17",
-        "dividend_yield": 4.2,
+        "ex_date": "2024-05-24",
+        "payment_date": "2024-06-14",
+        "record_date": "2024-05-27",
+        "dividend_yield": 4.5,
         "type": "cash",
         "status": "paid"
     },
     {
         "symbol": "SNP",
         "name": "OMV Petrom",
-        "dividend_per_share": 0.035,
+        "dividend_per_share": 0.06,
         "currency": "RON",
         "ex_date": "2024-05-20",
         "payment_date": "2024-06-05",
         "record_date": "2024-05-22",
-        "dividend_yield": 3.5,
+        "dividend_yield": 6.0,
         "type": "cash",
         "status": "paid"
     },
     {
         "symbol": "BRD",
         "name": "BRD - Groupe Société Générale",
-        "dividend_per_share": 1.64,
+        "dividend_per_share": 1.97,
         "currency": "RON",
         "ex_date": "2024-04-25",
         "payment_date": "2024-05-15",
         "record_date": "2024-04-29",
-        "dividend_yield": 6.1,
+        "dividend_yield": 9.1,
         "type": "cash",
         "status": "paid"
     },
     {
         "symbol": "SNN",
         "name": "Nuclearelectrica",
-        "dividend_per_share": 3.20,
+        "dividend_per_share": 3.83,
         "currency": "RON",
-        "ex_date": "2024-07-10",
-        "payment_date": "2024-08-01",
-        "record_date": "2024-07-12",
-        "dividend_yield": 5.8,
+        "ex_date": "2024-06-10",
+        "payment_date": "2024-07-01",
+        "record_date": "2024-06-12",
+        "dividend_yield": 6.2,
         "type": "cash",
         "status": "paid"
     },
     {
         "symbol": "TGN",
         "name": "Transgaz",
-        "dividend_per_share": 25.50,
+        "dividend_per_share": 1.08,
         "currency": "RON",
         "ex_date": "2024-06-20",
         "payment_date": "2024-07-10",
         "record_date": "2024-06-24",
-        "dividend_yield": 7.2,
+        "dividend_yield": 2.1,
+        "type": "cash",
+        "status": "paid"
+    },
+    {
+        "symbol": "H2O",
+        "name": "Hidroelectrica",
+        "dividend_per_share": 2.03,
+        "currency": "RON",
+        "ex_date": "2024-06-28",
+        "payment_date": "2024-07-22",
+        "record_date": "2024-07-01",
+        "dividend_yield": 1.8,
         "type": "cash",
         "status": "paid"
     },
@@ -88,117 +102,271 @@ BVB_DIVIDENDS_2024 = [
         "ex_date": "2024-08-15",
         "payment_date": "2024-09-01",
         "record_date": "2024-08-19",
-        "dividend_yield": 0.5,
+        "dividend_yield": 0.4,
         "type": "cash",
         "status": "paid"
     },
-    # Upcoming 2025 estimates
-    {
-        "symbol": "TLV",
-        "name": "Banca Transilvania",
-        "dividend_per_share": 0.14,
-        "currency": "RON",
-        "ex_date": "2025-06-15",
-        "payment_date": "2025-07-01",
-        "record_date": "2025-06-17",
-        "dividend_yield": 4.8,
-        "type": "cash",
-        "status": "estimated"
-    },
-    {
-        "symbol": "SNP",
-        "name": "OMV Petrom",
-        "dividend_per_share": 0.04,
-        "currency": "RON",
-        "ex_date": "2025-05-20",
-        "payment_date": "2025-06-05",
-        "record_date": "2025-05-22",
-        "dividend_yield": 4.0,
-        "type": "cash",
-        "status": "estimated"
-    },
+    # ========== 2025 - PLĂTITE / ANUNȚATE ==========
     {
         "symbol": "BRD",
         "name": "BRD - Groupe Société Générale",
-        "dividend_per_share": 1.80,
+        "dividend_per_share": 2.10,
         "currency": "RON",
         "ex_date": "2025-04-25",
         "payment_date": "2025-05-15",
         "record_date": "2025-04-29",
+        "dividend_yield": 8.5,
+        "type": "cash",
+        "status": "paid"
+    },
+    {
+        "symbol": "SNP",
+        "name": "OMV Petrom",
+        "dividend_per_share": 0.065,
+        "currency": "RON",
+        "ex_date": "2025-05-19",
+        "payment_date": "2025-06-05",
+        "record_date": "2025-05-21",
         "dividend_yield": 6.5,
         "type": "cash",
-        "status": "estimated"
+        "status": "paid"
+    },
+    {
+        "symbol": "TLV",
+        "name": "Banca Transilvania",
+        "dividend_per_share": 1.35,
+        "currency": "RON",
+        "ex_date": "2025-05-23",
+        "payment_date": "2025-06-13",
+        "record_date": "2025-05-26",
+        "dividend_yield": 4.8,
+        "type": "cash",
+        "status": "paid"
     },
     {
         "symbol": "SNN",
         "name": "Nuclearelectrica",
-        "dividend_per_share": 3.50,
+        "dividend_per_share": 4.10,
         "currency": "RON",
-        "ex_date": "2025-07-10",
-        "payment_date": "2025-08-01",
-        "record_date": "2025-07-12",
-        "dividend_yield": 6.2,
+        "ex_date": "2025-06-09",
+        "payment_date": "2025-06-30",
+        "record_date": "2025-06-11",
+        "dividend_yield": 6.5,
         "type": "cash",
-        "status": "estimated"
+        "status": "paid"
+    },
+    {
+        "symbol": "TGN",
+        "name": "Transgaz",
+        "dividend_per_share": 2.14,
+        "currency": "RON",
+        "ex_date": "2025-06-19",
+        "payment_date": "2025-07-10",
+        "record_date": "2025-06-23",
+        "dividend_yield": 2.8,
+        "type": "cash",
+        "status": "paid"
+    },
+    {
+        "symbol": "H2O",
+        "name": "Hidroelectrica",
+        "dividend_per_share": 2.45,
+        "currency": "RON",
+        "ex_date": "2025-06-27",
+        "payment_date": "2025-07-21",
+        "record_date": "2025-06-30",
+        "dividend_yield": 1.9,
+        "type": "cash",
+        "status": "paid"
+    },
+    # ========== 2026 - ESTIMATE TradeVille ==========
+    # Sursa: https://www.bursa.ro/tradeville-3-6-procente-media-randamentelor
+    # Media randament BETPlus: 3.6% (dec 2025)
+    {
+        "symbol": "TLV",
+        "name": "Banca Transilvania",
+        "dividend_per_share": 1.46,
+        "currency": "RON",
+        "ex_date": "2026-05-22",
+        "payment_date": "2026-06-12",
+        "record_date": "2026-05-25",
+        "dividend_yield": 5.2,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare TradeVille, payout ratio ~50%"
+    },
+    {
+        "symbol": "SNP",
+        "name": "OMV Petrom",
+        "dividend_per_share": 0.07,
+        "currency": "RON",
+        "ex_date": "2026-05-18",
+        "payment_date": "2026-06-04",
+        "record_date": "2026-05-20",
+        "dividend_yield": 7.0,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare bazată pe profit 2025"
+    },
+    {
+        "symbol": "BRD",
+        "name": "BRD - Groupe Société Générale",
+        "dividend_per_share": 2.25,
+        "currency": "RON",
+        "ex_date": "2026-04-24",
+        "payment_date": "2026-05-14",
+        "record_date": "2026-04-28",
+        "dividend_yield": 4.4,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare, payout ratio ~50%"
+    },
+    {
+        "symbol": "SNN",
+        "name": "Nuclearelectrica",
+        "dividend_per_share": 4.50,
+        "currency": "RON",
+        "ex_date": "2026-06-08",
+        "payment_date": "2026-06-29",
+        "record_date": "2026-06-10",
+        "dividend_yield": 6.8,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare TradeVille"
+    },
+    {
+        "symbol": "TGN",
+        "name": "Transgaz",
+        "dividend_per_share": 2.39,
+        "currency": "RON",
+        "ex_date": "2026-06-18",
+        "payment_date": "2026-07-09",
+        "record_date": "2026-06-22",
+        "dividend_yield": 3.8,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare TradeVille (creștere de la 1.08 în 2024)"
+    },
+    {
+        "symbol": "H2O",
+        "name": "Hidroelectrica",
+        "dividend_per_share": 2.80,
+        "currency": "RON",
+        "ex_date": "2026-06-26",
+        "payment_date": "2026-07-20",
+        "record_date": "2026-06-29",
+        "dividend_yield": 1.9,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Randament scăzut, dar volum mare"
+    },
+    {
+        "symbol": "TEL",
+        "name": "Transelectrica",
+        "dividend_per_share": 1.78,
+        "currency": "RON",
+        "ex_date": "2026-06-05",
+        "payment_date": "2026-06-26",
+        "record_date": "2026-06-09",
+        "dividend_yield": 2.5,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare TradeVille (scădere de la 3.81 în 2024)"
+    },
+    {
+        "symbol": "FP",
+        "name": "Fondul Proprietatea",
+        "dividend_per_share": 0.08,
+        "currency": "RON",
+        "ex_date": "2026-05-15",
+        "payment_date": "2026-06-05",
+        "record_date": "2026-05-18",
+        "dividend_yield": 4.2,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Istoric constant de dividende"
     },
 ]
 
 BVB_EVENTS = [
+    # ========== 2026 - EVENIMENTE VIITOARE ==========
+    {
+        "type": "aga",
+        "symbol": "BRD",
+        "name": "BRD - Groupe Société Générale",
+        "title": "Adunare Generală Ordinară",
+        "date": "2026-04-15",
+        "time": "10:00",
+        "location": "București",
+        "description": "Aprobarea situațiilor financiare 2025 și propunere dividende"
+    },
     {
         "type": "aga",
         "symbol": "TLV",
         "name": "Banca Transilvania",
         "title": "Adunare Generală Ordinară",
-        "date": "2025-04-20",
+        "date": "2026-04-22",
         "time": "10:00",
         "location": "Cluj-Napoca",
-        "description": "Aprobarea situațiilor financiare 2024 și distribuirea dividendelor"
+        "description": "Aprobarea situațiilor financiare 2025 și distribuirea dividendelor"
     },
     {
         "type": "aga",
         "symbol": "SNP",
         "name": "OMV Petrom",
         "title": "Adunare Generală Ordinară",
-        "date": "2025-04-25",
+        "date": "2026-04-28",
         "time": "10:00",
         "location": "București",
         "description": "Aprobarea raportului anual și propunere dividende"
     },
     {
-        "type": "report",
-        "symbol": "BRD",
-        "name": "BRD - Groupe Société Générale",
-        "title": "Raport Financiar Q4 2024",
-        "date": "2025-02-15",
-        "time": "08:00",
-        "description": "Publicarea rezultatelor financiare pentru Q4 2024"
+        "type": "aga",
+        "symbol": "SNN",
+        "name": "Nuclearelectrica",
+        "title": "Adunare Generală Ordinară",
+        "date": "2026-05-05",
+        "time": "11:00",
+        "location": "București",
+        "description": "Aprobarea dividendelor și a raportului anual 2025"
+    },
+    {
+        "type": "aga",
+        "symbol": "H2O",
+        "name": "Hidroelectrica",
+        "title": "Adunare Generală Ordinară",
+        "date": "2026-05-12",
+        "time": "10:00",
+        "location": "București",
+        "description": "Aprobarea dividendelor și planul de investiții 2026"
     },
     {
         "type": "report",
         "symbol": "TLV",
         "name": "Banca Transilvania",
-        "title": "Raport Financiar Q4 2024",
-        "date": "2025-02-20",
+        "title": "Raport Financiar Q1 2026",
+        "date": "2026-05-08",
         "time": "08:00",
-        "description": "Publicarea rezultatelor financiare pentru Q4 2024"
+        "description": "Publicarea rezultatelor financiare pentru Q1 2026"
     },
     {
         "type": "report",
-        "symbol": "DIGI",
-        "name": "Digi Communications",
-        "title": "Raport Anual 2024",
-        "date": "2025-03-15",
-        "time": "18:00",
-        "description": "Publicarea raportului anual consolidat"
+        "symbol": "BRD",
+        "name": "BRD - Groupe Société Générale",
+        "title": "Raport Financiar Q1 2026",
+        "date": "2026-05-10",
+        "time": "08:00",
+        "description": "Publicarea rezultatelor financiare pentru Q1 2026"
     },
     {
-        "type": "ipo",
-        "symbol": "NEW",
-        "name": "Hidroelectrica",
-        "title": "Listare Suplimentară",
-        "date": "2025-03-01",
-        "description": "Potențială ofertă secundară de acțiuni"
-    }
+        "type": "report",
+        "symbol": "SNP",
+        "name": "OMV Petrom",
+        "title": "Raport Financiar Q1 2026",
+        "date": "2026-05-07",
+        "time": "07:00",
+        "description": "Rezultate financiare Q1 2026 și update operațional"
+    },
 ]
 
 
