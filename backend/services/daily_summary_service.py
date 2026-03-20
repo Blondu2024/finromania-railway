@@ -359,20 +359,25 @@ Cea mai mare lichiditate a fost pe {top_vol.get('symbol')}, cu un volum de {vol_
             return False
     
     async def send_to_all_subscribers(self) -> Dict:
-        """Trimite rezumatul zilnic la toți userii abonați"""
+        """Trimite rezumatul zilnic la toți userii abonați (max 95/zi pt Resend free)"""
         db = await get_database()
-        results = {"sent": 0, "failed": 0, "skipped": 0}
+        results = {"sent": 0, "failed": 0, "skipped": 0, "limit_reached": False}
+        DAILY_LIMIT = 95  # Resend free = 100/zi, lăsăm 5 pentru test emails
         
         try:
-            # Găsește userii care au activat notificările zilnice
             subscribers = await db.users.find({
                 "daily_summary_enabled": True,
                 "email": {"$exists": True, "$ne": ""}
             }, {"_id": 0, "email": 1, "name": 1, "subscription_level": 1, "user_id": 1}).to_list(500)
             
-            logger.info(f"Found {len(subscribers)} subscribers for daily summary")
+            logger.info(f"Found {len(subscribers)} subscribers for daily summary (limit: {DAILY_LIMIT})")
             
             for user in subscribers:
+                if results["sent"] >= DAILY_LIMIT:
+                    results["skipped"] += 1
+                    results["limit_reached"] = True
+                    continue
+                
                 email = user.get("email")
                 if not email:
                     results["skipped"] += 1
@@ -392,6 +397,8 @@ Cea mai mare lichiditate a fost pe {top_vol.get('symbol')}, cu un volum de {vol_
                 else:
                     results["failed"] += 1
             
+            if results["limit_reached"]:
+                logger.warning(f"⚠️ Daily email limit reached ({DAILY_LIMIT}). {results['skipped']} subscribers skipped.")
             logger.info(f"Daily summary results: {results}")
             
         except Exception as e:
