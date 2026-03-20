@@ -60,6 +60,7 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
   - Real-time quotes + historical data working
   - Charts now show real candlestick data
   - Removed beautifulsoup4 dependency
+- [x] **Fixed "+%" bug on Daily Summary page** - percentages now display correctly (was using wrong field name)
 
 ## Pending Issues
 - [x] ~~P0: EODHD integration - scraper removal~~ ✅ DONE
