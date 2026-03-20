@@ -8,6 +8,7 @@ import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional
 from config.database import get_database
+from apis.eodhd_client import get_eodhd_client
 
 LUNI_RO = {
     1: "ianuarie", 2: "februarie", 3: "martie", 4: "aprilie",
@@ -27,6 +28,7 @@ class DailySummaryService:
         self.from_email = "FinRomania <noreply@finromania.ro>"
         # Folosim domeniul Resend pentru test dacă nu avem domeniu verificat
         self.from_email_test = "FinRomania <onboarding@resend.dev>"
+        self.eodhd_client = get_eodhd_client()
     
     async def get_market_data(self) -> Dict:
         """Colectează datele de piață pentru rezumat"""
@@ -38,6 +40,44 @@ class DailySummaryService:
         if not stocks:
             return None
         
+        # Obține indicii BVB din serviciul existent (folosește yfinance)
+        indices = {}
+        try:
+            from routes.bvb_market import BVB_INDICES, BVB_INDEX_FALLBACK
+            import yfinance as yf
+            
+            for key, info in BVB_INDICES.items():
+                try:
+                    ticker = yf.Ticker(info["symbol"])
+                    hist = ticker.history(period="2d")
+                    
+                    if not hist.empty and len(hist) >= 1:
+                        current = hist['Close'].iloc[-1]
+                        previous = hist['Close'].iloc[-2] if len(hist) > 1 else current
+                        change = current - previous
+                        change_percent = (change / previous * 100) if previous > 0 else 0
+                        
+                        indices[key] = {
+                            "value": round(current, 2),
+                            "change_percent": round(change_percent, 2)
+                        }
+                    else:
+                        # Fallback
+                        fallback = BVB_INDEX_FALLBACK.get(key, {})
+                        indices[key] = {
+                            "value": fallback.get("value", 0),
+                            "change_percent": round(fallback.get("change_percent", 0) * 100, 2)
+                        }
+                except Exception as e:
+                    logger.warning(f"Could not fetch index {key}: {e}")
+                    fallback = BVB_INDEX_FALLBACK.get(key, {})
+                    indices[key] = {
+                        "value": fallback.get("value", 0),
+                        "change_percent": round(fallback.get("change_percent", 0) * 100, 2)
+                    }
+        except Exception as e:
+            logger.warning(f"Could not fetch BVB indices: {e}")
+        
         # Sortează pentru top gainers/losers
         sorted_by_change = sorted(stocks, key=lambda x: x.get("change_percent", 0), reverse=True)
         
@@ -48,8 +88,12 @@ class DailySummaryService:
         sorted_by_volume = sorted(stocks, key=lambda x: x.get("volume", 0), reverse=True)
         top_volume = sorted_by_volume[:3]
         
-        # Calculează media pieței (proxy pentru BET)
+        # Calculează media pieței ca backup
         avg_change = sum(s.get("change_percent", 0) for s in stocks) / len(stocks) if stocks else 0
+        
+        # Folosește BET ca indicator principal dacă e disponibil
+        bet_change = indices.get("BET", {}).get("change_percent")
+        headline_change = bet_change if bet_change is not None else round(avg_change, 2)
         
         # Sentiment general
         positive = sum(1 for s in stocks if s.get("change_percent", 0) > 0)
@@ -63,6 +107,8 @@ class DailySummaryService:
             "date": datetime.now(timezone.utc).strftime("%d ") + LUNI_RO[datetime.now(timezone.utc).month] + datetime.now(timezone.utc).strftime(" %Y"),
             "total_stocks": len(stocks),
             "avg_change": round(avg_change, 2),
+            "bet_change": headline_change,  # Indicele BET real sau media ca fallback
+            "indices": indices,  # Toți indicii BVB
             "sentiment": {
                 "positive": positive,
                 "negative": negative,
@@ -79,13 +125,24 @@ class DailySummaryService:
         try:
             from emergentintegrations.llm.chat import LlmChat, UserMessage
             
-            # Construiește contextul pentru AI
+            # Construiește contextul pentru AI cu indicii BVB reali
+            indices = market_data.get('indices', {})
+            bet_info = indices.get('BET', {})
+            bettr_info = indices.get('BETTR', {})
+            betfi_info = indices.get('BETFI', {})
+            betng_info = indices.get('BETNG', {})
+            
             context = f"""
 DATE PIAȚĂ {market_data['date']}:
 
-STATISTICI GENERALE:
+INDICII BVB (DATE OFICIALE):
+- BET: {bet_info.get('value', 'N/A')} ({bet_info.get('change_percent', 0):+.2f}%)
+- BET-TR: {bettr_info.get('value', 'N/A')} ({bettr_info.get('change_percent', 0):+.2f}%)
+- BET-FI: {betfi_info.get('value', 'N/A')} ({betfi_info.get('change_percent', 0):+.2f}%)
+- BET-NG: {betng_info.get('value', 'N/A')} ({betng_info.get('change_percent', 0):+.2f}%)
+
+STATISTICI ACȚIUNI:
 - Total acțiuni analizate: {market_data['total_stocks']}
-- Variație medie piață: {market_data['avg_change']:+.2f}%
 - Acțiuni în creștere: {market_data['sentiment']['positive']}
 - Acțiuni în scădere: {market_data['sentiment']['negative']}
 
@@ -104,19 +161,23 @@ TOP 3 CREȘTERI:
                 vol_str = f"{vol/1000000:.1f}M" if vol >= 1000000 else f"{vol/1000:.0f}K"
                 context += f"- {s.get('symbol')}: {vol_str} acțiuni | {s.get('price', 0):.2f} RON\n"
             
-            if market_data.get('news'):
-                context += "\nȘTIRI RECENTE:\n"
-                for n in market_data['news'][:3]:
-                    context += f"- {n.get('title', '')}\n"
-            
             system_prompt = """Ești un analist financiar profesionist care scrie rezumate de piață pentru investitori români.
-Scrie un rezumat de 150-200 cuvinte în română.
-Începe cu sentimentul general al pieței.
-Menționează TOP performerii și ce ar fi putut cauza mișcările.
-Folosește CIFRE EXACTE mereu (volume, prețuri, procente) - NU cuvinte vagi ca "semnificativ", "considerabil".
-Încheie cu o perspectivă pentru mâine (generală, fără predicții concrete).
-Ton: profesionist dar accesibil.
-NU da sfaturi de investiții specifice."""
+
+REGULI STRICTE:
+1. Scrie DOAR fapte verificabile din datele primite - NU specula și NU inventa cauze
+2. Folosește INDICELE BET ca referință principală, NU o medie calculată
+3. Menționează CIFRELE EXACTE pentru indici, prețuri, procente și volume
+4. NU scrie fraze ca "ar putea fi cauzat de", "posibil datorită", "probabil din cauza" - acestea sunt speculații
+5. NU da sfaturi de investiții sau predicții
+
+STRUCTURĂ:
+- Început: "Indicele BET a închis la X puncte (±Y%)" 
+- Menționează diferențele între indici dacă sunt semnificative (ex: BET-FI în scădere vs BET în creștere)
+- Listează TOP performerii cu cifre exacte
+- Menționează volumul tranzacționat pentru SNP/TLV dacă e relevant
+- Încheie cu o frază neutră despre sesiunea de mâine
+
+Lungime: 120-150 cuvinte. Ton: factual, profesionist."""
 
             chat = LlmChat(
                 api_key=os.environ.get("EMERGENT_UNIVERSAL_KEY"),

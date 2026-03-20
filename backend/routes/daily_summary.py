@@ -39,11 +39,21 @@ async def preview_daily_summary():
         # Generează rezumatul AI
         ai_summary = await daily_summary_service.generate_ai_summary(market_data)
         
+        # Extrage indicii BVB
+        indices = market_data.get("indices", {})
+        
         return {
             "success": True,
             "date": market_data["date"],
             "market_data": {
-                "avg_change": market_data["avg_change"],
+                "bet_change": market_data.get("bet_change"),  # Indicele BET real
+                "avg_change": market_data["avg_change"],  # Media calculată (backup)
+                "indices": {
+                    "BET": indices.get("BET", {}),
+                    "BETTR": indices.get("BETTR", {}),
+                    "BETFI": indices.get("BETFI", {}),
+                    "BETNG": indices.get("BETNG", {}),
+                },
                 "sentiment": market_data["sentiment"],
                 "top_gainers": [
                     {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent")}

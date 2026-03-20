@@ -3,7 +3,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
-import { TrendingUp, TrendingDown, BarChart3, Clock, Lock } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3, Clock, Lock, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
@@ -53,10 +53,15 @@ export default function DailySummaryPage() {
   const gainers = md.top_gainers || [];
   const losers = md.top_losers || [];
   const sentiment = md.sentiment || {};
+  const indices = md.indices || {};
+  
+  // Folosește BET ca indicator principal, cu fallback la media calculată
+  const betChange = md.bet_change ?? md.avg_change ?? 0;
+  const betValue = indices.BET?.value;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6" data-testid="daily-summary-page">
-      {/* Header */}
+      {/* Header cu BET */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -68,10 +73,37 @@ export default function DailySummaryPage() {
             {data.date}
           </p>
         </div>
-        <Badge variant={md.avg_change >= 0 ? 'default' : 'destructive'} className="text-lg px-3 py-1">
-          {md.avg_change >= 0 ? '+' : ''}{md.avg_change?.toFixed(2)}%
-        </Badge>
+        <div className="text-right">
+          <Badge variant={betChange >= 0 ? 'default' : 'destructive'} className="text-lg px-3 py-1">
+            BET {betChange >= 0 ? '+' : ''}{betChange?.toFixed(2)}%
+          </Badge>
+          {betValue && (
+            <p className="text-xs text-muted-foreground mt-1">{betValue?.toLocaleString('ro-RO')} pct</p>
+          )}
+        </div>
       </div>
+
+      {/* Indicii BVB */}
+      <Card data-testid="indices-card">
+        <CardContent className="p-4">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-1">
+            <Activity className="w-4 h-4" /> Indicii BVB
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {Object.entries(indices).map(([name, idx]) => (
+              <div key={name} className="text-center p-2 bg-accent/30 rounded">
+                <p className="text-xs text-muted-foreground">{name}</p>
+                <p className={`text-sm font-bold ${(idx?.change_percent ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {(idx?.change_percent ?? 0) >= 0 ? '+' : ''}{(idx?.change_percent ?? 0).toFixed(2)}%
+                </p>
+                {idx?.value && (
+                  <p className="text-xs text-muted-foreground">{idx.value?.toLocaleString('ro-RO')}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Stats Row */}
       <div className="grid grid-cols-3 gap-3">

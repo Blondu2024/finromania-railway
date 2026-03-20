@@ -36,11 +36,70 @@ class EODHDClient:
         "ALR": {"name": "Alro", "sector": "Industrie"},
     }
     
+    # BVB Index symbols (EODHD format)
+    BVB_INDICES = {
+        "BET": {"name": "BET Index", "description": "Blue-chip companies"},
+        "BETTR": {"name": "BET-TR Index", "description": "Total Return"},
+        "BETFI": {"name": "BET-FI Index", "description": "Financial sector"},
+        "BETNG": {"name": "BET-NG Index", "description": "Energy sector"},
+        "BETXT": {"name": "BET-XT Index", "description": "Extended index"},
+    }
+    
     def __init__(self, api_key: str = None):
         self.api_key = api_key or os.environ.get("EODHD_API_KEY")
         if not self.api_key:
             logger.warning("EODHD API key not configured")
     
+    async def get_index_quote(self, index_symbol: str) -> Optional[Dict]:
+        """Get real-time quote for a BVB index (BET, BETTR, etc.)"""
+        if not self.api_key:
+            return None
+            
+        try:
+            async with httpx.AsyncClient() as client:
+                # EODHD format for indices: INDICE.INDX
+                url = f"{self.BASE_URL}/real-time/{index_symbol}.INDX"
+                params = {
+                    "api_token": self.api_key,
+                    "fmt": "json"
+                }
+                
+                response = await client.get(url, params=params, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    index_info = self.BVB_INDICES.get(index_symbol, {"name": index_symbol})
+                    
+                    return {
+                        "symbol": index_symbol,
+                        "name": index_info["name"],
+                        "value": float(data.get("close", 0)),
+                        "change": float(data.get("change", 0)),
+                        "change_percent": float(data.get("change_p", 0)),
+                        "previous_close": float(data.get("previousClose", 0)),
+                        "timestamp": data.get("timestamp"),
+                    }
+                else:
+                    logger.warning(f"EODHD index API returned {response.status_code} for {index_symbol}")
+                    return None
+                    
+        except Exception as e:
+            logger.error(f"Error fetching index {index_symbol}: {e}")
+            return None
+    
+    async def get_all_bvb_indices(self) -> List[Dict]:
+        """Get quotes for all BVB indices"""
+        if not self.api_key:
+            return []
+        
+        indices = []
+        for symbol in self.BVB_INDICES.keys():
+            quote = await self.get_index_quote(symbol)
+            if quote:
+                indices.append(quote)
+        
+        return indices
+
     async def get_stock_quote(self, symbol: str) -> Optional[Dict]:
         """Get real-time quote for a BVB stock"""
         if not self.api_key:
