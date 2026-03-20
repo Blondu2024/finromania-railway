@@ -62,10 +62,12 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
   - Removed beautifulsoup4 dependency
 - [x] **Fixed "+%" bug on Daily Summary page** - percentages now display correctly (was using wrong field name)
 - [x] **MAJOR: Rezumat Zilnic complet refăcut (March 20, 2026):**
-  - Headline folosește acum indicele BET real (+0.25%), nu media calculată (-0.01%)
+  - Headline folosește acum indicele BET real (~28,000 pct), nu media calculată
   - Adăugată secțiune "Indicii BVB" cu BET, BETTR, BETFI, BETNG
   - Prompt AI rescris să fie factual (fără speculații)
-  - Folosește yfinance pentru indici (EODHD nu suportă indicii BVB)
+  - **ATENȚIE:** Indicii BVB sunt FALLBACK hardcodat (yfinance nu suportă ^BET)
+  - Fallback actualizat cu valori corecte din TradingEconomics (20 mar 2026)
+  - Prețurile acțiunilor (SNP, MedLife, etc.) sunt CORECTE din EODHD
 
 ## Pending Issues
 - [x] ~~P0: EODHD integration - scraper removal~~ ✅ DONE

@@ -44,12 +44,15 @@ BVB_INDICES = {
 }
 
 # Backup index data if Yahoo doesn't have real-time
+# IMPORTANT: Aceste valori trebuie actualizate manual periodic!
+# Sursa: https://tradingeconomics.com/romania/stock-market
+# Ultima actualizare: 20 martie 2026
 BVB_INDEX_FALLBACK = {
-    "BET": {"value": 18245.32, "change": 0.45, "change_percent": 0.0025},
-    "BETTR": {"value": 42156.78, "change": 1.23, "change_percent": 0.0029},
-    "BETFI": {"value": 58432.12, "change": -0.87, "change_percent": -0.0015},
-    "BETNG": {"value": 1245.67, "change": 0.32, "change_percent": 0.0026},
-    "BETXT": {"value": 1567.89, "change": 0.18, "change_percent": 0.0012}
+    "BET": {"value": 28012.98, "change": -210.39, "change_percent": -0.0074},
+    "BETTR": {"value": 66834.21, "change": -498.12, "change_percent": -0.0074},
+    "BETFI": {"value": 75621.45, "change": -587.23, "change_percent": -0.0078},
+    "BETNG": {"value": 1523.67, "change": -11.32, "change_percent": -0.0074},
+    "BETXT": {"value": 1834.52, "change": -13.87, "change_percent": -0.0075}
 }
 
 
