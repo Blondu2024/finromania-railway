@@ -207,14 +207,10 @@ def start_scheduler():
         logger.info(f"   • Price alerts: every 5 min")
         logger.info(f"   • Daily summary email: daily at 18:05 (Europe/Bucharest)")
         
-        # Run all jobs once immediately
-        asyncio.create_task(update_bvb_stocks_job())
-        asyncio.create_task(update_global_indices_job())
-        asyncio.create_task(fetch_news_job())
-        asyncio.create_task(fetch_international_news_job())
-        asyncio.create_task(update_currency_rates_job())
-        asyncio.create_task(check_subscription_expirations_job())  # Check on startup too
-        asyncio.create_task(check_price_alerts_job())  # Check price alerts on startup
+        # DON'T run jobs immediately at startup - let the scheduler handle them
+        # This prevents blocking the application startup
+        # Jobs will run at their scheduled intervals starting from next trigger
+        logger.info("✅ Jobs will start running at their scheduled intervals")
         
     except Exception as e:
         logger.error(f"Error starting scheduler: {e}")

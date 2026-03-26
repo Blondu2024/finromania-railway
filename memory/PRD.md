@@ -120,6 +120,16 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] **Calculator Dividende** with 2026 estimates and projections
 - [x] **Demo Login Endpoint** for automated testing (Playwright)
 - [x] Upgraded to EODHD All-in-One plan ($100/month) for full fundamentals access
+- [x] **MAJOR: Fixed backend startup blocking issue** - removed immediate job execution that was blocking uvicorn startup
+- [x] **NEW: Stock Comparison Tool** (`/api/stocks/compare`) - Compare 2-4 BVB stocks side-by-side with P/E, RSI, dividend yield, 52W high/low
+- [x] **NEW: Unusual Volume Alerts** (`/api/stocks/unusual-volume`) - Shows stocks with 2x+ average volume with severity badges
+- [x] **NEW: 52 Week Extremes** (`/api/stocks/52-week-extremes`) - Stocks near 52 week high/low
+- [x] **NEW: Sector Filter** on StocksPage - Dropdown to filter stocks by sector (data pending)
+- [x] **NEW: Stock Compare UI** on StocksPage - Checkbox selection + "Compară" button for side-by-side comparison
+- [x] **NEW: Market Signals Widget** on Homepage - Shows unusual volume and 52 week extremes in real-time
+- [x] **Email Notifications for Price Alerts** - Price alerts now send email via Resend ($20 plan)
+- [x] **Daily Summary at 18:05** - Changed from 18:10 to 18:05 (right after BVB closes at 18:00)
+- [x] **Increased Email Limit** - From 95/day to 500/day (Resend $20 plan = 10k/month)
 
 ## Upcoming Tasks
 - [ ] P1: Add "Subscribe to Daily Summary" UI checkbox in user settings
@@ -142,12 +152,19 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - GET /api/dividend-calculator/stocks - All dividend-paying BVB stocks
 - POST /api/dividend-calculator/calculate - Calculate dividends for portfolio
 - GET /api/auth/demo-login?secret=xxx - Demo login for automated testing
+- **GET /api/stocks/compare?symbols=TLV,SNP,BRD** - Compare 2-4 stocks side-by-side
+- **GET /api/stocks/unusual-volume** - Stocks with abnormal trading volume
+- **GET /api/stocks/52-week-extremes** - Stocks near 52 week high/low
+- **GET /api/stocks/bvb/filter-by-sector?sector=Banci** - Filter BVB stocks by sector
 
 ## Key Files - NEW
 - /app/backend/routes/screener_pro.py - Screener PRO API
-- /app/backend/routes/dividend_calculator.py - Dividend Calculator API  
+- /app/backend/routes/dividend_calculator.py - Dividend Calculator API
+- /app/backend/routes/stock_compare.py - Stock comparison, 52W extremes, unusual volume API
 - /app/frontend/src/pages/ScreenerProPage.jsx - Screener PRO UI
 - /app/frontend/src/pages/DividendCalculatorPage.jsx - Dividend Calculator UI
 - /app/frontend/src/pages/FiscalSimulatorPage.jsx
+- /app/frontend/src/components/StockCompare.jsx - Stock comparison modal component
+- /app/frontend/src/components/MarketSignals.jsx - 52 Week Extremes + Unusual Volume widgets
 - /app/backend/services/daily_summary_service.py
 - /app/backend/services/notification_service.py
