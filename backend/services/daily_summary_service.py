@@ -295,53 +295,76 @@ class DailySummaryService:
             bettr_info = indices.get('BETTR', {})
             betfi_info = indices.get('BETFI', {})
             betng_info = indices.get('BETNG', {})
+            betxt_info = indices.get('BETXT', {})
+            betaero_info = indices.get('BETAeRO', {})
             
-            context = f"""
-DATE PIAȚĂ {market_data['date']}:
+            # Calculează total valoare tranzacționată
+            total_volume = sum(s.get('volume', 0) for s in market_data.get('top_volume', []))
+            
+            context = f"""DATE OFICIALE BVB - {market_data['date']}
 
-INDICII BVB (DATE OFICIALE):
-- BET: {bet_info.get('value', 'N/A')} ({bet_info.get('change_percent', 0):+.2f}%)
-- BET-TR: {bettr_info.get('value', 'N/A')} ({bettr_info.get('change_percent', 0):+.2f}%)
-- BET-FI: {betfi_info.get('value', 'N/A')} ({betfi_info.get('change_percent', 0):+.2f}%)
-- BET-NG: {betng_info.get('value', 'N/A')} ({betng_info.get('change_percent', 0):+.2f}%)
+====== INDICII BVB (VALORI EXACTE) ======
+• BET: {bet_info.get('value', 'N/A')} puncte ({bet_info.get('change_percent', 0):+.2f}%)
+• BET-TR (Total Return): {bettr_info.get('value', 'N/A')} ({bettr_info.get('change_percent', 0):+.2f}%)
+• BET-FI (Financiar): {betfi_info.get('value', 'N/A')} ({betfi_info.get('change_percent', 0):+.2f}%)
+• BET-NG (Energie): {betng_info.get('value', 'N/A')} ({betng_info.get('change_percent', 0):+.2f}%)
+• BET-XT (Extended): {betxt_info.get('value', 'N/A')} ({betxt_info.get('change_percent', 0):+.2f}%)
+• BETAeRO: {betaero_info.get('value', 'N/A')} ({betaero_info.get('change_percent', 0):+.2f}%)
 
-STATISTICI ACȚIUNI:
-- Total acțiuni analizate: {market_data['total_stocks']}
-- Acțiuni în creștere: {market_data['sentiment']['positive']}
-- Acțiuni în scădere: {market_data['sentiment']['negative']}
+====== STATISTICI PIAȚĂ ======
+• Acțiuni analizate: {market_data['total_stocks']}
+• În creștere: {market_data['sentiment']['positive']}
+• În scădere: {market_data['sentiment']['negative']}
+• Nemodificate: {market_data['sentiment']['neutral']}
 
-TOP 3 CREȘTERI:
-"""
+====== TOP 3 CREȘTERI (CÂȘTIGĂTORI) ======"""
             for s in market_data['top_gainers']:
-                context += f"- {s.get('symbol')} ({s.get('name', '')}): {s.get('change_percent', 0):+.2f}% | {s.get('price', 0):.2f} RON\n"
+                context += f"\n• {s.get('symbol')} ({s.get('name', 'N/A')}): {s.get('change_percent', 0):+.2f}% → {s.get('price', 0):.4f} RON"
             
-            context += "\nTOP 3 SCĂDERI:\n"
+            context += "\n\n====== TOP 3 SCĂDERI (PERDANȚI) ======"
             for s in market_data['top_losers']:
-                context += f"- {s.get('symbol')} ({s.get('name', '')}): {s.get('change_percent', 0):+.2f}% | {s.get('price', 0):.2f} RON\n"
+                context += f"\n• {s.get('symbol')} ({s.get('name', 'N/A')}): {s.get('change_percent', 0):+.2f}% → {s.get('price', 0):.4f} RON"
             
-            context += "\nCEL MAI TRANZACȚIONATE (VOLUM):\n"
+            context += "\n\n====== CELE MAI LICHIDE ACȚIUNI (VOLUM) ======"
             for s in market_data['top_volume']:
                 vol = s.get('volume', 0)
-                vol_str = f"{vol/1000000:.1f}M" if vol >= 1000000 else f"{vol/1000:.0f}K"
-                context += f"- {s.get('symbol')}: {vol_str} acțiuni | {s.get('price', 0):.2f} RON\n"
+                vol_str = f"{vol:,.0f}".replace(',', '.') if vol else "0"
+                context += f"\n• {s.get('symbol')}: {vol_str} acțiuni tranzacționate → {s.get('price', 0):.4f} RON ({s.get('change_percent', 0):+.2f}%)"
             
-            system_prompt = """Ești un analist financiar profesionist care scrie rezumate de piață pentru investitori români.
+            context += f"""
 
-REGULI STRICTE:
-1. Scrie DOAR fapte verificabile din datele primite - NU specula și NU inventa cauze
-2. Folosește INDICELE BET ca referință principală, NU o medie calculată
-3. Menționează CIFRELE EXACTE pentru indici, prețuri, procente și volume
-4. NU scrie fraze ca "ar putea fi cauzat de", "posibil datorită", "probabil din cauza" - acestea sunt speculații
-5. NU da sfaturi de investiții sau predicții
+====== AVERTISMENT PENTRU AI ======
+FOLOSEȘTE DOAR DATELE DE MAI SUS!
+NU inventa cauze, NU specula, NU prezice.
+Dacă nu ai o informație, NU o menționa."""
+            
+            system_prompt = """Ești un analist financiar care redactează rezumate FACTUALE pentru Bursa de Valori București (BVB).
 
-STRUCTURĂ:
-- Început: "Indicele BET a închis la X puncte (±Y%)" 
-- Menționează diferențele între indici dacă sunt semnificative (ex: BET-FI în scădere vs BET în creștere)
-- Listează TOP performerii cu cifre exacte
-- Menționează volumul tranzacționat pentru SNP/TLV dacă e relevant
-- Încheie cu o frază neutră despre sesiunea de mâine
+REGULI OBLIGATORII - ÎNCĂLCAREA = REZUMAT INVALID:
 
-Lungime: 120-150 cuvinte. Ton: factual, profesionist."""
+❌ INTERZIS TOTAL:
+- NU inventa cauze/motive (ex: "din cauza tensiunilor geopolitice", "datorită rezultatelor financiare")
+- NU specula (ex: "ar putea", "probabil", "posibil")
+- NU da sfaturi sau predicții (ex: "se recomandă", "investitorii ar trebui")
+- NU scrie cifre pe care NU le ai în date (ex: capitalizare de piață, P/E ratio)
+- NU compara cu zilele anterioare dacă nu ai acele date
+
+✅ OBLIGATORIU:
+- Folosește DOAR cifrele exacte din datele primite
+- Indicele BET = referință principală (valoare + variație %)
+- Menționează TOȚI indicii (BET-TR, BET-FI, BET-NG) cu cifrele lor
+- Listează TOP 3 creșteri și scăderi cu % și preț
+- Menționează cel puțin o acțiune cu volum mare
+
+STRUCTURĂ FIXĂ:
+1. "Indicele BET a închis la [VALOARE] puncte ([±X.XX]%)."
+2. Ceilalți indici cu cifrele lor
+3. Acțiuni câștigătoare (simbol, %, preț)
+4. Acțiuni perdante (simbol, %, preț)
+5. Volum/lichiditate
+6. O frază neutră de încheiere (fără predicții)
+
+LUNGIME: 100-130 cuvinte. TON: factual, profesionist, fără emoție."""
 
             chat = LlmChat(
                 api_key=os.environ.get("EMERGENT_UNIVERSAL_KEY"),
