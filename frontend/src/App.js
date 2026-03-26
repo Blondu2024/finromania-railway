@@ -35,7 +35,9 @@ const EducationPage = lazy(() => import('./pages/EducationPage'));
 // Tools pages
 const CurrencyConverterPage = lazy(() => import('./pages/CurrencyConverterPage'));
 const DividendCalendarPage = lazy(() => import('./pages/DividendCalendarPage'));
+const DividendCalculatorPage = lazy(() => import('./pages/DividendCalculatorPage'));
 const StockScreenerPage = lazy(() => import('./pages/StockScreenerPage'));
+const ScreenerProPage = lazy(() => import('./pages/ScreenerProPage'));
 const GlossaryPage = lazy(() => import('./pages/GlossaryPage'));
 
 // Detail pages
@@ -205,8 +207,10 @@ function Navigation({ darkMode, toggleDarkMode }) {
   ];
 
   const instrumenteItems = [
-    { path: '/calendar', label: 'Dividende', icon: '🎯' },
-    { path: '/screener', label: 'Screener', icon: '🔍' },
+    { path: '/calendar', label: 'Calendar Dividende', icon: '📅' },
+    { path: '/calculator-dividende', label: 'Calculator Dividende', icon: '💰', badge: 'NOU' },
+    { path: '/screener', label: 'Screener Basic', icon: '🔍' },
+    { path: '/screener-pro', label: 'Screener PRO', icon: '👑', badge: 'PRO' },
     { path: '/converter', label: 'Convertor', icon: '💱' },
     { path: '/simulator-fiscal', label: 'Simulator Antreprenor', icon: '🏢' },
   ];
@@ -425,7 +429,9 @@ function AppRouter() {
         <Route path="/faq" element={<FAQPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/calendar" element={<DividendCalendarPage />} />
+        <Route path="/calculator-dividende" element={<DividendCalculatorPage />} />
         <Route path="/screener" element={<StockScreenerPage />} />
+        <Route path="/screener-pro" element={<ScreenerProPage />} />
         <Route path="/notifications" element={<NotificationSettingsPage />} />
         <Route path="/global" element={<GlobalMarketsPage />} />
         <Route path="/quiz/:level" element={<QuizPage />} />

@@ -7,28 +7,58 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - Frontend: React + Tailwind + Shadcn/UI
 - Backend: FastAPI + Python
 - Database: MongoDB
-- Auth: Firebase (Google Auth)
+- Auth: Google Auth (Emergent)
 - Payments: Stripe
 - Email: Resend
 - AI: OpenAI GPT (Emergent LLM Key)
-- Market Data: **EODHD (Paid Plan - $29/month, 100k requests/day)**
+- Market Data: **EODHD (Paid Plan - $100/month All-in-One, 300k requests/day)**
+- Indices: TradingView API (free)
+- Global Markets: Yahoo Finance
 
 ## What's Been Implemented
+
+### Core Features
 - Homepage with market ticker, hero section, feature cards
-- BVB stocks listing and detail pages
-- Global markets pages
-- Fiscal Calculator (PF vs PFA vs SRL)
-- Fiscal Simulator Antreprenor (2026 tax rules) - NEW
-- AI Assistant (FinRomania Assistant)
-- AI Technical Analysis (FAVORABIL/RISCANT terminology)
-- PRO subscription via Stripe
-- Early Adopter program (first 100 users, 3 months free PRO)
-- Admin dashboard with feedback management
-- News system (Romanian + international)
+- BVB stocks listing and detail pages with real-time data
+- Global markets pages with Yahoo Finance data
+- BVB Indices via TradingView (100% accurate)
+- News system (Romanian RSS + international)
 - In-app notifications for price alerts
-- Daily BVB summary email via Resend (backend complete)
 - Interactive onboarding tour
-- Trading School / Education section
+
+### PRO Features (NEW - March 26, 2026)
+- **Screener PRO** - Advanced stock screener with:
+  - RSI, MACD, Bollinger Bands, SMA/EMA (LIVE from EODHD)
+  - P/E, ROE, EPS, Dividend Yield (LIVE from EODHD)
+  - AI-powered Buy/Sell signals with scoring
+  - 6 preset strategies (Oversold Quality, Momentum, Dividend Hunters, etc.)
+  - Export to CSV
+- **Calculator Dividende** - Dividend calculator with:
+  - 15 BVB stocks with 2026 dividend estimates
+  - Portfolio builder with custom shares
+  - Tax calculation (16% withheld at source)
+  - 5-20 year projections with compound growth
+  - DRIP (dividend reinvestment) simulation
+- **Demo Login Endpoint** for automated testing (Playwright)
+
+### Fiscal Tools
+- Fiscal Calculator (PF vs PFA vs SRL) - Updated for 2026
+- Fiscal Simulator Antreprenor (multi-entity comparison)
+
+### AI Features
+- AI Assistant (FinRomania Assistant)
+- AI Technical Analysis (RSI, MACD, Support/Resistance)
+- Daily AI Summary (cached once/day)
+
+### Subscription & Auth
+- PRO subscription via Stripe (49 lei/month)
+- FREE PRO for ALL users until June 5, 2026
+- Google Auth integration
+
+### Admin Tools
+- Admin dashboard with feedback management
+- Bulk upgrade users to PRO button
+- Trading School / Education section with quizzes
 
 ## Completed Bug Fixes (This Session - March 2026)
 - [x] Fixed blue gradient overlay on homepage (HeroSection + InteractiveTour welcome screen) → bg-black solid
@@ -85,9 +115,16 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [ ] P2: Mobile responsiveness issues
 - [ ] P2: Slow page load times
 
+## Completed (March 26, 2026 Session)
+- [x] **Screener PRO** with LIVE technical indicators + fundamentals from EODHD
+- [x] **Calculator Dividende** with 2026 estimates and projections
+- [x] **Demo Login Endpoint** for automated testing (Playwright)
+- [x] Upgraded to EODHD All-in-One plan ($100/month) for full fundamentals access
+
 ## Upcoming Tasks
 - [ ] P1: Add "Subscribe to Daily Summary" UI checkbox in user settings
 - [ ] P1: Verify Resend domain (pending user DNS records)
+- [ ] P1: PRO Live Chat (community feature)
 - [ ] P2: Get expert feedback on Fiscal Simulator
 
 ## Future/Backlog
@@ -95,19 +132,22 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [ ] "3 Straturi" portfolio strategy feature
 - [ ] Expiration notification emails
 - [ ] Native mobile app
+- [ ] Heatmap BVB
+- [ ] Earnings Calendar
 
-## Key API Endpoints
-- POST /api/fiscal-simulator/simulate
-- GET /api/fiscal-simulator/praguri
-- POST /api/daily-summary/subscribe
-- POST /api/daily-summary/unsubscribe
-- GET /api/daily-summary/preview
-- POST /api/notifications/check-price-alerts
+## Key API Endpoints - NEW
+- GET /api/screener-pro/scan - Full BVB scan with technicals + fundamentals
+- POST /api/screener-pro/filter - Filter by RSI, MACD, P/E, etc.
+- GET /api/screener-pro/presets - 6 preset strategies
+- GET /api/dividend-calculator/stocks - All dividend-paying BVB stocks
+- POST /api/dividend-calculator/calculate - Calculate dividends for portfolio
+- GET /api/auth/demo-login?secret=xxx - Demo login for automated testing
 
-## Key Files
-- /app/frontend/src/pages/HomePage.jsx
-- /app/frontend/src/components/InteractiveTour.jsx
-- /app/backend/routes/fiscal_simulator_antreprenor.py
+## Key Files - NEW
+- /app/backend/routes/screener_pro.py - Screener PRO API
+- /app/backend/routes/dividend_calculator.py - Dividend Calculator API  
+- /app/frontend/src/pages/ScreenerProPage.jsx - Screener PRO UI
+- /app/frontend/src/pages/DividendCalculatorPage.jsx - Dividend Calculator UI
 - /app/frontend/src/pages/FiscalSimulatorPage.jsx
 - /app/backend/services/daily_summary_service.py
 - /app/backend/services/notification_service.py

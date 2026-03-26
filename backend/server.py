@@ -40,6 +40,8 @@ from routes.bvb_market import router as bvb_market_router
 from routes.smart_analysis import router as smart_analysis_router
 from routes.dividend_calendar import router as dividend_calendar_router
 from routes.stock_screener import router as stock_screener_router
+from routes.screener_pro import router as screener_pro_router
+from routes.dividend_calculator import router as dividend_calculator_router
 from routes.global_markets import router as global_markets_router
 from routes.push_notifications import router as push_notifications_router
 from routes.trading_companion import router as trading_companion_router
@@ -599,6 +601,8 @@ app.include_router(bvb_market_router)
 app.include_router(smart_analysis_router)
 app.include_router(dividend_calendar_router)
 app.include_router(stock_screener_router)
+app.include_router(screener_pro_router)  # Screener PRO cu indicatori LIVE
+app.include_router(dividend_calculator_router)  # Dividend Calculator PRO
 app.include_router(global_markets_router)
 app.include_router(push_notifications_router)
 app.include_router(trading_companion_router)

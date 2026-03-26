@@ -202,6 +202,84 @@ async def get_me(user: dict = Depends(require_auth)):
     """Get current user"""
     return user
 
+
+# Demo login for automated testing (Playwright, etc.)
+DEMO_SECRET = os.environ.get("DEMO_LOGIN_SECRET", "finromania-demo-2026")
+
+@router.get("/demo-login")
+async def demo_login(secret: str, response: Response):
+    """
+    Demo login endpoint for automated testing tools like Playwright.
+    Creates a valid session for a PRO user without going through Google OAuth.
+    
+    Usage: GET /api/auth/demo-login?secret=YOUR_SECRET
+    
+    Returns a session cookie that can be used for subsequent requests.
+    """
+    if secret != DEMO_SECRET:
+        raise HTTPException(status_code=403, detail="Invalid demo secret")
+    
+    db = await get_database()
+    
+    # Find or create demo user
+    demo_email = "demo@finromania.ro"
+    demo_user = await db.users.find_one({"email": demo_email}, {"_id": 0})
+    
+    if not demo_user:
+        # Create demo PRO user
+        demo_user_id = f"demo_{uuid.uuid4().hex[:12]}"
+        demo_user = {
+            "user_id": demo_user_id,
+            "email": demo_email,
+            "name": "Demo User (PRO)",
+            "picture": None,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "is_admin": False,
+            "subscription_level": "pro",
+            "subscription_expires_at": "2026-06-05T23:59:59Z",
+            "is_early_adopter": False,
+            "daily_summary_enabled": True
+        }
+        await db.users.insert_one(demo_user)
+        logger.info(f"Created demo PRO user: {demo_email}")
+    else:
+        demo_user_id = demo_user["user_id"]
+    
+    # Create session
+    session_token = f"demo_{uuid.uuid4().hex}"
+    session_data = {
+        "session_token": session_token,
+        "user_id": demo_user_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+    }
+    
+    await db.user_sessions.insert_one(session_data)
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        max_age=86400,  # 24 hours
+        path="/"
+    )
+    
+    logger.info(f"Demo login successful for automated testing")
+    
+    return {
+        "message": "Demo login successful",
+        "user": {
+            "email": demo_email,
+            "name": demo_user.get("name", "Demo User"),
+            "subscription_level": "pro"
+        },
+        "session_token": session_token,
+        "expires_in": "24 hours"
+    }
+
 @router.post("/logout")
 async def logout(request: Request, response: Response):
     """Logout user"""

@@ -1,0 +1,634 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  TrendingUp, TrendingDown, Activity, Filter, Zap, Target, Crown,
+  RefreshCw, ChevronDown, ChevronUp, Gem, Rocket, Coins, Trophy,
+  RotateCcw, ArrowUpDown, Eye, Download, BarChart3, PieChart
+} from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Skeleton } from '../components/ui/skeleton';
+import { Slider } from '../components/ui/slider';
+import { Switch } from '../components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../components/ui/tooltip';
+import { toast } from 'sonner';
+import SEO from '../components/SEO';
+import { useAuth } from '../context/AuthContext';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+// ============================================
+// SIGNAL BADGE COMPONENT
+// ============================================
+const SignalBadge = ({ signal, score }) => {
+  const configs = {
+    STRONG_BUY: { bg: 'bg-green-600', text: 'Cumpărare Puternică', icon: '🚀' },
+    BUY: { bg: 'bg-green-500', text: 'Cumpărare', icon: '📈' },
+    HOLD: { bg: 'bg-gray-500', text: 'Păstrare', icon: '⏸️' },
+    SELL: { bg: 'bg-orange-500', text: 'Vânzare', icon: '📉' },
+    STRONG_SELL: { bg: 'bg-red-600', text: 'Vânzare Puternică', icon: '🔻' },
+  };
+  
+  const config = configs[signal] || configs.HOLD;
+  
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <Badge className={`${config.bg} text-white font-bold px-2 py-1`}>
+            {config.icon} {config.text}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Scor: {score}/100</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+// ============================================
+// INDICATOR CELL COMPONENT
+// ============================================
+const IndicatorCell = ({ value, type, thresholds }) => {
+  if (value === null || value === undefined) {
+    return <span className="text-gray-400">-</span>;
+  }
+  
+  let color = 'text-gray-600';
+  let icon = null;
+  
+  if (type === 'rsi') {
+    if (value < 30) {
+      color = 'text-green-600 font-bold';
+      icon = <TrendingUp className="w-3 h-3 inline ml-1" />;
+    } else if (value > 70) {
+      color = 'text-red-600 font-bold';
+      icon = <TrendingDown className="w-3 h-3 inline ml-1" />;
+    }
+  } else if (type === 'pe') {
+    if (value > 0 && value < 10) {
+      color = 'text-green-600 font-bold';
+    } else if (value > 25) {
+      color = 'text-orange-500';
+    }
+  } else if (type === 'roe') {
+    if (value > 15) {
+      color = 'text-green-600 font-bold';
+    } else if (value < 5) {
+      color = 'text-red-500';
+    }
+  } else if (type === 'change') {
+    color = value >= 0 ? 'text-green-600' : 'text-red-600';
+  }
+  
+  return (
+    <span className={color}>
+      {typeof value === 'number' ? value.toFixed(type === 'macd' ? 4 : 2) : value}
+      {icon}
+    </span>
+  );
+};
+
+// ============================================
+// PRESET CARD COMPONENT
+// ============================================
+const PresetCard = ({ preset, onClick, isActive }) => {
+  const icons = {
+    gem: <Gem className="w-5 h-5" />,
+    rocket: <Rocket className="w-5 h-5" />,
+    coins: <Coins className="w-5 h-5" />,
+    target: <Target className="w-5 h-5" />,
+    trophy: <Trophy className="w-5 h-5" />,
+    refresh: <RotateCcw className="w-5 h-5" />,
+  };
+  
+  return (
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className={`cursor-pointer p-4 rounded-xl border-2 transition-all ${
+        isActive 
+          ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' 
+          : 'border-gray-200 hover:border-amber-300 dark:border-gray-700'
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+          isActive ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800'
+        }`}>
+          {icons[preset.icon] || <Filter className="w-5 h-5" />}
+        </div>
+        <div className="flex-1">
+          <p className="font-semibold">{preset.name}</p>
+          <p className="text-xs text-muted-foreground">{preset.description}</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// ============================================
+// SIGNAL SUMMARY COMPONENT
+// ============================================
+const SignalSummary = ({ summary }) => {
+  const signals = ['STRONG_BUY', 'BUY', 'HOLD', 'SELL', 'STRONG_SELL'];
+  const colors = {
+    STRONG_BUY: 'bg-green-600',
+    BUY: 'bg-green-400',
+    HOLD: 'bg-gray-400',
+    SELL: 'bg-orange-400',
+    STRONG_SELL: 'bg-red-600',
+  };
+  const labels = {
+    STRONG_BUY: 'Cumpărare Puternică',
+    BUY: 'Cumpărare',
+    HOLD: 'Păstrare',
+    SELL: 'Vânzare',
+    STRONG_SELL: 'Vânzare Puternică',
+  };
+  
+  return (
+    <div className="grid grid-cols-5 gap-2">
+      {signals.map(signal => (
+        <div key={signal} className="text-center">
+          <div className={`${colors[signal]} text-white rounded-lg p-3 mb-1`}>
+            <p className="text-2xl font-bold">{summary[signal]?.count || 0}</p>
+          </div>
+          <p className="text-xs text-muted-foreground">{labels[signal]}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
+export default function ScreenerProPage() {
+  const { user, token } = useAuth();
+  const [stocks, setStocks] = useState([]);
+  const [presets, setPresets] = useState([]);
+  const [signalSummary, setSignalSummary] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [scanTime, setScanTime] = useState(null);
+  const [activePreset, setActivePreset] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'signal_score', direction: 'desc' });
+  const [expandedStock, setExpandedStock] = useState(null);
+  
+  // Filters state
+  const [filters, setFilters] = useState({
+    min_rsi: null,
+    max_rsi: null,
+    macd_signal: null,
+    above_sma20: null,
+    min_pe: null,
+    max_pe: null,
+    min_roe: null,
+    signal_filter: null,
+  });
+  
+  const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
+  
+  // Fetch presets
+  useEffect(() => {
+    fetch(`${API_URL}/api/screener-pro/presets`)
+      .then(r => r.json())
+      .then(data => setPresets(data.presets || []))
+      .catch(console.error);
+  }, []);
+  
+  // Full scan
+  const runFullScan = useCallback(async () => {
+    if (!isPro) {
+      toast.error('Screener PRO necesită abonament PRO');
+      return;
+    }
+    
+    setLoading(true);
+    const startTime = Date.now();
+    
+    try {
+      const [scanRes, summaryRes] = await Promise.all([
+        fetch(`${API_URL}/api/screener-pro/scan`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`${API_URL}/api/screener-pro/signals/summary`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+      
+      if (scanRes.ok) {
+        const data = await scanRes.json();
+        setStocks(data.stocks || []);
+        setScanTime(((Date.now() - startTime) / 1000).toFixed(1));
+        toast.success(`Scanare completă: ${data.count} acțiuni analizate`);
+      } else {
+        const err = await scanRes.json();
+        toast.error(err.detail || 'Eroare la scanare');
+      }
+      
+      if (summaryRes.ok) {
+        const summaryData = await summaryRes.json();
+        setSignalSummary(summaryData.summary);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Eroare de conexiune');
+    } finally {
+      setLoading(false);
+      setActivePreset(null);
+    }
+  }, [token, isPro]);
+  
+  // Apply preset
+  const applyPreset = async (preset) => {
+    if (!isPro) {
+      toast.error('Screener PRO necesită abonament PRO');
+      return;
+    }
+    
+    setLoading(true);
+    setActivePreset(preset.id);
+    
+    try {
+      const res = await fetch(`${API_URL}/api/screener-pro/filter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(preset.filters)
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setStocks(data.stocks || []);
+        toast.success(`${preset.name}: ${data.count} acțiuni găsite`);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Eroare la filtrare');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Sort handler
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
+    }));
+  };
+  
+  // Sorted stocks
+  const sortedStocks = [...stocks].sort((a, b) => {
+    const aVal = a[sortConfig.key] ?? 0;
+    const bVal = b[sortConfig.key] ?? 0;
+    return sortConfig.direction === 'desc' ? bVal - aVal : aVal - bVal;
+  });
+  
+  // Export to CSV
+  const exportCSV = () => {
+    const headers = ['Simbol', 'Nume', 'Preț', 'Var%', 'RSI', 'MACD', 'P/E', 'ROE%', 'Semnal', 'Scor'];
+    const rows = sortedStocks.map(s => [
+      s.symbol,
+      s.name,
+      s.price,
+      s.change_percent,
+      s.rsi,
+      s.macd,
+      s.pe_ratio,
+      s.roe,
+      s.signal_text,
+      s.signal_score
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `screener_pro_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+  };
+  
+  // If not PRO, show upgrade prompt
+  if (!isPro) {
+    return (
+      <>
+        <SEO title="Screener PRO | FinRomania" />
+        <div className="max-w-4xl mx-auto py-12">
+          <Card className="border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
+            <CardContent className="p-8 text-center">
+              <Crown className="w-16 h-16 mx-auto text-amber-500 mb-4" />
+              <h1 className="text-3xl font-bold mb-4">Screener PRO</h1>
+              <p className="text-lg text-muted-foreground mb-6">
+                Analizează toate acțiunile BVB cu indicatori tehnici și fundamentale LIVE de la EODHD
+              </p>
+              <div className="grid md:grid-cols-3 gap-4 mb-8 text-left">
+                <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                  <BarChart3 className="w-8 h-8 text-blue-500 mb-2" />
+                  <h3 className="font-bold">Indicatori Tehnici</h3>
+                  <p className="text-sm text-muted-foreground">RSI, MACD, Bollinger, SMA/EMA - actualizați în timp real</p>
+                </div>
+                <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                  <PieChart className="w-8 h-8 text-green-500 mb-2" />
+                  <h3 className="font-bold">Fundamentale</h3>
+                  <p className="text-sm text-muted-foreground">P/E, ROE, EPS, Dividend Yield, Market Cap</p>
+                </div>
+                <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
+                  <Target className="w-8 h-8 text-purple-500 mb-2" />
+                  <h3 className="font-bold">Semnale AI</h3>
+                  <p className="text-sm text-muted-foreground">Strong Buy → Strong Sell bazat pe toți indicatorii</p>
+                </div>
+              </div>
+              <Link to="/pricing">
+                <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                  <Crown className="w-5 h-5 mr-2" />
+                  Upgrade la PRO - 49 lei/lună
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+  
+  return (
+    <>
+      <SEO title="Screener PRO | FinRomania" description="Analiză avansată BVB cu indicatori tehnici și fundamentale LIVE" />
+      
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Crown className="w-8 h-8 text-amber-500" />
+              Screener PRO
+              <Badge className="bg-amber-500 text-white">LIVE DATA</Badge>
+            </h1>
+            <p className="text-muted-foreground">
+              Indicatori tehnici + Fundamentale de la EODHD • Actualizat în timp real
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={runFullScan} disabled={loading} className="bg-gradient-to-r from-amber-500 to-orange-500">
+              {loading ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Zap className="w-4 h-4 mr-2" />
+              )}
+              Scanează Tot
+            </Button>
+            {stocks.length > 0 && (
+              <Button variant="outline" onClick={exportCSV}>
+                <Download className="w-4 h-4 mr-2" />
+                Export CSV
+              </Button>
+            )}
+          </div>
+        </div>
+        
+        {/* Signal Summary */}
+        {signalSummary && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Sumar Semnale BVB</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SignalSummary summary={signalSummary} />
+            </CardContent>
+          </Card>
+        )}
+        
+        {/* Presets */}
+        <div>
+          <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
+            <Filter className="w-5 h-5" />
+            Strategii Predefinite
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {presets.map(preset => (
+              <PresetCard
+                key={preset.id}
+                preset={preset}
+                isActive={activePreset === preset.id}
+                onClick={() => applyPreset(preset)}
+              />
+            ))}
+          </div>
+        </div>
+        
+        {/* Results */}
+        {loading ? (
+          <Card>
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center justify-center gap-4">
+                <RefreshCw className="w-12 h-12 text-amber-500 animate-spin" />
+                <p className="text-lg font-semibold">Se scanează toate acțiunile BVB...</p>
+                <p className="text-sm text-muted-foreground">Se încarcă RSI, MACD, P/E, ROE pentru fiecare acțiune</p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : stocks.length > 0 ? (
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle>
+                  Rezultate ({stocks.length} acțiuni)
+                  {scanTime && <span className="text-sm font-normal text-muted-foreground ml-2">în {scanTime}s</span>}
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/50">
+                    <tr>
+                      <th className="p-3 text-left">Acțiune</th>
+                      <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('price')}>
+                        Preț <ArrowUpDown className="w-3 h-3 inline" />
+                      </th>
+                      <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('change_percent')}>
+                        Var% <ArrowUpDown className="w-3 h-3 inline" />
+                      </th>
+                      <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('rsi')}>
+                        RSI <ArrowUpDown className="w-3 h-3 inline" />
+                      </th>
+                      <th className="p-3 text-right">MACD</th>
+                      <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('pe_ratio')}>
+                        P/E <ArrowUpDown className="w-3 h-3 inline" />
+                      </th>
+                      <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('roe')}>
+                        ROE% <ArrowUpDown className="w-3 h-3 inline" />
+                      </th>
+                      <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('signal_score')}>
+                        Semnal <ArrowUpDown className="w-3 h-3 inline" />
+                      </th>
+                      <th className="p-3 text-center">Detalii</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedStocks.map((stock, idx) => (
+                      <React.Fragment key={stock.symbol}>
+                        <motion.tr
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: idx * 0.02 }}
+                          className="border-b hover:bg-muted/30"
+                        >
+                          <td className="p-3">
+                            <Link to={`/stocks/bvb/${stock.symbol}`} className="font-bold text-blue-600 hover:underline">
+                              {stock.symbol}
+                            </Link>
+                            <p className="text-xs text-muted-foreground">{stock.name}</p>
+                          </td>
+                          <td className="p-3 text-right font-medium">{stock.price?.toFixed(2)} RON</td>
+                          <td className="p-3 text-right">
+                            <IndicatorCell value={stock.change_percent} type="change" />
+                          </td>
+                          <td className="p-3 text-right">
+                            <IndicatorCell value={stock.rsi} type="rsi" />
+                          </td>
+                          <td className="p-3 text-right">
+                            <IndicatorCell value={stock.macd} type="macd" />
+                          </td>
+                          <td className="p-3 text-right">
+                            <IndicatorCell value={stock.pe_ratio} type="pe" />
+                          </td>
+                          <td className="p-3 text-right">
+                            <IndicatorCell value={stock.roe} type="roe" />
+                          </td>
+                          <td className="p-3 text-right">
+                            <SignalBadge signal={stock.signal} score={stock.signal_score} />
+                          </td>
+                          <td className="p-3 text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setExpandedStock(expandedStock === stock.symbol ? null : stock.symbol)}
+                            >
+                              {expandedStock === stock.symbol ? <ChevronUp className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </Button>
+                          </td>
+                        </motion.tr>
+                        
+                        {/* Expanded Details */}
+                        <AnimatePresence>
+                          {expandedStock === stock.symbol && (
+                            <motion.tr
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                            >
+                              <td colSpan={9} className="p-4 bg-muted/20">
+                                <div className="grid md:grid-cols-3 gap-4">
+                                  {/* Technicals */}
+                                  <div className="space-y-2">
+                                    <h4 className="font-bold text-sm flex items-center gap-1">
+                                      <BarChart3 className="w-4 h-4" /> Indicatori Tehnici
+                                    </h4>
+                                    <div className="text-sm space-y-1">
+                                      <p>RSI(14): <span className="font-mono">{stock.rsi?.toFixed(2) || '-'}</span></p>
+                                      <p>MACD: <span className="font-mono">{stock.macd?.toFixed(4) || '-'}</span></p>
+                                      <p>MACD Signal: <span className="font-mono">{stock.macd_signal?.toFixed(4) || '-'}</span></p>
+                                      <p>SMA20: <span className="font-mono">{stock.sma20?.toFixed(2) || '-'}</span></p>
+                                      <p>SMA50: <span className="font-mono">{stock.sma50?.toFixed(2) || '-'}</span></p>
+                                      <p>BB Upper: <span className="font-mono">{stock.bb_upper?.toFixed(2) || '-'}</span></p>
+                                      <p>BB Lower: <span className="font-mono">{stock.bb_lower?.toFixed(2) || '-'}</span></p>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Fundamentals */}
+                                  <div className="space-y-2">
+                                    <h4 className="font-bold text-sm flex items-center gap-1">
+                                      <PieChart className="w-4 h-4" /> Fundamentale
+                                    </h4>
+                                    <div className="text-sm space-y-1">
+                                      <p>P/E Ratio: <span className="font-mono">{stock.pe_ratio?.toFixed(2) || '-'}</span></p>
+                                      <p>P/B Ratio: <span className="font-mono">{stock.pb_ratio?.toFixed(2) || '-'}</span></p>
+                                      <p>ROE: <span className="font-mono">{stock.roe?.toFixed(2) || '-'}%</span></p>
+                                      <p>EPS: <span className="font-mono">{stock.eps?.toFixed(2) || '-'}</span></p>
+                                      <p>Div Yield: <span className="font-mono">{stock.dividend_yield?.toFixed(2) || '-'}%</span></p>
+                                      <p>Market Cap: <span className="font-mono">{stock.market_cap ? (stock.market_cap/1e9).toFixed(2) + 'B' : '-'}</span></p>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Signal Reasons */}
+                                  <div className="space-y-2">
+                                    <h4 className="font-bold text-sm flex items-center gap-1">
+                                      <Target className="w-4 h-4" /> Motivele Semnalului
+                                    </h4>
+                                    <div className="space-y-1">
+                                      {stock.signal_reasons?.map((reason, i) => (
+                                        <div key={i} className="flex items-center gap-2 text-sm">
+                                          <Badge variant={reason[1] === 'bullish' ? 'default' : 'destructive'} className="text-xs">
+                                            {reason[1] === 'bullish' ? '↑' : '↓'}
+                                          </Badge>
+                                          <span>{reason[0]}</span>
+                                          <span className="text-muted-foreground text-xs">({reason[2]})</span>
+                                        </div>
+                                      ))}
+                                      {stock.warnings?.length > 0 && (
+                                        <div className="mt-2 text-orange-600 text-xs">
+                                          ⚠️ {stock.warnings.join(', ')}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                            </motion.tr>
+                          )}
+                        </AnimatePresence>
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="p-12 text-center">
+              <Activity className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Gata de Scanare</h3>
+              <p className="text-muted-foreground mb-4">
+                Click pe "Scanează Tot" sau alege o strategie predefinită
+              </p>
+              <Button onClick={runFullScan} className="bg-gradient-to-r from-amber-500 to-orange-500">
+                <Zap className="w-4 h-4 mr-2" />
+                Începe Scanarea
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+        
+        {/* Disclaimer */}
+        <p className="text-xs text-center text-muted-foreground">
+          ⚠️ Informațiile sunt furnizate doar în scop educativ și NU constituie sfaturi de investiții.
+          Indicatorii tehnici și semnalele sunt calculate automat și pot conține erori.
+        </p>
+      </div>
+    </>
+  );
+}
