@@ -9,21 +9,21 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/global", tags=["Global Markets"])
 cache = get_cache()
 
-# Global indices - EODHD symbols pentru real-time data
+# Global indices - EODHD symbols pentru LIVE real-time data (All-in-One plan)
 GLOBAL_INDICES = {
-    # US Markets - folosim ETF-uri pentru real-time (SPY = S&P 500, QQQ = NASDAQ, DIA = Dow)
-    "SPY.US": {"name": "S&P 500", "country": "USA", "flag": "🇺🇸", "category": "indices"},
-    "QQQ.US": {"name": "NASDAQ", "country": "USA", "flag": "🇺🇸", "category": "indices"},
-    "DIA.US": {"name": "Dow Jones", "country": "USA", "flag": "🇺🇸", "category": "indices"},
+    # US Markets - Indici reali cu EODHD
+    "GSPC.INDX": {"name": "S&P 500", "country": "USA", "flag": "🇺🇸", "category": "indices"},
+    "NDX.INDX": {"name": "NASDAQ 100", "country": "USA", "flag": "🇺🇸", "category": "indices"},
+    "DJI.INDX": {"name": "Dow Jones", "country": "USA", "flag": "🇺🇸", "category": "indices"},
     
     # European Markets
-    "EWG.US": {"name": "DAX (Germany ETF)", "country": "Germania", "flag": "🇩🇪", "category": "indices"},
-    "EWU.US": {"name": "FTSE 100 (UK ETF)", "country": "UK", "flag": "🇬🇧", "category": "indices"},
-    "EWQ.US": {"name": "CAC 40 (France ETF)", "country": "Franța", "flag": "🇫🇷", "category": "indices"},
+    "GDAXI.INDX": {"name": "DAX", "country": "Germania", "flag": "🇩🇪", "category": "indices"},
+    "FTSE.INDX": {"name": "FTSE 100", "country": "UK", "flag": "🇬🇧", "category": "indices"},
+    "FCHI.INDX": {"name": "CAC 40", "country": "Franța", "flag": "🇫🇷", "category": "indices"},
     
     # Asian Markets  
-    "EWJ.US": {"name": "Nikkei 225 (Japan ETF)", "country": "Japonia", "flag": "🇯🇵", "category": "indices"},
-    "EWH.US": {"name": "Hang Seng (HK ETF)", "country": "Hong Kong", "flag": "🇭🇰", "category": "indices"},
+    "N225.INDX": {"name": "Nikkei 225", "country": "Japonia", "flag": "🇯🇵", "category": "indices"},
+    "HSI.INDX": {"name": "Hang Seng", "country": "Hong Kong", "flag": "🇭🇰", "category": "indices"},
 }
 
 COMMODITIES = {
@@ -44,10 +44,26 @@ CRYPTO = {
 }
 
 FOREX = {
-    "EURUSD=X": {"name": "EUR/USD", "flag": "🇪🇺/🇺🇸", "category": "forex", "use_yfinance": True},
-    "GBPUSD=X": {"name": "GBP/USD", "flag": "🇬🇧/🇺🇸", "category": "forex", "use_yfinance": True},
-    "USDJPY=X": {"name": "USD/JPY", "flag": "🇺🇸/🇯🇵", "category": "forex", "use_yfinance": True},
-    "USDCHF=X": {"name": "USD/CHF", "flag": "🇺🇸/🇨🇭", "category": "forex", "use_yfinance": True},
+    "EURUSD.FOREX": {"name": "EUR/USD", "flag": "🇪🇺/🇺🇸", "category": "forex"},
+    "GBPUSD.FOREX": {"name": "GBP/USD", "flag": "🇬🇧/🇺🇸", "category": "forex"},
+    "USDJPY.FOREX": {"name": "USD/JPY", "flag": "🇺🇸/🇯🇵", "category": "forex"},
+    "USDCHF.FOREX": {"name": "USD/CHF", "flag": "🇺🇸/🇨🇭", "category": "forex"},
+    "USDRON.FOREX": {"name": "USD/RON", "flag": "🇺🇸/🇷🇴", "category": "forex"},
+    "EURRON.FOREX": {"name": "EUR/RON", "flag": "🇪🇺/🇷🇴", "category": "forex"},
+}
+
+# Popular Global Stocks - LIVE cu EODHD
+GLOBAL_STOCKS = {
+    "AAPL.US": {"name": "Apple", "country": "USA", "flag": "🇺🇸", "category": "tech"},
+    "MSFT.US": {"name": "Microsoft", "country": "USA", "flag": "🇺🇸", "category": "tech"},
+    "GOOGL.US": {"name": "Alphabet (Google)", "country": "USA", "flag": "🇺🇸", "category": "tech"},
+    "AMZN.US": {"name": "Amazon", "country": "USA", "flag": "🇺🇸", "category": "tech"},
+    "NVDA.US": {"name": "NVIDIA", "country": "USA", "flag": "🇺🇸", "category": "tech"},
+    "META.US": {"name": "Meta (Facebook)", "country": "USA", "flag": "🇺🇸", "category": "tech"},
+    "TSLA.US": {"name": "Tesla", "country": "USA", "flag": "🇺🇸", "category": "auto"},
+    "JPM.US": {"name": "JPMorgan Chase", "country": "USA", "flag": "🇺🇸", "category": "finance"},
+    "V.US": {"name": "Visa", "country": "USA", "flag": "🇺🇸", "category": "finance"},
+    "XOM.US": {"name": "Exxon Mobil", "country": "USA", "flag": "🇺🇸", "category": "energy"},
 }
 
 
@@ -100,7 +116,7 @@ async def fetch_ticker_data(symbol: str, info: dict) -> dict:
 
 
 async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
-    """Fetch data from EODHD API (EOD+Intraday $29.99/month) - 15min delay"""
+    """Fetch LIVE data from EODHD API (All-in-One $100/month plan - REAL-TIME!)"""
     import httpx
     import os
     
@@ -110,7 +126,7 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
         return None
     
     try:
-        # EODHD real-time endpoint (15min delayed for $29.99 plan)
+        # EODHD real-time endpoint - LIVE cu planul All-in-One!
         url = f"https://eodhd.com/api/real-time/{symbol}"
         params = {"api_token": api_key, "fmt": "json"}
         
@@ -125,6 +141,10 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
         prev_close = float(data.get("previousClose", current_price))
         change = float(data.get("change", 0))
         change_percent = float(data.get("change_p", 0))
+        high = float(data.get("high", current_price))
+        low = float(data.get("low", current_price))
+        volume = int(data.get("volume", 0))
+        timestamp = data.get("timestamp", 0)
         
         return {
             "symbol": symbol,
@@ -137,10 +157,14 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
             "change": round(change, 2),
             "change_percent": round(change_percent, 2),
             "prev_close": round(prev_close, 2),
-            "sparkline": [],  # Optional: can add intraday sparkline
+            "high": round(high, 2),
+            "low": round(low, 2),
+            "volume": volume,
+            "sparkline": [],
             "is_positive": bool(change_percent >= 0),
-            "last_update": datetime.fromtimestamp(data.get("timestamp", 0)).isoformat(),
-            "source": "eodhd_15min_delay"
+            "last_update": datetime.fromtimestamp(timestamp).isoformat() if timestamp else datetime.now(timezone.utc).isoformat(),
+            "source": "eodhd_live",
+            "is_live": True
         }
     except Exception as e:
         logger.error(f"EODHD error for {symbol}: {e}")
@@ -215,21 +239,47 @@ async def get_crypto():
 
 @router.get("/forex")
 async def get_forex():
-    """Get forex rates"""
+    """Get forex rates - LIVE cu EODHD"""
     try:
         results = []
         for symbol, info in FOREX.items():
-            data = await fetch_ticker_data(symbol, info)
+            data = await fetch_ticker_data_eodhd(symbol, info)
             if data:
                 results.append(data)
         
         return {
             "forex": results,
             "count": len(results),
+            "is_live": True,
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
     except Exception as e:
         logger.error(f"Error fetching forex: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/stocks")
+async def get_global_stocks():
+    """Get popular global stocks - LIVE cu EODHD All-in-One plan"""
+    try:
+        results = []
+        for symbol, info in GLOBAL_STOCKS.items():
+            data = await fetch_ticker_data_eodhd(symbol, info)
+            if data:
+                results.append(data)
+        
+        # Sort by market cap or change
+        results.sort(key=lambda x: x["change_percent"], reverse=True)
+        
+        return {
+            "stocks": results,
+            "count": len(results),
+            "is_live": True,
+            "source": "EODHD All-in-One",
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error fetching global stocks: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -245,8 +295,9 @@ async def get_global_overview(response: Response):
         logger.info("Fetching LIVE global market data (no cache)...")
         all_assets = {}
         
-        # Fetch all categories - EODHD pentru US, yfinance pentru crypto
-        for symbol, info in {**GLOBAL_INDICES, **COMMODITIES, **CRYPTO, **FOREX}.items():
+        # Fetch all categories - EODHD pentru tot (All-in-One plan), yfinance pentru crypto
+        all_symbols = {**GLOBAL_INDICES, **GLOBAL_STOCKS, **COMMODITIES, **CRYPTO, **FOREX}
+        for symbol, info in all_symbols.items():
             # Folosește yfinance pentru crypto (EODHD nu are)
             if info.get("use_yfinance"):
                 data = await fetch_ticker_yfinance(symbol, info)
@@ -278,6 +329,7 @@ async def get_global_overview(response: Response):
         
         result = {
             "indices": all_assets.get("indices", []),
+            "stocks": all_assets.get("tech", []) + all_assets.get("finance", []) + all_assets.get("energy", []) + all_assets.get("auto", []),
             "commodities": all_assets.get("commodities", []),
             "crypto": all_assets.get("crypto", []),
             "forex": all_assets.get("forex", []),
@@ -288,6 +340,8 @@ async def get_global_overview(response: Response):
                 "status": "bullish" if avg_change > 0 else "bearish"
             },
             "market_status": market_status,
+            "is_live": True,
+            "source": "EODHD All-in-One",
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
