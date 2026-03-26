@@ -28,10 +28,22 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState('1mo');
+  const [period, setPeriod] = useState('1d');
+  const [interval, setInterval] = useState('15m');
   const [chartInfo, setChartInfo] = useState(null);
 
+  // Intraday intervals pentru EODHD LIVE
+  const intervals = [
+    { value: '1m', label: '1 min', requiresPeriod: '1d' },
+    { value: '5m', label: '5 min', requiresPeriod: '1d' },
+    { value: '15m', label: '15 min', requiresPeriod: '1d' },
+    { value: '30m', label: '30 min', requiresPeriod: '5d' },
+    { value: '1h', label: '1 oră', requiresPeriod: '5d' },
+    { value: '1d', label: '1 zi', requiresPeriod: '1mo' },
+  ];
+
   const periods = [
+    { value: '1d', label: '1 Zi' },
     { value: '5d', label: '5 Zile' },
     { value: '1mo', label: '1 Lună' },
     { value: '3mo', label: '3 Luni' },
@@ -43,7 +55,7 @@ const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
     const fetchChart = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API_URL}/api/global/chart/${encodeURIComponent(asset.symbol)}?period=${period}`);
+        const res = await fetch(`${API_URL}/api/global/chart/${encodeURIComponent(asset.symbol)}?period=${period}&interval=${interval}`);
         if (res.ok) {
           const data = await res.json();
           setChartData(data.data || []);
@@ -59,7 +71,7 @@ const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
     if (asset?.symbol) {
       fetchChart();
     }
-  }, [asset?.symbol, period]);
+  }, [asset?.symbol, period, interval]);
 
   if (!asset) return null;
 

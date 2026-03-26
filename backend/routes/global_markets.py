@@ -355,18 +355,163 @@ async def get_global_overview(response: Response):
 
 
 @router.get("/chart/{symbol}")
-async def get_asset_chart(symbol: str, period: str = "1mo"):
-    """Get historical chart data for an asset"""
+async def get_asset_chart(
+    symbol: str, 
+    period: str = "1mo",
+    interval: str = "1d"
+):
+    """
+    Get historical/intraday chart data for an asset
+    
+    EODHD Intraday intervals: 1m, 5m, 15m, 30m, 1h
+    EOD periods: 1d, 5d, 1mo, 3mo, 6mo, 1y, 5y
+    """
+    import httpx
+    import os
+    from datetime import datetime, timedelta
+    
+    api_key = os.environ.get("EODHD_API_KEY")
+    
+    # Map period to EODHD format
+    period_days = {
+        "1d": 1,
+        "5d": 5,
+        "1mo": 30,
+        "3mo": 90,
+        "6mo": 180,
+        "1y": 365,
+        "5y": 1825
+    }
+    
+    # Intraday intervals supported by EODHD
+    intraday_intervals = ["1m", "5m", "15m", "30m", "1h"]
+    
     try:
-        ticker = yf.Ticker(symbol)
-        hist = ticker.history(period=period)
+        # Convert symbol format if needed (e.g., GSPC.INDX -> ^GSPC for yfinance fallback)
+        eodhd_symbol = symbol
+        
+        # Determine if we need intraday data
+        use_intraday = interval in intraday_intervals
+        
+        async with httpx.AsyncClient() as client:
+            if use_intraday:
+                # Use EODHD Intraday API (LIVE with $100 plan!)
+                url = f"https://eodhd.com/api/intraday/{eodhd_symbol}"
+                params = {
+                    "api_token": api_key,
+                    "fmt": "json",
+                    "interval": interval
+                }
+                
+                # Calculate date range - EODHD needs UNIX timestamp!
+                days = period_days.get(period, 30)
+                from_timestamp = int((datetime.now() - timedelta(days=days)).timestamp())
+                params["from"] = from_timestamp
+                
+                logger.info(f"Fetching EODHD intraday for {eodhd_symbol}, interval={interval}, from_ts={from_timestamp}")
+                
+                response = await client.get(url, params=params, timeout=30)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if not data:
+                        raise HTTPException(status_code=404, detail=f"No intraday data for {symbol}")
+                    
+                    chart_data = [
+                        {
+                            "date": item.get("datetime") or item.get("date"),
+                            "timestamp": item.get("timestamp"),
+                            "open": float(item.get("open") or 0),
+                            "high": float(item.get("high") or 0),
+                            "low": float(item.get("low") or 0),
+                            "close": float(item.get("close") or 0),
+                            "volume": int(item.get("volume") or 0)
+                        }
+                        for item in data
+                        if item.get("close") is not None
+                    ]
+                    
+                    # Get asset info
+                    all_assets = {**GLOBAL_INDICES, **GLOBAL_STOCKS, **COMMODITIES, **CRYPTO, **FOREX}
+                    asset_info = all_assets.get(symbol, {"name": symbol, "flag": "📊"})
+                    
+                    return {
+                        "symbol": symbol,
+                        "name": asset_info.get("name", symbol),
+                        "flag": asset_info.get("flag", "📊"),
+                        "period": period,
+                        "interval": interval,
+                        "data": chart_data,
+                        "data_points": len(chart_data),
+                        "current_price": chart_data[-1]["close"] if chart_data else None,
+                        "period_change": round(
+                            ((chart_data[-1]["close"] - chart_data[0]["close"]) / chart_data[0]["close"]) * 100, 2
+                        ) if chart_data and chart_data[0]["close"] > 0 else 0,
+                        "source": "eodhd_intraday",
+                        "is_live": True
+                    }
+                else:
+                    logger.warning(f"EODHD intraday failed for {symbol}: {response.status_code}")
+            
+            # Fallback to EOD data or use yfinance
+            # Try EODHD EOD first
+            url = f"https://eodhd.com/api/eod/{eodhd_symbol}"
+            days = period_days.get(period, 30)
+            from_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+            params = {
+                "api_token": api_key,
+                "fmt": "json",
+                "from": from_date
+            }
+            
+            response = await client.get(url, params=params, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if data:
+                    chart_data = [
+                        {
+                            "date": item.get("date"),
+                            "open": float(item.get("open", 0)),
+                            "high": float(item.get("high", 0)),
+                            "low": float(item.get("low", 0)),
+                            "close": float(item.get("close", 0)),
+                            "volume": int(item.get("volume", 0))
+                        }
+                        for item in data
+                    ]
+                    
+                    all_assets = {**GLOBAL_INDICES, **GLOBAL_STOCKS, **COMMODITIES, **CRYPTO, **FOREX}
+                    asset_info = all_assets.get(symbol, {"name": symbol, "flag": "📊"})
+                    
+                    return {
+                        "symbol": symbol,
+                        "name": asset_info.get("name", symbol),
+                        "flag": asset_info.get("flag", "📊"),
+                        "period": period,
+                        "interval": "1d",
+                        "data": chart_data,
+                        "data_points": len(chart_data),
+                        "current_price": chart_data[-1]["close"] if chart_data else None,
+                        "period_change": round(
+                            ((chart_data[-1]["close"] - chart_data[0]["close"]) / chart_data[0]["close"]) * 100, 2
+                        ) if chart_data and chart_data[0]["close"] > 0 else 0,
+                        "source": "eodhd_eod",
+                        "is_live": False
+                    }
+        
+        # Final fallback to yfinance
+        ticker = yf.Ticker(symbol.replace(".US", "").replace(".INDX", ""))
+        hist = ticker.history(period=period, interval=interval if interval != "1d" else None)
         
         if hist.empty:
             raise HTTPException(status_code=404, detail=f"No data for {symbol}")
         
         chart_data = [
             {
-                "date": index.strftime("%Y-%m-%d"),
+                "date": index.strftime("%Y-%m-%d %H:%M:%S") if interval in intraday_intervals else index.strftime("%Y-%m-%d"),
                 "open": float(round(row["Open"], 2)),
                 "high": float(round(row["High"], 2)),
                 "low": float(round(row["Low"], 2)),
@@ -376,8 +521,7 @@ async def get_asset_chart(symbol: str, period: str = "1mo"):
             for index, row in hist.iterrows()
         ]
         
-        # Get asset info
-        all_assets = {**GLOBAL_INDICES, **COMMODITIES, **CRYPTO, **FOREX}
+        all_assets = {**GLOBAL_INDICES, **GLOBAL_STOCKS, **COMMODITIES, **CRYPTO, **FOREX}
         asset_info = all_assets.get(symbol, {"name": symbol, "flag": "📊"})
         
         return {
@@ -385,14 +529,20 @@ async def get_asset_chart(symbol: str, period: str = "1mo"):
             "name": asset_info.get("name", symbol),
             "flag": asset_info.get("flag", "📊"),
             "period": period,
+            "interval": interval,
             "data": chart_data,
+            "data_points": len(chart_data),
             "current_price": chart_data[-1]["close"] if chart_data else None,
             "period_change": round(
                 ((chart_data[-1]["close"] - chart_data[0]["close"]) / chart_data[0]["close"]) * 100, 2
-            ) if chart_data else 0
+            ) if chart_data and chart_data[0]["close"] > 0 else 0,
+            "source": "yfinance",
+            "is_live": False
         }
+        
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error fetching chart for {symbol}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+

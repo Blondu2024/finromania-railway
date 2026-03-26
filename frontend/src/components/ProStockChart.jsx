@@ -109,16 +109,16 @@ export default function ProStockChart({ symbol, type = 'bvb', isPro = false, tok
     try {
       let url;
       if (intv && isPro) {
-        // Intraday data (PRO only) - EODHD API
+        // Intraday data (PRO only) - EODHD API cu interval
         url = type === 'bvb'
           ? `${API_URL}/api/bvb/intraday/${encodeURIComponent(symbol)}?interval=${intv}`
-          : `${API_URL}/api/data/intraday/global/${encodeURIComponent(symbol)}?interval=${intv}`;
+          : `${API_URL}/api/global/chart/${encodeURIComponent(symbol)}?period=5d&interval=${intv}`;
       } else {
         // Daily/historical data
         const mappedPeriod = mapPeriodToYFinance(tf);
         url = type === 'bvb'
           ? `${API_URL}/api/bvb/chart/${encodeURIComponent(symbol)}?period=${mappedPeriod}`
-          : `${API_URL}/api/global/chart/${encodeURIComponent(symbol)}?period=${mappedPeriod}`;
+          : `${API_URL}/api/global/chart/${encodeURIComponent(symbol)}?period=${mappedPeriod}&interval=1d`;
       }
       
       const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
