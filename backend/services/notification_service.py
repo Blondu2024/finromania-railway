@@ -2,10 +2,15 @@
 from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Optional
 import logging
+import os
+import resend
 from config.database import get_database
 import uuid
 
 logger = logging.getLogger(__name__)
+
+# Configure Resend for notifications
+resend.api_key = os.environ.get("RESEND_API_KEY")
 
 
 class NotificationService:
@@ -369,7 +374,7 @@ class NotificationService:
         current_price: float,
         stock_name: str = None
     ) -> dict:
-        """Creează notificare pentru alertă de preț"""
+        """Creează notificare pentru alertă de preț și trimite email"""
         db = await get_database()
         
         notification_type = f"price_alert_{alert_type}"
@@ -411,7 +416,117 @@ class NotificationService:
         await db.notifications.insert_one(notification)
         logger.info(f"Created price alert notification for {user_id}: {symbol} {alert_type} {target_price}")
         
+        # Trimite email pentru alertă de preț
+        await self.send_price_alert_email(user_id, symbol, stock_name, alert_type, target_price, current_price)
+        
         return notification
+    
+    async def send_price_alert_email(
+        self,
+        user_id: str,
+        symbol: str,
+        stock_name: str,
+        alert_type: str,
+        target_price: float,
+        current_price: float
+    ) -> bool:
+        """Trimite email pentru alertă de preț"""
+        db = await get_database()
+        
+        try:
+            # Obține datele utilizatorului
+            user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "email": 1, "name": 1})
+            if not user or not user.get("email"):
+                logger.warning(f"User {user_id} has no email for price alert")
+                return False
+            
+            email = user.get("email")
+            name = user.get("name", "Investitor")
+            
+            # Determină culoarea și iconița
+            is_above = alert_type == "above"
+            color = "#16a34a" if is_above else "#dc2626"
+            icon = "📈" if is_above else "📉"
+            direction = "a crescut la" if is_above else "a scăzut la"
+            threshold = "peste" if is_above else "sub"
+            
+            html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
+    <div style="max-width: 500px; margin: 0 auto; background-color: #ffffff;">
+        <!-- Header -->
+        <div style="background: {color}; padding: 25px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">{icon} Alertă de Preț</h1>
+        </div>
+        
+        <!-- Content -->
+        <div style="padding: 25px;">
+            <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">
+                Salut{' ' + name if name else ''},
+            </p>
+            
+            <div style="background: #f8fafc; border-left: 4px solid {color}; padding: 20px; margin: 20px 0;">
+                <h2 style="margin: 0 0 10px 0; color: #1e3a5f; font-size: 20px;">
+                    {symbol} {direction} {current_price:.2f} RON
+                </h2>
+                <p style="margin: 0; color: #64748b; font-size: 14px;">
+                    {stock_name or symbol}
+                </p>
+                <p style="margin: 15px 0 0 0; color: #64748b; font-size: 14px;">
+                    Ai setat o alertă pentru când prețul ajunge {threshold} <strong>{target_price:.2f} RON</strong>.
+                </p>
+            </div>
+            
+            <a href="https://finromania.ro/stocks/bvb/{symbol}" 
+               style="display: block; background: {color}; color: #ffffff; text-decoration: none; 
+                      padding: 15px 25px; border-radius: 8px; font-weight: bold; text-align: center; margin: 25px 0;">
+                Vezi Detalii {symbol} →
+            </a>
+            
+            <p style="font-size: 12px; color: #94a3b8; margin: 20px 0 0 0; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                ⚠️ Această alertă a fost declanșată o singură dată. Pentru a primi din nou notificări, 
+                actualizează alerta din watchlist.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background: #1e3a5f; padding: 15px; text-align: center;">
+            <p style="margin: 0; color: #a0c4e8; font-size: 12px;">
+                <a href="https://finromania.ro" style="color: #60a5fa;">FinRomania.ro</a> • 
+                Informații educative, NU sfaturi de investiții
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+            
+            params = {
+                "from": "FinRomania <noreply@finromania.ro>",
+                "to": [email],
+                "subject": f"{icon} Alertă: {symbol} {direction} {current_price:.2f} RON",
+                "html": html
+            }
+            
+            result = resend.Emails.send(params)
+            logger.info(f"Price alert email sent to {email} for {symbol}: {result}")
+            
+            # Marchează notificarea ca email trimis
+            await db.notifications.update_one(
+                {"user_id": user_id, "custom_data.alert_key": f"price_alert_{alert_type}_{symbol}_{target_price}"},
+                {"$set": {"email_sent": True}}
+            )
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error sending price alert email: {e}")
+            return False
 
 
 notification_service = NotificationService()

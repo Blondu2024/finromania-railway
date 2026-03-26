@@ -186,10 +186,10 @@ def start_scheduler():
             replace_existing=True
         )
         
-        # Job 8: Send daily summary email (daily at 18:10 Bucharest time - after market close)
+        # Job 8: Send daily summary email (daily at 18:05 Bucharest time - right after market close at 18:00)
         scheduler.add_job(
             send_daily_summary_job,
-            trigger=CronTrigger(hour=18, minute=10, timezone='Europe/Bucharest'),
+            trigger=CronTrigger(hour=18, minute=5, timezone='Europe/Bucharest'),
             id='send_daily_summary',
             name='Send Daily Market Summary',
             replace_existing=True
@@ -205,7 +205,7 @@ def start_scheduler():
         logger.info(f"   • Currency rates: every {settings.CURRENCY_UPDATE_INTERVAL_HOURS} hour")
         logger.info(f"   • Subscription expirations: daily at 9:00 AM")
         logger.info(f"   • Price alerts: every 5 min")
-        logger.info(f"   • Daily summary email: daily at 18:10 (Europe/Bucharest)")
+        logger.info(f"   • Daily summary email: daily at 18:05 (Europe/Bucharest)")
         
         # Run all jobs once immediately
         asyncio.create_task(update_bvb_stocks_job())

@@ -617,10 +617,10 @@ Cea mai mare lichiditate a fost pe {top_vol.get('symbol')}, cu un volum de {vol_
             return False
     
     async def send_to_all_subscribers(self) -> Dict:
-        """Trimite rezumatul zilnic la toți userii abonați (max 95/zi pt Resend free)"""
+        """Trimite rezumatul zilnic la toți userii abonați (plan Resend $20 = 10k/lună)"""
         db = await get_database()
         results = {"sent": 0, "failed": 0, "skipped": 0, "limit_reached": False}
-        DAILY_LIMIT = 95  # Resend free = 100/zi, lăsăm 5 pentru test emails
+        DAILY_LIMIT = 500  # Plan $20 Resend = 10k/lună, ~330/zi - lăsăm buffer pentru alerte
         
         try:
             subscribers = await db.users.find({

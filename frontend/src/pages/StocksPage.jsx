@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   TrendingUp, TrendingDown, RefreshCw, Search, ArrowUpDown, BarChart3, 
   Flame, Activity, Building2, Clock, Zap, Eye, Target, AlertTriangle,
-  ChevronRight, Sparkles, Gauge, Timer, ArrowRight
+  ChevronRight, Sparkles, Gauge, Timer, ArrowRight, Filter, GitCompare, X
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -12,8 +12,10 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Skeleton } from '../components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import SEO from '../components/SEO';
 import TradingCompanion from '../components/TradingCompanion';
+import StockCompare from '../components/StockCompare';
 import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -568,6 +570,9 @@ export default function StocksPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'change_percent', direction: 'desc' });
+  const [selectedSector, setSelectedSector] = useState('all');
+  const [showCompare, setShowCompare] = useState(false);
+  const [compareSymbols, setCompareSymbols] = useState([]);
   
   // Check subscription for delay badge și refresh rate
   const [subscriptionLevel, setSubscriptionLevel] = useState('free');
@@ -659,11 +664,28 @@ export default function StocksPage() {
     }));
   };
 
+  // Get unique sectors for filter
+  const uniqueSectors = useMemo(() => {
+    const sectorSet = new Set(stocks.map(s => s.sector).filter(Boolean));
+    return ['all', ...Array.from(sectorSet).sort()];
+  }, [stocks]);
+
+  // Add to compare
+  const toggleCompare = (symbol) => {
+    if (compareSymbols.includes(symbol)) {
+      setCompareSymbols(compareSymbols.filter(s => s !== symbol));
+    } else if (compareSymbols.length < 4) {
+      setCompareSymbols([...compareSymbols, symbol]);
+    }
+  };
+
   const filteredStocks = stocks
-    .filter(stock => 
-      stock.symbol?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      stock.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter(stock => {
+      const matchesSearch = stock.symbol?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        stock.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSector = selectedSector === 'all' || stock.sector === selectedSector;
+      return matchesSearch && matchesSector;
+    })
     .sort((a, b) => {
       const aVal = a[sortConfig.key] || 0;
       const bVal = b[sortConfig.key] || 0;
@@ -810,6 +832,26 @@ export default function StocksPage() {
           </motion.div>
         </div>
 
+        {/* Stock Compare Modal */}
+        {showCompare && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+            onClick={() => setShowCompare(false)}
+          >
+            <div className="max-w-4xl w-full max-h-[80vh] overflow-auto" onClick={e => e.stopPropagation()}>
+              <StockCompare 
+                initialSymbols={compareSymbols} 
+                onClose={() => {
+                  setShowCompare(false);
+                  setCompareSymbols([]);
+                }} 
+              />
+            </div>
+          </motion.div>
+        )}
+
         {/* All Stocks Table */}
         <Card>
           <CardHeader>
@@ -818,21 +860,76 @@ export default function StocksPage() {
                 <BarChart3 className="w-5 h-5" />
                 Toate Acțiunile BVB ({filteredStocks.length})
               </CardTitle>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Caută acțiune..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64"
-                />
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Sector Filter */}
+                <Select value={selectedSector} onValueChange={setSelectedSector}>
+                  <SelectTrigger className="w-[180px]" data-testid="sector-filter">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue placeholder="Toate Sectoarele" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {uniqueSectors.map(sector => (
+                      <SelectItem key={sector} value={sector}>
+                        {sector === 'all' ? 'Toate Sectoarele' : sector}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {/* Compare Button */}
+                <Button 
+                  variant={compareSymbols.length > 0 ? "default" : "outline"}
+                  onClick={() => compareSymbols.length >= 2 ? setShowCompare(true) : null}
+                  disabled={compareSymbols.length < 2}
+                  className="gap-2"
+                  data-testid="compare-stocks-btn"
+                >
+                  <GitCompare className="w-4 h-4" />
+                  Compară ({compareSymbols.length}/4)
+                </Button>
+
+                {compareSymbols.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => setCompareSymbols([])}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+
+                {/* Search */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Caută acțiune..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 w-64"
+                    data-testid="stock-search-input"
+                  />
+                </div>
               </div>
             </div>
+            
+            {/* Selected for comparison */}
+            {compareSymbols.length > 0 && (
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t">
+                <span className="text-sm text-muted-foreground">Selectate:</span>
+                {compareSymbols.map(symbol => (
+                  <Badge key={symbol} variant="secondary" className="flex items-center gap-1">
+                    {symbol}
+                    <button onClick={() => toggleCompare(symbol)} className="ml-1 hover:text-red-600">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[50px]">
+                    <GitCompare className="w-4 h-4" />
+                  </TableHead>
                   <TableHead className="cursor-pointer" onClick={() => handleSort('symbol')}>
                     <div className="flex items-center gap-1">
                       Simbol <ArrowUpDown className="w-4 h-4" />
@@ -864,8 +961,18 @@ export default function StocksPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: idx * 0.02 }}
-                    className="hover:bg-muted/50"
+                    className={`hover:bg-muted/50 ${compareSymbols.includes(stock.symbol) ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
                   >
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        checked={compareSymbols.includes(stock.symbol)}
+                        onChange={() => toggleCompare(stock.symbol)}
+                        disabled={!compareSymbols.includes(stock.symbol) && compareSymbols.length >= 4}
+                        className="w-4 h-4 cursor-pointer accent-blue-600"
+                        data-testid={`compare-checkbox-${stock.symbol}`}
+                      />
+                    </TableCell>
                     <TableCell>
                       <Link to={`/stocks/bvb/${stock.symbol}`} className="font-bold text-blue-600 hover:underline">
                         {stock.symbol}

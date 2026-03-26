@@ -14,6 +14,7 @@ import FeatureCard from '../components/FeatureCard';
 import QuickCalculator from '../components/QuickCalculator';
 import FearGreedIndex from '../components/FearGreedIndex';
 import EarlyAdopterBanner from '../components/EarlyAdopterBanner';
+import MarketSignals from '../components/MarketSignals';
 import { cachedFetch } from '../utils/apiCache';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -713,6 +714,17 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
+        </section>
+
+        {/* Market Signals Section - 52 Week Extremes & Unusual Volume */}
+        <section className="mt-12">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2">
+            📡 Semnale de Piață
+          </h2>
+          <p className="text-center text-muted-foreground mb-6">
+            Acțiuni aproape de maxim/minim pe 52 săptămâni și volum neobișnuit
+          </p>
+          <MarketSignals />
         </section>
 
         {/* Educational Benefits - PROFESSIONAL TONE */}
