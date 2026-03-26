@@ -286,6 +286,98 @@ BVB_DIVIDENDS_2024 = [
         "status": "estimated",
         "notes": "Istoric constant de dividende"
     },
+    # ========== 2026 - COMPANII ADĂUGATE ==========
+    {
+        "symbol": "SNG",
+        "name": "Romgaz",
+        "dividend_per_share": 3.60,
+        "currency": "RON",
+        "ex_date": "2026-06-01",
+        "payment_date": "2026-06-25",
+        "record_date": "2026-06-03",
+        "dividend_yield": 6.55,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare TradeVille - dividend yield stabil"
+    },
+    {
+        "symbol": "DIGI",
+        "name": "Digi Communications",
+        "dividend_per_share": 2.60,
+        "currency": "RON",
+        "ex_date": "2026-05-10",
+        "payment_date": "2026-05-30",
+        "record_date": "2026-05-12",
+        "dividend_yield": 5.00,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare - creștere constantă dividende"
+    },
+    {
+        "symbol": "EL",
+        "name": "Electrica",
+        "dividend_per_share": 0.85,
+        "currency": "RON",
+        "ex_date": "2026-06-02",
+        "payment_date": "2026-06-22",
+        "record_date": "2026-06-04",
+        "dividend_yield": 5.15,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare TradeVille"
+    },
+    {
+        "symbol": "ONE",
+        "name": "One United Properties",
+        "dividend_per_share": 0.048,
+        "currency": "RON",
+        "ex_date": "2026-05-15",
+        "payment_date": "2026-06-05",
+        "record_date": "2026-05-18",
+        "dividend_yield": 4.36,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Growth company - payout ratio redus"
+    },
+    {
+        "symbol": "WINE",
+        "name": "Purcari Wineries",
+        "dividend_per_share": 0.55,
+        "currency": "RON",
+        "ex_date": "2026-06-03",
+        "payment_date": "2026-06-23",
+        "record_date": "2026-06-05",
+        "dividend_yield": 3.24,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare - creștere graduală"
+    },
+    {
+        "symbol": "M",
+        "name": "MedLife",
+        "dividend_per_share": 0.15,
+        "currency": "RON",
+        "ex_date": "2026-05-20",
+        "payment_date": "2026-06-10",
+        "record_date": "2026-05-22",
+        "dividend_yield": 2.00,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Growth company - dividend mic, reinvestire"
+    },
+    {
+        "symbol": "AQ",
+        "name": "Aquila Part Prod Com",
+        "dividend_per_share": 0.09,
+        "currency": "RON",
+        "ex_date": "2026-05-25",
+        "payment_date": "2026-06-15",
+        "record_date": "2026-05-27",
+        "dividend_yield": 5.00,
+        "type": "cash",
+        "status": "estimated",
+        "notes": "Estimare TradeVille"
+    },
 ]
 
 BVB_EVENTS = [
@@ -379,11 +471,17 @@ async def get_dividends(
     year: Optional[int] = Query(default=None, description="Filter by year"),
     symbol: Optional[str] = Query(default=None, description="Filter by symbol"),
     status: Optional[str] = Query(default=None, description="paid, estimated, announced"),
-    upcoming_only: bool = Query(default=False, description="Show only upcoming dividends")
+    upcoming_only: bool = Query(default=True, description="Show only upcoming dividends (default: True)"),
+    include_past: bool = Query(default=False, description="Include past dividends")
 ):
-    """Get dividend calendar"""
+    """Get dividend calendar - implicit doar viitoare"""
     try:
         dividends = BVB_DIVIDENDS_2024.copy()
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        
+        # Implicit: doar dividende viitoare (dacă nu se cere explicit altceva)
+        if upcoming_only and not include_past:
+            dividends = [d for d in dividends if d["ex_date"] >= today]
         
         # Filter by year
         if year:
@@ -396,11 +494,6 @@ async def get_dividends(
         # Filter by status
         if status:
             dividends = [d for d in dividends if d["status"] == status]
-        
-        # Filter upcoming only
-        if upcoming_only:
-            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-            dividends = [d for d in dividends if d["ex_date"] >= today]
         
         # Sort by ex_date
         dividends.sort(key=lambda x: x["ex_date"])
