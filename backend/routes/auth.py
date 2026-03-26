@@ -226,7 +226,7 @@ async def demo_login(secret: str, response: Response):
     demo_user = await db.users.find_one({"email": demo_email}, {"_id": 0})
     
     if not demo_user:
-        # Create demo PRO user
+        # Create demo PRO user with ADVANCED experience level
         demo_user_id = f"demo_{uuid.uuid4().hex[:12]}"
         demo_user = {
             "user_id": demo_user_id,
@@ -238,12 +238,20 @@ async def demo_login(secret: str, response: Response):
             "subscription_level": "pro",
             "subscription_expires_at": "2026-06-05T23:59:59Z",
             "is_early_adopter": False,
-            "daily_summary_enabled": True
+            "daily_summary_enabled": True,
+            "experience_level": "advanced"  # IMPORTANT pentru AI Analysis complet!
         }
         await db.users.insert_one(demo_user)
         logger.info(f"Created demo PRO user: {demo_email}")
     else:
         demo_user_id = demo_user["user_id"]
+        # Update experience level if missing
+        if not demo_user.get("experience_level"):
+            await db.users.update_one(
+                {"email": demo_email},
+                {"$set": {"experience_level": "advanced"}}
+            )
+            logger.info(f"Updated demo user experience level to advanced")
     
     # Create session
     session_token = f"demo_{uuid.uuid4().hex}"

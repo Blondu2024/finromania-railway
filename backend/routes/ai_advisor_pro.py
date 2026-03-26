@@ -135,7 +135,7 @@ class ChartAnalysisRequest(BaseModel):
 # ============================================
 
 async def fetch_stock_fundamentals(symbol: str) -> Dict:
-    """Fetch fundamental data from EODHD"""
+    """Fetch COMPLETE fundamental data from EODHD - All-in-One plan ($100/month)"""
     if not EODHD_API_KEY:
         return {}
     
@@ -148,24 +148,93 @@ async def fetch_stock_fundamentals(symbol: str) -> Dict:
             if response.status_code == 200:
                 data = response.json()
                 
-                # Extract key metrics
+                # Extract ALL key metrics from EODHD
+                general = data.get("General", {})
                 highlights = data.get("Highlights", {})
                 valuation = data.get("Valuation", {})
+                shares_stats = data.get("SharesStats", {})
+                financials = data.get("Financials", {})
+                earnings = data.get("Earnings", {})
+                
+                # Get latest balance sheet data
+                balance_sheet = {}
+                if financials.get("Balance_Sheet", {}).get("quarterly"):
+                    latest_quarter = list(financials["Balance_Sheet"]["quarterly"].keys())[0] if financials["Balance_Sheet"]["quarterly"] else None
+                    if latest_quarter:
+                        balance_sheet = financials["Balance_Sheet"]["quarterly"][latest_quarter]
+                
+                # Get latest income statement
+                income_stmt = {}
+                if financials.get("Income_Statement", {}).get("quarterly"):
+                    latest_quarter = list(financials["Income_Statement"]["quarterly"].keys())[0] if financials["Income_Statement"]["quarterly"] else None
+                    if latest_quarter:
+                        income_stmt = financials["Income_Statement"]["quarterly"][latest_quarter]
                 
                 return {
-                    "name": data.get("General", {}).get("Name", symbol),
-                    "sector": data.get("General", {}).get("Sector", "N/A"),
-                    "industry": data.get("General", {}).get("Industry", "N/A"),
+                    # General Info
+                    "name": general.get("Name", symbol),
+                    "sector": general.get("Sector", "N/A"),
+                    "industry": general.get("Industry", "N/A"),
+                    "description": general.get("Description", "")[:500],  # First 500 chars
+                    "employees": general.get("FullTimeEmployees"),
+                    "ipo_date": general.get("IPODate"),
+                    
+                    # Valuation Metrics
                     "market_cap": highlights.get("MarketCapitalization"),
                     "pe_ratio": highlights.get("PERatio"),
+                    "peg_ratio": highlights.get("PEGRatio"),
                     "pb_ratio": valuation.get("PriceBookMRQ"),
-                    "dividend_yield": highlights.get("DividendYield"),
+                    "ps_ratio": valuation.get("PriceSalesTTM"),
+                    "enterprise_value": valuation.get("EnterpriseValue"),
+                    "ev_to_revenue": valuation.get("EnterpriseValueRevenue"),
+                    "ev_to_ebitda": valuation.get("EnterpriseValueEbitda"),
+                    
+                    # Profitability Metrics
                     "eps": highlights.get("EarningsShare"),
+                    "eps_growth_yoy": highlights.get("EPSEstimateCurrentYear"),
                     "roe": highlights.get("ReturnOnEquityTTM"),
+                    "roa": highlights.get("ReturnOnAssetsTTM"),
                     "profit_margin": highlights.get("ProfitMargin"),
+                    "operating_margin": highlights.get("OperatingMarginTTM"),
+                    "gross_margin": highlights.get("GrossProfitTTM"),
+                    
+                    # Dividend Info
+                    "dividend_yield": highlights.get("DividendYield"),
+                    "dividend_share": highlights.get("DividendShare"),
+                    "payout_ratio": highlights.get("PayoutRatio"),
+                    "ex_dividend_date": highlights.get("ExDividendDate"),
+                    
+                    # Financial Health
+                    "current_ratio": highlights.get("CurrentRatio"),
+                    "debt_to_equity": highlights.get("DebtEquity"),
+                    "total_debt": balance_sheet.get("totalDebt"),
+                    "total_cash": balance_sheet.get("cash"),
+                    "book_value": highlights.get("BookValue"),
+                    
+                    # Growth & Revenue
+                    "revenue": highlights.get("RevenueTTM"),
+                    "revenue_per_share": highlights.get("RevenuePerShareTTM"),
+                    "quarterly_revenue_growth": highlights.get("QuarterlyRevenueGrowthYOY"),
+                    "quarterly_earnings_growth": highlights.get("QuarterlyEarningsGrowthYOY"),
+                    
+                    # Shares Info
+                    "shares_outstanding": shares_stats.get("SharesOutstanding"),
+                    "float_shares": shares_stats.get("SharesFloat"),
+                    "percent_insiders": shares_stats.get("PercentInsiders"),
+                    "percent_institutions": shares_stats.get("PercentInstitutions"),
+                    
+                    # Price Levels
                     "52_week_high": highlights.get("52WeekHigh"),
                     "52_week_low": highlights.get("52WeekLow"),
-                    "beta": highlights.get("Beta")
+                    "50_day_ma": highlights.get("50DayMA"),
+                    "200_day_ma": highlights.get("200DayMA"),
+                    "beta": highlights.get("Beta"),
+                    
+                    # Analyst Ratings (if available)
+                    "target_price": highlights.get("WallStreetTargetPrice"),
+                    
+                    # Latest Earnings
+                    "last_earnings_date": earnings.get("History", {}).get(list(earnings.get("History", {}).keys())[0] if earnings.get("History") else None, {}).get("reportDate"),
                 }
     except Exception as e:
         logger.error(f"Error fetching fundamentals for {symbol}: {e}")
@@ -173,7 +242,7 @@ async def fetch_stock_fundamentals(symbol: str) -> Dict:
 
 
 async def fetch_technical_indicators(symbol: str) -> Dict:
-    """Fetch technical indicators from EODHD"""
+    """Fetch ALL technical indicators from EODHD - Complete analysis"""
     if not EODHD_API_KEY:
         return {}
     
@@ -181,7 +250,6 @@ async def fetch_technical_indicators(symbol: str) -> Dict:
     
     try:
         async with httpx.AsyncClient() as client:
-            # RSI
             url = f"{EODHD_BASE_URL}/technical/{symbol}.RO"
             
             # Fetch RSI
@@ -191,6 +259,14 @@ async def fetch_technical_indicators(symbol: str) -> Dict:
                 data = response.json()
                 if data:
                     indicators["rsi"] = data[-1].get("rsi") if data else None
+            
+            # Fetch SMA 20 (short term)
+            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "sma", "period": 20}
+            response = await client.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    indicators["sma_20"] = data[-1].get("sma") if data else None
             
             # Fetch SMA 50
             params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "sma", "period": 50}
@@ -208,6 +284,21 @@ async def fetch_technical_indicators(symbol: str) -> Dict:
                 if data:
                     indicators["sma_200"] = data[-1].get("sma") if data else None
             
+            # Fetch EMA 12 and EMA 26 (for MACD confirmation)
+            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "ema", "period": 12}
+            response = await client.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    indicators["ema_12"] = data[-1].get("ema") if data else None
+            
+            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "ema", "period": 26}
+            response = await client.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    indicators["ema_26"] = data[-1].get("ema") if data else None
+            
             # Fetch MACD
             params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "macd"}
             response = await client.get(url, params=params, timeout=10)
@@ -219,6 +310,43 @@ async def fetch_technical_indicators(symbol: str) -> Dict:
                     indicators["macd_signal"] = latest.get("macd_signal")
                     indicators["macd_histogram"] = latest.get("macd_hist")
             
+            # Fetch Bollinger Bands
+            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "bbands", "period": 20}
+            response = await client.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    latest = data[-1] if data else {}
+                    indicators["bb_upper"] = latest.get("uband")
+                    indicators["bb_middle"] = latest.get("mband")
+                    indicators["bb_lower"] = latest.get("lband")
+            
+            # Fetch Stochastic Oscillator
+            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "stoch"}
+            response = await client.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    latest = data[-1] if data else {}
+                    indicators["stoch_k"] = latest.get("slow_k")
+                    indicators["stoch_d"] = latest.get("slow_d")
+            
+            # Fetch ADX (Average Directional Index) - trend strength
+            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "adx", "period": 14}
+            response = await client.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    indicators["adx"] = data[-1].get("adx") if data else None
+            
+            # Fetch ATR (Average True Range) - volatility
+            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "atr", "period": 14}
+            response = await client.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    indicators["atr"] = data[-1].get("atr") if data else None
+                    
     except Exception as e:
         logger.error(f"Error fetching technical indicators for {symbol}: {e}")
     
@@ -437,40 +565,154 @@ async def ai_chat(query: AIQuery, user: dict = Depends(require_auth)):
         if experience_level in ["intermediate", "advanced"]:
             tech_data = await fetch_technical_indicators(symbol)
             if tech_data:
-                market_context += f"\n📈 INDICATORI TEHNICI:\n"
+                market_context += f"\n📈 INDICATORI TEHNICI COMPLETI:\n"
+                
+                # Trend Indicators
+                market_context += f"[TREND]\n"
                 if tech_data.get("rsi"):
                     rsi = tech_data["rsi"]
-                    rsi_status = "SUPRAVÂNDUT" if rsi < 30 else "SUPRACUMPĂRAT" if rsi > 70 else "NEUTRU"
+                    rsi_status = "SUPRAVÂNDUT ⬆️" if rsi < 30 else "SUPRACUMPĂRAT ⬇️" if rsi > 70 else "NEUTRU ➡️"
                     market_context += f"- RSI(14): {rsi:.1f} ({rsi_status})\n"
+                
+                if tech_data.get("adx"):
+                    adx = tech_data["adx"]
+                    trend_strength = "FĂRĂ TREND" if adx < 20 else "TREND SLAB" if adx < 25 else "TREND PUTERNIC" if adx < 50 else "TREND FOARTE PUTERNIC"
+                    market_context += f"- ADX(14): {adx:.1f} ({trend_strength})\n"
+                
+                # Moving Averages
+                market_context += f"[MEDII MOBILE]\n"
+                if tech_data.get("sma_20"):
+                    market_context += f"- SMA 20: {tech_data['sma_20']:.2f}\n"
                 if tech_data.get("sma_50"):
                     market_context += f"- SMA 50: {tech_data['sma_50']:.2f}\n"
                 if tech_data.get("sma_200"):
                     market_context += f"- SMA 200: {tech_data['sma_200']:.2f}\n"
-                if tech_data.get("macd"):
-                    market_context += f"- MACD: {tech_data['macd']:.3f}\n"
+                if tech_data.get("ema_12"):
+                    market_context += f"- EMA 12: {tech_data['ema_12']:.2f}\n"
+                if tech_data.get("ema_26"):
+                    market_context += f"- EMA 26: {tech_data['ema_26']:.2f}\n"
+                
+                # MACD
+                market_context += f"[MACD]\n"
+                if tech_data.get("macd") is not None:
+                    macd_val = tech_data.get("macd", 0) or 0
+                    macd_sig = tech_data.get("macd_signal", 0) or 0
+                    macd_signal = "BULLISH ⬆️" if macd_val > macd_sig else "BEARISH ⬇️"
+                    market_context += f"- MACD: {macd_val:.4f}\n"
+                    market_context += f"- Signal: {macd_sig:.4f}\n"
+                    hist_val = tech_data.get('macd_histogram', 0) or 0
+                    market_context += f"- Histogram: {hist_val:.4f} ({macd_signal})\n"
+                
+                # Bollinger Bands
+                if tech_data.get("bb_upper"):
+                    market_context += f"[BOLLINGER BANDS]\n"
+                    market_context += f"- Upper: {tech_data['bb_upper']:.2f}\n"
+                    market_context += f"- Middle: {tech_data.get('bb_middle', 0):.2f}\n"
+                    market_context += f"- Lower: {tech_data.get('bb_lower', 0):.2f}\n"
+                
+                # Stochastic
+                if tech_data.get("stoch_k"):
+                    stoch_status = "SUPRAVÂNDUT" if tech_data["stoch_k"] < 20 else "SUPRACUMPĂRAT" if tech_data["stoch_k"] > 80 else "NEUTRU"
+                    market_context += f"[STOCHASTIC]\n"
+                    market_context += f"- %K: {tech_data['stoch_k']:.1f}\n"
+                    market_context += f"- %D: {tech_data.get('stoch_d', 0):.1f} ({stoch_status})\n"
+                
+                # Volatility
+                if tech_data.get("atr"):
+                    market_context += f"[VOLATILITATE]\n"
+                    market_context += f"- ATR(14): {tech_data['atr']:.4f}\n"
         
-        # Fundamental data for advanced
+        # Fundamental data for advanced - NOW WITH COMPLETE DATA!
         if experience_level == "advanced":
             fund_data = await fetch_stock_fundamentals(symbol)
             if fund_data:
-                market_context += f"\n📋 DATE FUNDAMENTALE:\n"
-                market_context += f"- Sector: {fund_data.get('sector', 'N/A')}\n"
+                market_context += f"\n📋 DATE FUNDAMENTALE COMPLETE:\n"
+                
+                # General Info
+                market_context += f"- Companie: {fund_data.get('name', symbol)}\n"
+                market_context += f"- Sector: {fund_data.get('sector', 'N/A')} | Industrie: {fund_data.get('industry', 'N/A')}\n"
+                
+                # Valuation
+                market_context += f"\n💰 EVALUARE:\n"
+                if fund_data.get("market_cap"):
+                    mc = fund_data["market_cap"]
+                    mc_str = f"{mc/1e9:.2f}B RON" if mc > 1e9 else f"{mc/1e6:.0f}M RON"
+                    market_context += f"- Capitalizare: {mc_str}\n"
                 if fund_data.get("pe_ratio"):
-                    market_context += f"- P/E: {fund_data['pe_ratio']:.2f}\n"
+                    market_context += f"- P/E Ratio: {fund_data['pe_ratio']:.2f}\n"
+                if fund_data.get("peg_ratio"):
+                    market_context += f"- PEG Ratio: {fund_data['peg_ratio']:.2f}\n"
                 if fund_data.get("pb_ratio"):
-                    market_context += f"- P/B: {fund_data['pb_ratio']:.2f}\n"
-                if fund_data.get("dividend_yield"):
-                    market_context += f"- Dividend Yield: {fund_data['dividend_yield']:.2f}%\n"
+                    market_context += f"- P/B Ratio: {fund_data['pb_ratio']:.2f}\n"
+                if fund_data.get("ps_ratio"):
+                    market_context += f"- P/S Ratio: {fund_data['ps_ratio']:.2f}\n"
+                if fund_data.get("ev_to_ebitda"):
+                    market_context += f"- EV/EBITDA: {fund_data['ev_to_ebitda']:.2f}\n"
+                
+                # Profitability
+                market_context += f"\n📈 PROFITABILITATE:\n"
+                if fund_data.get("eps"):
+                    market_context += f"- EPS: {fund_data['eps']:.2f} RON\n"
                 if fund_data.get("roe"):
-                    market_context += f"- ROE: {fund_data['roe']:.2f}%\n"
+                    market_context += f"- ROE: {fund_data['roe']*100 if fund_data['roe'] < 1 else fund_data['roe']:.2f}%\n"
+                if fund_data.get("roa"):
+                    market_context += f"- ROA: {fund_data['roa']*100 if fund_data['roa'] < 1 else fund_data['roa']:.2f}%\n"
                 if fund_data.get("profit_margin"):
-                    market_context += f"- Profit Margin: {fund_data['profit_margin']:.2f}%\n"
+                    market_context += f"- Marjă Profit: {fund_data['profit_margin']*100 if fund_data['profit_margin'] < 1 else fund_data['profit_margin']:.2f}%\n"
+                if fund_data.get("operating_margin"):
+                    market_context += f"- Marjă Operațională: {fund_data['operating_margin']*100 if fund_data['operating_margin'] < 1 else fund_data['operating_margin']:.2f}%\n"
+                
+                # Dividends
+                if fund_data.get("dividend_yield"):
+                    market_context += f"\n🎯 DIVIDENDE:\n"
+                    market_context += f"- Randament Dividend: {fund_data['dividend_yield']*100 if fund_data['dividend_yield'] < 1 else fund_data['dividend_yield']:.2f}%\n"
+                    if fund_data.get("dividend_share"):
+                        market_context += f"- Dividend/Acțiune: {fund_data['dividend_share']:.2f} RON\n"
+                    if fund_data.get("payout_ratio"):
+                        market_context += f"- Payout Ratio: {fund_data['payout_ratio']:.0f}%\n"
+                
+                # Financial Health
+                market_context += f"\n🏦 SĂNĂTATE FINANCIARĂ:\n"
+                if fund_data.get("current_ratio"):
+                    market_context += f"- Current Ratio: {fund_data['current_ratio']:.2f}\n"
+                if fund_data.get("debt_to_equity"):
+                    market_context += f"- Debt/Equity: {fund_data['debt_to_equity']:.2f}\n"
+                if fund_data.get("book_value"):
+                    market_context += f"- Book Value: {fund_data['book_value']:.2f} RON\n"
+                
+                # Growth
+                market_context += f"\n📊 CREȘTERE:\n"
+                if fund_data.get("quarterly_revenue_growth"):
+                    market_context += f"- Creștere Venituri (YoY): {fund_data['quarterly_revenue_growth']*100:.1f}%\n"
+                if fund_data.get("quarterly_earnings_growth"):
+                    market_context += f"- Creștere Profit (YoY): {fund_data['quarterly_earnings_growth']*100:.1f}%\n"
+                
+                # Price Levels
+                market_context += f"\n📍 NIVELURI PREȚ:\n"
+                if fund_data.get("52_week_high"):
+                    market_context += f"- Max 52 săpt: {fund_data['52_week_high']:.2f} RON\n"
+                if fund_data.get("52_week_low"):
+                    market_context += f"- Min 52 săpt: {fund_data['52_week_low']:.2f} RON\n"
+                if fund_data.get("50_day_ma"):
+                    market_context += f"- MA 50 zile: {fund_data['50_day_ma']:.2f} RON\n"
+                if fund_data.get("200_day_ma"):
+                    market_context += f"- MA 200 zile: {fund_data['200_day_ma']:.2f} RON\n"
+                if fund_data.get("beta"):
+                    market_context += f"- Beta: {fund_data['beta']:.2f}\n"
+                
+                # Ownership
+                if fund_data.get("percent_insiders") or fund_data.get("percent_institutions"):
+                    market_context += f"\n👥 STRUCTURĂ ACȚIONARIAT:\n"
+                    if fund_data.get("percent_insiders"):
+                        market_context += f"- Deținere Insideri: {fund_data['percent_insiders']:.1f}%\n"
+                    if fund_data.get("percent_institutions"):
+                        market_context += f"- Deținere Instituții: {fund_data['percent_institutions']:.1f}%\n"
             
             # Get chart analysis for advanced
             historical = await fetch_historical_for_analysis(symbol)
             if historical:
                 levels = identify_support_resistance(historical)
-                market_context += f"\n📐 NIVELURI TEHNICE:\n"
+                market_context += f"\n📐 NIVELURI TEHNICE CHEIE:\n"
                 market_context += f"- Preț curent: {levels['current_price']} RON\n"
                 for s in levels['supports']:
                     market_context += f"- Suport: {s['price']} RON ({s['label']})\n"
