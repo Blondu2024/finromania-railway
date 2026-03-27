@@ -145,6 +145,21 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [ ] P2: Mobile responsiveness issues
 - [ ] P2: Slow page load times
 
+## Completed (March 27, 2026 — BVB.ro Scraping Session)
+- [x] **MAJOR: BVB.ro Dividend Scraping** — Official dividend data from BVB.ro replaces hardcoded/estimated data
+  - Scraper: `/app/backend/scrapers/bvb_dividend_scraper.py`
+  - 99 dividend records + 1,411 calendar events from BVB.ro
+  - Rate limiting (3-5s between requests), realistic User-Agent
+  - MongoDB caching (`bvb_dividends_scraped`, `bvb_calendar_scraped`, `bvb_scrape_meta`)
+  - Automatic daily scrape at 7:00 AM Bucharest time + startup warmup
+  - New API: `/api/bvb-dividends/*` (all, latest, upcoming, trailing, history, calendar, refresh, status)
+- [x] **Updated Dividend Calculator** — Now uses BVB.ro > EODHD > Fallback priority chain
+  - 42 stocks with official BVB.ro dividend data
+  - "BVB.ro (oficial)" data source shown on UI
+- [x] **Updated Dividend Calendar** — Official BVB.ro data instead of hardcoded estimates
+  - Dividend Kings, CSV export all use BVB.ro data
+  - Calendar events from BVB.ro financial calendar
+
 ## Completed (March 26, 2026 Session)
 - [x] **Screener PRO** with LIVE technical indicators + fundamentals from EODHD
 - [x] **Calculator Dividende** with 2026 estimates and projections
@@ -162,7 +177,6 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] **Increased Email Limit** - From 95/day to 500/day (Resend $20 plan = 10k/month)
 
 ## Upcoming Tasks
-- [ ] P1: Add "Subscribe to Daily Summary" UI checkbox in user settings ✅ DONE
 - [ ] P1: Verify Resend domain (pending user DNS records)
 - [ ] P1: PRO Live Chat (community feature)
 - [ ] P2: Get expert feedback on Fiscal Simulator
@@ -179,20 +193,31 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - GET /api/screener-pro/scan - Full BVB scan with technicals + fundamentals
 - POST /api/screener-pro/filter - Filter by RSI, MACD, P/E, etc.
 - GET /api/screener-pro/presets - 6 preset strategies
-- GET /api/dividend-calculator/stocks - All dividend-paying BVB stocks
+- GET /api/dividend-calculator/stocks - All dividend-paying BVB stocks (BVB.ro source)
 - POST /api/dividend-calculator/calculate - Calculate dividends for portfolio
 - GET /api/auth/demo-login?secret=xxx - Demo login for automated testing
-- **GET /api/stocks/compare?symbols=TLV,SNP,BRD** - Compare 2-4 stocks side-by-side
-- **GET /api/stocks/unusual-volume** - Stocks with abnormal trading volume
-- **GET /api/stocks/52-week-extremes** - Stocks near 52 week high/low
-- **GET /api/stocks/bvb/filter-by-sector?sector=Banci** - Filter BVB stocks by sector
+- **GET /api/bvb-dividends/all** - All scraped BVB.ro dividend records
+- **GET /api/bvb-dividends/latest** - Latest dividend per symbol
+- **GET /api/bvb-dividends/upcoming** - Upcoming dividends (ex_date >= today)
+- **GET /api/bvb-dividends/trailing/{symbol}** - Trailing 12M dividend for a symbol
+- **GET /api/bvb-dividends/history/{symbol}** - Full dividend history for a symbol
+- **GET /api/bvb-dividends/calendar** - BVB.ro financial calendar events
+- **POST /api/bvb-dividends/refresh** - Trigger manual BVB.ro scrape
+- **GET /api/bvb-dividends/status** - Scrape status and timestamps
+- GET /api/stocks/compare?symbols=TLV,SNP,BRD - Compare 2-4 stocks side-by-side
+- GET /api/stocks/unusual-volume - Stocks with abnormal trading volume
+- GET /api/stocks/52-week-extremes - Stocks near 52 week high/low
 
 ## Key Files - NEW
+- /app/backend/scrapers/bvb_dividend_scraper.py - BVB.ro dividend & calendar scraper
+- /app/backend/routes/bvb_dividends.py - BVB.ro scraped data API
 - /app/backend/routes/screener_pro.py - Screener PRO API
-- /app/backend/routes/dividend_calculator.py - Dividend Calculator API
+- /app/backend/routes/dividend_calculator.py - Dividend Calculator API (uses BVB.ro)
+- /app/backend/routes/dividend_calendar.py - Dividend Calendar API (uses BVB.ro)
 - /app/backend/routes/stock_compare.py - Stock comparison, 52W extremes, unusual volume API
 - /app/frontend/src/pages/ScreenerProPage.jsx - Screener PRO UI
 - /app/frontend/src/pages/DividendCalculatorPage.jsx - Dividend Calculator UI
+- /app/frontend/src/pages/DividendCalendarPage.jsx - Dividend Calendar UI
 - /app/frontend/src/pages/FiscalSimulatorPage.jsx
 - /app/frontend/src/components/StockCompare.jsx - Stock comparison modal component
 - /app/frontend/src/components/MarketSignals.jsx - 52 Week Extremes + Unusual Volume widgets
