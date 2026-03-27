@@ -222,7 +222,18 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] **Daily Summary at 18:05** - Changed from 18:10 to 18:05 (right after BVB closes at 18:00)
 - [x] **Increased Email Limit** - From 95/day to 500/day (Resend $20 plan = 10k/month)
 
-## Completed (March 27, 2026 — Portofoliu BVB PRO — Faza 3)
+## Completed (March 27, 2026 — Portofoliu BVB PRO — Faza 4)
+- [x] **Portofoliu BVB PRO — Faza 4 (Dividende + Știri)** — Testat 24/24 (100%)
+  - Endpoint `/api/portfolio-bvb/dividends` — dividend yield % + income anual RON per poziție
+    - Sursa: BVB.ro scraper (confirmat, fără improvizații) 
+    - BRD: 3.78% / 211.62 RON/an; H2O: 6.08% / 449.44 RON/an; Total: 661.06 RON/an
+  - Endpoint `/api/portfolio-bvb/news` — 8 articole filtrate per simboluri din portofoliu
+    - Badge-uri [H2O] / [BRD] per articol cu simbolul relevant
+  - Frontend: coloane noi Div Yield + Income/an în tabel (verde, cu tooltip)
+  - Metric card "Income Dividende/An" în sumar (apare doar dacă există date)
+  - Secțiunea "Știri Portofoliu" cu articole taguite per simbol
+
+
 - [x] **Portofoliu BVB PRO — Faza 3 (AI Advisor)** — Testat 35/35 (100%)
   - Endpoint `/api/portfolio-bvb/ai-analysis` — GPT-4o-mini via Emergent LLM key
   - Input STRICT din EODHD: RSI, P/E, ROE, D/E, EPS, P&L%, variație azi

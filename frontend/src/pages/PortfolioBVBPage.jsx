@@ -1031,7 +1031,7 @@ export default function PortfolioBVBPage() {
 
       {/* ── SUMMARY METRICS ── */}
       {!isEmpty && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
           <MetricCard
             label="Valoare Totală"
             value={fmtRON(summary.total_value)}
