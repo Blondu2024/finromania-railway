@@ -73,7 +73,7 @@ export default function TradingSchoolPage() {
   const progressPercent = totalLessons > 0 ? (completedCount / totalLessons) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="min-h-0">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
