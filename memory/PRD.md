@@ -11,16 +11,21 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - Payments: Stripe
 - Email: Resend
 - AI: OpenAI GPT (Emergent LLM Key)
-- Market Data: **EODHD (Paid Plan - $100/month All-in-One, 300k requests/day)**
-- Indices: TradingView API (free)
-- Global Markets: Yahoo Finance
+- Market Data: **EODHD 100% (Paid Plan - $100/month All-in-One)** - NO yfinance
+- Global Markets: 100% EODHD (removed yfinance March 2026)
 
 ## What's Been Implemented
 
 ### Core Features
 - Homepage with market ticker, hero section, feature cards
 - BVB stocks listing and detail pages with real-time data
-- Global markets pages with Yahoo Finance data
+- **Global markets 100% EODHD** (removed yfinance March 2026):
+  - Gold = XAUUSD.FOREX real spot price (~$4,421/oz, NOT ETF price)
+  - Silver = XAGUSD.FOREX real spot price (~$68/oz)
+  - Oil/Gas = ETF proxies clearly labeled (USO ETF, UNG ETF)
+  - NASDAQ 100 (NDX.INDX) replaces old NASDAQ Composite
+  - FTSE 100 via DB fallback (^FTSE from yfinance, updated by EODHD scheduler)
+  - Scheduler (update_global_indices) uses 100% EODHD
 - BVB Indices via TradingView (100% accurate)
 - News system (Romanian RSS + international)
 - In-app notifications for price alerts

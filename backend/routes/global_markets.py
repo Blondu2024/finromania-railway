@@ -18,7 +18,7 @@ GLOBAL_INDICES = {
     
     # European Markets
     "GDAXI.INDX": {"name": "DAX", "country": "Germania", "flag": "🇩🇪", "category": "indices"},
-    "FTSE.INDX": {"name": "FTSE 100", "country": "UK", "flag": "🇬🇧", "category": "indices"},
+    "FTSE.INDX": {"name": "FTSE 100", "country": "UK", "flag": "🇬🇧", "category": "indices", "db_symbol": "^FTSE"},
     "FCHI.INDX": {"name": "CAC 40", "country": "Franța", "flag": "🇫🇷", "category": "indices"},
     
     # Asian Markets  
@@ -221,8 +221,9 @@ async def get_global_indices():
                 # Got live data from EODHD
                 results.append(data)
             else:
-                # Fallback to DB cache
-                cached = await db.stocks_global.find_one({"symbol": symbol}, {"_id": 0})
+                # Fallback to DB cache - use db_symbol alias if available (e.g. FTSE.INDX -> ^FTSE)
+                db_symbol = info.get("db_symbol", symbol)
+                cached = await db.stocks_global.find_one({"symbol": db_symbol}, {"_id": 0})
                 if cached:
                     cached["source"] = "db_cache"
                     cached["is_live"] = False
@@ -523,8 +524,9 @@ async def get_global_overview(response: Response):
         for symbol, info in all_symbols.items():
             data = all_data.get(symbol)
             if not data:
-                # Fallback to DB cache
-                cached = await db.stocks_global.find_one({"symbol": symbol}, {"_id": 0})
+                # Fallback to DB cache - use db_symbol alias if available
+                db_symbol = info.get("db_symbol", symbol)
+                cached = await db.stocks_global.find_one({"symbol": db_symbol}, {"_id": 0})
                 if cached:
                     cached["source"] = "db_cache"
                     cached["is_live"] = False
