@@ -116,7 +116,7 @@ async def fetch_ticker_data(symbol: str, info: dict) -> dict:
 
 
 async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
-    """Fetch LIVE data from EODHD API (All-in-One $100/month plan - REAL-TIME!)"""
+    """Fetch LIVE data from EODHD API - uses INTRADAY when markets are open!"""
     import httpx
     import os
     
@@ -144,51 +144,100 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
             return default
     
     try:
-        # EODHD real-time endpoint - LIVE cu planul All-in-One!
-        url = f"https://eodhd.com/api/real-time/{symbol}"
-        params = {"api_token": api_key, "fmt": "json"}
-        
         async with httpx.AsyncClient() as client:
+            # First try INTRADAY endpoint for LIVE data
+            intraday_url = f"https://eodhd.com/api/intraday/{symbol}"
+            intraday_params = {"api_token": api_key, "fmt": "json", "interval": "1m"}
+            
+            intraday_response = await client.get(intraday_url, params=intraday_params, timeout=5)
+            
+            if intraday_response.status_code == 200:
+                intraday_data = intraday_response.json()
+                if isinstance(intraday_data, list) and len(intraday_data) > 0:
+                    # Get the LATEST candle
+                    last_candle = intraday_data[-1]
+                    current_price = safe_float(last_candle.get("close"))
+                    timestamp = safe_int(last_candle.get("timestamp"))
+                    
+                    # Get previous day close from real-time endpoint for change calculation
+                    rt_url = f"https://eodhd.com/api/real-time/{symbol}"
+                    rt_params = {"api_token": api_key, "fmt": "json"}
+                    rt_response = await client.get(rt_url, params=rt_params, timeout=5)
+                    
+                    prev_close = current_price
+                    if rt_response.status_code == 200:
+                        rt_data = rt_response.json()
+                        prev_close = safe_float(rt_data.get("previousClose"), current_price)
+                    
+                    if current_price > 0:
+                        change = current_price - prev_close
+                        change_percent = (change / prev_close * 100) if prev_close > 0 else 0
+                        
+                        return {
+                            "symbol": symbol,
+                            "name": info["name"],
+                            "flag": info.get("flag", "📊"),
+                            "country": info.get("country", ""),
+                            "category": info.get("category", ""),
+                            "unit": info.get("unit", ""),
+                            "price": round(current_price, 2),
+                            "change": round(change, 2),
+                            "change_percent": round(change_percent, 2),
+                            "prev_close": round(prev_close, 2),
+                            "high": round(safe_float(last_candle.get("high"), current_price), 2),
+                            "low": round(safe_float(last_candle.get("low"), current_price), 2),
+                            "volume": safe_int(last_candle.get("volume")),
+                            "sparkline": [],
+                            "is_positive": bool(change_percent >= 0),
+                            "last_update": datetime.fromtimestamp(timestamp).isoformat() if timestamp else datetime.now(timezone.utc).isoformat(),
+                            "source": "eodhd_intraday",
+                            "is_live": True
+                        }
+            
+            # Fallback to real-time endpoint (for after-hours or when intraday fails)
+            url = f"https://eodhd.com/api/real-time/{symbol}"
+            params = {"api_token": api_key, "fmt": "json"}
+            
             response = await client.get(url, params=params, timeout=5)
             data = response.json() if response.status_code == 200 else None
-        
-        if not data:
-            return None
-        
-        current_price = safe_float(data.get("close"))
-        prev_close = safe_float(data.get("previousClose"), current_price)
-        change = safe_float(data.get("change"))
-        change_percent = safe_float(data.get("change_p"))
-        high = safe_float(data.get("high"), current_price)
-        low = safe_float(data.get("low"), current_price)
-        volume = safe_int(data.get("volume"))
-        timestamp = safe_int(data.get("timestamp"))
-        
-        # Skip if no valid price
-        if current_price == 0:
-            logger.warning(f"No valid price for {symbol}")
-            return None
-        
-        return {
-            "symbol": symbol,
-            "name": info["name"],
-            "flag": info.get("flag", "📊"),
-            "country": info.get("country", ""),
-            "category": info.get("category", ""),
-            "unit": info.get("unit", ""),
-            "price": round(current_price, 2),
-            "change": round(change, 2),
-            "change_percent": round(change_percent, 2),
-            "prev_close": round(prev_close, 2),
-            "high": round(high, 2),
-            "low": round(low, 2),
-            "volume": volume,
-            "sparkline": [],
-            "is_positive": bool(change_percent >= 0),
-            "last_update": datetime.fromtimestamp(timestamp).isoformat() if timestamp else datetime.now(timezone.utc).isoformat(),
-            "source": "eodhd_live",
-            "is_live": True
-        }
+            
+            if not data:
+                return None
+            
+            current_price = safe_float(data.get("close"))
+            prev_close = safe_float(data.get("previousClose"), current_price)
+            change = safe_float(data.get("change"))
+            change_percent = safe_float(data.get("change_p"))
+            high = safe_float(data.get("high"), current_price)
+            low = safe_float(data.get("low"), current_price)
+            volume = safe_int(data.get("volume"))
+            timestamp = safe_int(data.get("timestamp"))
+            
+            # Skip if no valid price
+            if current_price == 0:
+                logger.warning(f"No valid price for {symbol}")
+                return None
+            
+            return {
+                "symbol": symbol,
+                "name": info["name"],
+                "flag": info.get("flag", "📊"),
+                "country": info.get("country", ""),
+                "category": info.get("category", ""),
+                "unit": info.get("unit", ""),
+                "price": round(current_price, 2),
+                "change": round(change, 2),
+                "change_percent": round(change_percent, 2),
+                "prev_close": round(prev_close, 2),
+                "high": round(high, 2),
+                "low": round(low, 2),
+                "volume": volume,
+                "sparkline": [],
+                "is_positive": bool(change_percent >= 0),
+                "last_update": datetime.fromtimestamp(timestamp).isoformat() if timestamp else datetime.now(timezone.utc).isoformat(),
+                "source": "eodhd_realtime",
+                "is_live": False  # Not truly live, last close
+            }
     except Exception as e:
         logger.error(f"EODHD error for {symbol}: {e}")
         return None
@@ -324,7 +373,7 @@ async def get_global_stocks():
 
 
 async def fetch_multiple_tickers_eodhd(symbols_info: dict) -> dict:
-    """Batch fetch LIVE data from EODHD - MUCH FASTER!"""
+    """Batch fetch data from EODHD - uses INTRADAY only for main indices!"""
     import httpx
     import os
     
@@ -353,12 +402,16 @@ async def fetch_multiple_tickers_eodhd(symbols_info: dict) -> dict:
     # Filter out yfinance-only symbols
     eodhd_symbols = {s: i for s, i in symbols_info.items() if not i.get("use_yfinance")}
     
-    # Split into batches of 15 (EODHD limit)
-    symbol_list = list(eodhd_symbols.keys())
-    batches = [symbol_list[i:i+15] for i in range(0, len(symbol_list), 15)]
+    # PRIORITY INTRADAY: Only fetch intraday for MAIN INDICES (most watched)
+    INTRADAY_PRIORITY = ["GSPC.INDX", "DJI.INDX", "IXIC.INDX", "GDAXI.INDX", "FCHI.INDX", "N225.INDX", "HSI.INDX"]
     
     try:
         async with httpx.AsyncClient(timeout=15) as client:
+            # 1. FAST: Batch fetch real-time for ALL symbols first
+            symbol_list = list(eodhd_symbols.keys())
+            batches = [symbol_list[i:i+15] for i in range(0, len(symbol_list), 15)]
+            
+            prev_closes = {}
             for batch in batches:
                 symbols_str = ",".join(batch)
                 url = f"https://eodhd.com/api/real-time/{symbols_str}"
@@ -378,6 +431,7 @@ async def fetch_multiple_tickers_eodhd(symbols_info: dict) -> dict:
                     
                     info = eodhd_symbols[code]
                     price = safe_float(item.get("close"))
+                    prev_closes[code] = safe_float(item.get("previousClose"), price)
                     
                     if price == 0:
                         continue
@@ -392,14 +446,68 @@ async def fetch_multiple_tickers_eodhd(symbols_info: dict) -> dict:
                         "price": round(price, 2),
                         "change": round(safe_float(item.get("change")), 2),
                         "change_percent": round(safe_float(item.get("change_p")), 2),
-                        "prev_close": round(safe_float(item.get("previousClose"), price), 2),
+                        "prev_close": round(prev_closes[code], 2),
                         "high": round(safe_float(item.get("high"), price), 2),
                         "low": round(safe_float(item.get("low"), price), 2),
                         "volume": safe_int(item.get("volume")),
                         "sparkline": [],
                         "is_positive": bool(safe_float(item.get("change_p")) >= 0),
                         "last_update": datetime.fromtimestamp(safe_int(item.get("timestamp"))).isoformat() if safe_int(item.get("timestamp")) else datetime.now(timezone.utc).isoformat(),
-                        "source": "eodhd_live",
+                        "source": "eodhd_realtime",
+                        "is_live": False
+                    }
+            
+            # 2. UPGRADE: Fetch INTRADAY only for priority indices (parallel)
+            import asyncio
+            
+            async def fetch_intraday(symbol):
+                try:
+                    url = f"https://eodhd.com/api/intraday/{symbol}"
+                    params = {"api_token": api_key, "fmt": "json", "interval": "1m"}
+                    response = await client.get(url, params=params, timeout=5)
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        if isinstance(data, list) and len(data) > 0:
+                            return (symbol, data[-1])  # Return last candle
+                except:
+                    pass
+                return (symbol, None)
+            
+            priority_in_list = [s for s in INTRADAY_PRIORITY if s in eodhd_symbols]
+            intraday_results = await asyncio.gather(*[fetch_intraday(s) for s in priority_in_list])
+            
+            for symbol, last_candle in intraday_results:
+                if not last_candle:
+                    continue
+                
+                info = eodhd_symbols[symbol]
+                price = safe_float(last_candle.get("close"))
+                timestamp = safe_int(last_candle.get("timestamp"))
+                prev_close = prev_closes.get(symbol, price)
+                
+                if price > 0:
+                    change = price - prev_close
+                    change_pct = (change / prev_close * 100) if prev_close > 0 else 0
+                    
+                    results[symbol] = {
+                        "symbol": symbol,
+                        "name": info["name"],
+                        "flag": info.get("flag", "📊"),
+                        "country": info.get("country", ""),
+                        "category": info.get("category", ""),
+                        "unit": info.get("unit", ""),
+                        "price": round(price, 2),
+                        "change": round(change, 2),
+                        "change_percent": round(change_pct, 2),
+                        "prev_close": round(prev_close, 2),
+                        "high": round(safe_float(last_candle.get("high"), price), 2),
+                        "low": round(safe_float(last_candle.get("low"), price), 2),
+                        "volume": safe_int(last_candle.get("volume")),
+                        "sparkline": [],
+                        "is_positive": bool(change_pct >= 0),
+                        "last_update": datetime.fromtimestamp(timestamp).isoformat() if timestamp else datetime.now(timezone.utc).isoformat(),
+                        "source": "eodhd_intraday",
                         "is_live": True
                     }
     except Exception as e:
