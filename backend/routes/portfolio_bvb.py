@@ -3,14 +3,16 @@ Portofoliu BVB PRO — Exclusiv pentru utilizatori PRO
 Date reale din EODHD, fără improvizații sau estimări.
 Faza 1: CRUD + Live P&L + RSI
 Faza 2: Grafic evoluție + Alocare sector + Fundamentale
+Faza 3: AI Advisor — recomandări per poziție + sumar risc portofoliu
 """
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import asyncio
 import logging
+import json
 import os
 import httpx
 
@@ -22,6 +24,8 @@ router = APIRouter(prefix="/portfolio-bvb", tags=["Portfolio BVB PRO"])
 
 EODHD_API_KEY = os.environ.get("EODHD_API_KEY")
 EODHD_BASE = "https://eodhd.com/api"
+EMERGENT_KEY = os.environ.get("EMERGENT_UNIVERSAL_KEY") or os.environ.get("EMERGENT_LLM_KEY")
+AI_CACHE_MINUTES = 60  # cache AI response 1 oră
 
 
 # ─────────────────────────────────────────
@@ -491,3 +495,277 @@ async def get_portfolio_analysis(user: dict = Depends(require_auth)):
         "history": history,
         "total_value": round(total_value, 2),
     }
+
+
+# ─────────────────────────────────────────
+# FAZA 3: AI ADVISOR — Recomandări per poziție + sumar risc
+# ─────────────────────────────────────────
+
+def _build_portfolio_prompt(positions_data: list, summary: dict) -> str:
+    """
+    Construiește prompt-ul pentru analiză AI cu date reale.
+    POLITICĂ STRICTĂ: Bazat EXCLUSIV pe datele furnizate, fără inventare.
+    """
+    lines = [
+        "Ești un analist financiar PRO specializat pe Bursa de Valori București (BVB).",
+        "Analizează portofoliul de mai jos și oferă recomandări concrete bazate EXCLUSIV pe datele furnizate.",
+        "",
+        "POLITICĂ STRICTĂ DE DATE:",
+        "- Folosești DOAR datele de mai jos, fără să inventezi sau să estimezi valori lipsă",
+        "- Dacă un indicator lipsește (null/N/A), menționează că nu îl poți evalua",
+        "- Nu da sfaturi generice — fi specific bazat pe valorile numerice furnizate",
+        "- Prioritizează acuratețea în fața completitudinii",
+        "",
+        "═══ PORTOFOLIU CURENT ═══",
+        f"Valoare totală: {summary.get('total_value', 0):,.2f} RON",
+        f"Total investit: {summary.get('total_invested', 0):,.2f} RON",
+        f"P&L Total: {summary.get('pl_ron', 0):+,.2f} RON ({summary.get('pl_percent', 0):+.2f}%)",
+        f"P&L Azi: {summary.get('today_pl', 0):+,.2f} RON",
+        f"Nr. poziții: {summary.get('positions_count', 0)}",
+        "",
+        "═══ POZIȚII (date reale EODHD) ═══",
+    ]
+
+    for p in positions_data:
+        sym = p.get("symbol", "?")
+        name = p.get("name", sym)
+        lines.append(f"\n▸ {sym} ({name})")
+        lines.append(f"  Cantitate: {p.get('shares', 0)} acțiuni")
+        lines.append(f"  Preț intrare: {p.get('purchase_price', 0):.4f} RON | Preț curent: {p.get('current_price', 'N/A')} RON")
+
+        pl_r = p.get("pl_ron")
+        pl_p = p.get("pl_percent")
+        if pl_r is not None:
+            lines.append(f"  P&L: {pl_r:+,.2f} RON ({pl_p:+.2f}%)")
+        else:
+            lines.append("  P&L: date indisponibile")
+
+        rsi = p.get("rsi")
+        rsi_sig = p.get("rsi_signal", "N/A")
+        lines.append(f"  RSI(14): {f'{rsi:.1f}' if rsi else 'N/A'} [{rsi_sig}]")
+
+        today_chg = p.get("price_change_percent")
+        if today_chg is not None:
+            lines.append(f"  Variație azi: {today_chg:+.2f}%")
+
+        # Fundamentale
+        fund = p.get("fundamentals", {})
+        f_parts = []
+        if fund.get("pe_ratio") is not None:
+            f_parts.append(f"P/E={fund['pe_ratio']:.2f}")
+        if fund.get("roe_percent") is not None:
+            f_parts.append(f"ROE={fund['roe_percent']:.1f}%")
+        if fund.get("eps") is not None:
+            f_parts.append(f"EPS={fund['eps']:.2f} RON")
+        if fund.get("debt_equity") is not None:
+            f_parts.append(f"D/E={fund['debt_equity']:.2f}")
+        if fund.get("pb_ratio"):
+            f_parts.append(f"P/B={fund['pb_ratio']:.2f}")
+
+        lines.append(f"  Fundamentale: {', '.join(f_parts) if f_parts else 'date indisponibile din EODHD'}")
+
+    lines += [
+        "",
+        "═══ FORMAT RĂSPUNS (JSON strict, fără text în afara JSON) ═══",
+        "",
+        'Returnează EXCLUSIV un obiect JSON valid, fără markdown, fără explicații în afara JSON-ului:',
+        "{",
+        '  "portfolio_summary": {',
+        '    "overall_signal": "HOLD",  // HOLD | BUY_MORE | REDUCE',
+        '    "risk_level": "MEDIU",     // SCĂZUT | MEDIU | RIDICAT',
+        '    "diversification_note": "scurt comentariu 1 frază",',
+        '    "global_recommendation": "2-3 fraze concrete bazate pe datele de mai sus"',
+        "  },",
+        '  "positions": [',
+        "    {",
+        '      "symbol": "SYM",',
+        '      "signal": "PĂSTREAZĂ",  // PĂSTREAZĂ | CUMPĂRĂ MAI MULT | CONSIDERĂ VÂNZARE',
+        '      "confidence": "RIDICAT", // RIDICAT | MEDIU | SCĂZUT',
+        '      "reason": "1-2 fraze concrete cu numărul exact (ex: RSI=57, P/E=8.45)",',
+        '      "key_metric": "indicatorul principal pozitiv sau de risc"',
+        "    }",
+        "  ]",
+        "}",
+    ]
+    return "\n".join(lines)
+
+
+@router.get("/ai-analysis")
+async def get_ai_portfolio_analysis(user: dict = Depends(require_auth)):
+    """
+    Faza 3 — AI Advisor per portofoliu:
+    - Recomandare per poziție: PĂSTREAZĂ / CUMPĂRĂ MAI MULT / CONSIDERĂ VÂNZARE
+    - Nivel de risc global: SCĂZUT / MEDIU / RIDICAT
+    - Rezumat global 2-3 fraze cu date reale
+
+    Cache: 1 oră per user (nu se regenerează la fiecare request).
+    Input AI: RSI, P/E, ROE, D/E, EPS, P&L%, variație azi — STRICT din EODHD.
+    """
+    _require_pro(user)
+
+    if not EMERGENT_KEY:
+        raise HTTPException(status_code=503, detail="AI Advisor temporar indisponibil")
+
+    db = await get_database()
+
+    # ── Verificare cache AI (1 oră) ──
+    cache_cutoff = datetime.now(timezone.utc) - timedelta(minutes=AI_CACHE_MINUTES)
+    cached_ai = await db.portfolio_ai_cache.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    )
+    if cached_ai:
+        generated_at = cached_ai.get("generated_at", "")
+        try:
+            gen_dt = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
+            if gen_dt.tzinfo is None:
+                gen_dt = gen_dt.replace(tzinfo=timezone.utc)
+            if gen_dt > cache_cutoff:
+                result = cached_ai.get("result", {})
+                result["from_cache"] = True
+                result["generated_at"] = generated_at
+                return result
+        except Exception:
+            pass
+
+    # ── Adună datele pentru prompt ──
+    raw = await db.portfolio_bvb_pro.find(
+        {"user_id": user["user_id"]}, {"_id": 0}
+    ).to_list(200)
+
+    if not raw:
+        raise HTTPException(status_code=400, detail="Portofoliu gol — adaugă poziții înainte de analiză AI")
+
+    symbols = [p["symbol"] for p in raw]
+
+    # Prețuri live + RSI în paralel
+    async with httpx.AsyncClient() as client:
+        prices, rsis = await asyncio.gather(
+            asyncio.gather(*[_get_live_price(client, sym) for sym in symbols]),
+            asyncio.gather(*[_get_rsi(client, sym) for sym in symbols]),
+        )
+
+    # Info companii
+    stocks_db = await db.stocks_bvb.find(
+        {"symbol": {"$in": symbols}}, {"_id": 0, "symbol": 1, "name": 1}
+    ).to_list(200)
+    info_map = {s["symbol"]: s for s in stocks_db}
+
+    # Calculează P&L per poziție
+    total_value = 0.0
+    total_invested = 0.0
+    positions_data = []
+
+    for i, pos in enumerate(raw):
+        sym = pos["symbol"]
+        price_data = prices[i]
+        current_price = price_data.get("price")
+        shares = pos["shares"]
+        purchase_price = pos["purchase_price"]
+        invested = shares * purchase_price
+        current_value = shares * current_price if current_price else None
+        pl_ron = round(current_value - invested, 2) if current_value else None
+        pl_pct = round((current_price - purchase_price) / purchase_price * 100, 2) if current_price else None
+
+        rsi_val = rsis[i]
+        total_invested += invested
+        if current_value:
+            total_value += current_value
+
+        # Fundamentale din cache
+        fund_cached = await db.fundamentals_daily_cache.find_one(
+            {"symbol": sym}, {"_id": 0}
+        )
+        roe_raw = fund_cached.get("roe") if fund_cached else None
+        roe_pct = round(roe_raw * 100, 1) if roe_raw is not None and abs(roe_raw) < 10 else roe_raw
+
+        positions_data.append({
+            "symbol": sym,
+            "name": info_map.get(sym, {}).get("name", sym),
+            "shares": shares,
+            "purchase_price": purchase_price,
+            "current_price": current_price,
+            "price_change_percent": price_data.get("change_percent"),
+            "current_value": round(current_value, 2) if current_value else None,
+            "invested": round(invested, 2),
+            "pl_ron": pl_ron,
+            "pl_percent": pl_pct,
+            "rsi": round(rsi_val, 1) if rsi_val else None,
+            "rsi_signal": _rsi_signal(rsi_val),
+            "fundamentals": {
+                "pe_ratio": fund_cached.get("pe_ratio") if fund_cached else None,
+                "roe_percent": roe_pct,
+                "eps": fund_cached.get("eps") if fund_cached else None,
+                "debt_equity": fund_cached.get("debt_equity") if fund_cached else None,
+                "pb_ratio": fund_cached.get("pb_ratio") if fund_cached and fund_cached.get("pb_ratio") else None,
+            } if fund_cached else {},
+        })
+
+    summary = {
+        "total_value": round(total_value, 2),
+        "total_invested": round(total_invested, 2),
+        "pl_ron": round(total_value - total_invested, 2),
+        "pl_percent": round((total_value - total_invested) / total_invested * 100, 2) if total_invested > 0 else 0,
+        "today_pl": round(sum(
+            (p.get("price_change_percent") or 0) / 100 * (p.get("current_value") or 0)
+            for p in positions_data
+        ), 2),
+        "positions_count": len(positions_data),
+    }
+
+    # ── Apel AI ──
+    prompt = _build_portfolio_prompt(positions_data, summary)
+    logger.info(f"[AI PORTFOLIO] Generating analysis for user {user['user_id']} ({len(positions_data)} positions)")
+
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+
+        chat = LlmChat(
+            api_key=EMERGENT_KEY,
+            session_id=f"portfolio_ai_{user['user_id']}",
+            system_message=(
+                "Ești un analist financiar expert pe piața BVB. "
+                "Răspunzi EXCLUSIV în format JSON valid, fără text în afara JSON-ului. "
+                "Ești direct, concis și bazat pe date reale. "
+                "Folosești date financiare reale și confirmate. "
+                "Nu estimezi, nu aproximezi, nu completezi lipsuri. "
+                "Dacă o valoare nu există, marchezi ca N/A în comentarii."
+            ),
+        ).with_model("openai", "gpt-4o-mini")
+
+        response = await chat.send_message(UserMessage(text=prompt))
+
+        # Curăță răspunsul (scoate markdown dacă există)
+        clean = response.strip()
+        if clean.startswith("```"):
+            clean = clean.split("\n", 1)[1] if "\n" in clean else clean[3:]
+        if clean.endswith("```"):
+            clean = clean.rsplit("```", 1)[0]
+        clean = clean.strip()
+
+        ai_result = json.loads(clean)
+
+    except json.JSONDecodeError as e:
+        logger.error(f"[AI PORTFOLIO] JSON parse error: {e}\nResponse: {response[:300]}")
+        raise HTTPException(status_code=500, detail="Răspuns AI invalid — încearcă din nou")
+    except Exception as e:
+        logger.error(f"[AI PORTFOLIO] AI error: {e}")
+        raise HTTPException(status_code=500, detail=f"Eroare AI: {str(e)[:100]}")
+
+    generated_at = datetime.now(timezone.utc).isoformat()
+    result = {
+        **ai_result,
+        "from_cache": False,
+        "generated_at": generated_at,
+        "positions_analyzed": len(positions_data),
+    }
+
+    # ── Salvare cache ──
+    await db.portfolio_ai_cache.replace_one(
+        {"user_id": user["user_id"]},
+        {"user_id": user["user_id"], "result": result, "generated_at": generated_at},
+        upsert=True,
+    )
+
+    logger.info(f"[AI PORTFOLIO] Analysis complete for {user['user_id']}")
+    return result
