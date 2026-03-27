@@ -307,27 +307,28 @@ export default function ScreenerProPage() {
   
   // Export to CSV
   const exportCSV = () => {
-    const headers = ['Simbol', 'Nume', 'Preț', 'Var%', 'RSI', 'MACD', 'P/E', 'ROE%', 'Semnal', 'Scor'];
+    const headers = ['Simbol', 'Nume', 'Preț (RON)', 'Variație %', 'RSI', 'MACD', 'P/E', 'ROE %', 'Semnal', 'Scor'];
     const rows = sortedStocks.map(s => [
       s.symbol,
-      s.name,
-      s.price,
-      s.change_percent,
-      s.rsi,
-      s.macd,
-      s.pe_ratio,
-      s.roe,
-      s.signal_text,
-      s.signal_score
+      `"${(s.name || '').replace(/"/g, '""')}"`,
+      s.price ?? '',
+      s.change_percent ?? '',
+      s.rsi ?? '',
+      s.macd ?? '',
+      s.pe_ratio ?? '',
+      s.roe ?? '',
+      s.signal_text ?? '',
+      s.signal_score ?? ''
     ]);
     
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `screener_pro_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
+    URL.revokeObjectURL(url);
   };
   
   // If not PRO, show upgrade prompt

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Bell, BellOff, TrendingUp, Newspaper, Calendar, GraduationCap,
-  Save, Check, Loader2, AlertTriangle, Smartphone, Mail, Globe
+  Save, Check, Loader2, AlertTriangle, Smartphone, Mail, Globe, MailCheck
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -52,24 +52,25 @@ const CategorySection = ({ title, icon: Icon, children, color }) => (
 export default function NotificationSettingsPage() {
   const { user, token } = useAuth();
   const [preferences, setPreferences] = useState({
-    // Market
     market_open_close: false,
     market_big_moves: false,
     daily_summary: false,
-    // Watchlist
     watchlist_price_alerts: true,
     watchlist_big_moves: true,
     dividend_announcements: false,
-    // News
     important_news: false,
     watchlist_news: false,
-    // Education
     lesson_reminders: false
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [browserPermission, setBrowserPermission] = useState('default');
+
+  // Email subscription state
+  const [emailSubscribed, setEmailSubscribed] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailSaved, setEmailSaved] = useState(false);
 
   // Check browser notification permission
   useEffect(() => {
@@ -78,21 +79,26 @@ export default function NotificationSettingsPage() {
     }
   }, []);
 
-  // Fetch preferences
+  // Fetch preferences + email subscription status
   useEffect(() => {
-    const fetchPreferences = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
+    const fetchAll = async () => {
+      if (!token) { setLoading(false); return; }
       try {
-        const res = await fetch(`${API_URL}/api/watchlist/notifications/preferences`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
+        const [prefsRes, emailRes] = await Promise.all([
+          fetch(`${API_URL}/api/watchlist/notifications/preferences`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }),
+          fetch(`${API_URL}/api/daily-summary/my-subscription`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+        ]);
+        if (prefsRes.ok) {
+          const data = await prefsRes.json();
           setPreferences(prev => ({ ...prev, ...data }));
+        }
+        if (emailRes.ok) {
+          const data = await emailRes.json();
+          setEmailSubscribed(data.subscribed);
         }
       } catch (err) {
         console.error('Error fetching preferences:', err);
@@ -100,9 +106,30 @@ export default function NotificationSettingsPage() {
         setLoading(false);
       }
     };
-
-    fetchPreferences();
+    fetchAll();
   }, [token]);
+
+  // Toggle email subscription
+  const toggleEmailSubscription = async () => {
+    if (!token) return;
+    setEmailLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/daily-summary/toggle-subscription`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setEmailSubscribed(data.subscribed);
+        setEmailSaved(true);
+        setTimeout(() => setEmailSaved(false), 3000);
+      }
+    } catch (err) {
+      console.error('Error toggling subscription:', err);
+    } finally {
+      setEmailLoading(false);
+    }
+  };
 
   // Request browser notification permission
   const requestPermission = async () => {
@@ -236,6 +263,60 @@ export default function NotificationSettingsPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* EMAIL SUBSCRIPTION SECTION */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card className="border-blue-200 dark:border-blue-800">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <MailCheck className="w-5 h-5" />
+                Email Zilnic — Rezumatul Bursei
+              </CardTitle>
+              <CardDescription className="text-blue-100">
+                Primești un email după ora 18:05, după închiderea BVB
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${emailSubscribed ? 'bg-green-100 dark:bg-green-900/30' : 'bg-muted'}`}>
+                    <Mail className={`w-5 h-5 ${emailSubscribed ? 'text-green-600' : 'text-muted-foreground'}`} />
+                  </div>
+                  <div>
+                    <p className="font-medium">Rezumat Zilnic BVB</p>
+                    <p className="text-sm text-muted-foreground">
+                      {emailSubscribed
+                        ? `Activ — emailul vine zilnic la ${user?.email}`
+                        : 'Dezactivat — nu primești emailul zilnic'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  {emailSaved && (
+                    <Badge variant="outline" className="text-green-600 border-green-300">
+                      <Check className="w-3 h-3 mr-1" /> Salvat!
+                    </Badge>
+                  )}
+                  {emailLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                  ) : (
+                    <Switch
+                      checked={emailSubscribed}
+                      onCheckedChange={toggleEmailSubscription}
+                      data-testid="daily-summary-email-toggle"
+                    />
+                  )}
+                </div>
+              </div>
+              {emailSubscribed && (
+                <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 text-sm text-green-700 dark:text-green-400 flex items-start gap-2">
+                  <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>Ești abonat! Vei primi rezumatul zilnic la <strong>{user?.email}</strong> după ora 18:05 în zilele de tranzacționare.</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Market Notifications */}
         <CategorySection

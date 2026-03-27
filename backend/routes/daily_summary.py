@@ -2,11 +2,12 @@
 Daily Summary Routes
 Endpoint-uri pentru rezumatul zilnic BVB
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from config.database import get_database
 from services.daily_summary_service import daily_summary_service
+from routes.auth import get_current_user
 import logging
 
 logger = logging.getLogger(__name__)
@@ -103,7 +104,7 @@ async def subscribe_to_daily_summary(request: SubscribeRequest):
     try:
         # Actualizează preferințele userului
         if request.user_id:
-            result = await db.users.update_one(
+            await db.users.update_one(
                 {"user_id": request.user_id},
                 {
                     "$set": {
@@ -180,4 +181,41 @@ async def get_subscribers_count():
         "total": users_count + anon_count,
         "registered_users": users_count,
         "anonymous": anon_count
+    }
+
+
+@router.get("/my-subscription")
+async def get_my_subscription(request: Request):
+    """Returnează statusul abonamentului curent al userului logat."""
+    user = await get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    return {
+        "subscribed": bool(user.get("daily_summary_enabled", False)),
+        "email": user.get("email", "")
+    }
+
+
+@router.post("/toggle-subscription")
+async def toggle_my_subscription(request: Request):
+    """Toggle abonamentul la rezumatul zilnic pentru userul logat."""
+    user = await get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    db = await get_database()
+    current = bool(user.get("daily_summary_enabled", False))
+    new_state = not current
+    
+    await db.users.update_one(
+        {"user_id": user["user_id"]},
+        {"$set": {"daily_summary_enabled": new_state}}
+    )
+    
+    action = "abonat" if new_state else "dezabonat"
+    return {
+        "success": True,
+        "subscribed": new_state,
+        "message": f"Te-ai {action} cu succes la Rezumatul Zilei BVB!"
     }

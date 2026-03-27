@@ -75,6 +75,7 @@ const PortfolioBVBPage = lazy(() => import('./pages/PortfolioBVBPage'));
 const TryProPage = lazy(() => import('./pages/TryProPage'));
 const DailySummaryPage = lazy(() => import('./pages/DailySummaryPage'));
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
+const CFDvsActiuniPage = lazy(() => import('./pages/CFDvsActiuniPage'));
 
 // Lazy load heavy components
 const TickerBar = lazy(() => import('./components/TickerBar'));
@@ -204,6 +205,7 @@ function Navigation({ darkMode, toggleDarkMode }) {
   const academiaItems = [
     { path: '/trading-school', label: 'Învață Trading', icon: '🎓' },
     { path: '/financial-education', label: 'Educație Financiară', icon: '📚' },
+    { path: '/educatie-cfd-vs-actiuni', label: 'CFD vs Acțiuni Reale', icon: '⚠️', badge: 'NOU' },
   ];
 
   const instrumenteItems = [
@@ -442,6 +444,7 @@ function AppRouter() {
         <Route path="/incearca-pro" element={<TryProPage />} />
         <Route path="/rezumat-zilnic" element={<DailySummaryPage />} />
         <Route path="/payment/success" element={<PaymentSuccessPage />} />
+        <Route path="/educatie-cfd-vs-actiuni" element={<CFDvsActiuniPage />} />
       </Routes>
     </Suspense>
   );
@@ -468,6 +471,7 @@ function Footer() {
               <li><Link to="/stocks" className="text-muted-foreground hover:text-foreground">Acțiuni BVB</Link></li>
               <li><Link to="/trading-school" className="text-muted-foreground hover:text-foreground">Trading School</Link></li>
               <li><Link to="/financial-education" className="text-muted-foreground hover:text-foreground">Educație Financiară</Link></li>
+              <li><Link to="/educatie-cfd-vs-actiuni" className="text-muted-foreground hover:text-foreground">CFD vs Acțiuni Reale</Link></li>
               <li><Link to="/glossary" className="text-muted-foreground hover:text-foreground">Glosar</Link></li>
             </ul>
           </div>

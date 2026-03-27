@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, TrendingUp, TrendingDown, Trash2, PieChart, Target, Award, Lock, AlertCircle, BarChart3, DollarSign } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, Trash2, PieChart, Target, Award, Lock, AlertCircle, BarChart3, DollarSign, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -157,6 +157,31 @@ export default function PortfolioBVBPage() {
     }
   };
 
+  const exportPortfolioCSV = () => {
+    const positions = portfolio?.positions || [];
+    if (positions.length === 0) return;
+    
+    const headers = ['Simbol', 'Acțiuni', 'Preț Achiziție (RON)', 'Preț Curent (RON)', 'Valoare Totală (RON)', 'Profit/Pierdere (RON)', 'Profit/Pierdere (%)'];
+    const rows = positions.map(p => [
+      p.symbol,
+      p.shares,
+      p.avg_purchase_price?.toFixed(2) ?? '',
+      p.current_price?.toFixed(2) ?? '',
+      p.total_value?.toFixed(2) ?? '',
+      p.profit_loss?.toFixed(2) ?? '',
+      p.profit_loss_percent?.toFixed(2) ?? ''
+    ]);
+
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `portofoliu_bvb_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (!user) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -294,9 +319,16 @@ export default function PortfolioBVBPage() {
         {/* Positions */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <CardTitle>Poziții Active</CardTitle>
-              <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+              <div className="flex gap-2">
+                {positions.length > 0 && (
+                  <Button variant="outline" size="sm" onClick={exportPortfolioCSV} data-testid="export-portfolio-csv">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
+                )}
+                <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
                 <DialogTrigger asChild>
                   <Button>
                     <Plus className="w-4 h-4 mr-2" />
@@ -341,6 +373,7 @@ export default function PortfolioBVBPage() {
                   </div>
                 </DialogContent>
               </Dialog>
+            </div>
             </div>
           </CardHeader>
           <CardContent>
