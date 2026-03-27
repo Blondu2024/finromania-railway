@@ -167,6 +167,12 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
   - Score badges cu culori gradient (verde=Excelent, albastru=FoarteBun, etc.)
   - MongoDB cache pentru clasament (se actualizează la fiecare 6h)
   - PRO paywall cu "Upgrade la PRO" pentru utilizatori free
+- [x] **NEW: Comparație Dividende Side-by-Side** — Compară 2-4 acțiuni BVB
+  - Checkboxes în tabelul de clasament + sticky bar "Compară"
+  - Grouped bar chart cu culori diferite per acțiune (albastru, verde, amber, rosu)
+  - Summary cards cu Score, Yield, CAGR, Preț pentru fiecare acțiune
+  - Tabel comparativ expandabil an-cu-an
+  - API: `/api/bvb-dividends/compare?symbols=TLV,BRD,SNP`
 
 ## Completed (March 26, 2026 Session)
 - [x] **Screener PRO** with LIVE technical indicators + fundamentals from EODHD
