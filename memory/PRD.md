@@ -145,6 +145,18 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [ ] P2: Mobile responsiveness issues
 - [ ] P2: Slow page load times
 
+## Completed (March 27, 2026 — Redesign Navigație EODHD-style)
+- [x] **Layout redesign complet — stil EODHD**
+  - TopNavbar simplu: Logo + 5 itemuri principale (Acasă, Acțiuni BVB, Piețe Globale, Știri, Rezumat)
+  - Sidebar stânga permanent pe desktop (lg+): 4 secțiuni — PIEȚE, PRO TOOLS, INSTRUMENTE, ACADEMIA
+    - PIEȚE: Acțiuni BVB, Piețe Globale, Calendar Dividende, Știri Financiare
+    - PRO TOOLS: Screener PRO (badge PRO), Calculator Dividende (badge NOU), Screener Basic
+    - INSTRUMENTE: Calculator Fiscal, Simulator Antreprenor, Convertor, Rezumat Zilnic
+    - ACADEMIA: Trading School, Educație Financiară, CFD vs Acțiuni (badge NOU), Glosar
+  - Mobile: sidebar ascuns, hamburger deschide Sheet din stânga cu toate linkurile
+  - Hero section: eliminate cele 5 carduri mari (BVB, Global, Calculator etc.) — rămân doar titlul + 2 CTA
+  - Footer compact
+
 ## Completed (March 27, 2026 — Acuratețe Date Financiare Screener PRO)
 - [x] **MAJOR: Date financiare 100% reale, fără estimări (Screener PRO)**
   - Dividend Yield: STRICT din dividende confirmate BVB.ro (nu EODHD estimate)
