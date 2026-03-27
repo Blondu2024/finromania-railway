@@ -24,7 +24,7 @@ const LEVEL_INFO = {
   advanced: {
     name: 'Expert',
     description: 'Analiză fundamentală și grafice pro',
-    color: 'purple',
+    color: 'blue',
     unlocks: [
       'Analiză fundamentală completă',
       'AI trasează linii pe grafice',
@@ -289,7 +289,7 @@ export default function QuizPage() {
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       {/* Header */}
-      <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <Card className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
         <CardContent className="p-6">
           <div className="flex justify-between items-center">
             <div>

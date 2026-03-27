@@ -458,10 +458,10 @@ export default function FiscalSimulatorPage() {
 
                   {/* Comparații - NOU */}
                   {e.comparatii && e.comparatii.length > 0 && (
-                    <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg">
-                      <p className="text-xs font-medium text-purple-700 dark:text-purple-400 mb-2">Comparație cu alternative:</p>
+                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                      <p className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-2">Comparație cu alternative:</p>
                       {e.comparatii.map((c, j) => (
-                        <div key={j} className="text-xs flex justify-between items-center py-1 border-b border-purple-100 last:border-0">
+                        <div key={j} className="text-xs flex justify-between items-center py-1 border-b border-blue-100 last:border-0">
                           <span>{c.alternativa}</span>
                           <span className={c.diferenta < 0 ? 'text-green-600' : 'text-red-600'}>
                             {c.diferenta < 0 ? '↓' : '↑'} {Math.abs(c.diferenta).toLocaleString('ro-RO')} RON
@@ -485,9 +485,9 @@ export default function FiscalSimulatorPage() {
 
           {/* Sumar Comparativ Global - NOU */}
           {result.sumar_comparativ && (
-            <Card className="border-purple-200 bg-purple-50 dark:bg-purple-950/20">
+            <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
               <CardHeader>
-                <CardTitle className="text-purple-700 dark:text-purple-400">Sumar Comparativ</CardTitle>
+                <CardTitle className="text-blue-700 dark:text-blue-400">Sumar Comparativ</CardTitle>
                 <CardDescription>Dacă toate veniturile ar fi pe un singur regim</CardDescription>
               </CardHeader>
               <CardContent>

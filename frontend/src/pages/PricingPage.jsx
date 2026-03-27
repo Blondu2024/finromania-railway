@@ -113,7 +113,7 @@ export default function PricingPage() {
             💎 Planuri & Prețuri
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold">
-            Alege Planul <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Potrivit</span>
+            Alege Planul <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-500">Potrivit</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Începe gratuit, treci la PRO pentru funcții avansate

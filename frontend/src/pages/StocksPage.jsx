@@ -260,7 +260,7 @@ const StockHeatmap = ({ stocks }) => {
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+      <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="w-5 h-5" />
           🗺️ Heatmap BVB
@@ -518,7 +518,7 @@ const SectorPerformance = ({ sectors }) => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Building2 className="w-5 h-5 text-indigo-600" />
+          <Building2 className="w-5 h-5 text-blue-600" />
           Performanță pe Sectoare
         </CardTitle>
       </CardHeader>
@@ -730,7 +730,7 @@ export default function StocksPage() {
           className="text-center py-4"
         >
           <div className="flex items-center justify-center gap-3 mb-2">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
               🏛️ Bursa de Valori București
             </h1>
             <Badge className={`${delayInfo.color} text-white`}>
@@ -765,7 +765,7 @@ export default function StocksPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold flex items-center gap-2">
-                <Activity className="w-5 h-5 text-purple-600" />
+                <Activity className="w-5 h-5 text-blue-600" />
                 Indicii BVB
               </h2>
               <Button variant="outline" onClick={handleRefresh} disabled={refreshing} size="sm">

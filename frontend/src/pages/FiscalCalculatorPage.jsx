@@ -314,7 +314,7 @@ export default function FiscalCalculatorPage() {
             🏆 Actualizat 2026
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold">
-            Calculator <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Fiscal BVB</span>
+            Calculator <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-500">Fiscal BVB</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Știai că pe BVB plătești doar <strong className="text-green-600">1-3% impozit</strong> pe câștiguri?
@@ -345,10 +345,10 @@ export default function FiscalCalculatorPage() {
               <p className="text-xs text-muted-foreground">🌍 Internațional</p>
             </CardContent>
           </Card>
-          <Card className="bg-purple-500/10 border-purple-500/30">
+          <Card className="bg-blue-500/10 border-blue-500/30">
             <CardContent className="p-4 text-center">
-              <TrendingUp className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-              <p className="text-xl font-bold text-purple-600">8%</p>
+              <TrendingUp className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+              <p className="text-xl font-bold text-blue-600">8%</p>
               <p className="text-xs text-muted-foreground">Dividende RO</p>
             </CardContent>
           </Card>
@@ -356,7 +356,7 @@ export default function FiscalCalculatorPage() {
 
         {/* Quick Preview */}
         {preview && !results && (
-          <Card className={`${tipPiata === 'bvb' ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-blue-600 to-purple-600'} text-white`}>
+          <Card className={`${tipPiata === 'bvb' ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-blue-700 to-blue-500'} text-white`}>
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -419,7 +419,7 @@ export default function FiscalCalculatorPage() {
               <div className="space-y-3">
                 <Label className="flex items-center justify-between">
                   Dividende primite
-                  <span className="font-bold text-purple-600">{formatRON(dividende)}</span>
+                  <span className="font-bold text-blue-600">{formatRON(dividende)}</span>
                 </Label>
                 <Slider
                   value={[dividende]}
@@ -496,7 +496,7 @@ export default function FiscalCalculatorPage() {
 
               {/* Calculate Button */}
               <Button 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="w-full bg-gradient-to-r from-blue-700 to-blue-500 hover:from-blue-700 hover:to-blue-700"
                 size="lg"
                 onClick={handleCalculate}
                 disabled={loading}
@@ -635,8 +635,8 @@ export default function FiscalCalculatorPage() {
                   <p className="text-sm text-muted-foreground">Prag: <strong>{constante.cass?.prag_activare}</strong></p>
                   <p className="text-xs text-muted-foreground mt-1">{constante.cass?.nota}</p>
                 </div>
-                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
-                  <h4 className="font-semibold text-purple-700 dark:text-purple-300 mb-2">🏢 SRL Micro</h4>
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🏢 SRL Micro</h4>
                   <p className="text-sm text-muted-foreground">Cu angajat: <strong>{constante.micro_srl?.cu_angajat}</strong></p>
                   <p className="text-sm text-muted-foreground">Fără angajat: <strong>{constante.micro_srl?.fara_angajat}</strong></p>
                 </div>
@@ -647,7 +647,7 @@ export default function FiscalCalculatorPage() {
 
         {/* AI Fiscal Advisor */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-gradient-to-br from-blue-600/10 to-purple-600/10 border-blue-500/30">
+          <Card className="bg-gradient-to-br from-blue-600/10 to-blue-600/10 border-blue-500/30">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-blue-500" />

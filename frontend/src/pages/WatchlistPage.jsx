@@ -173,7 +173,7 @@ const NotificationSettingsDialog = ({ token }) => {
 
         <div className="space-y-4 py-4">
           {/* Push Notifications Section - NEW */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
             <h4 className="font-semibold text-sm text-blue-600 dark:text-blue-400 mb-3 flex items-center gap-2">
               <Smartphone className="w-4 h-4" /> Notificări Push (Timp Real)
             </h4>
@@ -280,7 +280,7 @@ const NotificationSettingsDialog = ({ token }) => {
 
           {/* Știri */}
           <div>
-            <h4 className="font-semibold text-sm text-purple-600 mb-2 flex items-center gap-2">
+            <h4 className="font-semibold text-sm text-blue-600 mb-2 flex items-center gap-2">
               <Newspaper className="w-4 h-4" /> Știri
             </h4>
             <div className="bg-muted/30 rounded-lg px-3">

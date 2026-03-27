@@ -18,7 +18,7 @@ const StatCard = ({ title, value, subtitle, icon: Icon, trend, trendValue, color
   const colorClasses = {
     blue: "from-blue-500 to-blue-600",
     green: "from-green-500 to-green-600",
-    purple: "from-purple-500 to-purple-600",
+    slate: "from-slate-500 to-slate-600",
     orange: "from-orange-500 to-orange-600",
     pink: "from-pink-500 to-pink-600",
     cyan: "from-cyan-500 to-cyan-600",
@@ -114,7 +114,7 @@ const UsersTable = ({ users, loading, onViewUser }) => (
             <tr key={user.user_id || i} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
               <td className="py-3 px-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-medium">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center text-white text-sm font-medium">
                     {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?'}
                   </div>
                   <div>
@@ -187,7 +187,7 @@ const TopPages = ({ pages, loading }) => (
             </div>
             <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"
                 style={{ width: `${(page.views / (pages[0]?.views || 1)) * 100}%` }}
               />
             </div>
@@ -279,7 +279,7 @@ export default function AdminDashboardPro() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -355,7 +355,7 @@ export default function AdminDashboardPro() {
                 value={overview?.ai_usage?.total_credits_used || 0}
                 subtitle={`${overview?.ai_usage?.requests_today || 0} azi`}
                 icon={Brain}
-                color="purple"
+                color="blue"
                 loading={loading}
               />
               <StatCard
@@ -410,7 +410,7 @@ export default function AdminDashboardPro() {
                 title="Watchlist Items"
                 value={overview?.engagement?.watchlist_items || 0}
                 icon={Award}
-                color="purple"
+                color="blue"
                 loading={loading}
               />
               <StatCard
@@ -589,7 +589,7 @@ export default function AdminDashboardPro() {
                 title="Total Credite"
                 value={aiAnalytics?.total_credits_used || overview?.ai_usage?.total_credits_used || 0}
                 icon={Brain}
-                color="purple"
+                color="blue"
                 loading={loading}
               />
               <StatCard
@@ -629,7 +629,7 @@ export default function AdminDashboardPro() {
                 <div className="space-y-3">
                   {aiAnalytics?.top_users?.map((u, i) => (
                     <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-sm font-bold">
                         {i + 1}
                       </div>
                       <div className="flex-1 min-w-0">

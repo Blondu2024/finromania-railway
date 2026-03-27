@@ -275,8 +275,8 @@ export default function HomePage() {
               icon={Globe}
               title="Piețe Globale"
               description="US, EU, Asia - Delay 1 secundă!"
-              badge={{ text: "1s Delay", color: "bg-purple-500" }}
-              gradient="from-purple-500 to-pink-500"
+              badge={{ text: "1s Delay", color: "bg-blue-500" }}
+              gradient="from-blue-500 to-cyan-500"
               stats={[
                 { value: "LIVE", label: "Real-time" },
                 { value: "1s", label: "Delay" }
@@ -340,7 +340,7 @@ export default function HomePage() {
               title="Portofoliu BVB"
               description="Sistem 3 Straturi cu AI"
               badge={user ? { text: "Activ", color: "bg-green-500" } : { text: "Login", color: "bg-gray-500" }}
-              gradient="from-blue-500 to-indigo-500"
+              gradient="from-blue-600 to-blue-400"
               stats={[
                 { value: "3", label: "Nivele" },
                 { value: "AI", label: "Analiză" }
@@ -352,8 +352,8 @@ export default function HomePage() {
               icon={Activity}
               title="AI Advisor"
               description="5 gratis/zi, nelimitat cu PRO"
-              badge={{ text: "AI", color: "bg-purple-500" }}
-              gradient="from-purple-500 to-fuchsia-500"
+              badge={{ text: "AI", color: "bg-blue-500" }}
+              gradient="from-blue-500 to-cyan-500"
               stats={[
                 { value: "5", label: "FREE/zi" },
                 { value: "∞", label: "PRO" }
@@ -424,7 +424,7 @@ export default function HomePage() {
             <div className="flex justify-between items-center">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-                  <Newspaper className="w-6 h-6 text-purple-600" />
+                  <Newspaper className="w-6 h-6 text-blue-600" />
                   Ultimele Știri Financiare
                 </h2>
                 <p className="text-muted-foreground mt-1">Știri din România și surse internaționale</p>
@@ -707,10 +707,10 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-purple-200 hover:border-purple-400 transition-colors">
+            <Card className="border-2 border-blue-200 hover:border-blue-400 transition-colors">
               <CardContent className="p-6 text-center space-y-3">
-                <div className="inline-block p-4 bg-purple-100 rounded-full">
-                  <Award className="w-8 h-8 text-purple-600" />
+                <div className="inline-block p-4 bg-blue-100 rounded-full">
+                  <Award className="w-8 h-8 text-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold">Verificare Cunoștințe</h3>
                 <p className="text-muted-foreground">

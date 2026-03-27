@@ -168,7 +168,7 @@ export default function NewsPage() {
         {/* Romanian News Tab */}
         <TabsContent value="romania" className="space-y-4">
           {/* Stats for Romanian */}
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+          <Card className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
             <CardContent className="p-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <span className="text-sm text-muted-foreground">

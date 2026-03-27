@@ -21,7 +21,7 @@ const WHY_PRO_CARDS = [
     icon: Brain,
     title: "Învață Fără Limite",
     description: "AI Advisor nelimitat înseamnă că poți întreba orice, oricând. Înveți în ritmul tău, fără să numeri întrebările.",
-    gradient: "from-blue-500 to-purple-500"
+    gradient: "from-blue-500 to-blue-500"
   },
   {
     icon: TrendingUp,
@@ -33,7 +33,7 @@ const WHY_PRO_CARDS = [
     icon: Target,
     title: "Monitorizare Completă",
     description: "Watchlist nelimitat și alerte pentru toate companiile din portofoliu. Nu mai alegi între acțiuni - le urmărești pe toate.",
-    gradient: "from-purple-500 to-pink-500"
+    gradient: "from-blue-500 to-cyan-500"
   }
 ];
 
@@ -267,7 +267,7 @@ export default function TryProPage() {
         </div>
 
         {/* Trust & Security */}
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+        <Card className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-900/20 dark:to-blue-900/20">
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-4">

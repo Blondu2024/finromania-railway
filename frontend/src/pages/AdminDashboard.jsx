@@ -151,7 +151,7 @@ export default function AdminDashboard() {
                 <p className="text-sm text-muted-foreground">Credite AI Folosite</p>
                 <p className="text-3xl font-bold">{dashboard?.overview?.total_ai_credits_used || 0}</p>
               </div>
-              <Brain className="w-10 h-10 text-purple-500 opacity-50" />
+              <Brain className="w-10 h-10 text-blue-500 opacity-50" />
             </div>
           </CardContent>
         </Card>
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-muted-foreground">Login-uri</p>
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <p className="text-4xl font-bold text-purple-600">{dashboard?.today?.ai_requests || 0}</p>
+              <p className="text-4xl font-bold text-blue-600">{dashboard?.today?.ai_requests || 0}</p>
               <p className="text-sm text-muted-foreground">Cereri AI</p>
             </div>
           </div>
@@ -207,7 +207,7 @@ export default function AdminDashboard() {
                 {aiStats.daily_usage?.map((day, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center">
                     <div 
-                      className="w-full bg-purple-500 rounded-t"
+                      className="w-full bg-blue-500 rounded-t"
                       style={{ 
                         height: `${Math.max(4, (day.credits / Math.max(...aiStats.daily_usage.map(d => d.credits || 1))) * 80)}px` 
                       }}
@@ -230,7 +230,7 @@ export default function AdminDashboard() {
                           <Badge variant="outline">{i + 1}</Badge>
                           <span className="text-sm">{u.email}</span>
                         </div>
-                        <Badge className="bg-purple-600">
+                        <Badge className="bg-blue-600">
                           {u.ai_credits_used} credite
                         </Badge>
                       </div>
@@ -285,7 +285,7 @@ export default function AdminDashboard() {
                     <td className="py-2">{u.name || '-'}</td>
                     <td className="text-center py-2">{u.total_logins || 0}</td>
                     <td className="text-center py-2">
-                      <Badge variant="outline" className="text-purple-600">
+                      <Badge variant="outline" className="text-blue-600">
                         {u.ai_credits_used || 0}
                       </Badge>
                     </td>

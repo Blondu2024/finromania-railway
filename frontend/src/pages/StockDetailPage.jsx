@@ -279,7 +279,7 @@ export default function StockDetailPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
-              <Activity className="w-4 h-4 text-purple-600" />
+              <Activity className="w-4 h-4 text-blue-600" />
               <span className="text-sm">Volum Total</span>
             </div>
             <p className="text-2xl font-bold">

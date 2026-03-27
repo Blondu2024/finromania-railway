@@ -162,7 +162,7 @@ export default function PaymentSuccessPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
               <Button 
-                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600"
+                className="flex-1 bg-gradient-to-r from-blue-700 to-blue-500"
                 onClick={() => navigate('/global')}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />

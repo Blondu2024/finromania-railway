@@ -239,7 +239,7 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade }) => {
                 Randament Dividend
               </li>
               <li className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-purple-500" />
+                <BarChart3 className="w-4 h-4 text-blue-500" />
                 Marjă Profit, Grad Îndatorare
               </li>
             </ul>
@@ -349,7 +349,7 @@ const ProStockRow = ({ stock, index }) => {
           {isPositive ? '+' : ''}{stock.change_percent?.toFixed(2)}%
         </span>
       </td>
-      <td className="p-3 text-right font-medium text-purple-600">
+      <td className="p-3 text-right font-medium text-blue-600">
         {stock.pe_ratio?.toFixed(1) || '-'}
       </td>
       <td className="p-3 text-right text-blue-600">
@@ -510,7 +510,7 @@ export default function StockScreenerPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center py-4"
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent mb-2">
             🔍 Stock Screener BVB
           </h1>
           <p className="text-muted-foreground">Găsește oportunitățile de investiție potrivite pentru tine</p>

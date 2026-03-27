@@ -162,7 +162,7 @@ export default function FAQPage() {
           </div>
         ))}
 
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+        <Card className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-900/20 dark:to-blue-900/20">
           <CardContent className="p-8 text-center">
             <h3 className="text-xl font-bold mb-2">Nu ai găsit răspunsul?</h3>
             <p className="text-muted-foreground mb-4">

@@ -116,7 +116,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
 
   return (
     <Card className="w-full">
-      <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+      <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />

@@ -282,7 +282,7 @@ export default function CFDvsActiuniPage() {
               icon: TrendingUp,
               title: 'Screener PRO',
               desc: 'Identifică cele mai bune oportunități pe BVB cu indicatori tehnici (RSI, MACD) și fundamentali (P/E, ROE).',
-              color: 'purple',
+              color: 'amber',
               link: '/screener-pro',
               linkText: 'Deschide Screener PRO'
             },

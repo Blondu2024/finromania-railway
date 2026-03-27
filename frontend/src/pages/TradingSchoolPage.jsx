@@ -73,9 +73,9 @@ export default function TradingSchoolPage() {
   const progressPercent = totalLessons > 0 ? (completedCount / totalLessons) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+      <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center space-y-6">
             <div className="inline-block p-4 bg-white/20 rounded-full backdrop-blur-sm">
@@ -261,7 +261,7 @@ export default function TradingSchoolPage() {
 
         {/* Call to Action */}
         {!user && (
-          <Card className="mt-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
+          <Card className="mt-12 bg-gradient-to-r from-blue-700 to-blue-500 text-white border-0">
             <CardContent className="p-8 text-center">
               <Trophy className="w-12 h-12 mx-auto mb-4" />
               <h3 className="text-2xl font-bold mb-2">Gata să Începi?</h3>

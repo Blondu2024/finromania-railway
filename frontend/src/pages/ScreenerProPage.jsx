@@ -415,7 +415,7 @@ export default function ScreenerProPage() {
                   <p className="text-sm text-muted-foreground">P/E, ROE, EPS, Dividend Yield, Market Cap</p>
                 </div>
                 <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
-                  <Target className="w-8 h-8 text-purple-500 mb-2" />
+                  <Target className="w-8 h-8 text-blue-500 mb-2" />
                   <h3 className="font-bold">Semnale AI</h3>
                   <p className="text-sm text-muted-foreground">Strong Buy → Strong Sell bazat pe toți indicatorii</p>
                 </div>

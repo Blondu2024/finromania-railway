@@ -24,7 +24,7 @@ const LevelBadge = ({ level }) => {
   const config = {
     beginner: { label: 'Începător', color: 'bg-green-500', icon: '🟢' },
     intermediate: { label: 'Mediu', color: 'bg-blue-500', icon: '🟡' },
-    advanced: { label: 'Expert', color: 'bg-purple-500', icon: '🔴' }
+    advanced: { label: 'Expert', color: 'bg-blue-500', icon: '🔴' }
   };
   
   const c = config[level] || config.beginner;
@@ -231,7 +231,7 @@ export default function PortfolioBVBPage() {
         </div>
 
         {/* Level Features */}
-        <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30">
+        <Card className="bg-gradient-to-r from-blue-500/10 to-blue-500/10 border-blue-500/30">
           <CardContent className="p-4">
             <h3 className="font-semibold mb-2 flex items-center gap-2">
               <Target className="w-5 h-5" />

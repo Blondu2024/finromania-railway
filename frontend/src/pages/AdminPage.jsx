@@ -229,7 +229,7 @@ export default function AdminPage() {
               <CardContent className="p-6">
                 <div>
                   <p className="text-sm text-muted-foreground">AI Queries Total</p>
-                  <p className="text-2xl font-bold text-purple-600">{stats.total_ai_queries}</p>
+                  <p className="text-2xl font-bold text-blue-600">{stats.total_ai_queries}</p>
                   <p className="text-xs text-muted-foreground">Toate întrebările AI</p>
                 </div>
               </CardContent>

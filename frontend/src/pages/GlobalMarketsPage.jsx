@@ -314,7 +314,7 @@ const ExchangeCard = ({ ex, nowUTC }) => {
       animate={{ opacity: 1, y: 0 }}
       className={`rounded-xl p-3 border transition-all ${
         ex.alwaysOpen
-          ? 'bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20'
+          ? 'bg-gradient-to-br from-blue-500/10 to-blue-500/10 border-blue-500/20'
           : isOpen
           ? 'bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/25'
           : 'bg-gradient-to-br from-slate-500/10 to-slate-600/10 border-slate-500/20'
@@ -476,7 +476,7 @@ const GlobalHeatmap = ({ assets, onAssetClick }) => {
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+      <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="w-5 h-5" />
           🗺️ Heatmap Global
@@ -757,7 +757,7 @@ export default function GlobalMarketsPage() {
           className="text-center py-4"
         >
           <div className="flex items-center justify-center gap-3 mb-2">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
               🌍 Piețe Globale
             </h1>
             <Badge className={`${delayInfo.color} text-white ${isPro ? 'animate-pulse' : ''}`}>
@@ -859,7 +859,7 @@ export default function GlobalMarketsPage() {
         </Tabs>
 
         {/* Info Banner */}
-        <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
+        <Card className="bg-gradient-to-r from-blue-700 to-blue-500 text-white border-0">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div>

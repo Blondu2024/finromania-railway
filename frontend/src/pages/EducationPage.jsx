@@ -212,7 +212,7 @@ export default function EducationPage() {
 
           {/* Premium Package */}
           {premiumPkg && (
-            <Card className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white overflow-hidden relative">
+            <Card className="bg-gradient-to-br from-blue-700 via-blue-800 to-blue-900 text-white overflow-hidden relative">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
               <div className="absolute top-4 right-4">
                 <Crown className="w-8 h-8 text-yellow-300" />
@@ -234,7 +234,7 @@ export default function EducationPage() {
                   <div>
                     <span className="text-4xl font-bold">{premiumPkg.price}</span>
                     <span className="text-xl ml-1">RON</span>
-                    <p className="text-purple-200 text-sm">Acces complet permanent</p>
+                    <p className="text-blue-200 text-sm">Acces complet permanent</p>
                   </div>
                   <Button 
                     className="bg-yellow-400 text-yellow-900 hover:bg-yellow-300"
@@ -283,7 +283,7 @@ export default function EducationPage() {
                     lesson.is_locked 
                       ? 'bg-gray-100 text-gray-400' 
                       : lesson.tier === 'premium' 
-                        ? 'bg-purple-100 text-purple-600'
+                        ? 'bg-blue-100 text-blue-600'
                         : 'bg-blue-100 text-blue-600'
                   }`}>
                     {lesson.is_locked ? <Lock className="w-5 h-5" /> : idx + 1}
@@ -295,7 +295,7 @@ export default function EducationPage() {
                         <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">GRATUIT</Badge>
                       )}
                       {lesson.tier === 'premium' && !lesson.is_free && (
-                        <Badge className="text-xs bg-purple-100 text-purple-700">
+                        <Badge className="text-xs bg-blue-100 text-blue-700">
                           <Crown className="w-3 h-3 mr-1" /> Premium
                         </Badge>
                       )}

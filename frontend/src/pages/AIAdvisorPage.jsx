@@ -78,8 +78,8 @@ export default function AIAdvisorPage() {
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto">
         <div className="flex justify-center mb-4">
-          <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
-            <Bot className="w-10 h-10 text-purple-600" />
+          <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+            <Bot className="w-10 h-10 text-blue-600" />
           </div>
         </div>
         <h1 className="text-4xl font-bold mb-4">Consilier AI</h1>
@@ -241,8 +241,8 @@ export default function AIAdvisorPage() {
         <Link to="/portfolio">
           <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
             <CardContent className="p-6 text-center">
-              <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-full w-fit mx-auto mb-3">
-                <Bot className="w-6 h-6 text-purple-600" />
+              <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full w-fit mx-auto mb-3">
+                <Bot className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="font-semibold">Portofoliu Virtual</h3>
               <p className="text-sm text-muted-foreground">Practică fără risc</p>

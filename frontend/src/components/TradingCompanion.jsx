@@ -73,7 +73,7 @@ export const TradingReminder = ({ isOpen, onClose, onOpenCompanion }) => {
               Am înțeles
             </Button>
             <Button 
-              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600"
+              className="flex-1 bg-gradient-to-r from-blue-700 to-blue-500"
               onClick={() => {
                 onClose();
                 onOpenCompanion();
@@ -282,7 +282,7 @@ const TradingCompanion = ({
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow flex items-center gap-2"
+        className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-blue-700 to-blue-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow flex items-center gap-2"
       >
         <Shield className="w-5 h-5" />
         <span className="hidden sm:inline font-medium">Verifică Înainte</span>
@@ -299,7 +299,7 @@ const TradingCompanion = ({
             className="fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] max-h-[70vh] flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border overflow-hidden"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
+            <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">

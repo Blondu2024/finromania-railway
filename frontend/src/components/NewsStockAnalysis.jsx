@@ -36,7 +36,7 @@ const CATEGORY_COLORS = {
   indices: 'bg-blue-100 text-blue-800',
   commodities: 'bg-amber-100 text-amber-800',
   currencies: 'bg-green-100 text-green-800',
-  sectors_etf: 'bg-purple-100 text-purple-800',
+  sectors_etf: 'bg-blue-100 text-blue-800',
   popular_stocks: 'bg-pink-100 text-pink-800',
   bonds_rates: 'bg-gray-100 text-gray-800',
   other: 'bg-slate-100 text-slate-800'
@@ -190,9 +190,9 @@ export default function SmartNewsAnalysis({ article }) {
 
   if (loading) {
     return (
-      <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
+      <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50">
         <CardContent className="p-6 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-purple-600" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-600" />
           <p className="font-medium">🔍 AI analizează știrea...</p>
           <p className="text-sm text-muted-foreground mt-1">Identificăm activele financiare relevante</p>
         </CardContent>
@@ -201,18 +201,18 @@ export default function SmartNewsAnalysis({ article }) {
   }
 
   return (
-    <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950">
+    <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50 dark:from-blue-950 dark:to-blue-950">
       <CardHeader className="pb-2">
         <div 
           className="flex items-center justify-between cursor-pointer"
           onClick={() => setExpanded(!expanded)}
         >
           <CardTitle className="text-lg flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-600" />
+            <Sparkles className="w-5 h-5 text-blue-600" />
             🤖 Analiză Inteligentă AI
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
               <Globe className="w-3 h-3 mr-1" />
               {recommendations.length} active relevante
             </Badge>
@@ -319,14 +319,14 @@ export default function SmartNewsAnalysis({ article }) {
             <CardContent>
               {!aiAnalysis && !aiLoading && (
                 <div className="text-center py-6">
-                  <div className="inline-block p-4 bg-purple-100 rounded-full mb-4">
-                    <Sparkles className="w-8 h-8 text-purple-600" />
+                  <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
+                    <Sparkles className="w-8 h-8 text-blue-600" />
                   </div>
                   <p className="font-medium mb-2">Obține o analiză AI detaliată</p>
                   <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
                     AI-ul va analiza știrea și va oferi perspective despre impactul potențial asupra piețelor financiare
                   </p>
-                  <Button onClick={generateAiAnalysis} className="bg-purple-600 hover:bg-purple-700">
+                  <Button onClick={generateAiAnalysis} className="bg-blue-600 hover:bg-blue-700">
                     <Sparkles className="w-4 h-4 mr-2" />
                     Generează Analiză AI
                   </Button>
@@ -335,7 +335,7 @@ export default function SmartNewsAnalysis({ article }) {
               
               {aiLoading && (
                 <div className="text-center py-8">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-purple-600" />
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-600" />
                   <p className="font-medium">AI-ul analizează știrea...</p>
                   <p className="text-sm text-muted-foreground">Acest proces poate dura câteva secunde</p>
                 </div>

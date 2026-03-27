@@ -17,7 +17,7 @@ export default function AboutPage() {
       <div className="max-w-5xl mx-auto px-4 py-12 space-y-16">
         {/* Hero Section */}
         <div className="text-center space-y-6">
-          <div className="inline-block p-6 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full">
+          <div className="inline-block p-6 bg-gradient-to-br from-blue-700 to-blue-500 rounded-full">
             <Heart className="w-16 h-16 text-white" />
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold">
@@ -78,8 +78,8 @@ export default function AboutPage() {
 
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
-                <div className="inline-block p-4 bg-purple-100 rounded-full mb-4">
-                  <Zap className="w-8 h-8 text-purple-600" />
+                <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
+                  <Zap className="w-8 h-8 text-blue-600" />
                 </div>
                 <h3 className="font-bold text-lg mb-2">Inovație</h3>
                 <p className="text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ export default function AboutPage() {
         </div>
 
         {/* Features Highlight */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 md:p-12">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-50 rounded-2xl p-8 md:p-12">
           <h2 className="text-3xl font-bold text-center mb-8">Ce Oferim</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="flex gap-4">
@@ -122,7 +122,7 @@ export default function AboutPage() {
 
             <div className="flex gap-4">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-purple-600 text-white rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-blue-600 text-white rounded-lg flex items-center justify-center">
                   <BookOpen className="w-6 h-6" />
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function AboutPage() {
             <div className="text-sm text-muted-foreground">Termeni în Glosar</div>
           </div>
           <div>
-            <div className="text-4xl font-bold text-purple-600 mb-2">20+</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">20+</div>
             <div className="text-sm text-muted-foreground">Acțiuni BVB Live</div>
           </div>
           <div>
@@ -185,7 +185,7 @@ export default function AboutPage() {
         </div>
 
         {/* CTA */}
-        <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
+        <Card className="bg-gradient-to-r from-blue-700 to-blue-500 text-white border-0">
           <CardContent className="p-8 md:p-12 text-center">
             <h2 className="text-3xl font-bold mb-4">Începe Să Înveți Astăzi</h2>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">

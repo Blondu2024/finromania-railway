@@ -106,7 +106,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
               Evaluare: FAVORABIL/RISCANT/NEUTRU
             </li>
             <li className="flex items-center gap-2">
-              <Brain className="w-4 h-4 text-purple-500" />
+              <Brain className="w-4 h-4 text-blue-500" />
               Interpretare AI în română
             </li>
           </ul>
@@ -221,7 +221,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                 </div>
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Activity className="w-3 h-3 text-purple-500" /> RSI
+                    <Activity className="w-3 h-3 text-blue-500" /> RSI
                   </p>
                   <p className={`text-lg font-bold ${
                     analysis.analysis?.rsi < 30 ? 'text-green-600' :
@@ -272,7 +272,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                 {/* Market Context */}
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                    <TrendingUp className="w-3 h-3 text-purple-500" /> Piața BVB
+                    <TrendingUp className="w-3 h-3 text-blue-500" /> Piața BVB
                   </p>
                   <p className={`text-lg font-bold ${
                     analysis.analysis?.bet_change > 0 ? 'text-green-600' :
@@ -355,10 +355,10 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
               )}
 
               {/* AI Interpretation */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 p-4 rounded-xl border border-purple-200 dark:border-purple-800">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/20 dark:to-blue-950/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center gap-2 mb-2">
-                  <Brain className="w-5 h-5 text-purple-600" />
-                  <p className="font-semibold text-purple-800 dark:text-purple-300">Interpretare AI</p>
+                  <Brain className="w-5 h-5 text-blue-600" />
+                  <p className="font-semibold text-blue-800 dark:text-blue-300">Interpretare AI</p>
                 </div>
                 <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                   {analysis.ai_interpretation}

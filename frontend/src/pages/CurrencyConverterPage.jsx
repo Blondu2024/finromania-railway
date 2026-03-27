@@ -96,7 +96,7 @@ const CurrencyCard = ({ code, data, onClick, isSelected, delay = 0 }) => {
       <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all">
         <div className={`absolute inset-0 bg-gradient-to-br ${
           isSelected 
-            ? 'from-blue-500/20 to-purple-500/20' 
+            ? 'from-blue-500/20 to-blue-500/20' 
             : 'from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900'
         }`} />
         <CardContent className="relative p-4 text-center">
@@ -110,7 +110,7 @@ const CurrencyCard = ({ code, data, onClick, isSelected, delay = 0 }) => {
           <p className="font-bold text-lg">{code}</p>
           <p className="text-sm text-muted-foreground truncate">{data.name}</p>
           <div className="mt-2 pt-2 border-t">
-            <p className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <p className="text-xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
               {data.rate?.toFixed(4)}
             </p>
             <p className="text-xs text-muted-foreground">RON</p>
@@ -132,7 +132,7 @@ const PopularPairButton = ({ pair, onClick, delay }) => (
     onClick={onClick}
     className="relative group overflow-hidden rounded-xl"
   >
-    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     <div className="relative p-4 bg-white dark:bg-slate-800 group-hover:bg-transparent border rounded-xl transition-all">
       <div className="flex items-center justify-center gap-2 mb-2">
         <span className="text-2xl">{pair.from_flag}</span>
@@ -164,7 +164,7 @@ const MainConverter = ({
       transition={{ delay: 0.2 }}
     >
       <Card className="overflow-hidden border-0 shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMwLTkuOTQtOC4wNi0xOC0xOC0xOHY2YzYuNjMgMCAxMiA1LjM3IDEyIDEyaC02bDkgOSA5LTloLTZ6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4wNSIvPjwvZz48L3N2Zz4=')] opacity-50" />
         
         <CardContent className="relative p-8 text-white">
@@ -473,10 +473,10 @@ export default function CurrencyConverterPage() {
         <LiveTicker rates={rates} />
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-12 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <section className="relative overflow-hidden py-12 bg-gradient-to-br from-slate-50 via-blue-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           {/* Floating shapes */}
           <FloatingShape delay={0} duration={4} className="w-64 h-64 bg-blue-400 -top-32 -left-32" />
-          <FloatingShape delay={1} duration={5} className="w-48 h-48 bg-purple-400 top-20 right-10" />
+          <FloatingShape delay={1} duration={5} className="w-48 h-48 bg-blue-400 top-20 right-10" />
           <FloatingShape delay={2} duration={6} className="w-32 h-32 bg-green-400 bottom-10 left-1/4" />
 
           <div className="container mx-auto px-4 relative z-10">
@@ -496,7 +496,7 @@ export default function CurrencyConverterPage() {
                 >
                   <Globe className="w-12 h-12 text-blue-600" />
                 </motion.div>
-                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
                   Convertor Valutar
                 </h1>
               </div>
@@ -599,7 +599,7 @@ export default function CurrencyConverterPage() {
               {/* Auto Scroll Sidebar */}
               <div className="hidden lg:block">
                 <Card className="sticky top-4 overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                  <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="w-5 h-5" />
                       Rate Live

@@ -11,7 +11,7 @@ export default function FeatureCard({
   title, 
   description, 
   badge, 
-  gradient = "from-blue-500 to-purple-500",
+  gradient = "from-blue-500 to-blue-500",
   stats = [],
   highlight = false
 }) {

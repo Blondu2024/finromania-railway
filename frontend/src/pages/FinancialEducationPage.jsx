@@ -70,7 +70,7 @@ export default function FinancialEducationPage() {
   const progressPercent = totalLessons > 0 ? (completedCount / totalLessons) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
@@ -258,7 +258,7 @@ export default function FinancialEducationPage() {
           {/* Module 3 */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="h-1 w-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded" />
+              <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded" />
               <h2 className="text-2xl font-bold">Modul 3: Introducere în Investiții</h2>
               <Badge variant="secondary">Advanced</Badge>
             </div>
@@ -274,7 +274,7 @@ export default function FinancialEducationPage() {
                     className={`group cursor-pointer transition-all duration-300 hover:shadow-xl ${
                       completed ? 'border-2 border-green-500 bg-green-50' :
                       locked ? 'opacity-60 cursor-not-allowed' :
-                      'hover:scale-105 border-2 border-transparent hover:border-purple-400'
+                      'hover:scale-105 border-2 border-transparent hover:border-blue-400'
                     }`}
                     onClick={() => !locked && navigate(`/financial-education/${lesson.id}`)}
                   >
@@ -323,7 +323,7 @@ export default function FinancialEducationPage() {
 
         {/* Call to Action */}
         {!user && (
-          <Card className="mt-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
+          <Card className="mt-12 bg-gradient-to-r from-blue-700 to-blue-500 text-white border-0">
             <CardContent className="p-8 text-center">
               <Trophy className="w-12 h-12 mx-auto mb-4" />
               <h3 className="text-2xl font-bold mb-2">Gata să Începi?</h3>

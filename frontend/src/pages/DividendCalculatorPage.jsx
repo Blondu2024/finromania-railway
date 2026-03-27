@@ -219,10 +219,10 @@ const ResultsDisplay = ({ results }) => {
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200">
           <CardContent className="pt-4">
             <div className="text-sm text-muted-foreground">Randament Portofoliu</div>
-            <div className="text-2xl font-bold text-purple-600">{summary.portfolio_yield?.toFixed(2)}%</div>
+            <div className="text-2xl font-bold text-blue-600">{summary.portfolio_yield?.toFixed(2)}%</div>
             <div className="text-xs text-muted-foreground">brut/an</div>
           </CardContent>
         </Card>
@@ -368,7 +368,7 @@ const ResultsDisplay = ({ results }) => {
 const ScoreBadge = ({ score, rating, size = 'md' }) => {
   const colors = {
     'Excelent': 'from-emerald-500 to-green-600 text-white',
-    'Foarte Bun': 'from-blue-500 to-indigo-600 text-white',
+    'Foarte Bun': 'from-blue-600 to-blue-500 text-white',
     'Bun': 'from-amber-400 to-yellow-500 text-black',
     'Mediu': 'from-orange-400 to-orange-500 text-white',
     'Slab': 'from-red-400 to-red-500 text-white',
@@ -637,12 +637,12 @@ const DividendHistoryTab = ({ isPro }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
           >
-            <Card className="border-2 border-purple-200 bg-gradient-to-br from-slate-50 to-purple-50/30">
+            <Card className="border-2 border-blue-200 bg-gradient-to-br from-slate-50 to-blue-50/30">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-xl flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5 text-purple-600" />
+                      <BarChart3 className="w-5 h-5 text-blue-600" />
                       Comparație Dividende — {compareData.symbols.join(' vs ')}
                     </CardTitle>
                     <CardDescription>Dividend per an (RON/acțiune) • Sursa: BVB.ro + EODHD</CardDescription>
@@ -738,12 +738,12 @@ const DividendHistoryTab = ({ isPro }) => {
           animate={{ opacity: 1, y: 0 }}
           className="sticky top-20 z-10"
         >
-          <Card className="bg-purple-50 border-purple-200 shadow-lg">
+          <Card className="bg-blue-50 border-blue-200 shadow-lg">
             <CardContent className="py-3 flex items-center justify-between">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-medium text-purple-700">Compară:</span>
+                <span className="text-sm font-medium text-blue-700">Compară:</span>
                 {compareSymbols.map(sym => (
-                  <Badge key={sym} variant="secondary" className="bg-purple-100 text-purple-700 cursor-pointer" onClick={() => toggleCompare(sym)}>
+                  <Badge key={sym} variant="secondary" className="bg-blue-100 text-blue-700 cursor-pointer" onClick={() => toggleCompare(sym)}>
                     {sym} ✕
                   </Badge>
                 ))}
@@ -753,7 +753,7 @@ const DividendHistoryTab = ({ isPro }) => {
                 <Button size="sm" variant="ghost" onClick={() => { setCompareSymbols([]); setCompareData(null); }}>Anulează</Button>
                 <Button
                   size="sm"
-                  className="bg-purple-600 hover:bg-purple-700"
+                  className="bg-blue-600 hover:bg-blue-700"
                   onClick={runCompare}
                   disabled={compareSymbols.length < 2 || loadingCompare}
                   data-testid="compare-btn"
@@ -793,7 +793,7 @@ const DividendHistoryTab = ({ isPro }) => {
                     <TableHead className="w-10">
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger><BarChart3 className="w-4 h-4 text-purple-500" /></TooltipTrigger>
+                          <TooltipTrigger><BarChart3 className="w-4 h-4 text-blue-500" /></TooltipTrigger>
                           <TooltipContent>Selectează 2-4 acțiuni pentru comparație</TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -810,7 +810,7 @@ const DividendHistoryTab = ({ isPro }) => {
                   {rankings.map((r, idx) => (
                     <TableRow
                       key={r.symbol}
-                      className={`hover:bg-muted/50 ${selectedSymbol === r.symbol ? 'bg-blue-50' : ''} ${compareSymbols.includes(r.symbol) ? 'bg-purple-50/50' : ''}`}
+                      className={`hover:bg-muted/50 ${selectedSymbol === r.symbol ? 'bg-blue-50' : ''} ${compareSymbols.includes(r.symbol) ? 'bg-blue-50/50' : ''}`}
                       data-testid={`ranking-row-${r.symbol}`}
                     >
                       <TableCell className="font-bold text-muted-foreground">{idx + 1}</TableCell>
@@ -819,7 +819,7 @@ const DividendHistoryTab = ({ isPro }) => {
                           type="checkbox"
                           checked={compareSymbols.includes(r.symbol)}
                           onChange={() => toggleCompare(r.symbol)}
-                          className="w-4 h-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                          className="w-4 h-4 rounded border-blue-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                           data-testid={`compare-check-${r.symbol}`}
                         />
                       </TableCell>

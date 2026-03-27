@@ -20,7 +20,7 @@ const tourSteps = [
     subtitle: 'Prima platformă din România care îți oferă totul pentru succes financiar',
     description: 'În următoarele 60 de secunde, îți voi arăta cum poți deveni un investitor mai bun - complet GRATUIT.',
     icon: Sparkles,
-    gradient: 'from-blue-600 via-purple-600 to-pink-600',
+    gradient: 'from-blue-600 via-blue-500 to-cyan-500',
     path: null,
     features: [
       { icon: GraduationCap, text: 'Educație Financiară Gratuită' },
@@ -56,7 +56,7 @@ const tourSteps = [
     subtitle: 'Fii mereu la curent cu ce se întâmplă pe piață',
     description: 'Știri din România și din lume, traduse automat în română. Analiză AI pentru fiecare articol ca să înțelegi impactul asupra investițiilor tale.',
     icon: Newspaper,
-    gradient: 'from-rose-600 via-pink-600 to-fuchsia-600',
+    gradient: 'from-rose-600 via-pink-600 to-rose-700',
     path: '/news',
     highlights: ['Știri Live', 'Traduse în Română', 'Analiză AI'],
     ctaText: 'Citește Știrile →'
@@ -78,7 +78,7 @@ const tourSteps = [
     subtitle: 'Cursul BNR în timp real',
     description: 'Convertește rapid între RON, EUR, USD și alte valute. Curs oficial BNR actualizat zilnic.',
     icon: DollarSign,
-    gradient: 'from-sky-600 via-blue-600 to-indigo-600',
+    gradient: 'from-sky-600 via-blue-600 to-blue-700',
     path: '/converter',
     highlights: ['Curs BNR', 'Conversie Rapidă', 'Istoric Valutar'],
     ctaText: 'Deschide Convertorul →'
@@ -89,7 +89,7 @@ const tourSteps = [
     subtitle: 'Cursuri gratuite pentru toate nivelurile',
     description: 'De la primii pași în investiții până la strategii avansate. Lecții interactive cu quiz-uri care te ajută să reții informațiile.',
     icon: GraduationCap,
-    gradient: 'from-violet-600 via-purple-600 to-fuchsia-600',
+    gradient: 'from-blue-600 via-blue-500 to-cyan-500',
     path: '/trading-school',
     highlights: ['Lecții Interactive', 'Quiz-uri', 'Certificări'],
     ctaText: 'Începe să Înveți →'
@@ -100,7 +100,7 @@ const tourSteps = [
     subtitle: 'Întreabă orice despre piață, primește răspunsuri instant',
     description: 'AI-ul nostru analizează știrile, explică termenii și te ajută să înțelegi ce se întâmplă pe piață. E ca și cum ai un consultant financiar personal.',
     icon: Bot,
-    gradient: 'from-cyan-600 via-blue-600 to-indigo-600',
+    gradient: 'from-cyan-600 via-blue-600 to-blue-700',
     path: '/advisor',
     highlights: ['Răspunsuri Instant', 'Analiză Știri', 'Explicații Simple'],
     ctaText: 'Întreabă AI-ul →'

@@ -137,7 +137,7 @@ export default function FinAssistant() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-24 right-6 z-50 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow group"
+            className="fixed bottom-24 right-6 z-50 w-14 h-14 bg-gradient-to-r from-blue-700 to-blue-500 rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow group"
             data-testid="assistant-open-btn"
           >
             <Bot className="w-7 h-7 text-white" />
@@ -163,7 +163,7 @@ export default function FinAssistant() {
             data-testid="assistant-chat-window"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-blue-700 to-blue-500 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                   <Bot className="w-6 h-6 text-white" />
@@ -198,11 +198,11 @@ export default function FinAssistant() {
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
                       msg.role === 'user' 
                         ? 'bg-blue-100 dark:bg-blue-900' 
-                        : 'bg-purple-100 dark:bg-purple-900'
+                        : 'bg-blue-100 dark:bg-blue-900'
                     }`}>
                       {msg.role === 'user' 
                         ? <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        : <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        : <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       }
                     </div>
                     <div className={`px-3 py-2 rounded-2xl text-sm ${
@@ -219,8 +219,8 @@ export default function FinAssistant() {
               {loading && (
                 <div className="flex justify-start">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                      <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-2xl rounded-bl-md">
                       <div className="flex gap-1">
@@ -273,7 +273,7 @@ export default function FinAssistant() {
                     <Button 
                       onClick={submitFeedback}
                       disabled={loading || !feedbackText.trim()}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
+                      className="w-full bg-gradient-to-r from-blue-700 to-blue-500"
                       size="sm"
                     >
                       {loading ? 'Se trimite...' : 'Trimite'}
@@ -339,7 +339,7 @@ export default function FinAssistant() {
                     type="submit" 
                     size="icon"
                     disabled={loading || !input.trim()}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90"
+                    className="bg-gradient-to-r from-blue-700 to-blue-500 hover:opacity-90"
                     data-testid="assistant-send-btn"
                   >
                     <Send className="w-4 h-4" />

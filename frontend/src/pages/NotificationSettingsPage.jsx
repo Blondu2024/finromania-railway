@@ -267,7 +267,7 @@ export default function NotificationSettingsPage() {
         {/* EMAIL SUBSCRIPTION SECTION */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="border-blue-200 dark:border-blue-800">
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <MailCheck className="w-5 h-5" />
                 Email Zilnic — Rezumatul Bursei
@@ -380,7 +380,7 @@ export default function NotificationSettingsPage() {
         <CategorySection
           title="📰 Știri"
           icon={Newspaper}
-          color="from-purple-500 to-purple-600"
+          color="from-blue-500 to-blue-600"
         >
           <ToggleItem
             label="Știri Importante"

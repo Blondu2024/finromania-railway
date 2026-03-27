@@ -25,8 +25,8 @@ const LEVEL_INFO = {
   advanced: {
     name: 'Expert',
     icon: TrendingUp,
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-500/10',
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-500/10',
     description: 'Analiză fundamentală și grafice pro'
   }
 };

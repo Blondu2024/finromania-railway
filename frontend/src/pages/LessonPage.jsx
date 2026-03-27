@@ -194,7 +194,7 @@ export default function LessonPage() {
         </Link>
 
         <Card className="border-2 border-blue-500">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+          <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
             <CardTitle className="text-2xl">📝 Quiz: {lesson.title}</CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-6">
@@ -265,7 +265,7 @@ export default function LessonPage() {
       </Link>
 
       <Card className="border-2 border-blue-200 shadow-xl">
-        <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
+        <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white p-8">
           <div className="flex items-center gap-4">
             <div className="text-6xl">{lesson.emoji}</div>
             <div className="flex-1">

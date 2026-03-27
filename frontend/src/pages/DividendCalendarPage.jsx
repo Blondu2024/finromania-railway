@@ -92,7 +92,7 @@ const EventCard = ({ event, index }) => {
 
   const getEventColor = (type) => {
     switch(type) {
-      case 'aga': return 'bg-purple-100 text-purple-600';
+      case 'aga': return 'bg-blue-100 text-blue-600';
       case 'report': return 'bg-blue-100 text-blue-600';
       case 'ipo': return 'bg-green-100 text-green-600';
       default: return 'bg-gray-100 text-gray-600';
@@ -327,10 +327,10 @@ export default function DividendCalendarPage() {
               <p className="text-2xl font-bold">{upcomingDividends.length}</p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
             <CardContent className="p-4">
               <CalendarDays className="w-6 h-6 mb-2 opacity-80" />
-              <p className="text-sm text-purple-100">Evenimente</p>
+              <p className="text-sm text-blue-100">Evenimente</p>
               <p className="text-2xl font-bold">{events.length}</p>
             </CardContent>
           </Card>

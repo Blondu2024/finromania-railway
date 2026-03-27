@@ -119,7 +119,7 @@ const FiscalAIChat = ({ compact = false }) => {
   if (compact && !isExpanded) {
     return (
       <Card 
-        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white cursor-pointer hover:shadow-lg transition-all"
+        className="bg-gradient-to-r from-blue-700 to-blue-500 text-white cursor-pointer hover:shadow-lg transition-all"
         onClick={() => setIsExpanded(true)}
       >
         <CardContent className="p-4">
