@@ -63,12 +63,12 @@ const FearGreedGauge = ({ score, label, color }) => {
         className="absolute bottom-0 left-1/2 w-1 h-20 -ml-0.5 origin-bottom transition-transform duration-1000 ease-out"
         style={{ transform: `rotate(${rotation}deg)` }}
       >
-        <div className="w-2 h-2 bg-white rounded-full -ml-0.5 shadow-lg" />
-        <div className="w-1 h-16 bg-gradient-to-t from-gray-800 to-gray-600 mx-auto rounded-full shadow-lg" />
+        <div className="w-2 h-2 bg-foreground rounded-full -ml-0.5 shadow-lg" />
+        <div className="w-1 h-16 bg-foreground/70 mx-auto rounded-full shadow-lg" />
       </div>
       
       {/* Center circle */}
-      <div className="absolute bottom-0 left-1/2 w-6 h-6 -ml-3 -mb-3 bg-gray-800 rounded-full border-2 border-gray-600" />
+      <div className="absolute bottom-0 left-1/2 w-6 h-6 -ml-3 -mb-3 bg-muted rounded-full border-2 border-border" />
     </div>
   );
 };
@@ -119,12 +119,12 @@ const FearGreedIndex = ({ compact = false }) => {
 
   if (loading && !data) {
     return (
-      <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-zinc-700">
+      <Card>
         <CardContent className="p-6">
           <div className="animate-pulse">
-            <div className="h-6 bg-zinc-700 rounded w-1/2 mx-auto mb-4" />
-            <div className="h-32 bg-zinc-700 rounded-full w-32 mx-auto mb-4" />
-            <div className="h-4 bg-zinc-700 rounded w-3/4 mx-auto" />
+            <div className="h-6 bg-muted rounded w-1/2 mx-auto mb-4" />
+            <div className="h-32 bg-muted rounded-full w-32 mx-auto mb-4" />
+            <div className="h-4 bg-muted rounded w-3/4 mx-auto" />
           </div>
         </CardContent>
       </Card>
@@ -133,13 +133,13 @@ const FearGreedIndex = ({ compact = false }) => {
 
   if (error) {
     return (
-      <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-zinc-700">
+      <Card>
         <CardContent className="p-6 text-center">
           <AlertTriangle className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-          <p className="text-gray-400">Nu am putut încărca indicele</p>
-          <button 
+          <p className="text-muted-foreground">Nu am putut încărca indicele</p>
+          <button
             onClick={fetchData}
-            className="mt-2 text-blue-400 hover:text-blue-300 text-sm"
+            className="mt-2 text-blue-500 hover:text-blue-400 text-sm"
           >
             Încearcă din nou
           </button>
@@ -150,16 +150,16 @@ const FearGreedIndex = ({ compact = false }) => {
 
   if (compact) {
     return (
-      <div className="flex items-center gap-3 bg-zinc-800/50 rounded-lg px-4 py-2">
-        <div 
+      <div className="flex items-center gap-3 bg-muted/50 rounded-lg px-4 py-2">
+        <div
           className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg"
           style={{ backgroundColor: data?.color || '#64748b' }}
         >
           {data?.score || 0}
         </div>
         <div>
-          <p className="text-sm text-gray-400">Fear & Greed</p>
-          <p className="font-semibold text-white">{data?.label || 'Loading...'}</p>
+          <p className="text-sm text-muted-foreground">Fear & Greed</p>
+          <p className="font-semibold">{data?.label || 'Loading...'}</p>
         </div>
         {data?.trend && getTrendIcon(data.trend)}
       </div>
@@ -167,16 +167,16 @@ const FearGreedIndex = ({ compact = false }) => {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border-zinc-700 overflow-hidden">
+    <Card className="overflow-hidden">
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-white">Fear & Greed Index</h3>
+            <h3 className="text-lg font-bold">Fear & Greed Index</h3>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <Info className="w-4 h-4 text-gray-400 hover:text-gray-300" />
+                  <Info className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <p>Indicatorul Fear & Greed măsoară sentimentul general al pieței BVB bazat pe RSI, momentum, volatilitate și volum.</p>
@@ -184,26 +184,26 @@ const FearGreedIndex = ({ compact = false }) => {
               </Tooltip>
             </TooltipProvider>
           </div>
-          <button 
+          <button
             onClick={fetchData}
-            className="p-1.5 hover:bg-zinc-700 rounded-full transition-colors"
+            className="p-1.5 hover:bg-muted rounded-full transition-colors"
             disabled={loading}
           >
-            <RefreshCw className={`w-4 h-4 text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 text-muted-foreground ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
         {/* Main Score Display */}
         <div className="text-center mb-4">
-          <FearGreedGauge 
-            score={data?.score || 50} 
-            label={data?.label || 'Neutru'} 
-            color={data?.color || '#ca8a04'} 
+          <FearGreedGauge
+            score={data?.score || 50}
+            label={data?.label || 'Neutru'}
+            color={data?.color || '#ca8a04'}
           />
-          
+
           <div className="mt-4">
             <div className="flex items-center justify-center gap-2">
-              <span 
+              <span
                 className="text-5xl font-bold"
                 style={{ color: data?.color || '#64748b' }}
               >
@@ -211,13 +211,13 @@ const FearGreedIndex = ({ compact = false }) => {
               </span>
               {data?.trend && getTrendIcon(data.trend)}
             </div>
-            <p 
+            <p
               className="text-xl font-semibold mt-1"
               style={{ color: data?.color || '#64748b' }}
             >
               {data?.label || 'Loading...'}
             </p>
-            <p className="text-sm text-gray-400 mt-2 max-w-xs mx-auto">
+            <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
               {data?.description || ''}
             </p>
           </div>
@@ -226,15 +226,15 @@ const FearGreedIndex = ({ compact = false }) => {
         {/* Components Breakdown */}
         {data?.components && (
           <div className="mt-6">
-            <button 
+            <button
               onClick={() => setShowDetails(!showDetails)}
-              className="w-full text-sm text-gray-400 hover:text-gray-300 flex items-center justify-center gap-1 mb-3"
+              className="w-full text-sm text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 mb-3"
             >
               {showDetails ? 'Ascunde detalii' : 'Vezi componentele'}
-              <svg 
-                className={`w-4 h-4 transition-transform ${showDetails ? 'rotate-180' : ''}`} 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <svg
+                className={`w-4 h-4 transition-transform ${showDetails ? 'rotate-180' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -244,28 +244,28 @@ const FearGreedIndex = ({ compact = false }) => {
             {showDetails && (
               <div className="space-y-3 animate-in fade-in duration-200">
                 {Object.entries(data.components).map(([key, component]) => (
-                  <div key={key} className="flex items-center justify-between bg-zinc-800/50 rounded-lg px-3 py-2">
+                  <div key={key} className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-300 capitalize text-sm">
-                        {key === 'rsi' ? 'RSI' : 
+                      <span className="text-foreground capitalize text-sm">
+                        {key === 'rsi' ? 'RSI' :
                          key === 'momentum' ? 'Momentum' :
                          key === 'volatility' ? 'Volatilitate' : 'Volum'}
                       </span>
-                      <span className="text-xs text-gray-500">({component.weight})</span>
+                      <span className="text-xs text-muted-foreground">({component.weight})</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-zinc-700 rounded-full overflow-hidden">
-                        <div 
+                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                        <div
                           className="h-full rounded-full transition-all duration-500"
-                          style={{ 
+                          style={{
                             width: `${component.score}%`,
-                            backgroundColor: component.score < 30 ? '#dc2626' : 
+                            backgroundColor: component.score < 30 ? '#dc2626' :
                                            component.score < 50 ? '#ea580c' :
                                            component.score < 70 ? '#ca8a04' : '#16a34a'
                           }}
                         />
                       </div>
-                      <span className="text-sm font-medium text-gray-300 w-8 text-right">
+                      <span className="text-sm font-medium text-foreground w-8 text-right">
                         {component.score}
                       </span>
                     </div>
@@ -277,7 +277,7 @@ const FearGreedIndex = ({ compact = false }) => {
         )}
 
         {/* Last Updated */}
-        <p className="text-xs text-gray-500 text-center mt-4">
+        <p className="text-xs text-muted-foreground text-center mt-4">
           Actualizat: {data?.last_updated ? new Date(data.last_updated).toLocaleString('ro-RO') : 'N/A'}
         </p>
       </CardContent>
