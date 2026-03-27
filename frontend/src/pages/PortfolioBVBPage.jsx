@@ -248,6 +248,69 @@ const PositionDialog = ({ open, onClose, onSave, editData, bvbSymbols, loading }
 };
 
 // ─────────────────────────────────────────
+// FAZA 4: ȘTIRI PORTOFOLIU
+// ─────────────────────────────────────────
+const PortfolioNewsSection = ({ news }) => {
+  const articles = news?.news || [];
+  if (articles.length === 0) return null;
+
+  return (
+    <Card className="mt-4" data-testid="portfolio-news-section">
+      <CardHeader className="py-3 px-4 border-b">
+        <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <Info className="w-4 h-4 text-blue-500" />
+          Știri Relevante — Portofoliul Tău
+          <span className="text-xs font-normal text-muted-foreground">
+            · filtrate după simbolurile deținute
+          </span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="divide-y">
+          {articles.map((art, i) => (
+            <a
+              key={art.id || i}
+              href={art.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex gap-3 p-3 hover:bg-muted/30 transition-colors"
+              data-testid={`portfolio-news-${i}`}
+            >
+              {art.image_url && (
+                <img
+                  src={art.image_url}
+                  alt=""
+                  className="w-16 h-16 object-cover rounded flex-shrink-0"
+                  loading="lazy"
+                  onError={e => (e.target.style.display = 'none')}
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  {(art.related_symbols || []).map(sym => (
+                    <span key={sym} className="text-[10px] font-bold px-1.5 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded">
+                      {sym}
+                    </span>
+                  ))}
+                </div>
+                <p className="font-medium text-sm line-clamp-2 leading-snug">
+                  {art.title_ro || art.title}
+                </p>
+                <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                  <span>{art.source?.name}</span>
+                  <span>·</span>
+                  <span>{new Date(art.published_at).toLocaleDateString('ro-RO')}</span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// ─────────────────────────────────────────
 // FAZA 3: AI ADVISOR SECTION
 // ─────────────────────────────────────────
 
@@ -702,6 +765,8 @@ export default function PortfolioBVBPage() {
   const [portfolio, setPortfolio] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [aiAdvice, setAiAdvice] = useState(null);
+  const [dividends, setDividends] = useState(null);
+  const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -727,6 +792,20 @@ export default function PortfolioBVBPage() {
       console.error('Analysis fetch error:', e);
     } finally {
       setLoadingAnalysis(false);
+    }
+  }, [token]);
+
+  const fetchDividendsAndNews = useCallback(async () => {
+    if (!token) return;
+    try {
+      const [divRes, newsRes] = await Promise.all([
+        fetch(`${API_URL}/api/portfolio-bvb/dividends`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_URL}/api/portfolio-bvb/news`, { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+      if (divRes.ok) setDividends(await divRes.json());
+      if (newsRes.ok) setNews(await newsRes.json());
+    } catch (e) {
+      console.error('Dividends/news fetch error:', e);
     }
   }, [token]);
 
@@ -761,8 +840,10 @@ export default function PortfolioBVBPage() {
       if (r.ok) {
         const data = await r.json();
         setPortfolio(data);
-        // Fetch analysis when portfolio has positions
-        if ((data.positions || []).length > 0) fetchAnalysis();
+        if ((data.positions || []).length > 0) {
+          fetchAnalysis();
+          fetchDividendsAndNews();
+        }
       } else if (r.status === 403) {
         setPortfolio(null);
       }
@@ -772,7 +853,7 @@ export default function PortfolioBVBPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [token, fetchAnalysis]);
+  }, [token, fetchAnalysis, fetchDividendsAndNews]);
 
   useEffect(() => {
     if (user && isPro) fetchPortfolio();
@@ -901,6 +982,10 @@ export default function PortfolioBVBPage() {
   const plPos = (summary.pl_ron || 0) >= 0;
   const todayPos = (summary.today_pl || 0) >= 0;
 
+  // Map dividende per simbol pentru accces rapid în tabel
+  const divMap = {};
+  (dividends?.dividends || []).forEach(d => { divMap[d.symbol] = d; });
+
   return (
     <>
       <SEO title="Portofoliu BVB PRO | FinRomania" />
@@ -980,6 +1065,14 @@ export default function PortfolioBVBPage() {
             value={summary.positions_count ?? '—'}
             sub="acțiuni BVB"
           />
+          {dividends?.total_annual_income > 0 && (
+            <MetricCard
+              label="Income Dividende/An"
+              value={<span className="text-emerald-600 dark:text-emerald-400">{fmtRON(dividends.total_annual_income)}</span>}
+              sub="BVB.ro confirmat"
+              icon={TrendingUp}
+            />
+          )}
         </div>
       )}
 
@@ -1022,6 +1115,22 @@ export default function PortfolioBVBPage() {
                   <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">P&L</th>
                   <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Azi</th>
                   <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">RSI</th>
+                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger className="cursor-help">Div Yield</TooltipTrigger>
+                        <TooltipContent>Randament dividend trailing 12 luni (BVB.ro confirmat)</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </th>
+                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger className="cursor-help">Income/an</TooltipTrigger>
+                        <TooltipContent>Venit estimat anual din dividende pentru cantitatea deținută</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </th>
                   <th className="px-4 py-2.5"></th>
                 </tr>
               </thead>
@@ -1105,6 +1214,38 @@ export default function PortfolioBVBPage() {
                         <RSIBadge signal={pos.rsi_signal} rsi={pos.rsi} />
                       </td>
 
+                      {/* Dividend Yield — BVB.ro confirmat */}
+                      <td className="px-4 py-3 text-right">
+                        {divMap[pos.symbol]?.dividend_yield_pct != null ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                  {fmt(divMap[pos.symbol].dividend_yield_pct)}%
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="text-xs">Dividend trailing: {fmt(divMap[pos.symbol].trailing_annual_dividend, 4)} RON</p>
+                                <p className="text-xs text-emerald-400">BVB.ro confirmat</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">N/A</span>
+                        )}
+                      </td>
+
+                      {/* Income anual estimat */}
+                      <td className="px-4 py-3 text-right">
+                        {divMap[pos.symbol]?.annual_income_ron != null ? (
+                          <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">
+                            {fmtRON(divMap[pos.symbol].annual_income_ron)}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">—</span>
+                        )}
+                      </td>
+
                       {/* Acțiuni */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1147,6 +1288,14 @@ export default function PortfolioBVBPage() {
                     <PLCell value={summary.today_pl} />
                   </td>
                   <td colSpan={2}></td>
+                  <td className="px-4 py-3 text-right">
+                    {dividends?.total_annual_income > 0 ? (
+                      <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                        {fmtRON(dividends.total_annual_income)}/an
+                      </span>
+                    ) : null}
+                  </td>
+                  <td></td>
                 </tr>
               </tfoot>
             </table>
@@ -1173,6 +1322,11 @@ export default function PortfolioBVBPage() {
           loading={loadingAI}
           onGenerate={fetchAIAdvice}
         />
+      )}
+
+      {/* ── FAZA 4: ȘTIRI PORTOFOLIU ── */}
+      {!isEmpty && news && (
+        <PortfolioNewsSection news={news} />
       )}
 
       {/* ── DIALOGS ── */}

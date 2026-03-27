@@ -1,0 +1,96 @@
+{
+  "summary": "Completed Faza 4 testing: Dividende + Știri for Portofoliu BVB PRO. All 24 backend tests passed (100%). All frontend scenarios verified via Playwright. GET /api/portfolio-bvb/dividends returns exact values (BRD: 3.78%/211.62 RON, H2O: 6.08%/449.44 RON, total: 661.06 RON). GET /api/portfolio-bvb/news returns 8 tagged articles with H2O and BRD badges. Frontend renders all columns, metric card, and news section correctly.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Portfolio metric cards grid",
+        "issues": [
+          "MINOR: 'Income Dividende/An' is the 5th card in a 4-column grid (grid-cols-4), so it renders alone in a 2nd row taking 1/4 width. Functionally correct but layout looks uneven. Consider adjusting grid to 5-column or placing it in row 1."
+        ]
+      }
+    ]
+  },
+
+  "passed_tests": [
+    "✅ GET /api/portfolio-bvb/dividends without token → 401",
+    "✅ GET /api/portfolio-bvb/news without token → 401",
+    "✅ GET /api/portfolio-bvb/dividends with PRO token → 200",
+    "✅ Response has 'dividends' (list) and 'total_annual_income'",
+    "✅ Dividends contain BRD and H2O symbols",
+    "✅ All dividend entries have required fields: symbol, trailing_annual_dividend, dividend_yield_pct, annual_income_ron, shares, source",
+    "✅ BRD dividend_yield_pct = 3.78% (exact match)",
+    "✅ BRD annual_income_ron = 211.62 RON (exact match)",
+    "✅ BRD source = 'BVB.ro (confirmat)'",
+    "✅ H2O dividend_yield_pct = 6.08% (exact match)",
+    "✅ H2O annual_income_ron = 449.44 RON (exact match)",
+    "✅ H2O source = 'BVB.ro (confirmat)'",
+    "✅ total_annual_income = 661.06 RON (exact match)",
+    "✅ Top-level source = 'BVB.ro (oficial)'",
+    "✅ GET /api/portfolio-bvb/news with PRO token → 200",
+    "✅ Response has 'news' (list), 'symbols_searched', 'count'",
+    "✅ News returns 8 articles (max 8, API limit respected)",
+    "✅ All articles have required fields: title, source, published_at, related_symbols",
+    "✅ related_symbols is a list on all articles",
+    "✅ Tagged articles exist with H2O and/or BRD symbols",
+    "✅ symbols_searched contains H2O and BRD",
+    "✅ count (8) matches len(news) (8)",
+    "✅ All articles have non-empty titles",
+    "✅ All articles have valid published_at datetime strings",
+    "✅ Frontend: portfolio-table visible with 'Div Yield' and 'Income/an' columns",
+    "✅ Frontend: BRD row shows 3,78% in emerald green for Div Yield",
+    "✅ Frontend: BRD row shows 211,62 RON for Income/an",
+    "✅ Frontend: H2O row shows 6,08% in emerald green for Div Yield",
+    "✅ Frontend: H2O row shows 449,44 RON for Income/an",
+    "✅ Frontend: Metric card 'INCOME DIVIDENDE/AN' shows 661,06 RON in emerald green",
+    "✅ Frontend: Metric card subtitle 'BVB.ro confirmat' present",
+    "✅ Frontend: Total footer row shows 661,06 RON/an",
+    "✅ Frontend: [data-testid=portfolio-news-section] present and visible",
+    "✅ Frontend: Exactly 8 news articles rendered",
+    "✅ Frontend: H2O badges (bg-blue-100 text-blue-700) present on articles",
+    "✅ Frontend: BRD badge present on relevant article",
+    "✅ Frontend: Article images, source names, and dates displayed"
+  ],
+
+  "failed_tests": [],
+
+  "test_report_links": [
+    "/app/backend/tests/test_portfolio_faza4.py",
+    "/app/test_reports/pytest/pytest_faza4.xml"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "MINOR: Income Dividende/An metric card is the 5th card in a grid-cols-4 layout, rendering alone in a 2nd row. Consider using grid-cols-2 lg:grid-cols-5 or adding it to a different position.",
+    "NOTE: SYMBOL_SEARCH_TERMS maps 'TEL' to 'Transgaz' (same as TGN). This may cause double-tagging if both are in portfolio.",
+    "NOTE: news query searches title only (not title_ro) with regex but tagging logic checks both title+title_ro. This could lead to articles returned but with empty related_symbols if match is only in title_ro."
+  ],
+
+  "updated_files": [
+    "/app/backend/tests/test_portfolio_faza4.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% (24/24 tests passed)",
+    "frontend": "100% (all Faza 4 scenarios verified)"
+  },
+
+  "test_credentials": "Demo PRO: GET /api/auth/demo-login?secret=finromania-demo-2026 → session_token",
+
+  "seed_data_creation": "No new seed data created. Demo portfolio (H2O: 50 shares @ 65 RON, BRD: 200 shares @ 15 RON) already in DB. bvb_dividends_scraped collection has BRD (1.0581 RON) and H2O (8.989 RON) dividend data. articles collection has 8+ articles matching H2O/BRD search terms.",
+
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Faza 4 fully verified. GET /api/portfolio-bvb/dividends: BRD (3.78%, 211.62 RON), H2O (6.08%, 449.44 RON), total=661.06 RON, source='BVB.ro (confirmat)'. GET /api/portfolio-bvb/news: 8 articles with H2O+BRD related_symbols tags, blue badges. Frontend: divMap correctly populates Div Yield + Income/an columns in table, metric card 'Income Dividende/An' shows only when total_annual_income > 0, PortfolioNewsSection renders news section. Both endpoints require PRO auth (401 without token). bvb_dividends_scraped MongoDB collection is the data source.",
+
+  "rca_of_issue": "N/A — all tests passed, no bugs found"
+}

@@ -769,3 +769,166 @@ async def get_ai_portfolio_analysis(user: dict = Depends(require_auth)):
 
     logger.info(f"[AI PORTFOLIO] Analysis complete for {user['user_id']}")
     return result
+
+
+# ─────────────────────────────────────────
+# FAZA 4A: DIVIDENDE — Date reale BVB.ro per poziție
+# ─────────────────────────────────────────
+
+@router.get("/dividends")
+async def get_portfolio_dividends(user: dict = Depends(require_auth)):
+    """
+    Faza 4 — Dividende pentru fiecare poziție deținută:
+    - Dividend trailing 12 luni (din BVB.ro scraper, confirmat)
+    - Randament dividend pe baza prețului curent EODHD
+    - Income anual estimat = dividend/acțiune × cantitate deținută
+    STRICT: null dacă nu există date confirmate BVB.ro
+    """
+    _require_pro(user)
+
+    db = await get_database()
+    raw = await db.portfolio_bvb_pro.find(
+        {"user_id": user["user_id"]}, {"_id": 0}
+    ).to_list(200)
+
+    if not raw:
+        return {"dividends": [], "total_annual_income": 0}
+
+    symbols = [p["symbol"] for p in raw]
+    shares_map = {p["symbol"]: p["shares"] for p in raw}
+
+    # Prețuri curente pentru calcul yield
+    async with httpx.AsyncClient() as client:
+        prices = await asyncio.gather(*[_get_live_price(client, sym) for sym in symbols])
+    price_map = {sym: (prices[i].get("price")) for i, sym in enumerate(symbols)}
+
+    # Trailing 12 luni dividende din BVB.ro scraper (date confirmate)
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=400)).strftime("%Y-%m-%d")
+
+    dividends = []
+    total_income = 0.0
+
+    for sym in symbols:
+        payments = await db.bvb_dividends_scraped.find(
+            {"symbol": sym, "ex_date": {"$gte": cutoff}},
+            {"_id": 0, "dividend_per_share": 1, "ex_date": 1, "payment_date": 1}
+        ).sort("ex_date", -1).to_list(20)
+
+        trailing_annual = sum(float(p.get("dividend_per_share", 0)) for p in payments)
+        current_price = price_map.get(sym)
+        shares = shares_map.get(sym, 0)
+
+        # Yield calculat strict pe baza prețului EODHD și dividendelor BVB.ro
+        yield_pct = round(trailing_annual / current_price * 100, 2) if current_price and trailing_annual > 0 else None
+        annual_income = round(trailing_annual * shares, 2) if trailing_annual > 0 else None
+
+        if annual_income:
+            total_income += annual_income
+
+        dividends.append({
+            "symbol": sym,
+            "trailing_annual_dividend": round(trailing_annual, 6) if trailing_annual > 0 else None,
+            "dividend_yield_pct": yield_pct,
+            "annual_income_ron": annual_income,
+            "shares": shares,
+            "payments_count": len(payments),
+            "last_ex_date": payments[0].get("ex_date") if payments else None,
+            "source": "BVB.ro (confirmat)" if payments else "N/A",
+        })
+
+    return {
+        "dividends": dividends,
+        "total_annual_income": round(total_income, 2),
+        "source": "BVB.ro (oficial)",
+    }
+
+
+# ─────────────────────────────────────────
+# FAZA 4B: ȘTIRI — Filtrate per simboluri din portofoliu
+# ─────────────────────────────────────────
+
+# Mapping simbol → termeni de căutare (simbol + denumire companie)
+SYMBOL_SEARCH_TERMS = {
+    "TLV": ["TLV", "Banca Transilvania"],
+    "BRD": ["BRD", "Société Générale"],
+    "SNP": ["SNP", "OMV Petrom", "Petrom"],
+    "SNG": ["SNG", "Romgaz"],
+    "H2O": ["H2O", "Hidroelectrica"],
+    "SNN": ["SNN", "Nuclearelectrica"],
+    "TGN": ["TGN", "Transgaz"],
+    "EL": ["EL", "Electrica"],
+    "ONE": ["ONE", "One United"],
+    "FP": ["FP", "Fondul Proprietatea"],
+    "TEL": ["TEL", "Transgaz"],
+    "TRP": ["TRP", "Teraplast"],
+    "M": ["MedLife"],
+    "COTE": ["COTE", "Conpet"],
+    "WINE": ["Purcari"],
+    "AQ": ["AQ", "Aquila"],
+}
+
+
+@router.get("/news")
+async def get_portfolio_news(user: dict = Depends(require_auth)):
+    """
+    Faza 4 — Știri relevante filtrate pentru simbolurile din portofoliu.
+    Caută în colecția articles după titlu cu termenii de căutare per simbol.
+    """
+    _require_pro(user)
+
+    db = await get_database()
+    raw = await db.portfolio_bvb_pro.find(
+        {"user_id": user["user_id"]}, {"_id": 0, "symbol": 1}
+    ).to_list(200)
+
+    if not raw:
+        return {"news": [], "symbols_searched": []}
+
+    symbols = [p["symbol"] for p in raw]
+
+    # Construiește termenii de căutare pentru fiecare simbol
+    search_terms = []
+    for sym in symbols:
+        terms = SYMBOL_SEARCH_TERMS.get(sym, [sym])
+        search_terms.extend(terms)
+
+    # Query în DB: titlul conține oricare dintre termeni
+    regex_pattern = "|".join(search_terms)
+
+    articles = await db.articles.find(
+        {
+            "title": {"$regex": regex_pattern, "$options": "i"},
+        },
+        {
+            "_id": 0,
+            "id": 1,
+            "title": 1,
+            "title_ro": 1,
+            "description": 1,
+            "description_ro": 1,
+            "image_url": 1,
+            "source": 1,
+            "published_at": 1,
+            "url": 1,
+        }
+    ).sort("published_at", -1).limit(8).to_list(8)
+
+    # Tag each article with which symbol(s) it's related to
+    tagged = []
+    for art in articles:
+        title = (art.get("title") or "") + " " + (art.get("title_ro") or "")
+        related = []
+        for sym in symbols:
+            terms = SYMBOL_SEARCH_TERMS.get(sym, [sym])
+            if any(t.lower() in title.lower() for t in terms):
+                related.append(sym)
+        tagged.append({
+            **art,
+            "related_symbols": related,
+        })
+
+    return {
+        "news": tagged,
+        "symbols_searched": symbols,
+        "count": len(tagged),
+    }
