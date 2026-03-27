@@ -472,6 +472,88 @@ async def get_dividend_analysis(symbol: str):
     }
 
 
+
+# ============================================================
+# COMPARE ENDPOINT
+# ============================================================
+
+@router.get("/compare")
+async def compare_dividends(symbols: str):
+    """
+    Compară dividendele a 2-4 acțiuni side-by-side pe ani.
+    Usage: /api/bvb-dividends/compare?symbols=TLV,BRD,SNP
+    """
+    symbol_list = [s.strip().upper() for s in symbols.split(",") if s.strip()]
+    if len(symbol_list) < 2:
+        raise HTTPException(status_code=400, detail="Minim 2 simboluri pentru comparație")
+    if len(symbol_list) > 4:
+        raise HTTPException(status_code=400, detail="Maxim 4 simboluri pentru comparație")
+
+    records, _ = await get_cached_dividends()
+    db = await get_database()
+
+    stocks_data = {}
+    all_years = set()
+
+    for sym in symbol_list:
+        bvb_payments = [r for r in records if r["symbol"] == sym]
+        eodhd_payments = await _fetch_eodhd_dividend_history(sym)
+
+        merged = {}
+        for p in eodhd_payments:
+            merged[p["date"]] = {"date": p["date"], "dividend": p["dividend"]}
+        for p in bvb_payments:
+            dt = p.get("ex_date", "")
+            if dt:
+                merged[dt] = {"date": dt, "dividend": p["dividend_per_share"]}
+
+        payments_list = sorted(merged.values(), key=lambda x: x["date"])
+        yearly = _aggregate_by_year(payments_list, "date", "dividend")
+        cagr = _calculate_cagr(yearly)
+        stability = _calculate_stability(yearly)
+
+        stock_info = await db.stocks_bvb.find_one({"symbol": sym}, {"_id": 0, "price": 1})
+        price = stock_info.get("price", 0) if stock_info else 0
+        current_year = datetime.now().year
+        recent = yearly.get(current_year, 0) or yearly.get(current_year - 1, 0)
+        cur_yield = (recent / price * 100) if price > 0 else 0
+
+        score = _calculate_dividend_score(cagr, stability, cur_yield, len(yearly))
+
+        company = sym
+        if bvb_payments:
+            company = bvb_payments[0].get("company", sym)
+
+        all_years.update(yearly.keys())
+        stocks_data[sym] = {
+            "symbol": sym,
+            "company": company,
+            "price": round(price, 2),
+            "current_yield": round(cur_yield, 2),
+            "cagr": round(cagr, 2) if cagr is not None else None,
+            "consecutive_years": stability["consecutive_years"],
+            "dividend_score": score,
+            "yearly": yearly,
+        }
+
+    # Build chart data: [{year: 2019, TLV: 0.17, BRD: 1.17, SNP: 0.04}, ...]
+    sorted_years = sorted(all_years)
+    chart_data = []
+    for yr in sorted_years:
+        row = {"year": yr}
+        for sym in symbol_list:
+            row[sym] = round(stocks_data[sym]["yearly"].get(yr, 0), 6)
+        chart_data.append(row)
+
+    return {
+        "symbols": symbol_list,
+        "stocks": {sym: {k: v for k, v in d.items() if k != "yearly"} for sym, d in stocks_data.items()},
+        "chart_data": chart_data,
+        "years": sorted_years,
+        "source": "BVB.ro + EODHD",
+    }
+
+
 # ============================================================
 # RANKINGS ENDPOINT (with MongoDB cache)
 # ============================================================

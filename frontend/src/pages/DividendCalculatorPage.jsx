@@ -398,6 +398,11 @@ const DividendHistoryTab = ({ isPro }) => {
   const [analysis, setAnalysis] = useState(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
 
+  // Compare state
+  const [compareSymbols, setCompareSymbols] = useState([]);
+  const [compareData, setCompareData] = useState(null);
+  const [loadingCompare, setLoadingCompare] = useState(false);
+
   useEffect(() => {
     if (!isPro) return;
     const fetchRankings = async () => {
@@ -435,6 +440,33 @@ const DividendHistoryTab = ({ isPro }) => {
       toast.error('Eroare la încărcarea analizei');
     } finally {
       setLoadingAnalysis(false);
+    }
+  };
+
+  const toggleCompare = (symbol) => {
+    setCompareSymbols(prev => {
+      if (prev.includes(symbol)) return prev.filter(s => s !== symbol);
+      if (prev.length >= 4) { toast.error('Maxim 4 acțiuni pentru comparație'); return prev; }
+      return [...prev, symbol];
+    });
+  };
+
+  const runCompare = async () => {
+    if (compareSymbols.length < 2) { toast.error('Selectează minim 2 acțiuni'); return; }
+    setLoadingCompare(true);
+    try {
+      const res = await fetch(`${API_URL}/api/bvb-dividends/compare?symbols=${compareSymbols.join(',')}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCompareData(data);
+        setAnalysis(null);
+        setSelectedSymbol(null);
+      }
+    } catch (err) {
+      console.error('Error comparing:', err);
+      toast.error('Eroare la comparație');
+    } finally {
+      setLoadingCompare(false);
     }
   };
 
@@ -597,6 +629,144 @@ const DividendHistoryTab = ({ isPro }) => {
         )}
       </AnimatePresence>
 
+      {/* Comparison Panel */}
+      <AnimatePresence>
+        {compareData && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <Card className="border-2 border-purple-200 bg-gradient-to-br from-slate-50 to-purple-50/30">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-purple-600" />
+                      Comparație Dividende — {compareData.symbols.join(' vs ')}
+                    </CardTitle>
+                    <CardDescription>Dividend per an (RON/acțiune) • Sursa: BVB.ro + EODHD</CardDescription>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setCompareData(null)}>Închide</Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                {/* Stocks Summary Cards */}
+                <div className={`grid gap-3 ${compareData.symbols.length <= 2 ? 'grid-cols-2' : compareData.symbols.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
+                  {compareData.symbols.map((sym, idx) => {
+                    const s = compareData.stocks[sym];
+                    const colors = ['bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500'];
+                    return (
+                      <div key={sym} className="bg-white rounded-lg p-3 shadow-sm border">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={`w-3 h-3 rounded-full ${colors[idx]}`} />
+                          <span className="font-bold">{sym}</span>
+                          <ScoreBadge score={s.dividend_score.score} rating={s.dividend_score.rating} />
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">{s.company}</p>
+                        <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
+                          <div><span className="text-muted-foreground">Yield:</span> <span className="font-bold text-green-600">{s.current_yield}%</span></div>
+                          <div><span className="text-muted-foreground">CAGR:</span> <span className={`font-bold ${s.cagr >= 0 ? 'text-green-600' : 'text-red-500'}`}>{s.cagr != null ? `${s.cagr}%` : '—'}</span></div>
+                          <div><span className="text-muted-foreground">Consec.:</span> <span className="font-bold">{s.consecutive_years} ani</span></div>
+                          <div><span className="text-muted-foreground">Preț:</span> <span className="font-bold">{s.price} RON</span></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Grouped Bar Chart */}
+                <div className="bg-white rounded-lg p-4 shadow-sm border" data-testid="compare-chart">
+                  <h4 className="text-sm font-semibold mb-3">Dividend per An (RON/acțiune)</h4>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={compareData.chart_data} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 11 }} />
+                      <RechartsTooltip
+                        formatter={(value, name) => [`${Number(value).toFixed(4)} RON`, name]}
+                        contentStyle={{ borderRadius: '8px', fontSize: '13px' }}
+                      />
+                      {compareData.symbols.map((sym, idx) => {
+                        const fills = ['#3b82f6', '#10b981', '#f59e0b', '#f43f5e'];
+                        return <Bar key={sym} dataKey={sym} fill={fills[idx]} radius={[3, 3, 0, 0]} />;
+                      })}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Year-by-Year Table */}
+                <details className="bg-white rounded-lg shadow-sm border">
+                  <summary className="px-4 py-3 cursor-pointer text-sm font-semibold hover:bg-gray-50">
+                    Tabel comparativ pe ani ({compareData.years.length} ani)
+                  </summary>
+                  <div className="px-4 pb-3 overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>An</TableHead>
+                          {compareData.symbols.map(sym => (
+                            <TableHead key={sym} className="text-right">{sym}</TableHead>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {compareData.chart_data.map(row => (
+                          <TableRow key={row.year}>
+                            <TableCell className="font-bold">{row.year}</TableCell>
+                            {compareData.symbols.map(sym => (
+                              <TableCell key={sym} className="text-right font-mono">
+                                {row[sym] > 0 ? `${row[sym].toFixed(4)} RON` : '—'}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </details>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Compare Selection Bar */}
+      {compareSymbols.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="sticky top-20 z-10"
+        >
+          <Card className="bg-purple-50 border-purple-200 shadow-lg">
+            <CardContent className="py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-medium text-purple-700">Compară:</span>
+                {compareSymbols.map(sym => (
+                  <Badge key={sym} variant="secondary" className="bg-purple-100 text-purple-700 cursor-pointer" onClick={() => toggleCompare(sym)}>
+                    {sym} ✕
+                  </Badge>
+                ))}
+                <span className="text-xs text-muted-foreground">({compareSymbols.length}/4)</span>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="ghost" onClick={() => { setCompareSymbols([]); setCompareData(null); }}>Anulează</Button>
+                <Button
+                  size="sm"
+                  className="bg-purple-600 hover:bg-purple-700"
+                  onClick={runCompare}
+                  disabled={compareSymbols.length < 2 || loadingCompare}
+                  data-testid="compare-btn"
+                >
+                  {loadingCompare ? <RefreshCw className="w-4 h-4 animate-spin mr-1" /> : <BarChart3 className="w-4 h-4 mr-1" />}
+                  Compară ({compareSymbols.length})
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Rankings Table */}
       <Card>
         <CardHeader>
@@ -620,6 +790,14 @@ const DividendHistoryTab = ({ isPro }) => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-10">#</TableHead>
+                    <TableHead className="w-10">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger><BarChart3 className="w-4 h-4 text-purple-500" /></TooltipTrigger>
+                          <TooltipContent>Selectează 2-4 acțiuni pentru comparație</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableHead>
                     <TableHead>Acțiune</TableHead>
                     <TableHead className="text-center">Score</TableHead>
                     <TableHead className="text-right">Yield</TableHead>
@@ -632,12 +810,20 @@ const DividendHistoryTab = ({ isPro }) => {
                   {rankings.map((r, idx) => (
                     <TableRow
                       key={r.symbol}
-                      className={`hover:bg-muted/50 cursor-pointer ${selectedSymbol === r.symbol ? 'bg-blue-50' : ''}`}
-                      onClick={() => fetchAnalysis(r.symbol)}
+                      className={`hover:bg-muted/50 ${selectedSymbol === r.symbol ? 'bg-blue-50' : ''} ${compareSymbols.includes(r.symbol) ? 'bg-purple-50/50' : ''}`}
                       data-testid={`ranking-row-${r.symbol}`}
                     >
                       <TableCell className="font-bold text-muted-foreground">{idx + 1}</TableCell>
                       <TableCell>
+                        <input
+                          type="checkbox"
+                          checked={compareSymbols.includes(r.symbol)}
+                          onChange={() => toggleCompare(r.symbol)}
+                          className="w-4 h-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                          data-testid={`compare-check-${r.symbol}`}
+                        />
+                      </TableCell>
+                      <TableCell className="cursor-pointer" onClick={() => fetchAnalysis(r.symbol)}>
                         <div>
                           <span className="font-bold text-blue-600">{r.symbol}</span>
                           <p className="text-xs text-muted-foreground truncate max-w-[200px]">{r.company}</p>
@@ -659,6 +845,7 @@ const DividendHistoryTab = ({ isPro }) => {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => fetchAnalysis(r.symbol)}
                           disabled={loadingAnalysis && selectedSymbol === r.symbol}
                         >
                           {loadingAnalysis && selectedSymbol === r.symbol ? (
