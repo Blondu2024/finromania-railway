@@ -27,10 +27,12 @@ GLOBAL_INDICES = {
 }
 
 COMMODITIES = {
-    # Using ETFs since EODHD doesn't have direct commodity futures
-    "GLD.US": {"name": "Aur (GLD)", "flag": "🥇", "category": "commodities", "unit": "USD"},
-    "USO.US": {"name": "Petrol WTI (USO)", "flag": "🛢️", "category": "commodities", "unit": "USD"},
-    "UNG.US": {"name": "Gaze Naturale (UNG)", "flag": "🔥", "category": "commodities", "unit": "USD"},
+    # Precious metals - direct spot prices via EODHD FOREX EOD (USD per troy oz)
+    "XAUUSD.FOREX": {"name": "Aur", "flag": "🥇", "category": "commodities", "unit": "USD/oz", "is_eod_forex": True},
+    "XAGUSD.FOREX": {"name": "Argint", "flag": "🪙", "category": "commodities", "unit": "USD/oz", "is_eod_forex": True},
+    # Energy ETF proxies - EODHD real-time (no direct futures available)
+    "USO.US": {"name": "Petrol (ETF USO)", "flag": "🛢️", "category": "commodities", "unit": "USD/share"},
+    "UNG.US": {"name": "Gaze Nat. (ETF UNG)", "flag": "🔥", "category": "commodities", "unit": "USD/share"},
 }
 
 CRYPTO = {
@@ -63,85 +65,9 @@ GLOBAL_STOCKS = {
 }
 
 
-async def fetch_ticker_yfinance(symbol: str, info: dict) -> dict:
-    """Fallback pentru crypto/commodities cu yfinance - WITH 60s CACHE & SHARED THREAD POOL"""
-    import time
-    
-    # Check cache first (60 second TTL - longer to improve page load speed)
-    cache_key = symbol
-    if cache_key in _yfinance_cache:
-        cache_age = time.time() - _yfinance_cache_time.get(cache_key, 0)
-        if cache_age < 60:  # 60 second cache
-            return _yfinance_cache[cache_key]
-    
-    def _fetch_sync():
-        """Synchronous fetch in thread"""
-        try:
-            ticker = yf.Ticker(symbol)
-            hist = ticker.history(period="1d", interval="5m")
-            
-            if hist.empty:
-                hist = ticker.history(period="2d")
-                
-            if hist.empty:
-                return None
-                
-            current_price = hist['Close'].iloc[-1]
-            prev_close = hist['Close'].iloc[0] if len(hist) > 1 else current_price
-            change = current_price - prev_close
-            change_percent = (change / prev_close) * 100 if prev_close else 0
-            
-            return {
-                "symbol": symbol,
-                "name": info["name"],
-                "flag": info.get("flag", "📊"),
-                "country": info.get("country", ""),
-                "category": info.get("category", ""),
-                "unit": info.get("unit", ""),
-                "price": float(round(current_price, 2)),
-                "change": float(round(change, 2)),
-                "change_percent": float(round(change_percent, 2)),
-                "prev_close": float(round(prev_close, 2)),
-                "sparkline": [],
-                "is_positive": bool(change_percent >= 0),
-                "source": "yfinance"
-            }
-        except Exception as e:
-            logger.debug(f"yfinance error for {symbol}: {e}")
-            return None
-    
-    try:
-        # Run yfinance in SHARED thread pool 
-        loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(_yfinance_executor, _fetch_sync)
-        
-        if result:
-            # Store in cache
-            _yfinance_cache[cache_key] = result
-            _yfinance_cache_time[cache_key] = time.time()
-            return result
-        
-        # Return cached data if available, even if stale
-        if cache_key in _yfinance_cache:
-            return _yfinance_cache[cache_key]
-        return None
-    except Exception as e:
-        logger.debug(f"yfinance async error for {symbol}: {e}")
-        if cache_key in _yfinance_cache:
-            return _yfinance_cache[cache_key]
-        return None
-
-
 async def fetch_ticker_data(symbol: str, info: dict) -> dict:
-    """Unified function - route la EODHD sau yfinance based on asset type"""
-    # Folosește yfinance pentru crypto și commodities (EODHD nu le suportă)
-    if info.get("use_yfinance"):
-        return await fetch_ticker_yfinance(symbol, info)
-    else:
-        # Folosește EODHD pentru US indices și forex (real-time <50ms!)
-        return await fetch_ticker_data_eodhd(symbol, info)
-
-        return None
+    """Fetch ticker data via EODHD (100% no yfinance)"""
+    return await fetch_ticker_data_eodhd(symbol, info)
 
 
 async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
@@ -408,8 +334,91 @@ async def get_global_stocks():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def _safe_float(val, default=0.0):
+    """Safely convert to float, handling 'NA' strings"""
+    if val is None or val == 'NA' or val == 'N/A' or val == '':
+        return default
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return default
+
+
+def _safe_int(val, default=0):
+    """Safely convert to int, handling 'NA' strings"""
+    if val is None or val == 'NA' or val == 'N/A' or val == '':
+        return default
+    try:
+        return int(float(val))
+    except (ValueError, TypeError):
+        return default
+
+
+async def fetch_eod_forex_commodity(symbol: str, info: dict, client, api_key: str) -> dict | None:
+    """Fetch precious metals spot price via EODHD EOD endpoint (XAUUSD.FOREX, XAGUSD.FOREX).
+    Real-time endpoint returns NA; EOD gives today's close + yesterday's close for change %.
+    """
+    from datetime import timedelta
+    try:
+        # Today's EOD (last available candle - updates throughout trading session)
+        from_date = (datetime.now(timezone.utc) - timedelta(days=3)).strftime("%Y-%m-%d")
+        eod_url = f"https://eodhd.com/api/eod/{symbol}"
+        eod_params = {"api_token": api_key, "fmt": "json", "from": from_date}
+        eod_resp = await client.get(eod_url, params=eod_params, timeout=10)
+        
+        if eod_resp.status_code != 200:
+            logger.warning(f"EOD fetch failed for {symbol}: {eod_resp.status_code}")
+            return None
+        
+        eod_data = eod_resp.json()
+        if not isinstance(eod_data, list) or len(eod_data) == 0:
+            return None
+        
+        # Latest close = today (or most recent trading day)
+        latest = eod_data[-1]
+        current_price = _safe_float(latest.get("close"))
+        
+        if current_price == 0:
+            return None
+        
+        # Previous close (day before)
+        prev_close = _safe_float(eod_data[-2].get("close"), current_price) if len(eod_data) >= 2 else current_price
+        
+        change = current_price - prev_close
+        change_percent = (change / prev_close * 100) if prev_close > 0 else 0
+        high = _safe_float(latest.get("high"), current_price)
+        low = _safe_float(latest.get("low"), current_price)
+        
+        return {
+            "symbol": symbol,
+            "name": info["name"],
+            "flag": info.get("flag", "📊"),
+            "country": info.get("country", ""),
+            "category": info.get("category", ""),
+            "unit": info.get("unit", ""),
+            "price": round(current_price, 2),
+            "change": round(change, 2),
+            "change_percent": round(change_percent, 2),
+            "prev_close": round(prev_close, 2),
+            "high": round(high, 2),
+            "low": round(low, 2),
+            "volume": _safe_int(latest.get("volume")),
+            "sparkline": [],
+            "is_positive": bool(change_percent >= 0),
+            "last_update": latest.get("date", datetime.now(timezone.utc).isoformat()),
+            "source": "eodhd_eod_spot",
+            "is_live": True
+        }
+    except Exception as e:
+        logger.error(f"EOD forex commodity error for {symbol}: {e}")
+        return None
+
+
 async def fetch_multiple_tickers_eodhd(symbols_info: dict) -> dict:
-    """Fetch from EODHD - uses real-time batch (most reliable source)"""
+    """Fetch from EODHD:
+    - Precious metals (is_eod_forex=True): via EOD endpoint (real-time returns NA)
+    - All others: batch real-time endpoint (fast, accurate)
+    """
     import httpx
     import os
     
@@ -417,76 +426,72 @@ async def fetch_multiple_tickers_eodhd(symbols_info: dict) -> dict:
     if not api_key:
         return {}
     
-    def safe_float(val, default=0.0):
-        if val is None or val == 'NA' or val == 'N/A' or val == '':
-            return default
-        try:
-            return float(val)
-        except (ValueError, TypeError):
-            return default
-    
-    def safe_int(val, default=0):
-        if val is None or val == 'NA' or val == 'N/A' or val == '':
-            return default
-        try:
-            return int(float(val))
-        except (ValueError, TypeError):
-            return default
-    
     results = {}
-    eodhd_symbols = {s: i for s, i in symbols_info.items() if not i.get("use_yfinance")}
     
-    if not eodhd_symbols:
-        return results
+    # Separate precious metals from regular real-time symbols
+    eod_forex_symbols = {s: i for s, i in symbols_info.items() if i.get("is_eod_forex")}
+    realtime_symbols = {s: i for s, i in symbols_info.items() if not i.get("is_eod_forex") and not i.get("use_yfinance")}
     
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            # Single batch request for ALL assets - real-time is most reliable
-            all_symbols_str = ",".join(eodhd_symbols.keys())
-            rt_url = f"https://eodhd.com/api/real-time/{all_symbols_str}"
-            rt_params = {"api_token": api_key, "fmt": "json"}
-            
-            rt_response = await client.get(rt_url, params=rt_params)
-            
-            if rt_response.status_code == 200:
-                rt_data = rt_response.json()
-                rt_items = rt_data if isinstance(rt_data, list) else [rt_data]
+            # ── 1. Precious metals: individual EOD fetches ──────────────────
+            eod_tasks = [
+                fetch_eod_forex_commodity(sym, info, client, api_key)
+                for sym, info in eod_forex_symbols.items()
+            ]
+            if eod_tasks:
+                import asyncio
+                eod_results = await asyncio.gather(*eod_tasks, return_exceptions=True)
+                for sym, res in zip(eod_forex_symbols.keys(), eod_results):
+                    if res and not isinstance(res, Exception):
+                        results[sym] = res
+
+            # ── 2. Everything else: single batch real-time request ───────────
+            if realtime_symbols:
+                all_symbols_str = ",".join(realtime_symbols.keys())
+                rt_url = f"https://eodhd.com/api/real-time/{all_symbols_str}"
+                rt_params = {"api_token": api_key, "fmt": "json"}
                 
-                for item in rt_items:
-                    code = item.get("code", "")
-                    if code not in eodhd_symbols:
-                        continue
+                rt_response = await client.get(rt_url, params=rt_params)
+                
+                if rt_response.status_code == 200:
+                    rt_data = rt_response.json()
+                    rt_items = rt_data if isinstance(rt_data, list) else [rt_data]
                     
-                    info = eodhd_symbols[code]
-                    price = safe_float(item.get("close"))
-                    prev_close = safe_float(item.get("previousClose"), price)
-                    
-                    if price == 0:
-                        continue
-                    
-                    timestamp = safe_int(item.get("timestamp"))
-                    
-                    results[code] = {
-                        "symbol": code,
-                        "name": info["name"],
-                        "flag": info.get("flag", "📊"),
-                        "country": info.get("country", ""),
-                        "category": info.get("category", ""),
-                        "unit": info.get("unit", ""),
-                        "price": round(price, 2),
-                        "change": round(safe_float(item.get("change")), 2),
-                        "change_percent": round(safe_float(item.get("change_p")), 2),
-                        "prev_close": round(prev_close, 2),
-                        "high": round(safe_float(item.get("high"), price), 2),
-                        "low": round(safe_float(item.get("low"), price), 2),
-                        "volume": safe_int(item.get("volume")),
-                        "sparkline": [],
-                        "is_positive": bool(safe_float(item.get("change_p")) >= 0),
-                        "last_update": datetime.fromtimestamp(timestamp).isoformat() if timestamp else datetime.now(timezone.utc).isoformat(),
-                        "source": "eodhd_realtime",
-                        "is_live": True  
-                    }
-                    
+                    for item in rt_items:
+                        code = item.get("code", "")
+                        if code not in realtime_symbols:
+                            continue
+                        
+                        info = realtime_symbols[code]
+                        price = _safe_float(item.get("close"))
+                        prev_close = _safe_float(item.get("previousClose"), price)
+                        
+                        if price == 0:
+                            continue
+                        
+                        timestamp = _safe_int(item.get("timestamp"))
+                        
+                        results[code] = {
+                            "symbol": code,
+                            "name": info["name"],
+                            "flag": info.get("flag", "📊"),
+                            "country": info.get("country", ""),
+                            "category": info.get("category", ""),
+                            "unit": info.get("unit", ""),
+                            "price": round(price, 2),
+                            "change": round(_safe_float(item.get("change")), 2),
+                            "change_percent": round(_safe_float(item.get("change_p")), 2),
+                            "prev_close": round(prev_close, 2),
+                            "high": round(_safe_float(item.get("high"), price), 2),
+                            "low": round(_safe_float(item.get("low"), price), 2),
+                            "volume": _safe_int(item.get("volume")),
+                            "sparkline": [],
+                            "is_positive": bool(_safe_float(item.get("change_p")) >= 0),
+                            "last_update": datetime.fromtimestamp(timestamp).isoformat() if timestamp else datetime.now(timezone.utc).isoformat(),
+                            "source": "eodhd_realtime",
+                            "is_live": True
+                        }
     except Exception as e:
         logger.error(f"EODHD fetch error: {e}")
     
@@ -722,43 +727,8 @@ async def get_asset_chart(
                         "is_live": False
                     }
         
-        # Final fallback to yfinance
-        ticker = yf.Ticker(symbol.replace(".US", "").replace(".INDX", ""))
-        hist = ticker.history(period=period, interval=interval if interval != "1d" else None)
-        
-        if hist.empty:
-            raise HTTPException(status_code=404, detail=f"No data for {symbol}")
-        
-        chart_data = [
-            {
-                "date": index.strftime("%Y-%m-%d %H:%M:%S") if interval in intraday_intervals else index.strftime("%Y-%m-%d"),
-                "open": float(round(row["Open"], 2)),
-                "high": float(round(row["High"], 2)),
-                "low": float(round(row["Low"], 2)),
-                "close": float(round(row["Close"], 2)),
-                "volume": int(row["Volume"])
-            }
-            for index, row in hist.iterrows()
-        ]
-        
-        all_assets = {**GLOBAL_INDICES, **GLOBAL_STOCKS, **COMMODITIES, **CRYPTO, **FOREX}
-        asset_info = all_assets.get(symbol, {"name": symbol, "flag": "📊"})
-        
-        return {
-            "symbol": symbol,
-            "name": asset_info.get("name", symbol),
-            "flag": asset_info.get("flag", "📊"),
-            "period": period,
-            "interval": interval,
-            "data": chart_data,
-            "data_points": len(chart_data),
-            "current_price": chart_data[-1]["close"] if chart_data else None,
-            "period_change": round(
-                ((chart_data[-1]["close"] - chart_data[0]["close"]) / chart_data[0]["close"]) * 100, 2
-            ) if chart_data and chart_data[0]["close"] > 0 else 0,
-            "source": "yfinance",
-            "is_live": False
-        }
+        # No further fallback - EODHD is the sole data source
+        raise HTTPException(status_code=404, detail=f"No chart data available for {symbol}")
         
     except HTTPException:
         raise

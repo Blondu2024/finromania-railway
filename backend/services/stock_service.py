@@ -19,31 +19,103 @@ class StockService:
         self.eodhd_client = get_eodhd_client()
         self._use_real_bvb = bool(os.environ.get("EODHD_API_KEY"))
     
+    # EODHD symbols for global indices (batch real-time)
+    # symbol_display maps to legacy yfinance symbols stored in DB
+    EODHD_INDICES = {
+        "GSPC.INDX": {"name": "S&P 500", "symbol_display": "^GSPC"},
+        "NDX.INDX": {"name": "NASDAQ 100", "symbol_display": "^IXIC"},  # replace old NASDAQ Composite
+        "DJI.INDX": {"name": "Dow Jones", "symbol_display": "^DJI"},
+        "GDAXI.INDX": {"name": "DAX", "symbol_display": "^GDAXI"},
+        "FTSE.INDX": {"name": "FTSE 100", "symbol_display": "^FTSE"},
+        "N225.INDX": {"name": "Nikkei 225", "symbol_display": "^N225"},
+        "HSI.INDX": {"name": "Hang Seng", "symbol_display": "^HSI"},
+    }
+
     async def update_global_indices(self) -> int:
-        """Update indici globali"""
+        """Update indici globali - 100% EODHD (no yfinance)"""
+        import httpx
+        import os
+
+        def safe_float(val, default=0.0):
+            if val is None or val in ('NA', 'N/A', ''):
+                return default
+            try:
+                return float(val)
+            except (ValueError, TypeError):
+                return default
+
+        def safe_int(val, default=0):
+            if val is None or val in ('NA', 'N/A', ''):
+                return default
+            try:
+                return int(float(val))
+            except (ValueError, TypeError):
+                return default
+
         try:
-            logger.info("🔄 Updating global indices...")
-            
-            indices = self.yahoo_client.get_global_indices()
-            
-            if not indices:
-                logger.warning("No global indices fetched")
+            logger.info("🔄 Updating global indices (EODHD)...")
+            api_key = os.environ.get("EODHD_API_KEY")
+            if not api_key:
+                logger.warning("EODHD_API_KEY not set, skipping global indices update")
                 return 0
-            
+
+            symbols_str = ",".join(self.EODHD_INDICES.keys())
+            url = f"https://eodhd.com/api/real-time/{symbols_str}"
+
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.get(url, params={"api_token": api_key, "fmt": "json"})
+
+            if resp.status_code != 200:
+                logger.error(f"EODHD indices update failed: {resp.status_code}")
+                return 0
+
+            rt_data = resp.json()
+            rt_items = rt_data if isinstance(rt_data, list) else [rt_data]
+
             db = await get_database()
             count = 0
-            
-            for index in indices:
+            now = datetime.now(timezone.utc)
+
+            for item in rt_items:
+                code = item.get("code", "")
+                if code not in self.EODHD_INDICES:
+                    continue
+
+                info = self.EODHD_INDICES[code]
+                price = safe_float(item.get("close"))
+                if price == 0:
+                    continue
+
+                prev_close = safe_float(item.get("previousClose"), price)
+                change = safe_float(item.get("change"))
+                change_p = safe_float(item.get("change_p"))
+
+                index_doc = {
+                    "symbol": info["symbol_display"],
+                    "eodhd_symbol": code,
+                    "name": info["name"],
+                    "price": round(price, 2),
+                    "change": round(change, 2),
+                    "change_percent": round(change_p, 2),
+                    "previous_close": round(prev_close, 2),
+                    "high": round(safe_float(item.get("high"), price), 2),
+                    "low": round(safe_float(item.get("low"), price), 2),
+                    "volume": safe_int(item.get("volume")),
+                    "last_updated": now,
+                    "source": "eodhd_realtime",
+                    "is_live": True,
+                }
+
                 await db.stocks_global.update_one(
-                    {'symbol': index['symbol']},
-                    {'$set': index},
-                    upsert=True
+                    {"symbol": info["symbol_display"]},
+                    {"$set": index_doc},
+                    upsert=True,
                 )
                 count += 1
-            
-            logger.info(f"✅ Updated {count} global indices")
+
+            logger.info(f"✅ Updated {count} global indices (EODHD)")
             return count
-            
+
         except Exception as e:
             logger.error(f"Error updating global indices: {e}")
             return 0
