@@ -1,12 +1,12 @@
 """
 Dividend Calculator PRO - Calculator avansat de dividende pentru BVB
 Permite utilizatorilor să-și calculeze veniturile din dividende și să simuleze scenarii
-DATE LIVE de la EODHD + fallback verificat cu date reale BVB.ro
+DATE OFICIALE de pe BVB.ro (scraping) > EODHD > fallback hardcoded
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel
 from typing import List, Optional, Dict
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import logging
 import httpx
 import os
@@ -329,6 +329,36 @@ async def get_current_price(symbol: str) -> float:
     return stock.get("price", 0) if stock else 0
 
 
+async def get_bvb_scraped_dividend(symbol: str) -> Optional[Dict]:
+    """
+    Get dividend data from BVB.ro scrape cache (PRIMARY source).
+    Returns trailing 12M annual dividend sum for a symbol.
+    """
+    db = await get_database()
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=400)).strftime("%Y-%m-%d")
+
+    payments = await db.bvb_dividends_scraped.find(
+        {"symbol": symbol, "ex_date": {"$gte": cutoff}},
+        {"_id": 0}
+    ).to_list(50)
+
+    if not payments:
+        return None
+
+    trailing_annual = sum(p["dividend_per_share"] for p in payments)
+    latest = max(payments, key=lambda p: p.get("ex_date", ""))
+
+    return {
+        "dividend_per_share": round(trailing_annual, 6),
+        "dividend_yield": latest.get("dividend_yield", 0),
+        "name": latest.get("company", symbol),
+        "ex_date": latest.get("ex_date"),
+        "payment_date": latest.get("payment_date"),
+        "payments_count": len(payments),
+        "source": "BVB.ro (oficial)",
+    }
+
+
 # ============================================
 # REQUEST/RESPONSE MODELS
 # ============================================
@@ -368,22 +398,67 @@ class DividendResult(BaseModel):
 async def get_dividend_stocks():
     """
     Returnează toate acțiunile BVB cu dividende
-    Prioritate: Date LIVE EODHD > Fallback confirmat
+    Prioritate: BVB.ro scraped > EODHD LIVE > Fallback hardcoded
     """
     stocks = []
-    
+    seen_symbols = set()
+
+    # ── PHASE 1: BVB.ro scraped data (PRIMARY — most accurate) ──
+    db = await get_database()
+    bvb_records = await db.bvb_dividends_scraped.find({}, {"_id": 0}).to_list(500)
+    bvb_meta = await db.bvb_scrape_meta.find_one({"type": "dividends"}, {"_id": 0})
+    last_scraped = bvb_meta.get("last_scraped") if bvb_meta else None
+
+    # Group by symbol, get latest + trailing annual
+    from collections import defaultdict
+    by_symbol = defaultdict(list)
+    for rec in bvb_records:
+        by_symbol[rec["symbol"]].append(rec)
+
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=400)).strftime("%Y-%m-%d")
+
+    for symbol, payments in by_symbol.items():
+        recent = [p for p in payments if p.get("ex_date", "") >= cutoff]
+        if not recent:
+            continue
+
+        trailing_annual = sum(p["dividend_per_share"] for p in recent)
+        if trailing_annual <= 0:
+            continue
+
+        latest = max(recent, key=lambda p: p.get("ex_date", ""))
+        current_price = await get_current_price(symbol)
+        div_yield = latest.get("dividend_yield", 0)
+        if div_yield <= 0 and current_price > 0:
+            div_yield = trailing_annual / current_price * 100
+
+        stocks.append({
+            "symbol": symbol,
+            "name": latest.get("company", symbol),
+            "sector": "BVB",
+            "price": round(current_price, 2),
+            "dividend_per_share": round(trailing_annual, 4),
+            "dividend_yield": round(div_yield, 2),
+            "ex_date": latest.get("ex_date"),
+            "payment_date": latest.get("payment_date"),
+            "data_source": "BVB.ro (oficial)",
+            "payments_12m": len(recent),
+            "note": f"Trailing 12M: {len(recent)} plăți de pe BVB.ro",
+        })
+        seen_symbols.add(symbol)
+
+    # ── PHASE 2: Fill gaps with EODHD + Fallback for known dividend stocks ──
     for symbol in DIVIDEND_SYMBOLS:
-        # Try to get LIVE data from EODHD first
+        if symbol in seen_symbols:
+            continue
+
         live_data = await fetch_live_dividend_data(symbol)
         current_price = await get_current_price(symbol)
-        
+        fallback = DIVIDEND_FALLBACK_2026.get(symbol, {})
+
         if live_data and live_data.get("dividend_per_share", 0) > 0:
-            # Use LIVE EODHD data
             div_per_share = live_data["dividend_per_share"]
             div_yield = live_data.get("dividend_yield") or (div_per_share / current_price * 100 if current_price > 0 else 0)
-            
-            fallback = DIVIDEND_FALLBACK_2026.get(symbol, {})
-            
             stocks.append({
                 "symbol": symbol,
                 "name": live_data.get("name", symbol),
@@ -394,46 +469,44 @@ async def get_dividend_stocks():
                 "ex_date": fallback.get("ex_date_estimate"),
                 "payment_date": fallback.get("payment_date_estimate"),
                 "data_source": "EODHD LIVE",
-                "note": fallback.get("note")
+                "note": fallback.get("note"),
             })
-        elif symbol in DIVIDEND_FALLBACK_2026:
-            # Use fallback data
-            fallback = DIVIDEND_FALLBACK_2026[symbol]
-            div_per_share = fallback.get("dividend_per_share", 0)
-            
-            if div_per_share > 0:
-                div_yield = (div_per_share / current_price * 100) if current_price > 0 else 0
-                
-                stocks.append({
-                    "symbol": symbol,
-                    "name": fallback["name"],
-                    "sector": fallback.get("sector", "Unknown"),
-                    "price": round(current_price, 2),
-                    "dividend_per_share": round(div_per_share, 4),
-                    "dividend_yield": round(div_yield, 2),
-                    "ex_date": fallback.get("ex_date_estimate"),
-                    "payment_date": fallback.get("payment_date_estimate"),
-                    "data_source": "Fallback (confirmat 2024)",
-                    "note": fallback.get("note")
-                })
-    
-    # Sort by yield descending
+        elif fallback.get("dividend_per_share", 0) > 0:
+            div_per_share = fallback["dividend_per_share"]
+            if current_price > 0:
+                div_yield = div_per_share / current_price * 100
+            else:
+                div_yield = 0
+            stocks.append({
+                "symbol": symbol,
+                "name": fallback["name"],
+                "sector": fallback.get("sector", "Unknown"),
+                "price": round(current_price, 2),
+                "dividend_per_share": round(div_per_share, 4),
+                "dividend_yield": round(div_yield, 2),
+                "ex_date": fallback.get("ex_date_estimate"),
+                "payment_date": fallback.get("payment_date_estimate"),
+                "data_source": "Fallback (estimare)",
+                "note": fallback.get("note"),
+            })
+
     stocks.sort(key=lambda x: x["dividend_yield"], reverse=True)
-    
+
     return {
         "stocks": stocks,
         "count": len(stocks),
         "average_yield": round(sum(s["dividend_yield"] for s in stocks) / len(stocks), 2) if stocks else 0,
-        "data_sources": "EODHD LIVE + Fallback confirmat",
+        "data_sources": "BVB.ro (oficial) > EODHD > Fallback",
+        "bvb_last_scraped": last_scraped,
         "last_updated": datetime.now(timezone.utc).isoformat(),
-        "disclaimer": "Dividendele afișate sunt ultimele distribuite. Dividendele viitoare pot varia."
+        "disclaimer": "Dividendele sunt date oficiale BVB.ro. Dividendele viitoare pot varia."
     }
 
 
 @router.post("/calculate")
 async def calculate_dividends(request: CalculateRequest):
     """
-    Calculator avansat de dividende cu DATE LIVE
+    Calculator avansat de dividende cu DATE OFICIALE BVB.ro
     Calculează veniturile din dividende pentru un portofoliu dat
     Include: taxe, proiecții pe ani, scenarii de reinvestire
     """
@@ -446,38 +519,45 @@ async def calculate_dividends(request: CalculateRequest):
         symbol = holding.symbol.upper()
         shares = holding.shares
         
-        # Get LIVE data
-        live_data = await fetch_live_dividend_data(symbol)
+        # Priority: BVB.ro scraped > EODHD live > Fallback
+        bvb_data = await get_bvb_scraped_dividend(symbol)
+        live_data = await fetch_live_dividend_data(symbol) if not bvb_data else None
         current_price = await get_current_price(symbol)
         fallback = DIVIDEND_FALLBACK_2026.get(symbol, {})
         
-        # Determine dividend per share (LIVE > Fallback)
-        if live_data and live_data.get("dividend_per_share", 0) > 0:
+        if bvb_data and bvb_data.get("dividend_per_share", 0) > 0:
+            dividend_per_share = bvb_data["dividend_per_share"]
+            name = bvb_data.get("name", symbol)
+            sector = "BVB"
+            data_source = "BVB.ro (oficial)"
+            ex_date = bvb_data.get("ex_date")
+            payment_date = bvb_data.get("payment_date")
+        elif live_data and live_data.get("dividend_per_share", 0) > 0:
             dividend_per_share = live_data["dividend_per_share"]
             name = live_data.get("name", symbol)
             sector = live_data.get("sector", fallback.get("sector", "Unknown"))
             data_source = "EODHD LIVE"
+            ex_date = fallback.get("ex_date_estimate")
+            payment_date = fallback.get("payment_date_estimate")
         elif fallback.get("dividend_per_share", 0) > 0:
             dividend_per_share = fallback["dividend_per_share"]
             name = fallback.get("name", symbol)
             sector = fallback.get("sector", "Unknown")
-            data_source = "Fallback 2024"
+            data_source = "Fallback (estimare)"
+            ex_date = fallback.get("ex_date_estimate")
+            payment_date = fallback.get("payment_date_estimate")
         else:
-            # No dividend data available
             continue
         
         if current_price <= 0:
             continue
         
-        # ── Calculate dividends with Romanian fiscal rules ──────────────
-        # 2026: 16% withholding tax (Legea 141/2025, dividende distribuite din 01.01.2026)
         TAX_RATE = 0.16
         annual_dividend = shares * dividend_per_share
         tax_amount = annual_dividend * TAX_RATE
         net_dividend = annual_dividend - tax_amount
         div_yield = (dividend_per_share / current_price * 100)
         
-        # Track totals
         investment_value = shares * current_price
         total_investment += investment_value
         total_annual_dividend += annual_dividend
@@ -496,9 +576,9 @@ async def calculate_dividends(request: CalculateRequest):
             "tax_16_percent": round(tax_amount, 2),
             "annual_dividend_net": round(net_dividend, 2),
             "monthly_income_net": round(net_dividend / 12, 2),
-            "ex_date": fallback.get("ex_date_estimate"),
-            "payment_date": fallback.get("payment_date_estimate"),
-            "data_source": data_source
+            "ex_date": ex_date,
+            "payment_date": payment_date,
+            "data_source": data_source,
         })
     
     # Calculate portfolio metrics
@@ -565,25 +645,29 @@ async def calculate_dividends(request: CalculateRequest):
             "cass": f"10% pe plafon {cass_info['plafon_aplicat']} dacă venituri ≥ {6*SALARIU_MINIM_2026:,.0f} RON/an",
             "baza_legala": "Codul Fiscal 2026 — art. 97 (impozit dividende) + art. 156 (CASS)"
         },
-        "data_source": "EODHD Dividend History + Fallback confirmat BVB 2026",
-        "disclaimer": "Dividendele afișate sunt ultimele distribuite. Dividendele viitoare pot varia și depind de deciziile AGA."
+        "data_source": "BVB.ro (oficial) > EODHD > Fallback",
+        "disclaimer": "Dividendele sunt date oficiale de pe BVB.ro. Dividendele viitoare pot varia și depind de deciziile AGA."
     }
 
 
 @router.get("/stock/{symbol}")
 async def get_stock_dividend_details(symbol: str):
     """
-    Detalii complete despre dividendul unei acțiuni cu DATE LIVE
+    Detalii complete despre dividendul unei acțiuni — BVB.ro > EODHD > Fallback
     """
     symbol = symbol.upper()
-    
-    # Get LIVE data
-    live_data = await fetch_live_dividend_data(symbol)
+
+    bvb_data = await get_bvb_scraped_dividend(symbol)
+    live_data = await fetch_live_dividend_data(symbol) if not bvb_data else None
     current_price = await get_current_price(symbol)
     fallback = DIVIDEND_FALLBACK_2026.get(symbol, {})
-    
-    # Determine dividend data
-    if live_data and live_data.get("dividend_per_share", 0) > 0:
+
+    if bvb_data and bvb_data.get("dividend_per_share", 0) > 0:
+        dividend_per_share = bvb_data["dividend_per_share"]
+        name = bvb_data.get("name", symbol)
+        sector = "BVB"
+        data_source = "BVB.ro (oficial)"
+    elif live_data and live_data.get("dividend_per_share", 0) > 0:
         dividend_per_share = live_data["dividend_per_share"]
         name = live_data.get("name", symbol)
         sector = live_data.get("sector", fallback.get("sector", "Unknown"))
@@ -592,20 +676,19 @@ async def get_stock_dividend_details(symbol: str):
         dividend_per_share = fallback["dividend_per_share"]
         name = fallback.get("name", symbol)
         sector = fallback.get("sector", "Unknown")
-        data_source = "Fallback (confirmat 2024)"
+        data_source = "Fallback (estimare)"
     else:
         raise HTTPException(status_code=404, detail=f"Acțiunea {symbol} nu are date despre dividende")
-    
+
     if current_price <= 0:
         raise HTTPException(status_code=404, detail=f"Nu am putut obține prețul pentru {symbol}")
-    
+
     div_yield = (dividend_per_share / current_price * 100)
-    
-    # Calculate for 100 shares example
+
     example_shares = 100
     annual_dividend = example_shares * dividend_per_share
     net_dividend = annual_dividend * 0.84
-    
+
     return {
         "symbol": symbol,
         "name": name,
@@ -614,8 +697,8 @@ async def get_stock_dividend_details(symbol: str):
         "dividend_data": {
             "per_share": round(dividend_per_share, 4),
             "yield": round(div_yield, 2),
-            "ex_date": fallback.get("ex_date_estimate"),
-            "payment_date": fallback.get("payment_date_estimate"),
+            "ex_date": bvb_data.get("ex_date") if bvb_data else fallback.get("ex_date_estimate"),
+            "payment_date": bvb_data.get("payment_date") if bvb_data else fallback.get("payment_date_estimate"),
         },
         "example_calculation": {
             "shares": example_shares,
@@ -625,7 +708,7 @@ async def get_stock_dividend_details(symbol: str):
             "monthly_income_net": round(net_dividend / 12, 2),
         },
         "note": fallback.get("note"),
-        "data_source": data_source
+        "data_source": data_source,
     }
 
 

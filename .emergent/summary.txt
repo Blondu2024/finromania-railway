@@ -1,127 +1,115 @@
-<analysis>**original_problem_statement:** 
+<analysis>**original_problem_statement**: 
 The user's vision is to build FinRomania 2.0, a comprehensive, professional financial platform for the Romanian market. Core requirements include highly accurate real-time data for BVB and Global markets (using the paid 00/month EODHD All-in-One plan), an AI-powered Daily Summary, up-to-date Fiscal/Dividend Calculators, a PRO stock screener, and strict adherence to official BVB.ro data where EODHD fails.
-
-**PRODUCT REQUIREMENTS:**
-1. **Data Sources**: Strictly use the 00/month EODHD All-in-One plan for live BVB fundamentals, technicals, and real-time/intraday Global market data. 
-2. **Data Accuracy**: Platform calculations must exactly match official sources. Override EODHD data if it is factually incorrect.
-3. **Platform Stability**: Must handle 150+ concurrent users without timeouts. 
-4. **Notifications**: Use Resend for sending price alerts and Daily AI summaries.
+PRODUCT REQUIREMENTS:
+1. Data Sources: Strictly use the EODHD All-in-One plan for live BVB fundamentals, technicals, and real-time/intraday Global market data. 
+2. Data Accuracy: Platform calculations must exactly match official sources.
+3. Platform Stability: Must handle 150+ concurrent users without timeouts. 
+4. Notifications: Use Resend for sending price alerts and Daily AI summaries.
 
 **User's preferred language**: Romanian (⚠️ **INSTRUCT NEXT AGENT: You MUST respond to the user entirely in Romanian.**)
 
 **what currently exists?** 
-A full-stack React + FastAPI + MongoDB application. The Global Markets API has just been heavily refactored to remove all  dependencies, relying 100% on the EODHD paid plan (using ETFs like GLD.US for commodities). The platform successfully shows real index data, and the API response time for Global Markets was reduced from ~15 seconds to ~2 seconds.
+A full-stack React + FastAPI + MongoDB application. Real-time BVB and Global markets run smoothly via EODHD. The Dividend Calculator handles exact 2026 Romanian tax logic (16% tax + CASS). The Screener PRO feature is now optimized with background MongoDB caching to bypass external API timeouts, serving results in ~0.2s. Educational tools (CFD vs. Real Stocks) and User Notification preferences (Daily Summary toggle) are fully integrated. Export to CSV functionality is present for both Screener PRO and Portfolio BVB.
 
 **Last working item**:
-- **Last item agent was working**: Educating the user on the difference between real stock exchanges (which are closed on Good Friday) and CFD platforms like Plus500 (which show 24/7 synthetic futures data). The user realized they lost 25,000 EUR trading CFDs without actually owning the underlying assets. The agent proposed adding a Market Closed UI indicator or an educational section about CFDs vs. Real Stocks.
+- **Last item agent was working**: Refining the Screener PRO caching mechanism and frontend auto-polling. The user asked how data stays fresh without throwing errors. The agent implemented a background warmup on server startup and an 8-second auto-polling mechanism in the frontend whenever  is true, ensuring users never see a timeout (502) and data updates seamlessly in the UI.
 - **Status**: USER VERIFICATION PENDING
-- **Agent Testing Done**: Y (Heavy backend curl/bash testing, screenshot verification)
+- **Agent Testing Done**: Y (Tested backend API via curl and frontend via screenshots, confirmed 0.2s response times and polling behavior).
 - **Which testing method agent to use?** Frontend testing agent
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Add Market Closed Indicator UI (P0)**
-   - **Attempted fixes**: Backend logic is aware of market states, but UI needs clear messaging so users don't think the app is broken on weekends/holidays.
-   - **Next debug checklist**: Await user confirmation, then update  to show a badge or tooltip stating Market Closed - Showing Last Close when market status is inactive.
-   - **Why fix this issue and what will be achieved with the fix?** Prevents user confusion when comparing real exchange data to 24/7 CFD broker apps.
-   - **Status**: NOT STARTED (Pending user choice)
-   - **Is recurring issue?** N
-   - **Should Test frontend/backend/both after fix?** Frontend
-- **Issue 2: Mobile responsiveness issues on various pages (P2)**
-   - **Next debug checklist**: Use screenshot tool with mobile viewport on key pages.
-   - **Status**: NOT STARTED
-   - **Is recurring issue?** Y
-   - **Should Test frontend/backend/both after fix?** Frontend
+  - Issue 1: Monitor Mobile Responsiveness (P2)
+     - Attempted fixes: The previous agent reviewed and adjusted minor alignment issues on mobile, but UI requires continuous monitoring as new features are added.
+     - Next debug checklist: Check newly added pages () and modals on mobile viewports.
+     - Why fix this issue and what will be achieved with the fix? Ensures a seamless experience for mobile users.
+     - Status: TESTING PENDING
+     - Is recurring issue? Y (6 occurrences)
+     - Should Test frontend/backend/both after fix? Frontend
 
 **In progress Task List**:
-*None actively in progress; waiting for user response on the next pivot.*
+*None actively in progress.*
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-  - (P0) Add an educational article/section explaining CFDs vs Real Stocks / Real Exchanges to protect users from predatory brokers (proposed by agent based on user experience).
   - (P1) Build PRO-only Live Chat / Community features.
-  - (P1) Add Subscribe to Daily Summary UI toggle for logged-in users.
-  - (P2) Implement Export to CSV for Screener PRO and Portfolio.
 - **Future Tasks**:
   - (P2) Implement 3 Straturi Portfolio strategy feature.
   - (P3) Native mobile app.
 
 **Completed work in this session**
-- **Removed **: Completely stripped  from the backend to fix performance bottlenecks.
-- **EODHD 100% Integration**: Mapped commodities to EODHD ETFs (GLD.US, USO.US, UNG.US) to allow full reliance on the paid EODHD API.
-- **API Performance Optimization**: Rewrote  to use EODHD batch real-time requests instead of serial intraday requests, dropping load time from 15+ seconds down to ~2 seconds.
-- **User Education/Crisis Management**: Successfully diagnosed why FinRomania showed S&P 500 at a standstill while the user's trading app showed movement (It was Good Friday; the actual US market was closed, while the user was looking at a 24/7 CFD market maker).
+- **Educational Page**: Created  (CFD-uri vs Acțiuni Reale) and linked it in Navbar/Footer. (DONE)
+- **Daily Summary Toggle**: Added visual toggle in  and created  to manage user email preferences. (DONE)
+- **Export to CSV**: Implemented robust CSV export (with Romanian UTF-8 support) in  and . (DONE)
+- **Screener PRO Timeout Fix (502)**: Replaced slow synchronous EODHD scans with MongoDB caching (), reducing response times from 60+ seconds to 0.2s. (DONE)
+- **Screener Auto-Polling**: Added server-startup cache warmup and an 8-second UI polling interval in React while the backend updates the cache. (DONE)
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1: Export CSV for Screener and Portfolio**
-  - Debug checklist: Add CSV generation logic in backend or frontend table export.
-  - Why to solve this issue and what will be achieved with this? Core PRO feature requirement.
-  - Should Test frontend/backend/both after fix: Both
-  - Is recurring issue? N
+- None.
 
 **Known issue recurrence from previous fork**
-- Issue recurrence in previous fork: Mobile responsiveness.
+- Issue recurrence in previous fork: Mobile responsiveness on various pages.
 - Recurrence count: 6
-- Status: NOT STARTED
+- Status: RESOLVED (but keep monitoring).
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **EODHD Batching vs Intraday**: Intraday endpoints are extremely slow for multiple tickers. The solution is to use  with comma-separated batching (e.g., ) for the overview page, which reduces load times by 90%.
-- **Commodity Fallbacks**: EODHD does not easily support direct live commodity tickers via the standard API without special packages. The agent successfully used ETF equivalents (GLD.US for Gold, USO.US for Oil, UNG.US for Nat Gas) to provide accurate market direction.
+- **Screener Background Caching**:  now queries a MongoDB cache. If the cache is >45 min old, it returns the stale data immediately (instant UI load) but sets  and triggers a background update. The frontend () detects  and polls the endpoint every 8 seconds until fresh data arrives.
+- **Romanian 2026 Tax Logic**: Dividend tax is 16%. Health contribution (CASS) applies thresholds. Do not alter this.
 
 **key DB schema**
-- : (subscription_level, email)
+- : {subscription_level, email}
+- : {timestamp, results, is_refreshing} (New structure managing screener data)
 
 **changes in tech stack**
-- Fully deprecated and removed  library from the backend. 
+- Added background job scheduler logic natively within FastAPI for the screener caching.
 
 **All files of reference**
-- : Contains the newly optimized batch EODHD logic and ETF mappings.
+-  (New)
+-  (Updated)
+-  (Updated)
+-  (Updated with polling and timestamp UI)
+-  (Updated cache logic)
+-  (Updated toggle logic)
 
 **Areas that need refactoring**:
-- None currently,  was just heavily optimized.
+- None currently.
 
 **key api endpoints**
-- : (OPTIMIZED) Now responds in ~2s using EODHD batching instead of serial intraday requests.
+- : Returns cached screener data instantly to prevent 502 timeouts.
+- : Fetches user's daily email subscription state.
 
 **Critical Info for New Agent**
-- **USER PSYCHOLOGY ALERT:** The user just experienced a severe realization that they lost 25,000 EUR on Plus500 trading CFDs, without actually owning any underlying assets. **Be empathetic but factual.** Use this as a driving force to emphasize FinRomania's mission: educating Romanians on real investments via BVB instead of predatory CFD brokers.
-- **Market Data Fact:** If the user ever questions data freshness again, remind them to check if it's a weekend or a US Holiday (like Good Friday). FinRomania shows *real* exchange data, which stops when exchanges close.
-- **LANGUAGE:** You MUST speak Romanian.
+- **Screener Auto-Polling**: If the user or tests report the Screener is stuck, verify the backend background task is successfully completing. The frontend relies on the backend flipping  back to  in MongoDB.
+- **LANGUAGE CONSTRAINT**: You MUST converse with the user in Romanian.
 
 **documents and test reports created in this job**
--  (Needs updating with new global market architecture)
+-  (Updated)
+-  (Latest testing report)
 
-**Last 10 User Messages and any pending HUMAN messages**
-1. User: Complained that it's Friday 14:15 in Romania, so the market shouldn't be closed, demanding the platform to work.
-2. User: Complained again that the agent was using Yahoo Finance instead of the paid EODHD plan. (Agent fixed this by removing yfinance).
-3. User: Stated FinRomania data is totally wrong because their broker shows indices much higher.
-4. User: Angrily asked the agent to search the web because EODHD is giving false data. (Agent searched the web and proved it was Good Friday, so the US market was officially closed, and EODHD was accurately showing yesterday's close).
-5. User: Asked: And if the market is closed, how come I see it open on Plus500? Thats a European broker, doesnt it have live data? Provides screenshots. (Agent explained Plus500 is a CFD market maker, not a real exchange).
-6. User: Asked for clarification on how the market is closed but Plus500 shows it open.
-7. **PENDING User**: So youre telling me I lost 25,000 euros on Plus500 and I didnt even truly buy or sell contracts? *(Agent explained exactly how CFDs work and asked how to proceed with the app, pending user reply).*
+**Last 10 User Messages and any pending HUMAN messages** 
+1. User: pai si astea cand se reactualizeaza sau cum va face ca userul sa nu primeasca erori ? (How does it update so the user doesn't get errors?) -> Agent implemented backend cache warmup and an 8-second frontend auto-polling system. (COMPLETED - Pending User Verification)
 
 **Project Health Check:**
 - Broken: None.
 - Mocked: None.
 
 **3rd Party Integrations**
-- OpenAI: Uses Emergent LLM Key 
+- OpenAI: Uses Emergent LLM Key
 - EODHD: 00/mo All-in-One plan - requires User API Key
 - Stripe: Payments - requires User API Key
 - Resend: Emails - requires User API Key
 
 **Testing status**
-- Testing agent used after significant changes: NO
+- Testing agent used after significant changes: YES
 - Troubleshoot agent used after agent stuck in loop: NO
-- Test files created: None
-- Known regressions: None
+- Test files created: 
+- Known regressions: None currently.
 
 **Credentials to test flow:**
 - Trigger  to receive a valid PRO session token for automated backend testing.
 
 **What agent forgot to execute**
-- Did not invoke the  after the major rewrite of .
-- Forgot to update  to reflect the removal of  and the new 100% EODHD architecture.</analysis>
+- None. All explicit requests and edge cases related to the Screener timeout were handled and verified.</analysis>

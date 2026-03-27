@@ -65,6 +65,7 @@ from routes.sitemap import router as sitemap_router
 from routes.ai_technical_analysis import router as ai_technical_analysis_router
 from routes.daily_summary import router as daily_summary_router
 from routes.stock_compare import router as stock_compare_router
+from routes.bvb_dividends import router as bvb_dividends_router
 
 # Configure logging
 logging.basicConfig(
@@ -98,7 +99,19 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Screener warmup failed (non-critical): {e}")
     
+    # Warmup BVB dividends cache on startup if empty
+    async def _warmup_bvb_dividends():
+        try:
+            from scrapers.bvb_dividend_scraper import get_cached_dividends, run_full_scrape
+            existing, _ = await get_cached_dividends()
+            if not existing:
+                logger.info("🔄 Warming up BVB dividends cache on startup...")
+                await run_full_scrape()
+        except Exception as e:
+            logger.warning(f"BVB dividends warmup failed (non-critical): {e}")
+    
     _asyncio.create_task(_warmup_screener())
+    _asyncio.create_task(_warmup_bvb_dividends())
     logger.info("✅ FinRomania API started successfully!")
     yield
     # Shutdown
@@ -641,6 +654,7 @@ app.include_router(sitemap_router, prefix="/api")  # Sitemap generator
 app.include_router(ai_technical_analysis_router)  # AI Technical Analysis PRO
 app.include_router(daily_summary_router, prefix="/api")  # Daily Market Summary Email
 app.include_router(stock_compare_router)  # Stock Comparison & 52 Week Extremes
+app.include_router(bvb_dividends_router)  # BVB.ro Dividends (scraped)
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest

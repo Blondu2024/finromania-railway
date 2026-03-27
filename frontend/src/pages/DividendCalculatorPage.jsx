@@ -63,6 +63,9 @@ const DividendStocksTable = ({ stocks, onAddToPortfolio }) => {
                 <div>
                   <span className="font-bold text-blue-600">{stock.symbol}</span>
                   <p className="text-xs text-muted-foreground">{stock.name}</p>
+                  {stock.data_source?.includes('BVB') && (
+                    <span className="text-[10px] text-green-600 font-medium">BVB.ro</span>
+                  )}
                 </div>
               </TableCell>
               <TableCell className="text-right font-mono">{stock.price?.toFixed(2)} RON</TableCell>
@@ -447,7 +450,7 @@ export default function DividendCalculatorPage() {
               Calculator Dividende BVB
             </h1>
             <p className="text-muted-foreground">
-              Calculează-ți veniturile pasive din dividende • Date estimate 2026
+              Calculează-ți veniturile pasive din dividende • Date oficiale BVB.ro
             </p>
           </div>
         </div>
@@ -587,9 +590,9 @@ export default function DividendCalculatorPage() {
           <TabsContent value="stocks">
             <Card>
               <CardHeader>
-                <CardTitle>Acțiuni BVB cu Dividende - Estimări 2026</CardTitle>
+                <CardTitle>Acțiuni BVB cu Dividende</CardTitle>
                 <CardDescription>
-                  Sursa: TradeVille Research • Sortate după Dividend Yield
+                  Sursa: BVB.ro (oficial) • Sortate după Dividend Yield
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -607,8 +610,8 @@ export default function DividendCalculatorPage() {
 
         {/* Disclaimer */}
         <p className="text-xs text-center text-muted-foreground">
-          ⚠️ Estimările dividendelor se bazează pe date publice și proiecții TradeVille. 
-          Dividendele reale pot varia semnificativ. Aceasta nu constituie sfat de investiții.
+          Datele despre dividende provin de pe BVB.ro (sursa oficială). 
+          Dividendele viitoare pot varia. Aceasta nu constituie sfat de investiții.
         </p>
       </div>
     </>

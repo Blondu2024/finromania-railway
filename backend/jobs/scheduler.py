@@ -130,6 +130,16 @@ async def update_screener_cache_job():
     except Exception as e:
         logger.error(f"❌ [JOB] Error updating screener cache: {e}")
 
+async def scrape_bvb_dividends_job():
+    """Job: Scrape dividende de pe BVB.ro (1x/zi dimineața)"""
+    try:
+        from scrapers.bvb_dividend_scraper import run_full_scrape
+        logger.info("🔄 [JOB] Scraping BVB.ro dividends & calendar...")
+        result = await run_full_scrape()
+        logger.info(f"✅ [JOB] BVB scrape done: {result['dividends']} dividends, {result['calendar']} events")
+    except Exception as e:
+        logger.error(f"❌ [JOB] Error scraping BVB.ro: {e}")
+
 
 def start_scheduler():
     """Start all scheduled jobs"""
@@ -215,6 +225,15 @@ def start_scheduler():
             replace_existing=True
         )
         
+        # Job 10: Scrape BVB.ro dividends (daily at 7:00 AM Bucharest time)
+        scheduler.add_job(
+            scrape_bvb_dividends_job,
+            trigger=CronTrigger(hour=7, minute=0, timezone='Europe/Bucharest'),
+            id='scrape_bvb_dividends',
+            name='Scrape BVB.ro Dividends',
+            replace_existing=True
+        )
+        
         # Start scheduler
         scheduler.start()
         logger.info("✅ Scheduler started with all jobs!")
@@ -226,6 +245,7 @@ def start_scheduler():
         logger.info("   • Subscription expirations: daily at 9:00 AM")
         logger.info("   • Price alerts: every 5 min")
         logger.info("   • Daily summary email: daily at 18:05 (Europe/Bucharest)")
+        logger.info("   • BVB.ro dividends scrape: daily at 7:00 AM (Europe/Bucharest)")
         
         # DON'T run jobs immediately at startup - let the scheduler handle them
         # This prevents blocking the application startup

@@ -11,7 +11,7 @@ export default function AboutPage() {
       <SEO 
         title="Despre Noi - Misiunea FinRomania"
         description="Descoperă misiunea FinRomania: să democratizăm educația financiară în România prin instrumente gratuite, date reale BVB, și lecții interactive de trading."
-        url="https://finromania-pro.preview.emergentagent.com/about"
+        url="https://finromania-pro-1.preview.emergentagent.com/about"
       />
       
       <div className="max-w-5xl mx-auto px-4 py-12 space-y-16">

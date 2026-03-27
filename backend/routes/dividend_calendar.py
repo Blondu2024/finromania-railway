@@ -474,40 +474,69 @@ async def get_dividends(
     upcoming_only: bool = Query(default=True, description="Show only upcoming dividends (default: True)"),
     include_past: bool = Query(default=False, description="Include past dividends")
 ):
-    """Get dividend calendar - implicit doar viitoare"""
+    """Get dividend calendar — date oficiale BVB.ro + fallback hardcoded"""
     try:
-        dividends = BVB_DIVIDENDS_2024.copy()
+        db = await get_database()
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        
-        # Implicit: doar dividende viitoare (dacă nu se cere explicit altceva)
+
+        # ── Try BVB.ro scraped data first ──
+        bvb_records = await db.bvb_dividends_scraped.find({}, {"_id": 0}).to_list(500)
+        bvb_meta = await db.bvb_scrape_meta.find_one({"type": "dividends"}, {"_id": 0})
+        last_scraped = bvb_meta.get("last_scraped") if bvb_meta else None
+
+        dividends = []
+        if bvb_records:
+            for rec in bvb_records:
+                ex_date = rec.get("ex_date", "")
+                is_upcoming = ex_date >= today
+                div_status = "estimated" if is_upcoming else "paid"
+
+                dividends.append({
+                    "symbol": rec["symbol"],
+                    "name": rec.get("company", rec["symbol"]),
+                    "dividend_per_share": rec.get("dividend_per_share", 0),
+                    "currency": "RON",
+                    "ex_date": ex_date,
+                    "payment_date": rec.get("payment_date", ""),
+                    "record_date": rec.get("record_date", ""),
+                    "dividend_yield": rec.get("dividend_yield", 0),
+                    "type": "cash",
+                    "status": div_status,
+                    "total_dividends": rec.get("total_dividends", 0),
+                    "year": rec.get("year", ""),
+                    "data_source": "BVB.ro (oficial)",
+                })
+        else:
+            # Fallback to hardcoded data
+            for d in BVB_DIVIDENDS_2024:
+                dividends.append({**d, "data_source": "Estimare TradeVille"})
+
+        # Filters
         if upcoming_only and not include_past:
             dividends = [d for d in dividends if d["ex_date"] >= today]
-        
-        # Filter by year
+
         if year:
             dividends = [d for d in dividends if d["ex_date"].startswith(str(year))]
-        
-        # Filter by symbol
+
         if symbol:
             dividends = [d for d in dividends if d["symbol"].upper() == symbol.upper()]
-        
-        # Filter by status
+
         if status:
             dividends = [d for d in dividends if d["status"] == status]
-        
-        # Sort by ex_date
+
         dividends.sort(key=lambda x: x["ex_date"])
-        
-        # Calculate statistics
+
         total_yield = sum(d["dividend_yield"] for d in dividends) / len(dividends) if dividends else 0
-        
+
         return {
             "dividends": dividends,
             "count": len(dividends),
             "average_yield": round(total_yield, 2),
-            "updated_at": datetime.now(timezone.utc).isoformat()
+            "data_source": "BVB.ro (oficial)" if bvb_records else "Estimare TradeVille",
+            "bvb_last_scraped": last_scraped,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
         }
-        
+
     except Exception as e:
         logger.error(f"Error fetching dividends: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -554,44 +583,81 @@ async def get_events(
 async def get_upcoming_calendar():
     """Get combined upcoming dividends and events for next 90 days"""
     try:
+        db = await get_database()
         today = datetime.now(timezone.utc)
         end_date = (today + timedelta(days=90)).strftime("%Y-%m-%d")
         today_str = today.strftime("%Y-%m-%d")
-        
-        # Get upcoming dividends
-        upcoming_dividends = [
-            {**d, "calendar_type": "dividend", "calendar_date": d["ex_date"]}
-            for d in BVB_DIVIDENDS_2024
-            if today_str <= d["ex_date"] <= end_date
-        ]
-        
-        # Get upcoming events
-        upcoming_events = [
-            {**e, "calendar_type": "event", "calendar_date": e["date"]}
-            for e in BVB_EVENTS
-            if today_str <= e["date"] <= end_date
-        ]
-        
-        # Combine and sort
+
+        # ── BVB.ro scraped dividends ──
+        bvb_records = await db.bvb_dividends_scraped.find({}, {"_id": 0}).to_list(500)
+        upcoming_dividends = []
+
+        if bvb_records:
+            for d in bvb_records:
+                ex = d.get("ex_date", "")
+                if today_str <= ex <= end_date:
+                    upcoming_dividends.append({
+                        "symbol": d["symbol"],
+                        "name": d.get("company", d["symbol"]),
+                        "dividend_per_share": d.get("dividend_per_share", 0),
+                        "ex_date": ex,
+                        "payment_date": d.get("payment_date", ""),
+                        "dividend_yield": d.get("dividend_yield", 0),
+                        "calendar_type": "dividend",
+                        "calendar_date": ex,
+                        "data_source": "BVB.ro",
+                    })
+        else:
+            upcoming_dividends = [
+                {**d, "calendar_type": "dividend", "calendar_date": d["ex_date"]}
+                for d in BVB_DIVIDENDS_2024
+                if today_str <= d["ex_date"] <= end_date
+            ]
+
+        # ── BVB.ro scraped calendar events ──
+        bvb_events = await db.bvb_calendar_scraped.find({}, {"_id": 0}).to_list(2000)
+        upcoming_events = []
+
+        if bvb_events:
+            for e in bvb_events:
+                dt = e.get("date", "")
+                if today_str <= dt <= end_date:
+                    upcoming_events.append({
+                        "type": "event",
+                        "symbol": e["symbol"],
+                        "name": e.get("company", ""),
+                        "title": e.get("event_type", ""),
+                        "date": dt,
+                        "calendar_type": "event",
+                        "calendar_date": dt,
+                        "data_source": "BVB.ro",
+                    })
+        else:
+            upcoming_events = [
+                {**e, "calendar_type": "event", "calendar_date": e["date"]}
+                for e in BVB_EVENTS
+                if today_str <= e["date"] <= end_date
+            ]
+
         all_upcoming = upcoming_dividends + upcoming_events
         all_upcoming.sort(key=lambda x: x["calendar_date"])
-        
-        # Group by month
+
         by_month = {}
         for item in all_upcoming:
-            month_key = item["calendar_date"][:7]  # YYYY-MM
+            month_key = item["calendar_date"][:7]
             if month_key not in by_month:
                 by_month[month_key] = []
             by_month[month_key].append(item)
-        
+
         return {
             "items": all_upcoming,
             "by_month": by_month,
             "total_dividends": len(upcoming_dividends),
             "total_events": len(upcoming_events),
-            "period": f"{today_str} - {end_date}"
+            "period": f"{today_str} - {end_date}",
+            "data_source": "BVB.ro (oficial)" if bvb_records else "Estimare",
         }
-        
+
     except Exception as e:
         logger.error(f"Error fetching upcoming calendar: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -599,50 +665,65 @@ async def get_upcoming_calendar():
 
 @router.get("/dividend-kings")
 async def get_dividend_kings():
-    """Get stocks with best dividend yields"""
+    """Get stocks with best dividend yields — date oficiale BVB.ro"""
     try:
         db = await get_database()
-        
-        # Get unique symbols with dividends
+
+        # ── BVB.ro scraped data ──
+        bvb_records = await db.bvb_dividends_scraped.find({}, {"_id": 0}).to_list(500)
+
         dividend_stocks = {}
-        for d in BVB_DIVIDENDS_2024:
-            if d["status"] == "paid":
-                symbol = d["symbol"]
-                if symbol not in dividend_stocks or d["ex_date"] > dividend_stocks[symbol]["ex_date"]:
-                    dividend_stocks[symbol] = d
-        
-        # Get current prices
+        if bvb_records:
+            for d in bvb_records:
+                sym = d["symbol"]
+                ex = d.get("ex_date", "")
+                if sym not in dividend_stocks or ex > dividend_stocks[sym].get("ex_date", ""):
+                    dividend_stocks[sym] = d
+        else:
+            for d in BVB_DIVIDENDS_2024:
+                if d["status"] == "paid":
+                    sym = d["symbol"]
+                    if sym not in dividend_stocks or d["ex_date"] > dividend_stocks[sym]["ex_date"]:
+                        dividend_stocks[sym] = d
+
         symbols = list(dividend_stocks.keys())
         stocks = await db.stocks_bvb.find(
             {"symbol": {"$in": symbols}},
             {"_id": 0}
         ).to_list(100)
-        
+
         stock_prices = {s["symbol"]: s.get("price", 0) for s in stocks}
-        
-        # Create dividend kings list
+
         kings = []
-        for symbol, div_data in dividend_stocks.items():
-            current_price = stock_prices.get(symbol, 0)
+        for sym, div_data in dividend_stocks.items():
+            current_price = stock_prices.get(sym, 0)
+            div_yield = div_data.get("dividend_yield", 0)
+            div_per_share = div_data.get("dividend_per_share", 0)
+            name = div_data.get("company") or div_data.get("name", sym)
+
+            if div_yield <= 0 and current_price > 0 and div_per_share > 0:
+                div_yield = round(div_per_share / current_price * 100, 2)
+
             kings.append({
-                "symbol": symbol,
-                "name": div_data["name"],
-                "dividend_per_share": div_data["dividend_per_share"],
-                "dividend_yield": div_data["dividend_yield"],
+                "symbol": sym,
+                "name": name,
+                "dividend_per_share": div_per_share,
+                "dividend_yield": div_yield,
                 "current_price": current_price,
-                "last_ex_date": div_data["ex_date"],
-                "status": div_data["status"]
+                "last_ex_date": div_data.get("ex_date", ""),
+                "status": "paid" if div_data.get("ex_date", "") < datetime.now(timezone.utc).strftime("%Y-%m-%d") else "upcoming",
+                "data_source": "BVB.ro" if bvb_records else "Estimare",
             })
-        
-        # Sort by yield
+
         kings.sort(key=lambda x: x["dividend_yield"], reverse=True)
-        
+
         return {
-            "dividend_kings": kings,
+            "dividend_kings": kings[:15],
             "count": len(kings),
-            "best_yield": kings[0] if kings else None
+            "best_yield": kings[0] if kings else None,
+            "data_source": "BVB.ro (oficial)" if bvb_records else "Estimare",
         }
-        
+
     except Exception as e:
         logger.error(f"Error fetching dividend kings: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -654,10 +735,7 @@ async def get_dividend_kings():
 
 @router.get("/export/dividends")
 async def export_dividends_csv(user: dict = Depends(require_auth)):
-    """
-    PRO Feature: Export dividend calendar to CSV
-    Can be opened in Excel
-    """
+    """PRO Feature: Export dividend calendar to CSV — date BVB.ro"""
     if user.get("subscription_level") not in ["pro", "premium"]:
         raise HTTPException(
             status_code=403,
@@ -665,40 +743,58 @@ async def export_dividends_csv(user: dict = Depends(require_auth)):
         )
     
     try:
-        # Create CSV in memory
+        db = await get_database()
+        bvb_records = await db.bvb_dividends_scraped.find({}, {"_id": 0}).to_list(500)
+
         output = io.StringIO()
         writer = csv.writer(output)
-        
-        # Header
+
         writer.writerow([
             "Simbol", "Companie", "Dividend/Acțiune (RON)", "Randament (%)",
-            "Data Ex-Dividend", "Data Înregistrare", "Data Plată", "Status"
+            "Data Ex-Dividend", "Data Înregistrare", "Data Plată", "An", "Sursă"
         ])
-        
-        # Data
-        for d in BVB_DIVIDENDS_2024:
-            writer.writerow([
-                d["symbol"],
-                d["name"],
-                d["dividend_per_share"],
-                d["dividend_yield"],
-                d["ex_date"],
-                d["record_date"],
-                d["payment_date"],
-                "Plătit" if d["status"] == "paid" else "Estimat"
-            ])
-        
+
+        data_rows = []
+        if bvb_records:
+            for d in sorted(bvb_records, key=lambda x: x.get("ex_date", "")):
+                data_rows.append([
+                    d["symbol"],
+                    d.get("company", ""),
+                    d.get("dividend_per_share", 0),
+                    d.get("dividend_yield", 0),
+                    d.get("ex_date", ""),
+                    d.get("record_date", ""),
+                    d.get("payment_date", ""),
+                    d.get("year", ""),
+                    "BVB.ro",
+                ])
+        else:
+            for d in BVB_DIVIDENDS_2024:
+                data_rows.append([
+                    d["symbol"],
+                    d["name"],
+                    d["dividend_per_share"],
+                    d["dividend_yield"],
+                    d["ex_date"],
+                    d.get("record_date", ""),
+                    d["payment_date"],
+                    "",
+                    "Estimare",
+                ])
+
+        for row in data_rows:
+            writer.writerow(row)
+
         output.seek(0)
-        
-        # Return as downloadable CSV
+
         return StreamingResponse(
-            io.BytesIO(output.getvalue().encode('utf-8-sig')),  # UTF-8 BOM for Excel
+            io.BytesIO(output.getvalue().encode('utf-8-sig')),
             media_type="text/csv",
             headers={
                 "Content-Disposition": f"attachment; filename=dividende_bvb_{datetime.now().strftime('%Y%m%d')}.csv"
             }
         )
-        
+
     except Exception as e:
         logger.error(f"Error exporting dividends: {e}")
         raise HTTPException(status_code=500, detail=str(e))

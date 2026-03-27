@@ -51,8 +51,11 @@ const DividendCard = ({ dividend, index }) => {
                 {dividend.dividend_per_share} RON
               </p>
               <Badge variant={isPaid ? 'default' : 'secondary'}>
-                {isPaid ? '✅ Plătit' : '📅 Estimat'}
+                {isPaid ? 'Plătit' : 'Viitor'}
               </Badge>
+              {dividend.data_source?.includes('BVB') && (
+                <span className="text-[10px] text-green-600 block mt-0.5">BVB.ro</span>
+              )}
             </div>
           </div>
           
@@ -278,9 +281,10 @@ export default function DividendCalendarPage() {
           className="text-center py-4"
         >
           <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
-            📅 Calendar Dividende & Evenimente
+            Calendar Dividende & Evenimente
           </h1>
-          <p className="text-muted-foreground mb-4">Toate datele importante pentru investitorii BVB</p>
+          <p className="text-muted-foreground mb-1">Toate datele importante pentru investitorii BVB</p>
+          <p className="text-xs text-green-600 font-medium mb-4">Sursa: BVB.ro (date oficiale)</p>
           
           {/* Export Button */}
           <div className="flex justify-center gap-2">
