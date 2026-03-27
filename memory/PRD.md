@@ -222,7 +222,16 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] **Daily Summary at 18:05** - Changed from 18:10 to 18:05 (right after BVB closes at 18:00)
 - [x] **Increased Email Limit** - From 95/day to 500/day (Resend $20 plan = 10k/month)
 
-## Completed (March 27, 2026 — Portofoliu BVB PRO — Faza 2)
+## Completed (March 27, 2026 — Portofoliu BVB PRO — Faza 3)
+- [x] **Portofoliu BVB PRO — Faza 3 (AI Advisor)** — Testat 35/35 (100%)
+  - Endpoint `/api/portfolio-bvb/ai-analysis` — GPT-4o-mini via Emergent LLM key
+  - Input STRICT din EODHD: RSI, P/E, ROE, D/E, EPS, P&L%, variație azi
+  - Output: portfolio_summary (overall_signal + risk_level + global_recommendation) + recomandări per poziție
+  - Semnale: PĂSTREAZĂ / CUMPĂRĂ MAI MULT / CONSIDERĂ VÂNZARE cu confidence + justificare + metrică cheie
+  - Cache MongoDB 1 oră per user (nu regenerează la fiecare refresh)
+  - UI: sumar global cu badge-uri colorate + carduri per poziție compacte + disclaimer
+
+
 - [x] **Portofoliu BVB PRO — Faza 2 (Analiză)** — Testat 39/39 (100%)
   - Endpoint nou `/api/portfolio-bvb/analysis`: sector allocation + fundamentale + istoric
   - Snapshot zilnic valoare portofoliu în MongoDB `portfolio_value_history` (o dată pe zi, fără duplicate)
