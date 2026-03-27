@@ -17,7 +17,7 @@ export default function FeatureCard({
 }) {
   return (
     <Link to={to}>
-      <Card className={`group hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] cursor-pointer overflow-hidden h-full ${highlight ? 'ring-2 ring-amber-500' : ''}`}>
+      <Card className={`group hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] cursor-pointer overflow-hidden h-full relative ${highlight ? 'ring-2 ring-amber-500' : ''}`}>
         <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-5 group-hover:opacity-10 transition-opacity`} />
         
         <CardContent className="p-6 relative">
