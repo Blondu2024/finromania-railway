@@ -88,7 +88,7 @@ const ProPaywall = () => (
     <div className="text-center">
       <h2 className="text-2xl font-bold mb-2">Portofoliu PRO</h2>
       <p className="text-muted-foreground max-w-md">
-        Urmărire poziții BVB cu date live EODHD, P&L în timp real, RSI per acțiune, AI Advisor și dividende estimate.
+        Urmărire poziții BVB cu date live, P&L în timp real, RSI per acțiune, AI Advisor și dividende estimate.
       </p>
     </div>
     <Link to="/pricing">
@@ -358,7 +358,7 @@ const AIAdvisorSection = ({ advice, loading, onGenerate }) => {
             <Brain className="w-4 h-4 text-blue-500" />
             AI Advisor — Recomandări per Poziție
             <span className="text-xs font-normal text-muted-foreground">
-              · GPT-4o · Date reale EODHD · Cache 1h
+              · GPT-4o · Date reale live · Cache 1h
             </span>
           </CardTitle>
           <div className="flex items-center gap-2">
@@ -399,7 +399,7 @@ const AIAdvisorSection = ({ advice, loading, onGenerate }) => {
             Analiză AI per fiecare poziție din portofoliu
           </p>
           <p className="text-xs text-muted-foreground">
-            Bazată pe RSI, P/E, ROE, D/E, EPS și P&L — date reale EODHD
+            Bazată pe RSI, P/E, ROE, D/E, EPS și P&L — date reale live
           </p>
         </CardContent>
       )}
@@ -409,7 +409,7 @@ const AIAdvisorSection = ({ advice, loading, onGenerate }) => {
         <CardContent className="py-10 text-center">
           <RefreshCw className="w-10 h-10 text-blue-500 mx-auto mb-3 animate-spin" />
           <p className="text-sm font-medium">Se analizează portofoliul...</p>
-          <p className="text-xs text-muted-foreground mt-1">GPT-4o procesează datele EODHD</p>
+          <p className="text-xs text-muted-foreground mt-1">GPT-4o procesează datele de piață</p>
         </CardContent>
       )}
 
@@ -487,7 +487,7 @@ const AIAdvisorSection = ({ advice, loading, onGenerate }) => {
           </div>
 
           <p className="text-xs text-muted-foreground text-center pt-1">
-            ⚠️ Recomandările AI sunt generate automat și nu constituie sfaturi de investiții. Bazate pe date EODHD.
+            ⚠️ Recomandările AI sunt generate automat și nu constituie sfaturi de investiții.
           </p>
         </CardContent>
       )}
@@ -657,7 +657,7 @@ const AnalysisSection = ({ analysis, loading }) => {
               <CardTitle className="text-sm font-medium">
                 Fundamentale per Acțiune
                 <span className="ml-2 text-xs font-normal text-muted-foreground">
-                  — din cache zilnic EODHD (date reale, N/A dacă lipsesc)
+                  — date reale confirmate (N/A dacă lipsesc)
                 </span>
               </CardTitle>
             </div>
@@ -733,7 +733,7 @@ const AnalysisSection = ({ analysis, loading }) => {
           </div>
           <div className="px-4 py-2 border-t bg-muted/10">
             <p className="text-xs text-muted-foreground">
-              Sursa: EODHD (cache zilnic 8:00 AM) · Verde = valoare favorabilă · Roșu = atenție · N/A = date indisponibile
+              Sursa: date fundamentale confirmate · Verde = favorabil · Roșu = atenție · N/A = date indisponibile
             </p>
           </div>
         </Card>
@@ -998,7 +998,7 @@ export default function PortfolioBVBPage() {
             Portofoliu BVB PRO
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Date live EODHD · Doar acțiuni BVB · Exclusiv PRO
+            Date live BVB · Exclusiv PRO
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -1304,7 +1304,7 @@ export default function PortfolioBVBPage() {
           {/* DATA NOTE */}
           <div className="px-4 py-2.5 border-t bg-muted/10">
             <p className="text-xs text-muted-foreground">
-              Date live EODHD · RSI(14) · Prețuri BVB cu delay 15min · Actualizare la refresh
+              Date live BVB · RSI(14) · Prețuri cu delay 15min · Actualizare la refresh
             </p>
           </div>
         </Card>

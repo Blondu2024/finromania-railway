@@ -10,7 +10,7 @@ export default function TrustBadges() {
     },
     {
       icon: Zap,
-      text: "EODHD Premium API",
+      text: "Date Financiare Premium",
       subtext: "$99.99 All-In-One Plan"
     },
     {

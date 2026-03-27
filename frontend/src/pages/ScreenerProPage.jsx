@@ -401,7 +401,7 @@ export default function ScreenerProPage() {
               <Crown className="w-16 h-16 mx-auto text-amber-500 mb-4" />
               <h1 className="text-3xl font-bold mb-4">Screener PRO</h1>
               <p className="text-lg text-muted-foreground mb-6">
-                Analizează toate acțiunile BVB cu indicatori tehnici și fundamentale LIVE de la EODHD
+                Analizează toate acțiunile BVB cu indicatori tehnici și fundamentale LIVE
               </p>
               <div className="grid md:grid-cols-3 gap-4 mb-8 text-left">
                 <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
@@ -447,7 +447,7 @@ export default function ScreenerProPage() {
               <Badge className="bg-amber-500 text-white">LIVE DATA</Badge>
             </h1>
             <p className="text-muted-foreground">
-              Indicatori tehnici + Fundamentale de la EODHD • Actualizat în timp real
+              Indicatori tehnici + Fundamentale • Date live actualizate în timp real
             </p>
           </div>
           <div className="flex gap-2">

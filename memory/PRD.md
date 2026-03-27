@@ -222,7 +222,21 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] **Daily Summary at 18:05** - Changed from 18:10 to 18:05 (right after BVB closes at 18:00)
 - [x] **Increased Email Limit** - From 95/day to 500/day (Resend $20 plan = 10k/month)
 
-## Completed (March 27, 2026 — Portofoliu BVB PRO — Faza 4)
+## Completed (March 28, 2026 — 3 Sarcini Corecții)
+- [x] **Eliminare completă "EODHD" din UI** — zero mențiuni vizibile utilizatorilor
+  - Înlocuit în: DividendCalculatorPage, GlobalMarketsPage, ScreenerProPage, DisclaimerPage, PortfolioBVBPage, TrustBadges, App.js, ProStockChart, TickerBar
+  - Formulări neutre: "date live", "date oficiale", "date fundamentale confirmate", "furnizor licențiat"
+- [x] **Fix Rezumat Zilnic — date corecte, fără scalping**
+  - Cauza: Acțiuni cu `volume=0` (netranzacționate azi) apăreau în top gainers/losers cu +14%/+15% false
+  - Fix: Filtru strict `volume > 0` înainte de sortare gainers/losers
+  - Fix: Data afișată acum în timezone Europe/Bucharest (nu UTC)
+  - Fix: Sentiment calculat pe acțiunile efectiv tranzacționate
+  - Rezumat regenerat cu codul nou
+- [x] **Fix factual CFD vs Acțiuni** 
+  - BT Capital Partners era descrisă ca "Subsidiara BRD/Banca Transilvania" — eroare! 
+  - Fix: "Subsidiara Banca Transilvania" (BT Capital = Banca Transilvania, nu BRD)
+
+
 - [x] **Portofoliu BVB PRO — Faza 4 (Dividende + Știri)** — Testat 24/24 (100%)
   - Endpoint `/api/portfolio-bvb/dividends` — dividend yield % + income anual RON per poziție
     - Sursa: BVB.ro scraper (confirmat, fără improvizații) 

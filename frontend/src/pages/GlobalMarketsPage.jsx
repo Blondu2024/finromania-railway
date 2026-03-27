@@ -32,7 +32,7 @@ const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
   const [interval, setInterval] = useState('15m');
   const [chartInfo, setChartInfo] = useState(null);
 
-  // Intraday intervals pentru EODHD LIVE
+  // Intraday intervals live
   const intervals = [
     { value: '1m', label: '1 min', requiresPeriod: '1d' },
     { value: '5m', label: '5 min', requiresPeriod: '1d' },
@@ -624,7 +624,7 @@ export default function GlobalMarketsPage() {
   // Delay info cu update frequency REAL pentru PRO
   // Data update info - fără a menționa delay
   const delayInfo = isPro
-    ? { text: 'PRO', color: 'bg-green-500', description: 'Date profesionale EODHD', frequency: '30s' }
+    ? { text: 'PRO', color: 'bg-green-500', description: 'Date profesionale live', frequency: '30s' }
     : { text: 'Live', color: 'bg-blue-500', description: 'Date actualizate automat', frequency: '60s' };
 
   const fetchData = useCallback(async () => {
@@ -654,11 +654,11 @@ export default function GlobalMarketsPage() {
   useEffect(() => {
     fetchData();
     
-    // Refresh la 60 secunde - datele EODHD au 15min delay oricum
+    // Refresh la 60 secunde - date cu delay 15min
     // Nu are sens să facem refresh mai des
     const interval = setInterval(fetchData, 60000);
     
-    console.log('[GlobalMarkets] Auto-refresh every 60s (EODHD 15min delay plan)');
+    console.log('[GlobalMarkets] Auto-refresh every 60s');
     
     return () => clearInterval(interval);
   }, [fetchData]);

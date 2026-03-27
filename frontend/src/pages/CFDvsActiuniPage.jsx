@@ -327,7 +327,7 @@ export default function CFDvsActiuniPage() {
             <div className="grid sm:grid-cols-2 gap-3">
               {[
                 { name: 'Tradeville', desc: 'Broker românesc, cel mai utilizat pe BVB', url: 'https://www.tradeville.ro' },
-                { name: 'BT Capital Partners', desc: 'Subsidiara BRD/Banca Transilvania, broker autorizat BVB', url: 'https://www.btcapital.ro' },
+                { name: 'BT Capital Partners', desc: 'Subsidiara Banca Transilvania, broker autorizat BVB', url: 'https://www.btcapital.ro' },
                 { name: 'XTB (secțiunea Acțiuni)', desc: 'Atenție: alege "Acțiuni" nu "CFD". XTB oferă ambele.', url: 'https://www.xtb.com/ro' },
                 { name: 'Interactive Brokers', desc: 'International, comisioane mici, acces global', url: 'https://www.interactivebrokers.com' },
               ].map((broker, i) => (

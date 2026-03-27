@@ -224,7 +224,7 @@ function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen }) {
 
 
 // ============================================
-// SIDEBAR — EODHD style, desktop always visible
+// SIDEBAR — stil profesional, mereu vizibil pe desktop
 // ============================================
 function Sidebar({ mobileOpen, onMobileClose }) {
   const location = useLocation();

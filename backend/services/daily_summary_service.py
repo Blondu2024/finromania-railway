@@ -243,32 +243,47 @@ class DailySummaryService:
                 }
         
         # Sortează pentru top gainers/losers
-        sorted_by_change = sorted(stocks, key=lambda x: x.get("change_percent", 0), reverse=True)
+        # IMPORTANT: Excludem acțiunile cu volum 0 (nu s-au tranzacționat azi = prețuri vechi)
+        # Aceste acțiuni "nelichide" apar cu +10%/+15% din sesiuni anterioare → date false
+        traded_stocks = [
+            s for s in stocks
+            if (s.get("volume") or 0) > 0 and s.get("price", 0) > 0
+        ]
+        
+        # Dacă nu avem suficiente acțiuni tranzacționate, coborâm pragul
+        if len(traded_stocks) < 6:
+            traded_stocks = [s for s in stocks if s.get("price", 0) > 0]
+        
+        sorted_by_change = sorted(traded_stocks, key=lambda x: x.get("change_percent", 0), reverse=True)
         
         top_gainers = sorted_by_change[:3]
-        top_losers = sorted_by_change[-3:][::-1]  # Reverse pentru a avea cel mai mare loss primul
+        top_losers = sorted_by_change[-3:][::-1]
         
-        # Top volume
+        # Top volume — cele mai lichide (tranzacționate) azi
         sorted_by_volume = sorted(stocks, key=lambda x: x.get("volume", 0), reverse=True)
-        top_volume = sorted_by_volume[:3]
+        top_volume = [s for s in sorted_by_volume if (s.get("volume") or 0) > 0][:3]
         
-        # Calculează media pieței ca backup
-        avg_change = sum(s.get("change_percent", 0) for s in stocks) / len(stocks) if stocks else 0
+        # Calculează media pieței — doar acțiuni tranzacționate azi
+        if traded_stocks:
+            avg_change = sum(s.get("change_percent", 0) for s in traded_stocks) / len(traded_stocks)
+        else:
+            avg_change = sum(s.get("change_percent", 0) for s in stocks) / len(stocks) if stocks else 0
         
         # Folosește BET ca indicator principal dacă e disponibil
         bet_change = indices.get("BET", {}).get("change_percent")
         headline_change = bet_change if bet_change is not None else round(avg_change, 2)
         
-        # Sentiment general
-        positive = sum(1 for s in stocks if s.get("change_percent", 0) > 0)
-        negative = sum(1 for s in stocks if s.get("change_percent", 0) < 0)
-        neutral = len(stocks) - positive - negative
+        # Sentiment general — pe acțiunile tranzacționate (nu cele cu vol=0)
+        ref_stocks = traded_stocks if len(traded_stocks) >= 10 else stocks
+        positive = sum(1 for s in ref_stocks if s.get("change_percent", 0) > 0)
+        negative = sum(1 for s in ref_stocks if s.get("change_percent", 0) < 0)
+        neutral = len(ref_stocks) - positive - negative
         
         # Obține știri recente
         news = await db.news_ro.find({}, {"_id": 0, "title": 1, "source": 1}).sort("published_at", -1).limit(5).to_list(5)
         
         return {
-            "date": datetime.now(timezone.utc).strftime("%d ") + LUNI_RO[datetime.now(timezone.utc).month] + datetime.now(timezone.utc).strftime(" %Y"),
+            "date": datetime.now(BUCHAREST_TZ).strftime("%d ") + LUNI_RO[datetime.now(BUCHAREST_TZ).month] + datetime.now(BUCHAREST_TZ).strftime(" %Y"),
             "total_stocks": len(stocks),
             "avg_change": round(avg_change, 2),
             "bet_change": headline_change,  # Indicele BET real sau media ca fallback
@@ -297,9 +312,6 @@ class DailySummaryService:
             betng_info = indices.get('BETNG', {})
             betxt_info = indices.get('BETXT', {})
             betaero_info = indices.get('BETAeRO', {})
-            
-            # Calculează total valoare tranzacționată
-            total_volume = sum(s.get('volume', 0) for s in market_data.get('top_volume', []))
             
             context = f"""DATE OFICIALE BVB - {market_data['date']}
 
@@ -331,7 +343,7 @@ class DailySummaryService:
                 vol_str = f"{vol:,.0f}".replace(',', '.') if vol else "0"
                 context += f"\n• {s.get('symbol')}: {vol_str} acțiuni tranzacționate → {s.get('price', 0):.4f} RON ({s.get('change_percent', 0):+.2f}%)"
             
-            context += f"""
+            context += """
 
 ====== AVERTISMENT PENTRU AI ======
 FOLOSEȘTE DOAR DATELE DE MAI SUS!

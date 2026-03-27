@@ -32,7 +32,7 @@ export default function TickerBar() {
     };
 
     fetchData();
-    // Update la 30 secunde - datele EODHD au 15min delay oricum
+    // Update la 30 secunde - date cu delay 15min
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);

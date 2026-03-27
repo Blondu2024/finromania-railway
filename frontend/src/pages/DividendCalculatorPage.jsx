@@ -507,7 +507,7 @@ const DividendHistoryTab = ({ isPro }) => {
                       {analysis.symbol} — {analysis.company}
                     </CardTitle>
                     <CardDescription>
-                      {analysis.current_price} RON • {analysis.data_years} ani de date • Sursa: BVB.ro + EODHD
+                      {analysis.current_price} RON • {analysis.data_years} ani de date • Sursa: BVB.ro + date istorice
                     </CardDescription>
                   </div>
                   <ScoreBadge score={analysis.dividend_score.score} rating={analysis.dividend_score.rating} size="lg" />
@@ -645,7 +645,7 @@ const DividendHistoryTab = ({ isPro }) => {
                       <BarChart3 className="w-5 h-5 text-blue-600" />
                       Comparație Dividende — {compareData.symbols.join(' vs ')}
                     </CardTitle>
-                    <CardDescription>Dividend per an (RON/acțiune) • Sursa: BVB.ro + EODHD</CardDescription>
+                    <CardDescription>Dividend per an (RON/acțiune) • Sursa: BVB.ro + date istorice</CardDescription>
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => setCompareData(null)}>Închide</Button>
                 </div>
@@ -775,7 +775,7 @@ const DividendHistoryTab = ({ isPro }) => {
             Clasament Dividend Score BVB
           </CardTitle>
           <CardDescription>
-            Scor calculat din: Stabilitate (40%) + Creștere (30%) + Randament (30%) • Sursa: BVB.ro + EODHD
+            Scor calculat din: Stabilitate (40%) + Creștere (30%) + Randament (30%) • Sursa: BVB.ro + date istorice
           </CardDescription>
         </CardHeader>
         <CardContent>

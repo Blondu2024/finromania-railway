@@ -115,7 +115,7 @@ export default function DisclaimerPage() {
             <h2 className="text-xl font-semibold">8. Date BVB</h2>
             <p className="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg">
               <strong>Informație:</strong> Datele despre acțiunile de pe Bursa de Valori București (BVB) 
-              sunt furnizate de EODHD API, un furnizor licențiat de date financiare. Datele sunt reale și 
+              sunt furnizate de un furnizor licențiat de date financiare. Datele sunt reale și 
               se actualizează automat la fiecare 5 minute. Cu toate acestea, pot exista întârzieri sau 
               discrepanțe față de datele oficiale BVB. Verificați întotdeauna cu surse oficiale înainte 
               de a lua decizii de investiții.
@@ -126,7 +126,7 @@ export default function DisclaimerPage() {
             <h2 className="text-xl font-semibold">9. Surse de date</h2>
             <p>Platforma FinRomania agregă date din următoarele surse:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>Acțiuni BVB:</strong> EODHD API (furnizor licențiat de date financiare)</li>
+              <li><strong>Acțiuni BVB:</strong> Furnizor licențiat de date financiare</li>
               <li><strong>Indici globali:</strong> Yahoo Finance (yfinance)</li>
               <li><strong>Cursuri valutare:</strong> Banca Națională a României (BNR)</li>
               <li><strong>Știri:</strong> Agregate din surse românești (Ziarul Financiar, Profit.ro, Bursa, Wall-Street)</li>
