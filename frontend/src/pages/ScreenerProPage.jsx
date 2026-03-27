@@ -238,7 +238,17 @@ export default function ScreenerProPage() {
         const data = await scanRes.json();
         setStocks(data.stocks || []);
         setScanTime(((Date.now() - startTime) / 1000).toFixed(1));
-        toast.success(`Scanare completă: ${data.count} acțiuni analizate`);
+        
+        if (data.cache_refreshing && (data.stocks || []).length === 0) {
+          toast.info('Se scanează în background... Reîncarcă în 2-3 minute pentru rezultate complete.');
+        } else if (data.from_cache) {
+          const cacheAge = data.scanned_at 
+            ? `(actualizat ${new Date(data.scanned_at).toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'})})`
+            : '';
+          toast.success(`${data.count} acțiuni din cache ${cacheAge}`);
+        } else {
+          toast.success(`Scanare completă: ${data.count} acțiuni analizate`);
+        }
       } else {
         const err = await scanRes.json();
         toast.error(err.detail || 'Eroare la scanare');
@@ -401,7 +411,7 @@ export default function ScreenerProPage() {
               Scanează Tot
             </Button>
             {stocks.length > 0 && (
-              <Button variant="outline" onClick={exportCSV}>
+              <Button variant="outline" onClick={exportCSV} data-testid="export-screener-csv">
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
               </Button>

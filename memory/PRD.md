@@ -67,7 +67,30 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - Bulk upgrade users to PRO button
 - Trading School / Education section with quizzes
 
-## Completed Bug Fixes (This Session - March 2026)
+## Completed Bug Fixes (This Session - March 27, 2026)
+- [x] **Pagina educațională CFD-uri vs Acțiuni Reale** (/educatie-cfd-vs-actiuni):
+  - Hero cu badge avertizare + text explicativ
+  - Banner 74-89% ESMA warning
+  - Tabel comparativ 10 rânduri
+  - Explicație levier + exemple concrete
+  - Secțiune brokeri autorizați BVB
+  - FAQ expandabil (6 întrebări)
+  - CTA spre acțiuni BVB și calculator dividende
+  - Link în meniu Academia + footer
+- [x] **Toggle Email Rezumat Zilnic** în /notifications:
+  - Secțiune vizuală nouă "Email Zilnic — Rezumatul Bursei"
+  - Switch conectat la `POST /api/daily-summary/toggle-subscription`
+  - Afișare status actual (activ/dezactivat cu emailul userului)
+  - Banner verde de confirmare + badge "Salvat!"
+  - Endpoint nou `GET /api/daily-summary/my-subscription`
+  - Endpoint nou `POST /api/daily-summary/toggle-subscription`
+- [x] **Export CSV Screener PRO** - îmbunătățit cu UTF-8 BOM și ghilimele pentru câmpuri
+- [x] **Export CSV Portofoliu BVB** - buton nou în headerul "Poziții Active", descarcă toate pozițiile
+- [x] **Fix MAJOR: Screener PRO scan timeout (502)** - implementat sistem de caching:
+  - Scan rulează în background și cache-uiește în MongoDB (`screener_pro_cache`)
+  - `/scan` returnează din cache instant (<0.3s vs 60+s anterior)
+  - Job scheduler la 45 min pentru refresh automat al cache-ului
+  - Frontend gestionează starea `cache_refreshing` cu mesaj informativ
 - [x] Fixed blue gradient overlay on homepage (HeroSection + InteractiveTour welcome screen) → bg-black solid
 - [x] Email date now in Romanian ("18 martie 2026" instead of "18 March 2026")
 - [x] AI summary uses exact numbers (no vague words like "semnificativ")
@@ -139,7 +162,7 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] **Increased Email Limit** - From 95/day to 500/day (Resend $20 plan = 10k/month)
 
 ## Upcoming Tasks
-- [ ] P1: Add "Subscribe to Daily Summary" UI checkbox in user settings
+- [ ] P1: Add "Subscribe to Daily Summary" UI checkbox in user settings ✅ DONE
 - [ ] P1: Verify Resend domain (pending user DNS records)
 - [ ] P1: PRO Live Chat (community feature)
 - [ ] P2: Get expert feedback on Fiscal Simulator

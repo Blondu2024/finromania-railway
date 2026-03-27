@@ -2,10 +2,10 @@
 SCREENER PRO - Advanced Stock Screener pentru FinRomania
 Date LIVE de la EODHD: Indicatori Tehnici + Fundamentale + Semnale
 """
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel
 from typing import List, Optional, Dict
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import asyncio
 import httpx
 import logging
@@ -19,6 +19,9 @@ router = APIRouter(prefix="/api/screener-pro", tags=["Screener PRO"])
 
 EODHD_API_KEY = os.environ.get("EODHD_API_KEY")
 EODHD_BASE = "https://eodhd.com/api"
+
+# Flag pentru a preveni rulări simultane ale scan-ului
+_scan_running = False
 
 # ============================================
 # MODELS
@@ -264,18 +267,18 @@ def calculate_signal(price: float, technicals: Dict, fundamentals: Dict) -> Dict
     if price and sma20:
         if price > sma20:
             score += 10
-            signals.append(("Peste SMA20", "bullish", f"Preț > SMA20"))
+            signals.append(("Peste SMA20", "bullish", "Preț > SMA20"))
         else:
             score -= 10
-            signals.append(("Sub SMA20", "bearish", f"Preț < SMA20"))
+            signals.append(("Sub SMA20", "bearish", "Preț < SMA20"))
     
     if price and sma50:
         if price > sma50:
             score += 10
-            signals.append(("Peste SMA50", "bullish", f"Preț > SMA50"))
+            signals.append(("Peste SMA50", "bullish", "Preț > SMA50"))
         else:
             score -= 10
-            signals.append(("Sub SMA50", "bearish", f"Preț < SMA50"))
+            signals.append(("Sub SMA50", "bearish", "Preț < SMA50"))
     
     # Golden Cross / Death Cross
     if sma20 and sma50:
@@ -343,54 +346,125 @@ def calculate_signal(price: float, technicals: Dict, fundamentals: Dict) -> Dict
 
 
 # ============================================
+# HELPER: Cache Management
+# ============================================
+
+async def get_scan_cache(max_age_minutes: int = 45):
+    """Returnează cache-ul din MongoDB dacă e proaspăt."""
+    try:
+        db = await get_database()
+        cache = await db.screener_pro_cache.find_one({}, {"_id": 0})
+        if not cache:
+            return None
+        scanned_at = cache.get("scanned_at")
+        if isinstance(scanned_at, str):
+            scanned_at = datetime.fromisoformat(scanned_at.replace("Z", "+00:00"))
+        if scanned_at.tzinfo is None:
+            scanned_at = scanned_at.replace(tzinfo=timezone.utc)
+        age = datetime.now(timezone.utc) - scanned_at
+        if age.total_seconds() / 60 > max_age_minutes:
+            return None
+        return cache
+    except Exception as e:
+        logger.error(f"Error reading screener cache: {e}")
+        return None
+
+
+async def run_scan_and_cache():
+    """Rulează scanarea completă și salvează în cache MongoDB."""
+    global _scan_running
+    if _scan_running:
+        logger.info("Screener scan already running, skipping")
+        return
+    
+    _scan_running = True
+    logger.info("[SCREENER] Starting background scan...")
+    
+    try:
+        db = await get_database()
+        stocks = await db.stocks_bvb.find({}, {"_id": 0}).to_list(100)
+        
+        if not stocks:
+            return
+        
+        results = []
+        
+        async with httpx.AsyncClient() as client:
+            batch_size = 5
+            for i in range(0, len(stocks), batch_size):
+                batch = stocks[i:i+batch_size]
+                tasks = [process_stock(client, stock) for stock in batch]
+                batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+                
+                for result in batch_results:
+                    if isinstance(result, dict):
+                        results.append(result)
+                
+                if i + batch_size < len(stocks):
+                    await asyncio.sleep(0.5)
+        
+        results.sort(key=lambda x: x.get("signal_score", 0), reverse=True)
+        
+        scanned_at = datetime.now(timezone.utc).isoformat()
+        await db.screener_pro_cache.replace_one(
+            {},
+            {
+                "stocks": results,
+                "count": len(results),
+                "scanned_at": scanned_at,
+                "is_live": True,
+                "from_cache": True
+            },
+            upsert=True
+        )
+        logger.info(f"[SCREENER] Background scan complete: {len(results)} stocks cached")
+    except Exception as e:
+        logger.error(f"[SCREENER] Error in background scan: {e}")
+    finally:
+        _scan_running = False
+
+
+# ============================================
 # ENDPOINTS
 # ============================================
 
 @router.get("/scan")
-async def scan_all_stocks(user: dict = Depends(require_auth)):
+async def scan_all_stocks(background_tasks: BackgroundTasks, user: dict = Depends(require_auth)):
     """
-    PRO Feature: Scanează toate acțiunile BVB cu indicatori tehnici și fundamentale LIVE
+    PRO Feature: Scanează toate acțiunile BVB cu indicatori tehnici și fundamentale LIVE.
+    Returnează din cache (< 45 min) pentru viteză. Dacă cache-ul e gol/vechi, 
+    declanșează un scan în background și returnează imediat.
     """
     if user.get("subscription_level") not in ["pro", "premium"]:
         raise HTTPException(status_code=403, detail="Screener PRO necesită abonament PRO")
     
+    # Returnează din cache dacă e proaspăt
+    cache = await get_scan_cache(max_age_minutes=45)
+    if cache:
+        return cache
+    
+    # Cache gol sau vechi — declanșează background scan dacă nu rulează deja
+    if not _scan_running:
+        background_tasks.add_task(run_scan_and_cache)
+        logger.info("[SCREENER] Triggered background scan for fresh data")
+    
+    # Returnează cache-ul mai vechi dacă există (chiar dacă e expirat)
     db = await get_database()
-    stocks = await db.stocks_bvb.find({}, {"_id": 0}).to_list(100)
+    old_cache = await db.screener_pro_cache.find_one({}, {"_id": 0})
+    if old_cache:
+        old_cache["from_cache"] = True
+        old_cache["cache_refreshing"] = True
+        return old_cache
     
-    if not stocks:
-        return {"stocks": [], "count": 0}
-    
-    results = []
-    
-    async with httpx.AsyncClient() as client:
-        # Process in batches pentru a nu supraîncărca API-ul
-        batch_size = 5
-        for i in range(0, len(stocks), batch_size):
-            batch = stocks[i:i+batch_size]
-            
-            tasks = []
-            for stock in batch:
-                symbol = stock.get("symbol")
-                tasks.append(process_stock(client, stock))
-            
-            batch_results = await asyncio.gather(*tasks, return_exceptions=True)
-            
-            for result in batch_results:
-                if isinstance(result, dict):
-                    results.append(result)
-            
-            # Small delay între batches
-            if i + batch_size < len(stocks):
-                await asyncio.sleep(0.5)
-    
-    # Sort by signal score descending
-    results.sort(key=lambda x: x.get("signal_score", 0), reverse=True)
-    
+    # Niciun cache disponibil - returnează răspuns cu mesaj
     return {
-        "stocks": results,
-        "count": len(results),
-        "scanned_at": datetime.now(timezone.utc).isoformat(),
-        "is_live": True
+        "stocks": [],
+        "count": 0,
+        "scanned_at": None,
+        "is_live": False,
+        "from_cache": False,
+        "cache_refreshing": True,
+        "message": "Se scanează toate acțiunile BVB. Reîncarcă în 2-3 minute pentru rezultate."
     }
 
 

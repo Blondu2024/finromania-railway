@@ -120,6 +120,17 @@ async def send_daily_summary_job():
     except Exception as e:
         logger.error(f"❌ [JOB] Error in daily summary job: {e}")
 
+async def update_screener_cache_job():
+    """Job: Actualizează cache-ul Screener PRO (rulează în fundal la fiecare 45 min)"""
+    try:
+        from routes.screener_pro import run_scan_and_cache
+        logger.info("🔄 [JOB] Updating Screener PRO cache...")
+        await run_scan_and_cache()
+        logger.info("✅ [JOB] Screener PRO cache updated")
+    except Exception as e:
+        logger.error(f"❌ [JOB] Error updating screener cache: {e}")
+
+
 def start_scheduler():
     """Start all scheduled jobs"""
     try:
@@ -195,6 +206,15 @@ def start_scheduler():
             replace_existing=True
         )
         
+        # Job 9: Update Screener PRO cache (every 45 minutes - background scan)
+        scheduler.add_job(
+            update_screener_cache_job,
+            trigger=IntervalTrigger(minutes=45),
+            id='update_screener_cache',
+            name='Update Screener PRO Cache',
+            replace_existing=True
+        )
+        
         # Start scheduler
         scheduler.start()
         logger.info("✅ Scheduler started with all jobs!")
@@ -203,9 +223,9 @@ def start_scheduler():
         logger.info(f"   • Romanian news: every {settings.SCRAPING_INTERVAL_MINUTES} min")
         logger.info(f"   • International news: every {settings.SCRAPING_INTERVAL_MINUTES} min")
         logger.info(f"   • Currency rates: every {settings.CURRENCY_UPDATE_INTERVAL_HOURS} hour")
-        logger.info(f"   • Subscription expirations: daily at 9:00 AM")
-        logger.info(f"   • Price alerts: every 5 min")
-        logger.info(f"   • Daily summary email: daily at 18:05 (Europe/Bucharest)")
+        logger.info("   • Subscription expirations: daily at 9:00 AM")
+        logger.info("   • Price alerts: every 5 min")
+        logger.info("   • Daily summary email: daily at 18:05 (Europe/Bucharest)")
         
         # DON'T run jobs immediately at startup - let the scheduler handle them
         # This prevents blocking the application startup
