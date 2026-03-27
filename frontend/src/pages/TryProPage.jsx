@@ -137,7 +137,7 @@ export default function TryProPage() {
 
         {/* Current Status */}
         {user && (
-          <Card className={isPro ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500' : 'bg-slate-100 dark:bg-slate-800'}>
+          <Card className={isPro ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500' : 'bg-gray-100 dark:bg-zinc-800'}>
             <CardContent className="p-8 text-center">
               {isPro ? (
                 <div className="flex items-center justify-center gap-3">
@@ -165,7 +165,7 @@ export default function TryProPage() {
           <h2 className="text-3xl font-bold text-center mb-8">De Ce PRO?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {WHY_PRO_CARDS.map((card, idx) => (
-              <Card key={idx} className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 hover:shadow-xl transition-all">
+              <Card key={idx} className="bg-gradient-to-br from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-800 hover:shadow-xl transition-all">
                 <CardContent className="p-6 text-center">
                   <div className={`w-16 h-16 bg-gradient-to-br ${card.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
                     <card.icon className="w-8 h-8 text-white" />
@@ -249,7 +249,7 @@ export default function TryProPage() {
           <h2 className="text-3xl font-bold text-center mb-8">Întrebări Frecvente</h2>
           <div className="max-w-4xl mx-auto space-y-4">
             {FAQ_ITEMS.map((item, idx) => (
-              <Card key={idx} className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800">
+              <Card key={idx} className="bg-gradient-to-br from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-800">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-start gap-3">
                     <span className="text-amber-600 flex-shrink-0">Q{idx + 1}.</span>

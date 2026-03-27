@@ -181,7 +181,7 @@ export default function ProStockChart({ symbol, type = 'bvb', isPro = false, tok
         </div>
         
         <div className="flex flex-wrap gap-2">
-          <div className="flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+          <div className="flex gap-1 p-1 bg-gray-100 dark:bg-zinc-800 rounded-lg">
             {TIMEFRAMES_DAILY.map(tf => (
               <Button
                 key={tf.value}

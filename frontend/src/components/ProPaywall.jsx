@@ -46,7 +46,7 @@ const ProPaywall = ({
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
-        <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-amber-500/30 overflow-hidden">
+        <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-amber-500/30 overflow-hidden">
           {/* Header gradient */}
           <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 p-6 text-white text-center">
             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -67,7 +67,7 @@ const ProPaywall = ({
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {PRO_FEATURES.map((feature, idx) => (
-                  <div key={idx} className="flex items-center gap-3 bg-slate-800/50 rounded-lg p-3">
+                  <div key={idx} className="flex items-center gap-3 bg-zinc-800/50 rounded-lg p-3">
                     <div className="p-2 bg-amber-500/20 rounded-lg">
                       <feature.icon className="w-4 h-4 text-amber-500" />
                     </div>
@@ -91,7 +91,7 @@ const ProPaywall = ({
                 </div>
               </div>
               
-              <div className="flex items-center justify-between pt-4 border-t border-slate-700">
+              <div className="flex items-center justify-between pt-4 border-t border-zinc-700">
                 <div>
                   <h4 className="text-lg font-semibold text-white">PRO Anual</h4>
                   <p className="text-green-400 text-sm">Economisești 2 luni!</p>
@@ -120,7 +120,7 @@ const ProPaywall = ({
             </div>
 
             {/* Trust badges */}
-            <div className="mt-6 pt-6 border-t border-slate-700 text-center">
+            <div className="mt-6 pt-6 border-t border-zinc-700 text-center">
               <p className="text-xs text-gray-500">
                 ✓ Anulare oricând &nbsp;•&nbsp; ✓ Plată securizată &nbsp;•&nbsp; ✓ Acces instant
               </p>
@@ -129,7 +129,7 @@ const ProPaywall = ({
         </Card>
 
         {/* Free alternative */}
-        <Card className="mt-4 bg-slate-800/50 border-slate-700">
+        <Card className="mt-4 bg-zinc-800/50 border-zinc-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>

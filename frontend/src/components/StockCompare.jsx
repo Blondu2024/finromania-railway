@@ -144,7 +144,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
             
             {/* Search Results Dropdown */}
             {searchResults.length > 0 && (
-              <div className="absolute z-10 w-full bg-white dark:bg-slate-800 border rounded-lg mt-1 shadow-lg">
+              <div className="absolute z-10 w-full bg-white dark:bg-zinc-800 border rounded-lg mt-1 shadow-lg">
                 {searchResults.map(stock => (
                   <button
                     key={stock.symbol}
@@ -238,7 +238,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
                 ))}
                 
                 {/* Sector Row */}
-                <tr className="border-b bg-slate-50 dark:bg-slate-800/50">
+                <tr className="border-b bg-gray-50 dark:bg-zinc-800/50">
                   <td className="p-2 font-medium text-sm">Sector</td>
                   {comparisonData.map(stock => (
                     <td key={`${stock.symbol}-sector`} className="text-center p-2">

@@ -45,7 +45,7 @@ export default function FeatureCard({
           {stats.length > 0 && (
             <div className="grid grid-cols-2 gap-2 mb-4">
               {stats.map((stat, idx) => (
-                <div key={idx} className="bg-slate-100 dark:bg-slate-800 rounded-lg p-2 text-center">
+                <div key={idx} className="bg-gray-100 dark:bg-zinc-800 rounded-lg p-2 text-center">
                   <p className="text-lg font-bold">{stat.value}</p>
                   <p className="text-xs text-muted-foreground">{stat.label}</p>
                 </div>

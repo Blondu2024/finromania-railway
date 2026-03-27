@@ -119,12 +119,12 @@ const FearGreedIndex = ({ compact = false }) => {
 
   if (loading && !data) {
     return (
-      <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700">
+      <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-zinc-700">
         <CardContent className="p-6">
           <div className="animate-pulse">
-            <div className="h-6 bg-slate-700 rounded w-1/2 mx-auto mb-4" />
-            <div className="h-32 bg-slate-700 rounded-full w-32 mx-auto mb-4" />
-            <div className="h-4 bg-slate-700 rounded w-3/4 mx-auto" />
+            <div className="h-6 bg-zinc-700 rounded w-1/2 mx-auto mb-4" />
+            <div className="h-32 bg-zinc-700 rounded-full w-32 mx-auto mb-4" />
+            <div className="h-4 bg-zinc-700 rounded w-3/4 mx-auto" />
           </div>
         </CardContent>
       </Card>
@@ -133,7 +133,7 @@ const FearGreedIndex = ({ compact = false }) => {
 
   if (error) {
     return (
-      <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700">
+      <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 border-zinc-700">
         <CardContent className="p-6 text-center">
           <AlertTriangle className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
           <p className="text-gray-400">Nu am putut încărca indicele</p>
@@ -150,7 +150,7 @@ const FearGreedIndex = ({ compact = false }) => {
 
   if (compact) {
     return (
-      <div className="flex items-center gap-3 bg-slate-800/50 rounded-lg px-4 py-2">
+      <div className="flex items-center gap-3 bg-zinc-800/50 rounded-lg px-4 py-2">
         <div 
           className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg"
           style={{ backgroundColor: data?.color || '#64748b' }}
@@ -167,7 +167,7 @@ const FearGreedIndex = ({ compact = false }) => {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700 overflow-hidden">
+    <Card className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 border-zinc-700 overflow-hidden">
       <CardContent className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -186,7 +186,7 @@ const FearGreedIndex = ({ compact = false }) => {
           </div>
           <button 
             onClick={fetchData}
-            className="p-1.5 hover:bg-slate-700 rounded-full transition-colors"
+            className="p-1.5 hover:bg-zinc-700 rounded-full transition-colors"
             disabled={loading}
           >
             <RefreshCw className={`w-4 h-4 text-gray-400 ${loading ? 'animate-spin' : ''}`} />
@@ -244,7 +244,7 @@ const FearGreedIndex = ({ compact = false }) => {
             {showDetails && (
               <div className="space-y-3 animate-in fade-in duration-200">
                 {Object.entries(data.components).map(([key, component]) => (
-                  <div key={key} className="flex items-center justify-between bg-slate-800/50 rounded-lg px-3 py-2">
+                  <div key={key} className="flex items-center justify-between bg-zinc-800/50 rounded-lg px-3 py-2">
                     <div className="flex items-center gap-2">
                       <span className="text-gray-300 capitalize text-sm">
                         {key === 'rsi' ? 'RSI' : 
@@ -254,7 +254,7 @@ const FearGreedIndex = ({ compact = false }) => {
                       <span className="text-xs text-gray-500">({component.weight})</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+                      <div className="w-24 h-2 bg-zinc-700 rounded-full overflow-hidden">
                         <div 
                           className="h-full rounded-full transition-all duration-500"
                           style={{ 

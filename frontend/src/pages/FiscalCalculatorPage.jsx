@@ -41,14 +41,14 @@ const EntityIcon = ({ type, className = "w-8 h-8" }) => {
 const ResultCard = ({ scenario, isBest, isWorst }) => {
   const bgColor = isBest ? 'bg-green-500/10 border-green-500' : 
                   isWorst ? 'bg-red-500/10 border-red-500' : 
-                  'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700';
+                  'bg-gray-100 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700';
   
   return (
     <Card className={`${bgColor} border-2 transition-all hover:shadow-lg`}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${isBest ? 'bg-green-500/20' : isWorst ? 'bg-red-500/20' : 'bg-slate-200 dark:bg-slate-700'}`}>
+            <div className={`p-2 rounded-lg ${isBest ? 'bg-green-500/20' : isWorst ? 'bg-red-500/20' : 'bg-gray-200 dark:bg-zinc-700'}`}>
               <EntityIcon type={scenario.tip_entitate} className={`w-6 h-6 ${isBest ? 'text-green-600' : isWorst ? 'text-red-600' : 'text-slate-600 dark:text-slate-300'}`} />
             </div>
             <div>
@@ -69,11 +69,11 @@ const ResultCard = ({ scenario, isBest, isWorst }) => {
       <CardContent className="space-y-4">
         {/* Key Numbers */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-3">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg p-3">
             <p className="text-sm text-muted-foreground">Total Taxe</p>
             <p className="text-lg font-semibold text-red-600">{formatRON(scenario.total_taxe)}</p>
           </div>
-          <div className="bg-white dark:bg-slate-900 rounded-lg p-3">
+          <div className="bg-white dark:bg-zinc-900 rounded-lg p-3">
             <p className="text-sm text-muted-foreground">Venit Net</p>
             <p className={`text-lg font-semibold ${isBest ? 'text-green-600' : ''}`}>{formatRON(scenario.venit_net)}</p>
           </div>
@@ -683,7 +683,7 @@ export default function FiscalCalculatorPage() {
         </div>
 
         {/* Disclaimer */}
-        <Card className="bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600">
+        <Card className="bg-gray-100 dark:bg-zinc-800 border-slate-300 dark:border-slate-600">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <AlertTriangle className="w-6 h-6 text-slate-600 flex-shrink-0 mt-1" />

@@ -57,7 +57,7 @@ const LiveTicker = ({ rates, isLoading }) => {
   const duplicatedItems = [...tickerItems, ...tickerItems, ...tickerItems];
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 py-3">
+    <div className="relative overflow-hidden bg-gradient-to-r from-zinc-900 via-blue-900 to-zinc-900 py-3">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9nPjwvc3ZnPg==')] opacity-30" />
       
       <motion.div 
@@ -97,7 +97,7 @@ const CurrencyCard = ({ code, data, onClick, isSelected, delay = 0 }) => {
         <div className={`absolute inset-0 bg-gradient-to-br ${
           isSelected 
             ? 'from-blue-500/20 to-blue-500/20' 
-            : 'from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900'
+            : 'from-gray-100 to-gray-50 dark:from-zinc-800 dark:to-zinc-900'
         }`} />
         <CardContent className="relative p-4 text-center">
           <motion.span 
@@ -133,7 +133,7 @@ const PopularPairButton = ({ pair, onClick, delay }) => (
     className="relative group overflow-hidden rounded-xl"
   >
     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-    <div className="relative p-4 bg-white dark:bg-slate-800 group-hover:bg-transparent border rounded-xl transition-all">
+    <div className="relative p-4 bg-white dark:bg-zinc-800 group-hover:bg-transparent border rounded-xl transition-all">
       <div className="flex items-center justify-center gap-2 mb-2">
         <span className="text-2xl">{pair.from_flag}</span>
         <motion.div
@@ -329,7 +329,7 @@ const AutoScrollRates = ({ rates }) => {
         {duplicatedRates.map(([code, data], idx) => (
           <motion.div
             key={`${code}-${idx}`}
-            className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 rounded-lg border hover:shadow-md transition-all"
+            className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-800 dark:to-zinc-900 rounded-lg border hover:shadow-md transition-all"
             whileHover={{ x: 5, scale: 1.02 }}
           >
             <div className="flex items-center gap-3">
@@ -473,7 +473,7 @@ export default function CurrencyConverterPage() {
         <LiveTicker rates={rates} />
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden py-12 bg-gradient-to-br from-slate-50 via-blue-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <section className="relative overflow-hidden py-12 bg-gradient-to-br from-gray-50 via-blue-50 to-blue-50 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900">
           {/* Floating shapes */}
           <FloatingShape delay={0} duration={4} className="w-64 h-64 bg-blue-400 -top-32 -left-32" />
           <FloatingShape delay={1} duration={5} className="w-48 h-48 bg-blue-400 top-20 right-10" />
@@ -566,7 +566,7 @@ export default function CurrencyConverterPage() {
         </section>
 
         {/* Two Column Layout: Currency Grid + Auto Scroll */}
-        <section className="py-12 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
+        <section className="py-12 bg-gradient-to-b from-gray-50 to-white dark:from-zinc-900 dark:to-zinc-800">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-[2fr,1fr] gap-8">
               {/* Currency Grid */}
@@ -620,7 +620,7 @@ export default function CurrencyConverterPage() {
         </section>
 
         {/* Info Footer */}
-        <section className="py-8 bg-slate-100 dark:bg-slate-800">
+        <section className="py-8 bg-gray-100 dark:bg-zinc-800">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">

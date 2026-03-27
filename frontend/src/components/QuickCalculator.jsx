@@ -88,7 +88,7 @@ export default function QuickCalculator({ user }) {
         </div>
 
         {/* Quick Results */}
-        <div className="bg-white dark:bg-slate-900 rounded-lg p-4 space-y-3">
+        <div className="bg-white dark:bg-zinc-900 rounded-lg p-4 space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Impozit ca PF:</span>
             <span className="font-bold">{preview.impozitPF.toLocaleString()} RON</span>

@@ -31,7 +31,7 @@ export default function TrustBadges() {
   ];
 
   return (
-    <div className="bg-slate-100 dark:bg-slate-900 rounded-xl p-6">
+    <div className="bg-gray-100 dark:bg-zinc-900 rounded-xl p-6">
       <div className="flex flex-wrap justify-center items-center gap-6">
         {badges.map((badge, idx) => (
           <div key={idx} className="flex items-center gap-2 text-center">

@@ -20,7 +20,7 @@ const tourSteps = [
     title: 'Explorează FinRomania 🇷🇴',
     description: 'Îți arătăm platforma în 2 minute — educație, date și instrumente pentru decizii informate.',
     icon: Sparkles,
-    gradient: 'from-slate-900 via-slate-900 to-slate-900',
+    gradient: 'from-zinc-900 via-zinc-900 to-zinc-900',
   },
   
   // ========== NAVIGATION MENU - DESKTOP ==========
@@ -166,7 +166,7 @@ const tourSteps = [
     title: 'Gata! Acum cunoști platforma 🚀',
     description: 'Creează un cont gratuit pentru Watchlist, Portofoliu Virtual și notificări personalizate.',
     icon: Zap,
-    gradient: 'from-slate-700 via-slate-800 to-slate-900',
+    gradient: 'from-zinc-700 via-zinc-800 to-zinc-900',
     showCTA: true,
   },
 ];
@@ -349,7 +349,7 @@ const TooltipCard = ({ step, position, targetRect, onNext, onSkip, currentStep, 
         exit={{ opacity: 0, y: -20, scale: 0.9 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       >
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-5 shadow-2xl border border-white/20 backdrop-blur-xl">
+        <div className="bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 rounded-2xl p-5 shadow-2xl border border-white/20 backdrop-blur-xl">
           {/* Header with icon */}
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg">
@@ -391,7 +391,7 @@ const TooltipCard = ({ step, position, targetRect, onNext, onSkip, currentStep, 
 
         {/* Arrow pointing to element */}
         <div 
-          className="absolute w-4 h-4 bg-slate-900 rotate-45 border-l border-t border-white/20"
+          className="absolute w-4 h-4 bg-zinc-900 rotate-45 border-l border-t border-white/20"
           style={{
             top: position === 'bottom' ? -8 : position === 'top' ? 'auto' : '50%',
             bottom: position === 'top' ? -8 : 'auto',

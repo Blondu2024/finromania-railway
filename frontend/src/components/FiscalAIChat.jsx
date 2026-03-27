@@ -141,9 +141,9 @@ const FiscalAIChat = ({ compact = false }) => {
   }
 
   return (
-    <Card className="bg-slate-900 border-slate-700 flex flex-col h-[500px]">
+    <Card className="bg-zinc-900 border-zinc-700 flex flex-col h-[500px]">
       {/* Header */}
-      <CardHeader className="border-b border-slate-700 pb-3 flex-shrink-0">
+      <CardHeader className="border-b border-zinc-700 pb-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/20 rounded-lg">
@@ -178,7 +178,7 @@ const FiscalAIChat = ({ compact = false }) => {
               <p className="text-xs text-gray-500 mb-2">Răspunsuri rapide:</p>
               <div className="grid grid-cols-2 gap-2">
                 {QUICK_ANSWERS.map((qa, idx) => (
-                  <div key={idx} className="bg-slate-800 rounded-lg p-2">
+                  <div key={idx} className="bg-zinc-800 rounded-lg p-2">
                     <p className="text-xs font-medium text-white">{qa.q}</p>
                     <p className="text-xs text-gray-400 mt-1">{qa.a}</p>
                   </div>
@@ -218,7 +218,7 @@ const FiscalAIChat = ({ compact = false }) => {
                     ? 'bg-amber-500/20 border border-amber-500/50'
                     : msg.isError
                     ? 'bg-red-500/20 border border-red-500/50'
-                    : 'bg-slate-800 text-gray-100'
+                    : 'bg-zinc-800 text-gray-100'
                 }`}
               >
                 {msg.role === 'assistant' && (
@@ -233,7 +233,7 @@ const FiscalAIChat = ({ compact = false }) => {
                 </div>
 
                 {msg.disclaimer && (
-                  <p className="text-xs text-amber-400 mt-2 border-t border-slate-700 pt-2">
+                  <p className="text-xs text-amber-400 mt-2 border-t border-zinc-700 pt-2">
                     {msg.disclaimer}
                   </p>
                 )}
@@ -254,7 +254,7 @@ const FiscalAIChat = ({ compact = false }) => {
         
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-slate-800 rounded-lg p-3">
+            <div className="bg-zinc-800 rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
                 <span className="text-gray-400 text-sm">Analizez întrebarea...</span>
@@ -267,7 +267,7 @@ const FiscalAIChat = ({ compact = false }) => {
       </CardContent>
 
       {/* Input */}
-      <div className="p-3 border-t border-slate-700 flex-shrink-0">
+      <div className="p-3 border-t border-zinc-700 flex-shrink-0">
         {!user ? (
           <div className="text-center">
             <Lock className="w-5 h-5 text-gray-500 mx-auto mb-1" />
@@ -280,7 +280,7 @@ const FiscalAIChat = ({ compact = false }) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Întreabă despre impozite..."
-              className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="flex-1 bg-zinc-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
               disabled={loading}
             />
             <Button 

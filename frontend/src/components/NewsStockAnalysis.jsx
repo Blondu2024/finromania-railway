@@ -39,7 +39,7 @@ const CATEGORY_COLORS = {
   sectors_etf: 'bg-blue-100 text-blue-800',
   popular_stocks: 'bg-pink-100 text-pink-800',
   bonds_rates: 'bg-gray-100 text-gray-800',
-  other: 'bg-slate-100 text-slate-800'
+  other: 'bg-gray-100 text-zinc-800'
 };
 
 // Mini Chart component

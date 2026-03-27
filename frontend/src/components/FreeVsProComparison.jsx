@@ -76,7 +76,7 @@ const COMPARISON_FEATURES = [
 export default function FreeVsProComparison() {
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-900 dark:to-slate-800 border-b">
+      <CardHeader className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-zinc-900 dark:to-zinc-800 border-b">
         <CardTitle className="text-2xl text-center">Ce Primești cu Fiecare Plan?</CardTitle>
         <p className="text-center text-muted-foreground">Separare clară FREE vs PRO</p>
       </CardHeader>
@@ -84,7 +84,7 @@ export default function FreeVsProComparison() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b bg-slate-50 dark:bg-slate-900">
+              <tr className="border-b bg-gray-50 dark:bg-zinc-900">
                 <th className="text-left p-4 font-semibold">Funcție</th>
                 <th className="text-center p-4 w-1/3">
                   <div className="flex flex-col items-center gap-1">
@@ -104,7 +104,7 @@ export default function FreeVsProComparison() {
             </thead>
             <tbody className="divide-y">
               {COMPARISON_FEATURES.map((feature, idx) => (
-                <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
+                <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-colors">
                   <td className="p-4 font-medium">{feature.category}</td>
                   
                   {/* FREE Column */}

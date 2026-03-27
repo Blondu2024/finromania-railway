@@ -92,7 +92,7 @@ const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-auto"
+          className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -159,7 +159,7 @@ const GlobalSentimentGauge = ({ sentiment }) => {
   const label = getLabel(score);
 
   return (
-    <Card className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white border-0">
+    <Card className="bg-gradient-to-br from-zinc-900 via-blue-900 to-zinc-900 text-white border-0">
       <CardContent className="p-6">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Activity className="w-5 h-5 text-blue-400" />
@@ -483,7 +483,7 @@ const GlobalHeatmap = ({ assets, onAssetClick }) => {
           <span className="text-xs font-normal ml-2 opacity-80">Click pe orice activ pentru grafic</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 bg-slate-900">
+      <CardContent className="p-4 bg-zinc-900">
         <div className="flex flex-wrap gap-2 justify-center">
           {assets.map((asset, idx) => {
             const colorClass = getColor(asset.change_percent || 0);
@@ -509,7 +509,7 @@ const GlobalHeatmap = ({ assets, onAssetClick }) => {
         </div>
         
         {/* Legend */}
-        <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-slate-700">
+        <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-zinc-700">
           <div className="flex items-center gap-2 text-sm text-slate-300">
             <div className="w-4 h-4 rounded bg-gradient-to-br from-red-500 to-red-600" />
             <span>Scădere</span>
@@ -878,7 +878,7 @@ export default function GlobalMarketsPage() {
         </Card>
 
         {/* Educational Note */}
-        <Card className="bg-slate-50 dark:bg-slate-800">
+        <Card className="bg-gray-50 dark:bg-zinc-800">
           <CardContent className="p-4 text-sm text-muted-foreground">
             <h4 className="font-semibold text-foreground mb-2">ℹ️ Informații</h4>
             <ul className="space-y-1">

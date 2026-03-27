@@ -46,7 +46,7 @@ export default function TickerBar() {
   const tickerItems = [...allItems, ...allItems];
 
   return (
-    <div className="bg-slate-900 dark:bg-slate-950 text-white overflow-hidden border-b">
+    <div className="bg-zinc-900 dark:bg-zinc-950 text-white overflow-hidden border-b">
       <div className="ticker-container">
         <div className="ticker-track">
           {tickerItems.map((item, idx) => {
@@ -59,7 +59,7 @@ export default function TickerBar() {
               <Link
                 key={`${item.symbol}-${idx}`}
                 to={linkPath}
-                className="ticker-item inline-flex items-center px-4 py-2 hover:bg-slate-800 transition-colors"
+                className="ticker-item inline-flex items-center px-4 py-2 hover:bg-zinc-800 transition-colors"
               >
                 <span className="font-semibold mr-2 text-white">{item.name}</span>
                 <span className="font-mono mr-2">

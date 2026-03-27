@@ -388,7 +388,7 @@ export default function PortfolioBVBPage() {
                 {positions.map((pos) => {
                   const isProfit = pos.profit_loss >= 0;
                   return (
-                    <Card key={pos.symbol} className="bg-slate-50 dark:bg-slate-900">
+                    <Card key={pos.symbol} className="bg-gray-50 dark:bg-zinc-900">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div>

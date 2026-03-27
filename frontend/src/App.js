@@ -85,7 +85,7 @@ const PageLoader = () => (
     </div>
   </div>
 );
-const TickerLoader = () => <div className="h-10 bg-slate-100 dark:bg-slate-800 animate-pulse" />;
+const TickerLoader = () => <div className="h-10 bg-gray-100 dark:bg-zinc-800 animate-pulse" />;
 const SearchLoader = () => <Skeleton className="h-9 w-36" />;
 
 

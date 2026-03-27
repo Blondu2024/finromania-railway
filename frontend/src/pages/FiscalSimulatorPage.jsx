@@ -442,7 +442,7 @@ export default function FiscalSimulatorPage() {
 
                   {/* Pași de calcul - NOU */}
                   {e.pasi_calcul && e.pasi_calcul.length > 0 && (
-                    <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                    <div className="mt-3 p-3 bg-gray-50 dark:bg-zinc-900 rounded-lg">
                       <p className="text-xs font-medium text-muted-foreground mb-2">Cum s-a calculat:</p>
                       <div className="space-y-1">
                         {e.pasi_calcul.map((pas, j) => (

@@ -167,7 +167,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
 
   if (!user) {
     return (
-      <Card className="bg-slate-900 border-slate-700">
+      <Card className="bg-zinc-900 border-zinc-700">
         <CardContent className="p-6 text-center">
           <Lock className="w-12 h-12 text-gray-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">Conectează-te pentru AI Advisor</h3>
@@ -187,9 +187,9 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
   const isUnlimited = subscriptionStatus?.ai_queries?.is_unlimited;
 
   return (
-    <Card className="bg-slate-900 border-slate-700 flex flex-col h-[600px]">
+    <Card className="bg-zinc-900 border-zinc-700 flex flex-col h-[600px]">
       {/* Header */}
-      <CardHeader className="border-b border-slate-700 pb-4">
+      <CardHeader className="border-b border-zinc-700 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/20 rounded-lg">
@@ -248,7 +248,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
                   ? 'bg-red-500/20 border border-red-500/50'
                   : msg.isWarning
                   ? 'bg-yellow-500/20 border border-yellow-500/50'
-                  : 'bg-slate-800 text-gray-100'
+                  : 'bg-zinc-800 text-gray-100'
               }`}
             >
               {msg.role === 'assistant' && (
@@ -263,7 +263,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
               </div>
 
               {msg.isLimitReached && msg.upgradePrompt && (
-                <div className="mt-3 p-3 bg-slate-900 rounded-lg">
+                <div className="mt-3 p-3 bg-zinc-900 rounded-lg">
                   <p className="font-semibold text-amber-400 flex items-center gap-2">
                     <Crown className="w-4 h-4" />
                     {msg.upgradePrompt.title}
@@ -292,7 +292,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
               )}
 
               {msg.chartLines && (
-                <div className="mt-3 p-2 bg-slate-900 rounded text-xs">
+                <div className="mt-3 p-2 bg-zinc-900 rounded text-xs">
                   <p className="text-gray-400 mb-1">📐 Linii pentru grafic:</p>
                   {msg.chartLines.supports?.map((s, i) => (
                     <p key={`s-${i}`} className="text-green-400">• Suport: {s.price} RON</p>
@@ -312,7 +312,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
         
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-slate-800 rounded-lg p-3">
+            <div className="bg-zinc-800 rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
                 <span className="text-gray-400 text-sm">Analizez datele...</span>
@@ -373,14 +373,14 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
       )}
 
       {/* Input */}
-      <div className="p-4 border-t border-slate-700">
+      <div className="p-4 border-t border-zinc-700">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={`Întreabă despre ${symbol || 'piața BVB'}...`}
-            className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            className="flex-1 bg-zinc-800 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
             disabled={loading}
           />
           <Button 

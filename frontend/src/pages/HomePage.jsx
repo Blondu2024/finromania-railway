@@ -216,7 +216,7 @@ export default function HomePage() {
             <FearGreedIndex />
           </div>
           <div className="lg:col-span-2">
-            <Card className="h-full bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 border-slate-200 dark:border-slate-700">
+            <Card className="h-full bg-gradient-to-br from-gray-50 to-white dark:from-zinc-900 dark:to-zinc-800 border-gray-200 dark:border-zinc-700">
               <CardContent className="p-6">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-blue-600" />
@@ -528,7 +528,7 @@ export default function HomePage() {
             <NewsletterSignup variant="sidebar" />
 
             {/* Trading School CTA - Professional Tone */}
-            <Card className="bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white border-0">
+            <Card className="bg-gradient-to-br from-zinc-700 via-zinc-800 to-zinc-900 text-white border-0">
               <CardContent className="p-6 text-center space-y-3">
                 <div className="inline-block p-3 bg-white/10 rounded-full">
                   <GraduationCap className="w-8 h-8" />
@@ -728,7 +728,7 @@ export default function HomePage() {
 
         {/* Final CTA - Professional & Clear */}
         <section className="mt-12">
-          <Card className="bg-gradient-to-br from-slate-800 to-slate-900 text-white border-0 max-w-4xl mx-auto">
+          <Card className="bg-gradient-to-br from-zinc-800 to-zinc-900 text-white border-0 max-w-4xl mx-auto">
             <CardContent className="p-8 text-center space-y-4">
               <h2 className="text-2xl md:text-3xl font-bold">
                 Claritate într-un domeniu haotic.
@@ -745,7 +745,7 @@ export default function HomePage() {
                   </Button>
                 </Link>
                 <Link to="/stocks">
-                  <Button size="lg" variant="outline" className="border-slate-500 text-white hover:bg-slate-700">
+                  <Button size="lg" variant="outline" className="border-slate-500 text-white hover:bg-zinc-700">
                     Explorează Piața →
                   </Button>
                 </Link>

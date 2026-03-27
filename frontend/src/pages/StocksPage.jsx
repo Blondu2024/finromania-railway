@@ -51,7 +51,7 @@ const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
       animate={{ opacity: 1, scale: 1 }}
       className="relative"
     >
-      <Card className="overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <Card className="overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900">
         <CardContent className="p-6">
           <div className="text-center mb-4">
             <h3 className="text-lg font-bold text-white flex items-center justify-center gap-2">
@@ -187,7 +187,7 @@ const MarketCountdown = () => {
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-xl p-4 ${timeLeft.isOpen ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-slate-700 to-slate-600'}`}
+      className={`rounded-xl p-4 ${timeLeft.isOpen ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-zinc-700 to-slate-600'}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -269,7 +269,7 @@ const StockHeatmap = ({ stocks }) => {
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 bg-slate-900">
+      <CardContent className="p-4 bg-zinc-900">
         <div className="flex flex-wrap gap-2 justify-center">
           {sortedStocks.map((stock, idx) => {
             const size = getBlockSize(stock);
@@ -306,7 +306,7 @@ const StockHeatmap = ({ stocks }) => {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-slate-700">
+        <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-zinc-700">
           <div className="flex items-center gap-2 text-sm text-slate-300">
             <div className="w-4 h-4 rounded bg-gradient-to-br from-red-500 to-red-600" />
             <span>Scădere mare</span>
@@ -328,7 +328,7 @@ const StockHeatmap = ({ stocks }) => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white dark:bg-slate-800 rounded-lg shadow-2xl p-4 z-50"
+              className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white dark:bg-zinc-800 rounded-lg shadow-2xl p-4 z-50"
             >
               <div className="flex items-center gap-4">
                 <div>
@@ -541,7 +541,7 @@ const SectorPerformance = ({ sectors }) => {
                   {isPositive ? '+' : ''}{sector.average_change_percent?.toFixed(2)}%
                 </span>
               </div>
-              <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${width}%` }}

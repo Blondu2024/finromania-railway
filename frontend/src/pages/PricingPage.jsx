@@ -125,7 +125,7 @@ export default function PricingPage() {
 
         {/* Current Status */}
         {user && subscriptionStatus && (
-          <Card className={isPro ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30' : 'bg-slate-100 dark:bg-slate-800'}>
+          <Card className={isPro ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30' : 'bg-gray-100 dark:bg-zinc-800'}>
             <CardContent className="p-6 text-center">
               <div className="flex items-center justify-center gap-3 mb-2">
                 {isPro ? <Crown className="w-6 h-6 text-amber-500" /> : <Shield className="w-6 h-6 text-gray-500" />}
@@ -341,7 +341,7 @@ export default function PricingPage() {
 
         {/* Trust Badges */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-6 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
+          <div className="inline-flex items-center gap-6 p-4 bg-gray-100 dark:bg-zinc-800 rounded-lg">
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-green-500" />
               <span className="text-sm">Plată Securizată</span>
