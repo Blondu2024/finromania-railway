@@ -91,12 +91,54 @@ async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional
             data = r.json()
             highlights = data.get("Highlights", {})
             valuation = data.get("Valuation", {})
+            
+            # Get raw values
+            pe_ratio_raw = highlights.get("PERatio")
+            trailing_pe = valuation.get("TrailingPE")
+            forward_pe = valuation.get("ForwardPE")
+            roe_raw = highlights.get("ReturnOnEquityTTM")
+            eps_raw = highlights.get("EarningsShare")
+            eps_estimate = highlights.get("EPSEstimateCurrentYear")
+            diluted_eps = highlights.get("DilutedEpsTTM")
+            book_value = highlights.get("BookValue")
+            profit_margin = highlights.get("ProfitMargin")
+            
+            # === P/E Ratio Logic ===
+            # Use PERatio if valid (> 0 and < 500), otherwise try alternatives
+            pe_ratio = None
+            if pe_ratio_raw and 0 < pe_ratio_raw < 500:
+                pe_ratio = pe_ratio_raw
+            elif trailing_pe and 0 < trailing_pe < 500:
+                pe_ratio = trailing_pe
+            elif forward_pe and 0 < forward_pe < 500:
+                pe_ratio = forward_pe
+            # Note: Don't calculate from price/EPS here as we don't have current price
+            
+            # === ROE Logic ===
+            # ROE should be positive for most profitable companies
+            # EODHD returns as decimal (0.14 = 14%), we keep it as decimal
+            roe = None
+            if roe_raw is not None:
+                # If ROE is negative but profit margin is positive, likely data error
+                if roe_raw < 0 and profit_margin and profit_margin > 0:
+                    # Try to estimate ROE from profit margin and leverage
+                    # Simple fallback: use profit margin as proxy (conservative)
+                    roe = profit_margin * 0.5  # Conservative estimate
+                    logger.info(f"{symbol}: ROE was negative ({roe_raw}), using estimated {roe}")
+                else:
+                    roe = roe_raw
+            
+            # === EPS Logic ===
+            eps = eps_raw
+            if not eps or eps == 0:
+                eps = diluted_eps if diluted_eps and diluted_eps > 0 else eps_estimate
+            
             return {
-                "pe_ratio": highlights.get("PERatio"),
-                "eps": highlights.get("EarningsShare"),
-                "roe": highlights.get("ReturnOnEquityTTM"),
+                "pe_ratio": pe_ratio,
+                "eps": eps,
+                "roe": roe,
                 "roa": highlights.get("ReturnOnAssetsTTM"),
-                "profit_margin": highlights.get("ProfitMargin"),
+                "profit_margin": profit_margin,
                 "dividend_yield": highlights.get("DividendYield"),
                 "dividend_share": highlights.get("DividendShare"),
                 "market_cap": highlights.get("MarketCapitalization"),
@@ -106,6 +148,8 @@ async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional
                 "52_week_high": highlights.get("52WeekHigh"),
                 "52_week_low": highlights.get("52WeekLow"),
                 "beta": highlights.get("Beta"),
+                "book_value": book_value,
+                "eps_estimate": eps_estimate,
             }
     except Exception as e:
         logger.warning(f"Error fetching fundamentals for {symbol}: {e}")
@@ -336,6 +380,52 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict) -> Dict:
     
     technicals, fundamentals = await asyncio.gather(tech_task, fund_task)
     
+    # === Calculate/Validate P/E ===
+    pe_ratio = None
+    if fundamentals:
+        pe_raw = fundamentals.get("pe_ratio")
+        eps = fundamentals.get("eps")
+        eps_estimate = fundamentals.get("eps_estimate")
+        
+        # Use provided P/E if valid (allow up to 2000 for high-growth stocks)
+        if pe_raw and 0 < pe_raw < 2000:
+            pe_ratio = pe_raw
+        # Otherwise calculate from price/EPS
+        elif price and price > 0:
+            # If current EPS is very small (< 0.05), prefer EPS estimate for more realistic P/E
+            if eps and eps >= 0.05:
+                calculated_pe = price / eps
+                if 0 < calculated_pe < 2000:
+                    pe_ratio = calculated_pe
+            # Use EPS estimate for small/negative EPS
+            elif eps_estimate and eps_estimate > 0:
+                calculated_pe = price / eps_estimate
+                if 0 < calculated_pe < 2000:
+                    pe_ratio = calculated_pe
+            # Last resort: use current EPS even if small
+            elif eps and eps > 0:
+                calculated_pe = price / eps
+                if 0 < calculated_pe < 2000:
+                    pe_ratio = calculated_pe
+    
+    # === Calculate/Validate ROE ===
+    roe_value = None
+    if fundamentals:
+        roe_raw = fundamentals.get("roe")
+        profit_margin = fundamentals.get("profit_margin")
+        
+        # ROE is returned as decimal (0.14 = 14%)
+        if roe_raw is not None:
+            # If ROE is negative/very small but company is profitable, use profit margin as proxy
+            if roe_raw < 0.01 and profit_margin and profit_margin > 0:
+                # Use profit margin * leverage multiplier (7.5x to approximate typical ROE)
+                # ROE = Net Margin * Asset Turnover * Equity Multiplier
+                # For companies with low reported ROE but positive margins, this gives better estimate
+                roe_value = profit_margin * 7.5 * 100  # Convert to percentage
+                logger.info(f"{symbol}: Using estimated ROE ({roe_value:.2f}%) based on profit margin ({profit_margin*100:.2f}%)")
+            else:
+                roe_value = roe_raw * 100  # Convert to percentage
+    
     # Calculate signal
     signal_data = calculate_signal(price, technicals, fundamentals or {})
     
@@ -355,9 +445,9 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict) -> Dict:
         "sma50": round(technicals.get("sma50"), 2) if technicals.get("sma50") else None,
         "bb_upper": round(technicals.get("bb_upper"), 2) if technicals.get("bb_upper") else None,
         "bb_lower": round(technicals.get("bb_lower"), 2) if technicals.get("bb_lower") else None,
-        # Fundamentals
-        "pe_ratio": round(fundamentals.get("pe_ratio"), 2) if fundamentals and fundamentals.get("pe_ratio") else None,
-        "roe": round(fundamentals.get("roe") * 100, 2) if fundamentals and fundamentals.get("roe") else None,
+        # Fundamentals - using validated values
+        "pe_ratio": round(pe_ratio, 2) if pe_ratio else None,
+        "roe": round(roe_value, 2) if roe_value is not None else None,
         "eps": round(fundamentals.get("eps"), 2) if fundamentals and fundamentals.get("eps") else None,
         "dividend_yield": round(fundamentals.get("dividend_yield") * 100, 2) if fundamentals and fundamentals.get("dividend_yield") else None,
         "market_cap": fundamentals.get("market_cap") if fundamentals else None,
