@@ -83,6 +83,17 @@ async def fetch_technical_indicator(client: httpx.AsyncClient, symbol: str, func
 
 async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional[Dict]:
     """Fetch date fundamentale de la EODHD"""
+    
+    # Manual overrides for symbols where EODHD data is known to be incorrect
+    # Verified against official BVB.ro data
+    MANUAL_OVERRIDES = {
+        "M": {  # MedLife - BVB.ro shows EPS=-0.02 but EODHD shows 0.01
+            "eps_override": -0.02,  # Official BVB.ro EPS
+            "pe_override": None,    # P/E cannot be calculated with negative EPS
+            "roe_override": None,   # Let EODHD ROE stand (or set manually if known)
+        }
+    }
+    
     try:
         url = f"{EODHD_BASE}/fundamentals/{symbol}.RO"
         params = {"api_token": EODHD_API_KEY, "fmt": "json"}
@@ -102,6 +113,20 @@ async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional
             diluted_eps = highlights.get("DilutedEpsTTM")
             book_value = highlights.get("BookValue")
             profit_margin = highlights.get("ProfitMargin")
+            
+            # Apply manual overrides if available
+            override = MANUAL_OVERRIDES.get(symbol, {})
+            if "eps_override" in override:
+                eps_raw = override["eps_override"]
+                logger.info(f"{symbol}: Using manual EPS override: {eps_raw}")
+            if "pe_override" in override:
+                pe_ratio_raw = override["pe_override"]
+                trailing_pe = None
+                forward_pe = None
+                logger.info(f"{symbol}: Using manual P/E override: {pe_ratio_raw}")
+            if "roe_override" in override and override["roe_override"] is not None:
+                roe_raw = override["roe_override"]
+                logger.info(f"{symbol}: Using manual ROE override: {roe_raw}")
             
             # === P/E Ratio Logic ===
             # Use PERatio if valid (> 0 and < 500), otherwise try alternatives
@@ -130,7 +155,7 @@ async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional
             
             # === EPS Logic ===
             eps = eps_raw
-            if not eps or eps == 0:
+            if (not eps or eps == 0) and eps_raw != 0:  # Don't override explicit zero/negative
                 eps = diluted_eps if diluted_eps and diluted_eps > 0 else eps_estimate
             
             return {
@@ -381,50 +406,48 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict) -> Dict:
     technicals, fundamentals = await asyncio.gather(tech_task, fund_task)
     
     # === Calculate/Validate P/E ===
+    # P/E is only meaningful when EPS is positive
     pe_ratio = None
     if fundamentals:
         pe_raw = fundamentals.get("pe_ratio")
         eps = fundamentals.get("eps")
         eps_estimate = fundamentals.get("eps_estimate")
         
-        # Use provided P/E if valid (allow up to 2000 for high-growth stocks)
-        if pe_raw and 0 < pe_raw < 2000:
+        # If EPS is negative, P/E cannot be calculated meaningfully
+        if eps is not None and eps < 0:
+            pe_ratio = None  # N/A for negative earnings
+        elif pe_raw and 0 < pe_raw < 2000:
             pe_ratio = pe_raw
-        # Otherwise calculate from price/EPS
         elif price and price > 0:
-            # If current EPS is very small (< 0.05), prefer EPS estimate for more realistic P/E
-            if eps and eps >= 0.05:
-                calculated_pe = price / eps
-                if 0 < calculated_pe < 2000:
-                    pe_ratio = calculated_pe
-            # Use EPS estimate for small/negative EPS
-            elif eps_estimate and eps_estimate > 0:
+            # Use EPS estimate if current EPS is zero or very small
+            if eps_estimate and eps_estimate > 0:
                 calculated_pe = price / eps_estimate
                 if 0 < calculated_pe < 2000:
                     pe_ratio = calculated_pe
-            # Last resort: use current EPS even if small
-            elif eps and eps > 0:
+            # Only use current EPS if it's meaningfully positive (>0.01)
+            elif eps and eps > 0.01:
                 calculated_pe = price / eps
                 if 0 < calculated_pe < 2000:
                     pe_ratio = calculated_pe
     
     # === Calculate/Validate ROE ===
+    # ROE = Net Income / Shareholder Equity
+    # If EPS is negative, company is losing money, ROE should reflect that
     roe_value = None
     if fundamentals:
         roe_raw = fundamentals.get("roe")
         profit_margin = fundamentals.get("profit_margin")
+        eps = fundamentals.get("eps")
         
         # ROE is returned as decimal (0.14 = 14%)
         if roe_raw is not None:
-            # If ROE is negative/very small but company is profitable, use profit margin as proxy
-            if roe_raw < 0.01 and profit_margin and profit_margin > 0:
-                # Use profit margin * leverage multiplier (7.5x to approximate typical ROE)
-                # ROE = Net Margin * Asset Turnover * Equity Multiplier
-                # For companies with low reported ROE but positive margins, this gives better estimate
-                roe_value = profit_margin * 7.5 * 100  # Convert to percentage
-                logger.info(f"{symbol}: Using estimated ROE ({roe_value:.2f}%) based on profit margin ({profit_margin*100:.2f}%)")
-            else:
-                roe_value = roe_raw * 100  # Convert to percentage
+            # If ROE is reported, use it directly (even if negative - that's valid)
+            roe_value = roe_raw * 100  # Convert to percentage
+        # If no ROE but we have profit margin, estimate (only for positive margins)
+        elif profit_margin is not None and profit_margin > 0:
+            # Only estimate positive ROE if company appears profitable
+            roe_value = profit_margin * 7.5 * 100
+            logger.info(f"{symbol}: Estimated ROE ({roe_value:.2f}%) from profit margin ({profit_margin*100:.2f}%)")
     
     # Calculate signal
     signal_data = calculate_signal(price, technicals, fundamentals or {})
