@@ -460,7 +460,7 @@ async def get_portfolio_analysis(user: dict = Depends(require_auth)):
             "roe_percent": roe_pct,
             "eps": cached.get("eps") if cached else None,
             "debt_equity": cached.get("debt_equity") if cached else None,
-            "pb_ratio": cached.get("pb_ratio") if cached else None,
+            "pb_ratio": cached.get("pb_ratio") if cached and cached.get("pb_ratio") else None,
             "cached_at": cached.get("cached_at") if cached else None,
         })
 
