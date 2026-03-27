@@ -110,69 +110,6 @@ const HeroSection = memo(function HeroSection({ user }) {
           </p>
         </div>
 
-        {/* 5 Pillars - ORDINEA CORECTĂ pentru prima impresie PRO */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          {/* 1. BVB - PRIMUL (arată că e platformă serioasă) */}
-          <Link to="/stocks" className="group">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
-              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                <TrendingUp className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg mb-1">📈 Bursa BVB</h3>
-              <p className="text-sm text-gray-300">50+ acțiuni, date live, delay 15min</p>
-              <Badge className="mt-2 bg-green-500/20 text-green-300 text-xs">LIVE DATA</Badge>
-            </div>
-          </Link>
-
-          {/* 2. GLOBAL - AL DOILEA (arată feature PRO) */}
-          <Link to="/global" className="group">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
-              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Globe className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg mb-1">🌍 Piețe Globale</h3>
-              <p className="text-sm text-gray-300">US, EU, Asia - delay doar 1 secundă!</p>
-              <Badge className="mt-2 bg-purple-500/20 text-purple-300 text-xs animate-pulse">1s DELAY</Badge>
-            </div>
-          </Link>
-
-          {/* 3. CALCULATOR - AL TREILEA (valoare reală) */}
-          <Link to="/calculator-fiscal" className="group">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105 ring-2 ring-amber-400/50">
-              <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Calculator className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg mb-1">🧮 Calculator Fiscal</h3>
-              <p className="text-sm text-gray-300">Pentru investitori BVB</p>
-              <Badge className="mt-2 bg-amber-500/20 text-amber-300 text-xs">PRO</Badge>
-            </div>
-          </Link>
-
-          {/* 4. SIMULATOR ANTREPRENOR - NOU */}
-          <Link to="/simulator-fiscal" className="group">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
-              <div className="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg mb-1">🏢 Simulator Fiscal</h3>
-              <p className="text-sm text-gray-300">Pentru antreprenori cu firme</p>
-              <Badge className="mt-2 bg-cyan-500/20 text-cyan-300 text-xs">NOU 2026</Badge>
-            </div>
-          </Link>
-
-          {/* 5. EDUCAȚIE - LA FINAL (pentru cei care vor să învețe) */}
-          <Link to="/trading-school" className="group">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center hover:bg-white/20 transition-all hover:scale-105">
-              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                <GraduationCap className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-lg mb-1">🎓 Educație</h3>
-              <p className="text-sm text-gray-300">Cursuri gratuite pentru toți</p>
-              <Badge className="mt-2 bg-blue-500/20 text-blue-300 text-xs">GRATUIT</Badge>
-            </div>
-          </Link>
-        </div>
-
         {/* CTA Buttons - Focus pe VALUE */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link to="/stocks">
