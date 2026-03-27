@@ -544,15 +544,140 @@ async def get_global_overview(response: Response):
         losers = sum(1 for item in all_items if item.get("change_percent", 0) < 0)
         avg_change = sum(item.get("change_percent", 0) for item in all_items) / len(all_items) if all_items else 0
         
-        # Market status for different regions
+        # Market status - per-exchange with accurate hours (all UTC, Mon-Fri)
         now = datetime.now(timezone.utc)
-        hour = now.hour
-        
+        weekday = now.weekday()  # 0=Mon, 6=Sun
+        is_weekday = weekday < 5
+        h, m = now.hour, now.minute
+        cur_min = h * 60 + m  # current UTC minutes since midnight
+
+        def mkt(open_h, open_m, close_h, close_m, always_open=False):
+            if always_open:
+                return True
+            if not is_weekday:
+                return False
+            return (open_h * 60 + open_m) <= cur_min < (close_h * 60 + close_m)
+
+        def next_event(open_h, open_m, close_h, close_m, always_open=False):
+            """Returns minutes until next open/close event and what that event is."""
+            if always_open:
+                return None, None
+            open_min = open_h * 60 + open_m
+            close_min = close_h * 60 + close_m
+            if not is_weekday:
+                # Days until Monday
+                days_until_mon = (7 - weekday) % 7
+                if days_until_mon == 0:
+                    days_until_mon = 7
+                mins_until_open = days_until_mon * 1440 - cur_min + open_min
+                return mins_until_open, "opens"
+            if cur_min < open_min:
+                return open_min - cur_min, "opens"
+            elif cur_min < close_min:
+                return close_min - cur_min, "closes"
+            else:
+                # After close today - opens tomorrow (or Monday if Friday)
+                days_ahead = 3 if weekday == 4 else 1  # Friday -> Monday
+                return days_ahead * 1440 - cur_min + open_min, "opens"
+
+        # Bucharest DST: EEST (UTC+3) end of March-Oct, EET (UTC+2) Nov-Mar
+        # BVB: 10:00-18:00 Bucharest local = 07:00-15:00 UTC (EEST) or 08:00-16:00 UTC (EET)
+        import calendar
+        # Last Sunday of March (DST start) and last Sunday of October (DST end)
+        # Simple DST check: April-October = EEST (+3), else EET (+2)
+        bvb_utc_offset = 3 if 4 <= now.month <= 10 else 2
+        bvb_open_utc = 10 - bvb_utc_offset   # 10:00 local - offset
+        bvb_close_utc = 18 - bvb_utc_offset  # 18:00 local - offset
+
         market_status = {
-            "us": {"name": "🇺🇸 Wall Street", "open": 14 <= hour < 21, "hours": "14:30 - 21:00 UTC"},
-            "europe": {"name": "🇪🇺 Europa", "open": 8 <= hour < 16, "hours": "08:00 - 16:30 UTC"},
-            "asia": {"name": "🇯🇵 Asia", "open": 0 <= hour < 7, "hours": "00:00 - 07:00 UTC"},
-            "crypto": {"name": "₿ Crypto", "open": True, "hours": "24/7"},
+            "us": {
+                "name": "Wall Street",
+                "flag": "🇺🇸",
+                "exchange": "NYSE / NASDAQ",
+                "open": mkt(14, 30, 21, 0),
+                "hours_utc": "14:30 – 21:00 UTC",
+                "hours_local": "09:30 – 16:00 ET",
+                "indices": ["S&P 500", "NASDAQ 100", "Dow Jones"],
+                "next_event_min": next_event(14, 30, 21, 0)[0],
+                "next_event_type": next_event(14, 30, 21, 0)[1],
+            },
+            "lse": {
+                "name": "Londra (LSE)",
+                "flag": "🇬🇧",
+                "exchange": "London Stock Exchange",
+                "open": mkt(8, 0, 16, 30),
+                "hours_utc": "08:00 – 16:30 UTC",
+                "hours_local": "08:00 – 16:30 UK",
+                "indices": ["FTSE 100"],
+                "next_event_min": next_event(8, 0, 16, 30)[0],
+                "next_event_type": next_event(8, 0, 16, 30)[1],
+            },
+            "xetra": {
+                "name": "Frankfurt (XETRA)",
+                "flag": "🇩🇪",
+                "exchange": "Deutsche Börse",
+                "open": mkt(7, 0, 15, 30),
+                "hours_utc": "07:00 – 15:30 UTC",
+                "hours_local": "09:00 – 17:30 CET",
+                "indices": ["DAX"],
+                "next_event_min": next_event(7, 0, 15, 30)[0],
+                "next_event_type": next_event(7, 0, 15, 30)[1],
+            },
+            "euronext": {
+                "name": "Paris (Euronext)",
+                "flag": "🇫🇷",
+                "exchange": "Euronext Paris",
+                "open": mkt(7, 0, 15, 30),
+                "hours_utc": "07:00 – 15:30 UTC",
+                "hours_local": "09:00 – 17:30 CET",
+                "indices": ["CAC 40"],
+                "next_event_min": next_event(7, 0, 15, 30)[0],
+                "next_event_type": next_event(7, 0, 15, 30)[1],
+            },
+            "tse": {
+                "name": "Tokyo (TSE)",
+                "flag": "🇯🇵",
+                "exchange": "Tokyo Stock Exchange",
+                "open": mkt(0, 0, 6, 0),
+                "hours_utc": "00:00 – 06:00 UTC",
+                "hours_local": "09:00 – 15:30 JST",
+                "indices": ["Nikkei 225"],
+                "next_event_min": next_event(0, 0, 6, 0)[0],
+                "next_event_type": next_event(0, 0, 6, 0)[1],
+            },
+            "hkex": {
+                "name": "Hong Kong (HKEX)",
+                "flag": "🇭🇰",
+                "exchange": "Hong Kong Exchange",
+                "open": mkt(1, 30, 8, 0),
+                "hours_utc": "01:30 – 08:00 UTC",
+                "hours_local": "09:30 – 16:00 HKT",
+                "indices": ["Hang Seng"],
+                "next_event_min": next_event(1, 30, 8, 0)[0],
+                "next_event_type": next_event(1, 30, 8, 0)[1],
+            },
+            "bvb": {
+                "name": "București (BVB)",
+                "flag": "🇷🇴",
+                "exchange": "Bursa de Valori București",
+                "open": mkt(bvb_open_utc, 0, bvb_close_utc, 0),
+                "hours_utc": f"{bvb_open_utc:02d}:00 – {bvb_close_utc:02d}:00 UTC",
+                "hours_local": "10:00 – 18:00 EET/EEST",
+                "indices": ["BET", "BET-FI"],
+                "next_event_min": next_event(bvb_open_utc, 0, bvb_close_utc, 0)[0],
+                "next_event_type": next_event(bvb_open_utc, 0, bvb_close_utc, 0)[1],
+            },
+            "crypto": {
+                "name": "Crypto",
+                "flag": "₿",
+                "exchange": "24/7 Global",
+                "open": True,
+                "hours_utc": "24/7",
+                "hours_local": "Non-stop",
+                "indices": ["Bitcoin", "Ethereum"],
+                "next_event_min": None,
+                "next_event_type": None,
+            },
         }
         
         result = {

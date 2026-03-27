@@ -186,31 +186,204 @@ const GlobalSentimentGauge = ({ sentiment }) => {
 };
 
 // ============================================
-// MARKET STATUS COMPONENT
+// EXCHANGE MARKET STATUS WITH COUNTDOWN
 // ============================================
-const MarketStatusBar = ({ marketStatus }) => {
+const EXCHANGES = [
+  {
+    key: 'us',
+    name: 'Wall Street',
+    flag: '🇺🇸',
+    exchange: 'NYSE / NASDAQ',
+    openH: 14, openM: 30,   // 14:30 UTC = 09:30 ET
+    closeH: 21, closeM: 0,  // 21:00 UTC = 16:00 ET
+    indices: ['S&P 500', 'NASDAQ 100', 'Dow Jones'],
+  },
+  {
+    key: 'lse',
+    name: 'Londra (LSE)',
+    flag: '🇬🇧',
+    exchange: 'London Stock Exchange',
+    openH: 8, openM: 0,
+    closeH: 16, closeM: 30,
+    indices: ['FTSE 100'],
+  },
+  {
+    key: 'xetra',
+    name: 'Frankfurt / Paris',
+    flag: '🇩🇪',
+    exchange: 'XETRA / Euronext',
+    openH: 7, openM: 0,
+    closeH: 15, closeM: 30,
+    indices: ['DAX', 'CAC 40'],
+  },
+  {
+    key: 'tse',
+    name: 'Tokyo (TSE)',
+    flag: '🇯🇵',
+    exchange: 'Tokyo Stock Exchange',
+    openH: 0, openM: 0,
+    closeH: 6, closeM: 0,
+    indices: ['Nikkei 225'],
+  },
+  {
+    key: 'hkex',
+    name: 'Hong Kong (HKEX)',
+    flag: '🇭🇰',
+    exchange: 'HK Stock Exchange',
+    openH: 1, openM: 30,
+    closeH: 8, closeM: 0,
+    indices: ['Hang Seng'],
+  },
+  {
+    key: 'bvb',
+    name: 'București (BVB)',
+    flag: '🇷🇴',
+    exchange: 'Bursa de Valori București',
+    // BVB 10:00-18:00 Bucharest. Dynamic UTC offset handled below.
+    indices: ['BET', 'BET-FI'],
+    isBVB: true,
+  },
+  {
+    key: 'crypto',
+    name: 'Crypto',
+    flag: '₿',
+    exchange: '24/7 Global',
+    alwaysOpen: true,
+    indices: ['Bitcoin', 'Ethereum'],
+  },
+];
+
+function getExchangeStatus(ex, nowUTC) {
+  if (ex.alwaysOpen) return { isOpen: true, nextEventMin: null, nextEventType: null };
+
+  const weekday = nowUTC.getUTCDay(); // 0=Sun, 6=Sat
+  const isWeekday = weekday >= 1 && weekday <= 5;
+  const curMin = nowUTC.getUTCHours() * 60 + nowUTC.getUTCMinutes();
+
+  let openMin, closeMin;
+  if (ex.isBVB) {
+    // BVB 10:00-18:00 Bucharest. Detect DST: April(3)-October(9) = EEST (UTC+3), else EET (UTC+2)
+    const month = nowUTC.getUTCMonth(); // 0-indexed
+    const utcOffset = (month >= 3 && month <= 9) ? 3 : 2;
+    openMin = (10 - utcOffset) * 60;   // e.g. 10-3=7:00 UTC in summer
+    closeMin = (18 - utcOffset) * 60;  // e.g. 18-3=15:00 UTC in summer
+  } else {
+    openMin = ex.openH * 60 + ex.openM;
+    closeMin = ex.closeH * 60 + ex.closeM;
+  }
+
+  const isOpen = isWeekday && curMin >= openMin && curMin < closeMin;
+
+  let nextEventMin = null;
+  let nextEventType = null;
+  if (isWeekday) {
+    if (curMin < openMin) {
+      nextEventMin = openMin - curMin;
+      nextEventType = 'opens';
+    } else if (curMin < closeMin) {
+      nextEventMin = closeMin - curMin;
+      nextEventType = 'closes';
+    } else {
+      const daysAhead = weekday === 5 ? 3 : 1; // Friday -> Monday
+      nextEventMin = daysAhead * 1440 - curMin + openMin;
+      nextEventType = 'opens';
+    }
+  } else {
+    const daysUntilMon = weekday === 0 ? 1 : (8 - weekday);
+    nextEventMin = daysUntilMon * 1440 - curMin + openMin;
+    nextEventType = 'opens';
+  }
+
+  return { isOpen, nextEventMin, nextEventType };
+}
+
+function fmtCountdown(totalMin) {
+  if (!totalMin) return '';
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return `${m}m`;
+  return `${h}h ${m}m`;
+}
+
+const ExchangeCard = ({ ex, nowUTC }) => {
+  const { isOpen, nextEventMin, nextEventType } = getExchangeStatus(ex, nowUTC);
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      {Object.entries(marketStatus || {}).map(([key, market]) => (
-        <motion.div
-          key={key}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`rounded-xl p-3 ${
-            market.open 
-              ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30' 
-              : 'bg-gradient-to-r from-slate-500/20 to-slate-600/20 border border-slate-500/30'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-bold text-sm">{market.name}</p>
-              <p className="text-xs text-muted-foreground">{market.hours}</p>
-            </div>
-            <div className={`w-3 h-3 rounded-full ${market.open ? 'bg-green-500 animate-pulse' : 'bg-slate-500'}`} />
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`rounded-xl p-3 border transition-all ${
+        ex.alwaysOpen
+          ? 'bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20'
+          : isOpen
+          ? 'bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/25'
+          : 'bg-gradient-to-br from-slate-500/10 to-slate-600/10 border-slate-500/20'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="text-base">{ex.flag}</span>
+            <span className="font-semibold text-sm truncate">{ex.name}</span>
+            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+              ex.alwaysOpen ? 'bg-blue-400 animate-pulse' :
+              isOpen ? 'bg-green-400 animate-pulse' : 'bg-slate-400'
+            }`} />
           </div>
-        </motion.div>
-      ))}
+          <p className="text-xs text-muted-foreground truncate">{ex.exchange}</p>
+          <div className="flex flex-wrap gap-1 mt-1">
+            {ex.indices.map(idx => (
+              <span key={idx} className="text-xs bg-background/60 rounded px-1 py-0.5 text-muted-foreground">{idx}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Status badge */}
+      <div className="mt-2 flex items-center justify-between">
+        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+          ex.alwaysOpen ? 'bg-blue-500/20 text-blue-400' :
+          isOpen ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-400'
+        }`}>
+          {ex.alwaysOpen ? 'LIVE 24/7' : isOpen ? 'DESCHISĂ' : 'ÎNCHISĂ'}
+        </span>
+        {!ex.alwaysOpen && nextEventMin !== null && (
+          <span className="text-xs text-muted-foreground">
+            {nextEventType === 'opens' ? 'Deschide' : 'Închide'} în{' '}
+            <span className="font-semibold text-foreground">{fmtCountdown(nextEventMin)}</span>
+          </span>
+        )}
+      </div>
+
+      {/* Data note when closed */}
+      {!ex.alwaysOpen && !isOpen && (
+        <p className="text-xs text-muted-foreground mt-1 italic">
+          Se afișează ultimul close
+        </p>
+      )}
+    </motion.div>
+  );
+};
+
+const MarketStatusBar = ({ marketStatus }) => {
+  const [nowUTC, setNowUTC] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNowUTC(new Date()), 60000); // update every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Clock className="w-4 h-4" />
+        <span>Orar Burse Mondiale — UTC acum: <strong className="text-foreground">{nowUTC.toUTCString().slice(17, 22)}</strong></span>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+        {EXCHANGES.map(ex => (
+          <ExchangeCard key={ex.key} ex={ex} nowUTC={nowUTC} />
+        ))}
+      </div>
     </div>
   );
 };
@@ -608,8 +781,12 @@ export default function GlobalMarketsPage() {
           </p>
         </motion.div>
 
-        {/* Market Status */}
-        <MarketStatusBar marketStatus={data?.market_status} />
+        {/* Market Status - ore burse per exchange cu countdown */}
+        <Card className="border border-border/50">
+          <CardContent className="p-4">
+            <MarketStatusBar marketStatus={data?.market_status} />
+          </CardContent>
+        </Card>
 
         {/* Top Section */}
         <div className="grid lg:grid-cols-[1fr,300px] gap-6">

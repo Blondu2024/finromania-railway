@@ -26,6 +26,8 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
   - NASDAQ 100 (NDX.INDX) replaces old NASDAQ Composite
   - FTSE 100 via DB fallback (^FTSE from yfinance, updated by EODHD scheduler)
   - Scheduler (update_global_indices) uses 100% EODHD
+  - **Market Status Panel** (March 27, 2026): 7 burse cu DESCHISĂ/ÎNCHISĂ, countdown, BVB DST auto
+    (NYSE/NASDAQ, LSE, XETRA/Euronext, TSE, HKEX, BVB, Crypto 24/7)
 - BVB Indices via TradingView (100% accurate)
 - News system (Romanian RSS + international)
 - In-app notifications for price alerts
