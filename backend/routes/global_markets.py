@@ -125,6 +125,24 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
         logger.warning(f"EODHD API key not found, skipping {symbol}")
         return None
     
+    def safe_float(val, default=0.0):
+        """Safely convert to float, handling 'NA' strings"""
+        if val is None or val == 'NA' or val == 'N/A' or val == '':
+            return default
+        try:
+            return float(val)
+        except (ValueError, TypeError):
+            return default
+    
+    def safe_int(val, default=0):
+        """Safely convert to int, handling 'NA' strings"""
+        if val is None or val == 'NA' or val == 'N/A' or val == '':
+            return default
+        try:
+            return int(float(val))
+        except (ValueError, TypeError):
+            return default
+    
     try:
         # EODHD real-time endpoint - LIVE cu planul All-in-One!
         url = f"https://eodhd.com/api/real-time/{symbol}"
@@ -137,14 +155,19 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
         if not data:
             return None
         
-        current_price = float(data.get("close", 0))
-        prev_close = float(data.get("previousClose", current_price))
-        change = float(data.get("change", 0))
-        change_percent = float(data.get("change_p", 0))
-        high = float(data.get("high", current_price))
-        low = float(data.get("low", current_price))
-        volume = int(data.get("volume", 0))
-        timestamp = data.get("timestamp", 0)
+        current_price = safe_float(data.get("close"))
+        prev_close = safe_float(data.get("previousClose"), current_price)
+        change = safe_float(data.get("change"))
+        change_percent = safe_float(data.get("change_p"))
+        high = safe_float(data.get("high"), current_price)
+        low = safe_float(data.get("low"), current_price)
+        volume = safe_int(data.get("volume"))
+        timestamp = safe_int(data.get("timestamp"))
+        
+        # Skip if no valid price
+        if current_price == 0:
+            logger.warning(f"No valid price for {symbol}")
+            return None
         
         return {
             "symbol": symbol,
@@ -173,16 +196,33 @@ async def fetch_ticker_data_eodhd(symbol: str, info: dict) -> dict:
 
 @router.get("/indices")
 async def get_global_indices():
-    """Get all global indices"""
+    """Get all global indices - LIVE from EODHD with DB fallback"""
+    from config.database import get_database
+    
     try:
+        db = await get_database()
         results = []
+        
         for symbol, info in GLOBAL_INDICES.items():
             data = await fetch_ticker_data(symbol, info)
+            
             if data:
+                # Got live data from EODHD
                 results.append(data)
+            else:
+                # Fallback to DB cache
+                cached = await db.stocks_global.find_one({"symbol": symbol}, {"_id": 0})
+                if cached:
+                    cached["source"] = "db_cache"
+                    cached["is_live"] = False
+                    cached["name"] = info.get("name", cached.get("name", symbol))
+                    cached["flag"] = info.get("flag", cached.get("flag", "📊"))
+                    cached["country"] = info.get("country", cached.get("country", ""))
+                    results.append(cached)
+                    logger.info(f"Using DB cache for {symbol} (EODHD unavailable)")
         
         # Sort by change percent
-        results.sort(key=lambda x: x["change_percent"], reverse=True)
+        results.sort(key=lambda x: x.get("change_percent", 0), reverse=True)
         
         return {
             "indices": results,
@@ -283,26 +323,129 @@ async def get_global_stocks():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+async def fetch_multiple_tickers_eodhd(symbols_info: dict) -> dict:
+    """Batch fetch LIVE data from EODHD - MUCH FASTER!"""
+    import httpx
+    import os
+    
+    api_key = os.environ.get("EODHD_API_KEY")
+    if not api_key:
+        return {}
+    
+    def safe_float(val, default=0.0):
+        if val is None or val == 'NA' or val == 'N/A' or val == '':
+            return default
+        try:
+            return float(val)
+        except (ValueError, TypeError):
+            return default
+    
+    def safe_int(val, default=0):
+        if val is None or val == 'NA' or val == 'N/A' or val == '':
+            return default
+        try:
+            return int(float(val))
+        except (ValueError, TypeError):
+            return default
+    
+    results = {}
+    
+    # Filter out yfinance-only symbols
+    eodhd_symbols = {s: i for s, i in symbols_info.items() if not i.get("use_yfinance")}
+    
+    # Split into batches of 15 (EODHD limit)
+    symbol_list = list(eodhd_symbols.keys())
+    batches = [symbol_list[i:i+15] for i in range(0, len(symbol_list), 15)]
+    
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            for batch in batches:
+                symbols_str = ",".join(batch)
+                url = f"https://eodhd.com/api/real-time/{symbols_str}"
+                params = {"api_token": api_key, "fmt": "json"}
+                
+                response = await client.get(url, params=params)
+                if response.status_code != 200:
+                    continue
+                
+                data = response.json()
+                items = data if isinstance(data, list) else [data]
+                
+                for item in items:
+                    code = item.get("code", "")
+                    if code not in eodhd_symbols:
+                        continue
+                    
+                    info = eodhd_symbols[code]
+                    price = safe_float(item.get("close"))
+                    
+                    if price == 0:
+                        continue
+                    
+                    results[code] = {
+                        "symbol": code,
+                        "name": info["name"],
+                        "flag": info.get("flag", "📊"),
+                        "country": info.get("country", ""),
+                        "category": info.get("category", ""),
+                        "unit": info.get("unit", ""),
+                        "price": round(price, 2),
+                        "change": round(safe_float(item.get("change")), 2),
+                        "change_percent": round(safe_float(item.get("change_p")), 2),
+                        "prev_close": round(safe_float(item.get("previousClose"), price), 2),
+                        "high": round(safe_float(item.get("high"), price), 2),
+                        "low": round(safe_float(item.get("low"), price), 2),
+                        "volume": safe_int(item.get("volume")),
+                        "sparkline": [],
+                        "is_positive": bool(safe_float(item.get("change_p")) >= 0),
+                        "last_update": datetime.fromtimestamp(safe_int(item.get("timestamp"))).isoformat() if safe_int(item.get("timestamp")) else datetime.now(timezone.utc).isoformat(),
+                        "source": "eodhd_live",
+                        "is_live": True
+                    }
+    except Exception as e:
+        logger.error(f"EODHD batch error: {e}")
+    
+    return results
+
+
 @router.get("/overview")
 async def get_global_overview(response: Response):
-    """Get complete global market overview cu date LIVE (NO CACHE pentru real-time)"""
+    """Get complete global market overview cu date LIVE (OPTIMIZED BATCH!)"""
+    from config.database import get_database
+    
     # Prevent ALL caching - critical for live data!
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     
     try:
-        logger.info("Fetching LIVE global market data (no cache)...")
-        all_assets = {}
+        db = await get_database()
+        logger.info("Fetching LIVE global market data (BATCH mode)...")
         
-        # Fetch all categories - EODHD pentru tot (All-in-One plan), yfinance pentru crypto
+        # Combine all symbols
         all_symbols = {**GLOBAL_INDICES, **GLOBAL_STOCKS, **COMMODITIES, **CRYPTO, **FOREX}
+        
+        # BATCH fetch from EODHD (much faster!)
+        eodhd_data = await fetch_multiple_tickers_eodhd(all_symbols)
+        
+        # Fetch yfinance crypto separately (EODHD nu are)
+        yfinance_symbols = {s: i for s, i in all_symbols.items() if i.get("use_yfinance")}
+        for symbol, info in yfinance_symbols.items():
+            data = await fetch_ticker_yfinance(symbol, info)
+            if data:
+                eodhd_data[symbol] = data
+        
+        # Organize by category
+        all_assets = {}
         for symbol, info in all_symbols.items():
-            # Folosește yfinance pentru crypto (EODHD nu are)
-            if info.get("use_yfinance"):
-                data = await fetch_ticker_yfinance(symbol, info)
-            else:
-                data = await fetch_ticker_data_eodhd(symbol, info)
+            data = eodhd_data.get(symbol)
+            if not data:
+                # Fallback to DB cache
+                cached = await db.stocks_global.find_one({"symbol": symbol}, {"_id": 0})
+                if cached:
+                    cached["source"] = "db_cache"
+                    cached["is_live"] = False
+                    data = cached
             
             if data:
                 category = info["category"]
@@ -312,9 +455,9 @@ async def get_global_overview(response: Response):
         
         # Calculate market sentiment
         all_items = [item for cat in all_assets.values() for item in cat]
-        gainers = sum(1 for item in all_items if item["change_percent"] > 0)
-        losers = sum(1 for item in all_items if item["change_percent"] < 0)
-        avg_change = sum(item["change_percent"] for item in all_items) / len(all_items) if all_items else 0
+        gainers = sum(1 for item in all_items if item.get("change_percent", 0) > 0)
+        losers = sum(1 for item in all_items if item.get("change_percent", 0) < 0)
+        avg_change = sum(item.get("change_percent", 0) for item in all_items) / len(all_items) if all_items else 0
         
         # Market status for different regions
         now = datetime.now(timezone.utc)
@@ -341,12 +484,11 @@ async def get_global_overview(response: Response):
             },
             "market_status": market_status,
             "is_live": True,
-            "source": "EODHD All-in-One",
+            "source": "EODHD All-in-One (Batch)",
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
-        # NO CACHE - pentru date LIVE!
-        logger.info(f"Returning LIVE data ({len(all_items)} assets)")
+        logger.info(f"Returning LIVE data ({len(all_items)} assets) - BATCH mode")
         
         return result
     except Exception as e:
