@@ -183,7 +183,8 @@ const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
 const ResultsDisplay = ({ results }) => {
   if (!results) return null;
 
-  const { summary, holdings, projections, settings } = results;
+  const { summary, holdings, projections, settings, tax_info } = results;
+  const cass = summary.cass || {};
 
   return (
     <div className="space-y-6">
@@ -192,32 +193,73 @@ const ResultsDisplay = ({ results }) => {
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200">
           <CardContent className="pt-4">
             <div className="text-sm text-muted-foreground">Investiție Totală</div>
-            <div className="text-2xl font-bold text-blue-600">{summary.total_investment.toLocaleString()} RON</div>
+            <div className="text-2xl font-bold text-blue-600">{summary.total_investment.toLocaleString('ro-RO', {minimumFractionDigits: 0})} RON</div>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200">
           <CardContent className="pt-4">
-            <div className="text-sm text-muted-foreground">Dividend Anual NET</div>
-            <div className="text-2xl font-bold text-green-600">{summary.total_annual_dividend_net.toLocaleString()} RON</div>
-            <div className="text-xs text-muted-foreground">După 16% impozit</div>
+            <div className="text-sm text-muted-foreground">Dividend Brut/An</div>
+            <div className="text-2xl font-bold text-green-600">{summary.total_annual_dividend_gross?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</div>
+            <div className="text-xs text-muted-foreground">Randament: {summary.portfolio_yield?.toFixed(2)}%</div>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-amber-200">
           <CardContent className="pt-4">
-            <div className="text-sm text-muted-foreground">Venit Lunar NET</div>
-            <div className="text-2xl font-bold text-amber-600">{summary.total_monthly_income_net.toLocaleString()} RON</div>
+            <div className="text-sm text-muted-foreground">Net după Impozit + CASS</div>
+            <div className="text-2xl font-bold text-amber-600">{(summary.total_net_dupa_cass ?? summary.total_annual_dividend_net)?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</div>
+            <div className="text-xs text-muted-foreground">~{((summary.total_net_dupa_cass ?? summary.total_annual_dividend_net) / 12).toFixed(0)} RON/lună</div>
           </CardContent>
         </Card>
         
         <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200">
           <CardContent className="pt-4">
             <div className="text-sm text-muted-foreground">Randament Portofoliu</div>
-            <div className="text-2xl font-bold text-purple-600">{summary.portfolio_yield.toFixed(2)}%</div>
+            <div className="text-2xl font-bold text-purple-600">{summary.portfolio_yield?.toFixed(2)}%</div>
+            <div className="text-xs text-muted-foreground">brut/an</div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Fiscal breakdown box */}
+      <Card className="border-orange-200 dark:border-orange-800/40">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Calculator className="w-4 h-4 text-orange-500" />
+            Calcul Fiscal 2026
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="space-y-1.5">
+              <div className="flex justify-between"><span>Dividend brut total:</span><span className="font-mono font-semibold">{summary.total_annual_dividend_gross?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span></div>
+              <div className="flex justify-between text-red-500"><span>Impozit 16% (reținut la sursă):</span><span className="font-mono">-{summary.impozit_dividende_16pct?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span></div>
+              <div className="flex justify-between font-semibold border-t pt-1"><span>Net după impozit:</span><span className="font-mono">{summary.total_annual_dividend_net?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span></div>
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex justify-between">
+                <span>CASS ({cass.plafon || 'sub 6 SMB'}):</span>
+                <span className={`font-mono ${cass.datorat ? 'text-red-500' : 'text-green-500'}`}>
+                  {cass.datorat ? `-${cass.suma?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON` : '0 RON (sub prag)'}
+                </span>
+              </div>
+              {cass.detaliu && <div className="text-xs text-muted-foreground">{cass.detaliu}</div>}
+              <div className="flex justify-between font-bold text-green-600 border-t pt-1">
+                <span>NET FINAL (după impozit + CASS):</span>
+                <span className="font-mono">{(summary.total_net_dupa_cass ?? summary.total_annual_dividend_net)?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span>
+              </div>
+            </div>
+          </div>
+          {tax_info && (
+            <div className="mt-3 text-xs text-muted-foreground border-t pt-2">
+              <p>📋 {tax_info.impozit_dividende}</p>
+              <p>🏥 CASS: {tax_info.cass}</p>
+              <p className="text-xs opacity-60">{tax_info.baza_legala}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Holdings Breakdown */}
       <Card>
@@ -237,7 +279,7 @@ const ResultsDisplay = ({ results }) => {
                   <TableHead className="text-right">Investiție</TableHead>
                   <TableHead className="text-right">Div/Acț</TableHead>
                   <TableHead className="text-right">Dividend Brut</TableHead>
-                  <TableHead className="text-right">Impozit (16%)</TableHead>
+                  <TableHead className="text-right">Impozit 16%</TableHead>
                   <TableHead className="text-right">Dividend NET</TableHead>
                 </TableRow>
               </TableHeader>
@@ -247,13 +289,14 @@ const ResultsDisplay = ({ results }) => {
                     <TableCell>
                       <span className="font-bold">{h.symbol}</span>
                       <span className="text-xs text-muted-foreground ml-2">{h.name}</span>
+                      {h.data_source && <span className="text-xs ml-1 text-blue-500">●</span>}
                     </TableCell>
-                    <TableCell className="text-right font-mono">{h.shares}</TableCell>
-                    <TableCell className="text-right font-mono">{h.investment_value.toLocaleString()} RON</TableCell>
+                    <TableCell className="text-right font-mono">{h.shares.toLocaleString()}</TableCell>
+                    <TableCell className="text-right font-mono">{h.investment_value?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</TableCell>
                     <TableCell className="text-right font-mono">{h.dividend_per_share} RON</TableCell>
-                    <TableCell className="text-right font-mono">{h.annual_dividend_gross.toLocaleString()} RON</TableCell>
-                    <TableCell className="text-right font-mono text-red-500">-{h.tax_16_percent.toLocaleString()} RON</TableCell>
-                    <TableCell className="text-right font-mono font-bold text-green-600">{h.annual_dividend_net.toLocaleString()} RON</TableCell>
+                    <TableCell className="text-right font-mono">{h.annual_dividend_gross?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</TableCell>
+                    <TableCell className="text-right font-mono text-red-500">-{h.tax_16_percent?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</TableCell>
+                    <TableCell className="text-right font-mono font-bold text-green-600">{h.annual_dividend_net?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -273,7 +316,7 @@ const ResultsDisplay = ({ results }) => {
             )}
           </CardTitle>
           <CardDescription>
-            Rata de creștere dividende: {settings.dividend_growth_rate}%/an
+            Rata de creștere dividende: {settings.dividend_growth_rate}%/an • Impozit 16% + CASS incluse
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -283,20 +326,24 @@ const ResultsDisplay = ({ results }) => {
                 <TableRow>
                   <TableHead>An</TableHead>
                   <TableHead className="text-right">Dividend Brut</TableHead>
-                  <TableHead className="text-right">Dividend NET</TableHead>
+                  <TableHead className="text-right">Impozit 16%</TableHead>
+                  <TableHead className="text-right">CASS</TableHead>
+                  <TableHead className="text-right">NET Final</TableHead>
                   <TableHead className="text-right">Cumulat NET</TableHead>
-                  <TableHead className="text-right">Yield on Cost</TableHead>
+                  <TableHead className="text-right">Yield/Cost</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {projections.map((p) => (
                   <TableRow key={p.year}>
                     <TableCell className="font-bold">{p.year}</TableCell>
-                    <TableCell className="text-right font-mono">{p.gross_dividend.toLocaleString()} RON</TableCell>
-                    <TableCell className="text-right font-mono text-green-600">{p.net_dividend.toLocaleString()} RON</TableCell>
-                    <TableCell className="text-right font-mono">{p.cumulative_net.toLocaleString()} RON</TableCell>
+                    <TableCell className="text-right font-mono">{p.gross_dividend?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</TableCell>
+                    <TableCell className="text-right font-mono text-red-400">-{p.impozit_16pct?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</TableCell>
+                    <TableCell className="text-right font-mono text-orange-400">{p.cass > 0 ? `-${p.cass?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON` : '—'}</TableCell>
+                    <TableCell className="text-right font-mono font-bold text-green-600">{(p.net_final_dupa_cass ?? p.net_dividend)?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</TableCell>
+                    <TableCell className="text-right font-mono text-blue-500">{p.cumulative_net?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</TableCell>
                     <TableCell className="text-right">
-                      <Badge variant="outline">{p.yield_on_cost}%</Badge>
+                      <Badge variant="outline">{p.yield_on_cost?.toFixed(2)}%</Badge>
                     </TableCell>
                   </TableRow>
                 ))}

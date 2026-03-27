@@ -1,7 +1,7 @@
 """
 Dividend Calculator PRO - Calculator avansat de dividende pentru BVB
 Permite utilizatorilor să-și calculeze veniturile din dividende și să simuleze scenarii
-DATE LIVE de la EODHD + fallback la estimări când EODHD nu are date
+DATE LIVE de la EODHD + fallback verificat cu date reale BVB.ro
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel
@@ -22,147 +22,301 @@ EODHD_BASE = "https://eodhd.com/api"
 
 
 # ============================================
-# FALLBACK DATA - Used when EODHD has no dividend data
-# Verified against BVB.ro and company announcements
-# Last updated: March 2026
+# FALLBACK DATA - Verificat cu EODHD + BVB.ro
+# SURSA: EODHD /div/{symbol}.RO — unadjustedValue
+# ACTUALIZAT: Martie 2026
+#
+# TAX 2026: Impozit dividende = 16% (Legea 141/2025, pentru dividende distribuite din 01.01.2026)
+# TAX 2025: Impozit dividende = 10% (dacă distribuite în 2025)
+# CASS: 10% pe plafon 6/12/24 salarii minime, dacă venituri neosalariale > 6 SMB (~27.000 RON/an 2026)
 # ============================================
+
+SALARIU_MINIM_2026 = 4700  # RON brut estimat 2026
 
 DIVIDEND_FALLBACK_2026 = {
     "TLV": {
         "name": "Banca Transilvania",
         "sector": "Financiar",
-        "dividend_per_share": 1.27,  # Confirmed 2024 dividend
-        "ex_date_estimate": "2026-05-25",
-        "payment_date_estimate": "2026-06-15",
-        "note": "Dividend 2024 confirmat"
+        "dividend_per_share": 1.73333,  # EODHD div 2025-06-13 (din profit 2024)
+        "dividend_2026_est": 1.85,      # Estimare 2026 (creștere ~7%)
+        "ex_date_estimate": "2026-06-12",
+        "payment_date_estimate": "2026-06-26",
+        "source_confirmed": "EODHD div API",
+        "note": "Dividend anual din profit 2024. Suplimentar: 0.642 RON dividend interimar (nov 2025)."
     },
     "BRD": {
         "name": "BRD Groupe Société Générale",
         "sector": "Financiar",
-        "dividend_per_share": 1.97,  # Confirmed 2024 dividend
-        "ex_date_estimate": "2026-04-25",
-        "payment_date_estimate": "2026-05-15",
-        "note": "Dividend 2024 confirmat"
+        "dividend_per_share": 1.0752,   # CONFIRMAT MarketScreener & EODHD — ex-date 2026-05-18
+        "dividend_2026_est": 1.0752,
+        "ex_date_estimate": "2026-05-18",   # CONFIRMAT
+        "payment_date_estimate": "2026-06-05",  # CONFIRMAT
+        "source_confirmed": "Confirmat BRD/BVB 2026",
+        "note": "Dividend confirmat pentru 2026 (din profit 2025). Ex-date: 18 mai 2026."
     },
-    "FP": {
-        "name": "Fondul Proprietatea",
-        "sector": "Financiar",
-        "dividend_per_share": 0.033,
-        "ex_date_estimate": "2026-06-15",
-        "payment_date_estimate": "2026-07-05",
-        "note": "Dividend variabil - depinde de vânzări active"
+    "SNP": {
+        "name": "OMV Petrom",
+        "sector": "Energie",
+        "dividend_per_share": 0.0578,   # CONFIRMAT OMV Petrom — ex-date 2026-05-14
+        "dividend_2026_est": 0.0578,
+        "ex_date_estimate": "2026-05-14",   # CONFIRMAT
+        "payment_date_estimate": "2026-06-08",  # CONFIRMAT
+        "source_confirmed": "Confirmat OMV Petrom/BVB 2026",
+        "note": "Dividend final confirmat 2026 (profit 2025). Randament ~5.7%."
     },
-    "DIGI": {
-        "name": "Digi Communications",
-        "sector": "Telecom",
-        "dividend_per_share": 2.38,
-        "ex_date_estimate": "2026-05-10",
-        "payment_date_estimate": "2026-05-30",
-        "note": "Dividend 2024 confirmat"
+    "H2O": {
+        "name": "Hidroelectrica",
+        "sector": "Energie",
+        "dividend_per_share": 8.9889,   # EODHD div 2025-06-03 (din profit 2024)
+        "dividend_2026_est": 9.50,      # Estimare 2026
+        "ex_date_estimate": "2026-06-05",
+        "payment_date_estimate": "2026-06-25",
+        "source_confirmed": "EODHD div API",
+        "note": "Cel mai mare dividend pe acțiune de pe BVB. Randament ~6%."
+    },
+    "SNN": {
+        "name": "Nuclearelectrica",
+        "sector": "Energie",
+        "dividend_per_share": 2.70243,  # EODHD div 2025-06-02 (din profit 2024)
+        "dividend_2026_est": 2.80,      # Estimare 2026
+        "ex_date_estimate": "2026-06-04",
+        "payment_date_estimate": "2026-06-25",
+        "source_confirmed": "EODHD div API",
+        "note": "Dividend anual stabil. Randament ~4%."
     },
     "SNG": {
         "name": "Romgaz",
         "sector": "Energie",
-        "dividend_per_share": 0.1568,  # CORRECTED: 2025 dividend (was 3.11 - ERROR!)
+        "dividend_per_share": 0.1568,   # CONFIRMAT EODHD + Romgaz.ro — ex-date 2025-07-03
+        "dividend_2026_est": 0.1572,    # Propus CA 25 mart 2026 (supus AGA apr 2026)
         "ex_date_estimate": "2026-07-03",
-        "payment_date_estimate": "2026-07-25",
-        "note": "Dividend 2025 - politică conservatoare de dividende"
+        "payment_date_estimate": "2026-07-28",
+        "source_confirmed": "EODHD + Romgaz.ro",
+        "note": "Propunere 2026: 0.1572 RON/acț. Politică conservatoare de dividende."
     },
     "TGN": {
         "name": "Transgaz",
         "sector": "Energie",
-        "dividend_per_share": 1.08,
-        "ex_date_estimate": "2026-06-20",
+        "dividend_per_share": 1.08,     # EODHD div 2025-06-24 (din profit 2024)
+        "dividend_2026_est": 1.15,      # Estimare 2026
+        "ex_date_estimate": "2026-06-24",
         "payment_date_estimate": "2026-07-10",
-        "note": "Dividend 2024 confirmat"
+        "source_confirmed": "EODHD div API",
+        "note": "Dividend anual regulat."
     },
     "EL": {
         "name": "Electrica",
         "sector": "Energie",
-        "dividend_per_share": 0.82,
-        "ex_date_estimate": "2026-06-01",
+        "dividend_per_share": 0.1767,   # EODHD div 2025-06-03 (din profit 2024)
+        "dividend_2026_est": 0.20,      # Estimare 2026
+        "ex_date_estimate": "2026-06-03",
         "payment_date_estimate": "2026-06-20",
-        "note": "Dividend 2024 confirmat"
+        "source_confirmed": "EODHD div API",
+        "note": "Dividend după ajustare pentru split acțiuni."
     },
     "TEL": {
         "name": "Transelectrica",
         "sector": "Energie",
-        "dividend_per_share": 1.93,
-        "ex_date_estimate": "2026-06-15",
-        "payment_date_estimate": "2026-07-05",
-        "note": "Dividend 2024 confirmat"
+        "dividend_per_share": 2.12,     # EODHD div 2025-06-05 (dividend anual din profit 2024)
+        "dividend_2026_est": 2.20,      # Estimare 2026
+        "ex_date_estimate": "2026-06-05",
+        "payment_date_estimate": "2026-06-20",
+        "source_confirmed": "EODHD div API",
+        "note": "Dividend anual + posibil dividend special separat (3.81 RON în iul 2025 - excepțional)."
+    },
+    "DIGI": {
+        "name": "Digi Communications",
+        "sector": "Telecom",
+        "dividend_per_share": 1.35,     # EODHD div 2025-06-26 (din profit 2024)
+        "dividend_2026_est": 1.45,      # Estimare 2026
+        "ex_date_estimate": "2026-06-26",
+        "payment_date_estimate": "2026-07-10",
+        "source_confirmed": "EODHD div API",
+        "note": "Dividend anual stabil."
+    },
+    "FP": {
+        "name": "Fondul Proprietatea",
+        "sector": "Financiar",
+        "dividend_per_share": 0.0409,   # EODHD div 2025-05-27
+        "dividend_2026_est": 0.035,     # Estimare 2026 (variabil)
+        "ex_date_estimate": "2026-05-25",
+        "payment_date_estimate": "2026-06-10",
+        "source_confirmed": "EODHD div API",
+        "note": "Dividend variabil — depinde de vânzări active din portofoliu."
     },
     "ONE": {
         "name": "One United Properties",
         "sector": "Imobiliare",
-        "dividend_per_share": 0.044,
-        "ex_date_estimate": "2026-05-15",
+        "dividend_per_share": 0.36,     # EODHD div 2025-05-20 (și nov 2025 = 0.36)
+        "dividend_2026_est": 0.36,      # Estimare 2026 (menținut)
+        "ex_date_estimate": "2026-05-20",
         "payment_date_estimate": "2026-06-05",
-        "note": "Growth company - low payout"
+        "source_confirmed": "EODHD div API",
+        "note": "Dividende semestriale — 0.36 RON × 2 plăți/an."
     },
     "WINE": {
         "name": "Purcari Wineries",
         "sector": "Consum",
-        "dividend_per_share": 0.50,
-        "ex_date_estimate": "2026-06-01",
-        "payment_date_estimate": "2026-06-20",
-        "note": "Dividend 2024 confirmat"
-    },
-    "M": {
-        "name": "MedLife",
-        "sector": "Sănătate",
-        "dividend_per_share": 0,  # Company has negative EPS, no dividend expected
-        "ex_date_estimate": None,
-        "payment_date_estimate": None,
-        "note": "EPS negativ - fără dividend așteptat"
+        "dividend_per_share": 0.65,     # EODHD div 2025-09-01
+        "dividend_2026_est": 0.68,      # Estimare 2026
+        "ex_date_estimate": "2026-09-01",
+        "payment_date_estimate": "2026-09-20",
+        "source_confirmed": "EODHD div API",
+        "note": "Dividend anual din profit."
     },
     "AQ": {
         "name": "Aquila Part Prod Com",
         "sector": "Distribuție",
-        "dividend_per_share": 0.08,
-        "ex_date_estimate": "2026-05-25",
-        "payment_date_estimate": "2026-06-15",
-        "note": "Dividend 2024 confirmat"
+        "dividend_per_share": 0.0499,   # EODHD div 2025-05-20
+        "dividend_2026_est": 0.055,     # Estimare 2026
+        "ex_date_estimate": "2026-05-20",
+        "payment_date_estimate": "2026-06-05",
+        "source_confirmed": "EODHD div API",
+        "note": "Dividend anual."
+    },
+    "M": {
+        "name": "MedLife",
+        "sector": "Sănătate",
+        "dividend_per_share": 0,
+        "dividend_2026_est": 0,
+        "ex_date_estimate": None,
+        "payment_date_estimate": None,
+        "source_confirmed": "BVB.ro",
+        "note": "EPS negativ — fără dividend așteptat în 2026."
     },
 }
 
-# List of all dividend-paying BVB stocks to check
-DIVIDEND_SYMBOLS = ["TLV", "BRD", "SNP", "SNN", "H2O", "SNG", "TGN", "FP", "DIGI", "EL", "TEL", "ONE", "WINE", "AQ"]
+# All dividend-paying BVB stocks to check (expanded list)
+DIVIDEND_SYMBOLS = [
+    "TLV", "BRD", "SNP", "H2O", "SNN", "SNG", "TGN", "EL", "TEL",
+    "DIGI", "FP", "ONE", "WINE", "AQ"
+]
+
+# ============================================
+# CASS CALCULATOR 2026
+# ============================================
+def calculate_cass_2026(venituri_anuale_brut: float) -> dict:
+    """
+    Calculează contribuția CASS (sănătate) pentru venituri din dividende 2026.
+    CASS = 10% aplicat pe baza de calcul plafonată (6/12/24 salarii minime brute).
+    Sursa: Codul Fiscal actualizat 2026.
+    """
+    smb = SALARIU_MINIM_2026  # 4700 RON/lună
+    plafonul_6 = 6 * smb    # 28.200 RON
+    plafonul_12 = 12 * smb  # 56.400 RON
+    plafonul_24 = 24 * smb  # 112.800 RON
+
+    if venituri_anuale_brut < plafonul_6:
+        return {
+            "datoreaza_cass": False,
+            "baza_calcul": 0,
+            "cass_datorat": 0,
+            "plafon_aplicat": "sub 6 SMB — CASS 0",
+            "detaliu": f"Venituri < {plafonul_6:,.0f} RON → fără CASS"
+        }
+    elif venituri_anuale_brut < plafonul_12:
+        baza = plafonul_6
+        cass = baza * 0.10
+        return {
+            "datoreaza_cass": True,
+            "baza_calcul": baza,
+            "cass_datorat": round(cass, 2),
+            "plafon_aplicat": "6 SMB",
+            "detaliu": f"Venituri ≥ {plafonul_6:,.0f} RON → CASS pe 6 SMB = {cass:,.2f} RON/an"
+        }
+    elif venituri_anuale_brut < plafonul_24:
+        baza = plafonul_12
+        cass = baza * 0.10
+        return {
+            "datoreaza_cass": True,
+            "baza_calcul": baza,
+            "cass_datorat": round(cass, 2),
+            "plafon_aplicat": "12 SMB",
+            "detaliu": f"Venituri ≥ {plafonul_12:,.0f} RON → CASS pe 12 SMB = {cass:,.2f} RON/an"
+        }
+    else:
+        baza = plafonul_24
+        cass = baza * 0.10
+        return {
+            "datoreaza_cass": True,
+            "baza_calcul": baza,
+            "cass_datorat": round(cass, 2),
+            "plafon_aplicat": "24 SMB (plafon maxim)",
+            "detaliu": f"Venituri ≥ {plafonul_24:,.0f} RON → CASS pe 24 SMB = {cass:,.2f} RON/an (MAX)"
+        }
+
 
 
 async def fetch_live_dividend_data(symbol: str) -> Optional[Dict]:
-    """Fetch dividend data from EODHD API"""
+    """Fetch dividend data from EODHD API.
+    Uses SUM of all dividends in the last 12 months as the annual dividend.
+    This is more accurate than just the last single payment (some companies pay multiple times).
+    Falls back to fundamentals Highlights if no div history.
+    """
     if not EODHD_API_KEY:
         return None
-    
+
     try:
-        async with httpx.AsyncClient() as client:
-            # Get fundamentals
-            url = f"{EODHD_BASE}/fundamentals/{symbol}.RO"
-            r = await client.get(url, params={"api_token": EODHD_API_KEY, "fmt": "json"}, timeout=10)
-            
-            if r.status_code != 200:
-                return None
-            
-            data = r.json()
-            highlights = data.get("Highlights", {})
-            general = data.get("General", {})
-            
-            dividend_share = highlights.get("DividendShare")
-            dividend_yield = highlights.get("DividendYield")
-            
-            # Only return if we have actual dividend data
-            if dividend_share and dividend_share > 0:
-                return {
-                    "dividend_per_share": dividend_share,
-                    "dividend_yield": round(dividend_yield * 100, 2) if dividend_yield else None,
-                    "name": general.get("Name", symbol),
-                    "sector": general.get("Sector", "Unknown"),
-                    "source": "EODHD LIVE"
-                }
-            
+        async with httpx.AsyncClient(timeout=10) as client:
+            # PRIMARY: Use dividend history endpoint — sum last 12M
+            from datetime import timedelta
+            from_date = (datetime.now(timezone.utc) - timedelta(days=380)).strftime("%Y-%m-%d")
+            div_url = f"{EODHD_BASE}/div/{symbol}.RO"
+            div_r = await client.get(div_url, params={"api_token": EODHD_API_KEY, "fmt": "json", "from": from_date})
+
+            if div_r.status_code == 200:
+                div_data = div_r.json()
+                if isinstance(div_data, list) and div_data:
+                    valid = [d for d in div_data if float(d.get("unadjustedValue", 0)) > 0.0001]
+                    if valid:
+                        # Sum of all dividends paid in last 12 months = trailing annual dividend
+                        trailing_annual = sum(float(d["unadjustedValue"]) for d in valid)
+                        latest = valid[-1]  # for ex-date
+
+                        # Try to get name from fundamentals
+                        fund_url = f"{EODHD_BASE}/fundamentals/{symbol}.RO"
+                        fund_r = await client.get(fund_url, params={"api_token": EODHD_API_KEY, "fmt": "json", "filter": "General,Highlights"})
+                        name = symbol
+                        sector = "Unknown"
+                        div_yield = None
+
+                        if fund_r.status_code == 200:
+                            fd = fund_r.json()
+                            gen = fd.get("General", {})
+                            hl = fd.get("Highlights", {})
+                            name = gen.get("Name", symbol)
+                            sector = gen.get("Sector", "Unknown")
+                            div_yield = hl.get("DividendYield")
+
+                        return {
+                            "dividend_per_share": round(trailing_annual, 4),
+                            "dividend_yield": round(div_yield * 100, 2) if div_yield else None,
+                            "name": name,
+                            "sector": sector,
+                            "ex_date": latest.get("date"),
+                            "payments_last_12m": len(valid),
+                            "source": "EODHD DIV HISTORY (sum 12M)"
+                        }
+
+            # FALLBACK: Fundamentals Highlights
+            fund_url = f"{EODHD_BASE}/fundamentals/{symbol}.RO"
+            fund_r = await client.get(fund_url, params={"api_token": EODHD_API_KEY, "fmt": "json", "filter": "General,Highlights"})
+            if fund_r.status_code == 200:
+                fd = fund_r.json()
+                hl = fd.get("Highlights", {})
+                gen = fd.get("General", {})
+                dividend_share = hl.get("DividendShare", 0) or 0
+                if dividend_share > 0:
+                    return {
+                        "dividend_per_share": float(dividend_share),
+                        "dividend_yield": round(hl.get("DividendYield", 0) * 100, 2),
+                        "name": gen.get("Name", symbol),
+                        "sector": gen.get("Sector", "Unknown"),
+                        "source": "EODHD FUNDAMENTALS"
+                    }
+
             return None
-            
+
     except Exception as e:
         logger.warning(f"Error fetching dividend data for {symbol}: {e}")
         return None
@@ -315,9 +469,11 @@ async def calculate_dividends(request: CalculateRequest):
         if current_price <= 0:
             continue
         
-        # Calculate dividends
+        # ── Calculate dividends with Romanian fiscal rules ──────────────
+        # 2026: 16% withholding tax (Legea 141/2025, dividende distribuite din 01.01.2026)
+        TAX_RATE = 0.16
         annual_dividend = shares * dividend_per_share
-        tax_amount = annual_dividend * 0.16  # 16% tax on dividends in Romania
+        tax_amount = annual_dividend * TAX_RATE
         net_dividend = annual_dividend - tax_amount
         div_yield = (dividend_per_share / current_price * 100)
         
@@ -348,6 +504,11 @@ async def calculate_dividends(request: CalculateRequest):
     # Calculate portfolio metrics
     portfolio_yield = (total_annual_dividend / total_investment * 100) if total_investment > 0 else 0
     
+    # Calculate CASS (health insurance) on total dividend income
+    cass_info = calculate_cass_2026(total_annual_dividend)
+    cass_amount = cass_info["cass_datorat"]
+    total_net_after_cass = total_net_dividend - cass_amount
+    
     # Generate projections (simplified - uses average growth rate)
     projections = []
     growth_rate = request.dividend_growth_rate or 3.0  # Default 3% annual dividend growth (conservative)
@@ -358,11 +519,16 @@ async def calculate_dividends(request: CalculateRequest):
         
         # Apply dividend growth to total
         year_gross = total_annual_dividend * (1 + growth_rate/100) ** (year - 1)
-        year_net = year_gross * 0.84  # After 16% tax
-        cumulative_net += year_net
+        year_net = year_gross * 0.84  # After 16% impozit dividende
+        year_cass = calculate_cass_2026(year_gross)["cass_datorat"]
+        year_net_final = year_net - year_cass
+        cumulative_net += year_net_final
         
         year_data["gross_dividend"] = round(year_gross, 2)
+        year_data["impozit_16pct"] = round(year_gross * 0.16, 2)
         year_data["net_dividend"] = round(year_net, 2)
+        year_data["cass"] = round(year_cass, 2)
+        year_data["net_final_dupa_cass"] = round(year_net_final, 2)
         year_data["cumulative_net"] = round(cumulative_net, 2)
         year_data["yield_on_cost"] = round(year_gross / total_investment * 100, 2) if total_investment > 0 else 0
         
@@ -373,19 +539,33 @@ async def calculate_dividends(request: CalculateRequest):
         "summary": {
             "total_investment": round(total_investment, 2),
             "total_annual_dividend_gross": round(total_annual_dividend, 2),
+            "impozit_dividende_16pct": round(total_annual_dividend * 0.16, 2),
             "total_annual_dividend_net": round(total_net_dividend, 2),
-            "total_monthly_income_net": round(total_net_dividend / 12, 2),
+            "cass": {
+                "datorat": cass_info["datoreaza_cass"],
+                "plafon": cass_info["plafon_aplicat"],
+                "suma": cass_amount,
+                "detaliu": cass_info["detaliu"],
+            },
+            "total_net_dupa_cass": round(total_net_after_cass, 2),
+            "total_monthly_income_net": round(total_net_after_cass / 12, 2),
             "portfolio_yield": round(portfolio_yield, 2),
-            "tax_paid_annually": round(total_annual_dividend * 0.16, 2),
         },
         "projections": projections,
         "settings": {
             "reinvest_dividends": request.reinvest_dividends,
             "dividend_growth_rate": growth_rate,
             "years_projected": request.years_projection,
-            "tax_rate": 16.0,
+            "tax_rate_2026": 16.0,
+            "cass_rate_2026": 10.0,
+            "salariu_minim_2026": SALARIU_MINIM_2026,
         },
-        "data_source": "EODHD LIVE + Fallback confirmat 2024",
+        "tax_info": {
+            "impozit_dividende": "16% (reținut la sursă din 01.01.2026 — Legea 141/2025)",
+            "cass": f"10% pe plafon {cass_info['plafon_aplicat']} dacă venituri ≥ {6*SALARIU_MINIM_2026:,.0f} RON/an",
+            "baza_legala": "Codul Fiscal 2026 — art. 97 (impozit dividende) + art. 156 (CASS)"
+        },
+        "data_source": "EODHD Dividend History + Fallback confirmat BVB 2026",
         "disclaimer": "Dividendele afișate sunt ultimele distribuite. Dividendele viitoare pot varia și depind de deciziile AGA."
     }
 
