@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -191,6 +191,9 @@ export default function ScreenerProPage() {
   const [activePreset, setActivePreset] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'signal_score', direction: 'desc' });
   const [expandedStock, setExpandedStock] = useState(null);
+  const [isRefreshingBackground, setIsRefreshingBackground] = useState(false);
+  const [cacheAge, setCacheAge] = useState(null);
+  const pollingRef = useRef(null);
   
   // Filters state
   const [filters, setFilters] = useState({
@@ -205,6 +208,41 @@ export default function ScreenerProPage() {
   });
   
   const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
+
+  // Funcție de polling — verifică la fiecare 8s dacă cache-ul e gata
+  const startPolling = useCallback((currentToken) => {
+    if (pollingRef.current) return; // deja în polling
+    pollingRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/screener-pro/scan`, {
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if ((data.stocks || []).length > 0 && !data.cache_refreshing) {
+            setStocks(data.stocks || []);
+            setScanTime('0.3');
+            setCacheAge(data.scanned_at);
+            setIsRefreshingBackground(false);
+            clearInterval(pollingRef.current);
+            pollingRef.current = null;
+            toast.success(`${data.count} acțiuni actualizate automat`);
+          }
+        }
+      } catch (err) {
+        // ignore polling errors
+      }
+    }, 8000);
+  }, []);
+
+  // Cleanup polling la unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+      }
+    };
+  }, []);
   
   // Fetch presets
   useEffect(() => {
@@ -238,16 +276,25 @@ export default function ScreenerProPage() {
         const data = await scanRes.json();
         setStocks(data.stocks || []);
         setScanTime(((Date.now() - startTime) / 1000).toFixed(1));
+        setCacheAge(data.scanned_at);
         
         if (data.cache_refreshing && (data.stocks || []).length === 0) {
-          toast.info('Se scanează în background... Reîncarcă în 2-3 minute pentru rezultate complete.');
+          // Cache gol — pornim polling automat, userul nu trebuie să facă nimic
+          setIsRefreshingBackground(true);
+          startPolling(token);
+          toast.info('Se pregătesc datele... Vei vedea rezultatele automat în câteva secunde.');
+        } else if (data.cache_refreshing) {
+          // Date vechi disponibile, refresh în background
+          setIsRefreshingBackground(true);
+          startPolling(token);
+          toast.success(`${data.count} acțiuni (actualizare automată în curs)`);
         } else if (data.from_cache) {
-          const cacheAge = data.scanned_at 
-            ? `(actualizat ${new Date(data.scanned_at).toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'})})`
+          const timeStr = data.scanned_at
+            ? new Date(data.scanned_at).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })
             : '';
-          toast.success(`${data.count} acțiuni din cache ${cacheAge}`);
+          toast.success(`${data.count} acțiuni din cache (${timeStr})`);
         } else {
-          toast.success(`Scanare completă: ${data.count} acțiuni analizate`);
+          toast.success(`Scanare completă: ${data.count} acțiuni`);
         }
       } else {
         const err = await scanRes.json();
@@ -265,7 +312,7 @@ export default function ScreenerProPage() {
       setLoading(false);
       setActivePreset(null);
     }
-  }, [token, isPro]);
+  }, [token, isPro, startPolling]);
   
   // Apply preset
   const applyPreset = async (preset) => {
@@ -402,7 +449,7 @@ export default function ScreenerProPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={runFullScan} disabled={loading} className="bg-gradient-to-r from-amber-500 to-orange-500">
+            <Button onClick={runFullScan} disabled={loading} className="bg-gradient-to-r from-amber-500 to-orange-500" data-testid="screener-scan-btn">
               {loading ? (
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
               ) : (
@@ -418,6 +465,14 @@ export default function ScreenerProPage() {
             )}
           </div>
         </div>
+
+        {/* Banner refresh background */}
+        {isRefreshingBackground && (
+          <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-700 dark:text-blue-300" data-testid="screener-refresh-banner">
+            <RefreshCw className="w-4 h-4 animate-spin flex-shrink-0" />
+            <span>Se actualizează datele în background — tabelul se va umple automat...</span>
+          </div>
+        )}
         
         {/* Signal Summary */}
         {signalSummary && (
@@ -463,11 +518,17 @@ export default function ScreenerProPage() {
         ) : stocks.length > 0 ? (
           <Card>
             <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-2">
                 <CardTitle>
                   Rezultate ({stocks.length} acțiuni)
                   {scanTime && <span className="text-sm font-normal text-muted-foreground ml-2">în {scanTime}s</span>}
                 </CardTitle>
+                {cacheAge && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    {isRefreshingBackground && <RefreshCw className="w-3 h-3 animate-spin" />}
+                    Actualizat la {new Date(cacheAge).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                )}
               </div>
             </CardHeader>
             <CardContent className="p-0">

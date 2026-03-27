@@ -85,6 +85,20 @@ async def lifespan(app: FastAPI):
     logger.info("🚀 Starting FinRomania API...")
     await connect_to_mongodb()
     start_scheduler()
+    
+    # Warmup Screener PRO cache la pornire dacă nu există sau e > 45 min
+    import asyncio as _asyncio
+    async def _warmup_screener():
+        try:
+            from routes.screener_pro import get_scan_cache, run_scan_and_cache
+            existing = await get_scan_cache(max_age_minutes=45)
+            if not existing:
+                logger.info("🔄 Warming up Screener PRO cache on startup...")
+                await run_scan_and_cache()
+        except Exception as e:
+            logger.warning(f"Screener warmup failed (non-critical): {e}")
+    
+    _asyncio.create_task(_warmup_screener())
     logger.info("✅ FinRomania API started successfully!")
     yield
     # Shutdown
