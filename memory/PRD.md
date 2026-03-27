@@ -145,7 +145,7 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [ ] P2: Mobile responsiveness issues
 - [ ] P2: Slow page load times
 
-## Completed (March 27, 2026 — BVB.ro Scraping Session)
+## Completed (March 27, 2026 — BVB.ro Scraping + Istoric Dividende PRO)
 - [x] **MAJOR: BVB.ro Dividend Scraping** — Official dividend data from BVB.ro replaces hardcoded/estimated data
   - Scraper: `/app/backend/scrapers/bvb_dividend_scraper.py`
   - 99 dividend records + 1,411 calendar events from BVB.ro
@@ -159,6 +159,14 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] **Updated Dividend Calendar** — Official BVB.ro data instead of hardcoded estimates
   - Dividend Kings, CSV export all use BVB.ro data
   - Calendar events from BVB.ro financial calendar
+- [x] **NEW: Istoric Dividende PRO** — Tab nou în Calculator Dividende (PRO-only)
+  - Dividend Score (0-100) cu breakdown: Stabilitate 40% + Creștere 30% + Randament 30%
+  - CAGR pe 5-8 ani de date (BVB.ro + EODHD deep history)
+  - Clasament complet 43 acțiuni BVB sortate după Dividend Score
+  - Analiză detaliată per acțiune cu grafic bar chart pe ani (Recharts)
+  - Score badges cu culori gradient (verde=Excelent, albastru=FoarteBun, etc.)
+  - MongoDB cache pentru clasament (se actualizează la fiecare 6h)
+  - PRO paywall cu "Upgrade la PRO" pentru utilizatori free
 
 ## Completed (March 26, 2026 Session)
 - [x] **Screener PRO** with LIVE technical indicators + fundamentals from EODHD
@@ -196,6 +204,8 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - GET /api/dividend-calculator/stocks - All dividend-paying BVB stocks (BVB.ro source)
 - POST /api/dividend-calculator/calculate - Calculate dividends for portfolio
 - GET /api/auth/demo-login?secret=xxx - Demo login for automated testing
+- **GET /api/bvb-dividends/analysis/{symbol}** - Full dividend analysis with Score, CAGR, chart data
+- **GET /api/bvb-dividends/rankings** - All stocks ranked by Dividend Score (cached)
 - **GET /api/bvb-dividends/all** - All scraped BVB.ro dividend records
 - **GET /api/bvb-dividends/latest** - Latest dividend per symbol
 - **GET /api/bvb-dividends/upcoming** - Upcoming dividends (ex_date >= today)
