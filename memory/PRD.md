@@ -145,6 +145,26 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [ ] P2: Mobile responsiveness issues
 - [ ] P2: Slow page load times
 
+## Completed (March 27, 2026 — Acuratețe Date Financiare Screener PRO)
+- [x] **MAJOR: Date financiare 100% reale, fără estimări (Screener PRO)**
+  - Dividend Yield: STRICT din dividende confirmate BVB.ro (nu EODHD estimate)
+    - Badge "BVB.ro" verde în UI, tooltip "Confirmat BVB.ro (dividende reale)"
+    - 41/87 acțiuni cu yield confirmat, 46 afișează N/A
+  - P/E: null automat dacă EPS ≤ 0 (companie cu pierderi → P/E invalid)
+    - DIGI: EPS=-1.77 → P/E=null (afișat '-' în UI)
+    - M: EPS=-0.02 (manual override) → P/E=null
+  - ROE: STRICT valoarea raportată EODHD (include și negative), fără estimări din profit_margin
+    - 18/87 acțiuni cu ROE negativ (raportat corect, nu eliminat)
+  - Debt/Equity: calculat din bilanțul EODHD (shortLongTermDebtTotal / totalStockholderEquity)
+    - TLV=8.97, SNP=0.59, BRD=8.27, SNG=0.21 - exact cu datele oficiale
+    - 61/87 acțiuni cu D/E disponibil
+  - Coloană D/E nouă în tabelul Screener PRO (sortabilă, culoare portocalie dacă > 2)
+  - Cache zilnic fundamentale: MongoDB `fundamentals_daily_cache` (83 documente)
+    - Job nou în scheduler la 8:00 AM Bucharest: refresh P/E, ROE, EPS, D/E
+    - Screener scan folosește cache zilnic → nu mai apelează EODHD live pentru fundamentale
+  - Endpoint nou: POST /api/screener-pro/refresh-fundamentals (trigger manual)
+  - Filter /api/screener-pro/filter funcționează corect cu max_debt_equity
+
 ## Completed (March 27, 2026 — BVB.ro Scraping + Istoric Dividende PRO)
 - [x] **MAJOR: BVB.ro Dividend Scraping** — Official dividend data from BVB.ro replaces hardcoded/estimated data
   - Scraper: `/app/backend/scrapers/bvb_dividend_scraper.py`
