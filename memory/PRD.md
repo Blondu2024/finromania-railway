@@ -222,8 +222,25 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - [x] **Daily Summary at 18:05** - Changed from 18:10 to 18:05 (right after BVB closes at 18:00)
 - [x] **Increased Email Limit** - From 95/day to 500/day (Resend $20 plan = 10k/month)
 
-## Upcoming Tasks
-- [ ] P1: Verify Resend domain (pending user DNS records)
+## Completed (March 27, 2026 — Portofoliu BVB PRO — Faza 1)
+- [x] **Portofoliu BVB PRO — Faza 1 (Fundație)** — Exclusiv PRO, date reale EODHD
+  - Backend complet rescris (`portfolio_bvb.py`) — eliminat sistemul "3 Straturi"
+  - CRUD complet: Add / Update / Delete / Export CSV
+  - Prețuri live BVB din EODHD (real-time, fără improvizații)
+  - RSI(14) per acțiune cu semnale colorate: SUPRAVÂNDUT/FAVORABIL/NEUTRU/RIDICAT/SUPRACUMPĂRAT
+  - P&L calculat în RON și % per poziție + P&L total + P&L azi
+  - Dashboard profesional (Bloomberg-style): 4 metric cards + tabel compact
+  - PRO paywall pentru utilizatori non-PRO
+  - Validare: simbol inexistent pe BVB → 404; duplicat → 409
+  - MongoDB collection: `portfolio_bvb_pro`
+  - Testat: 36/36 (100%) backend + frontend
+
+## Upcoming (Portofoliu BVB PRO — Fazele Următoare)
+- [ ] Faza 2: Grafic evoluție + alocare sector + fundamentale per poziție
+- [ ] Faza 3: AI Advisor per portofoliu
+- [ ] Faza 4: Dividende + știri filtrate per simboluri
+
+
 - [ ] P1: PRO Live Chat (community feature)
 - [ ] P2: Get expert feedback on Fiscal Simulator
 
