@@ -141,6 +141,20 @@ async def scrape_bvb_dividends_job():
         logger.error(f"❌ [JOB] Error scraping BVB.ro: {e}")
 
 
+async def refresh_fundamentals_cache_job():
+    """
+    Job: Actualizează cache-ul zilnic de fundamentale (P/E, ROE, EPS, D/E din EODHD).
+    Date reale, fără estimări. Se rulează o dată pe zi la 8:00 AM.
+    """
+    try:
+        from routes.screener_pro import refresh_fundamentals_daily_cache
+        logger.info("🔄 [JOB] Refreshing daily fundamentals cache (P/E, ROE, EPS, D/E)...")
+        await refresh_fundamentals_daily_cache()
+        logger.info("✅ [JOB] Daily fundamentals cache refreshed")
+    except Exception as e:
+        logger.error(f"❌ [JOB] Error refreshing fundamentals cache: {e}")
+
+
 def start_scheduler():
     """Start all scheduled jobs"""
     try:
@@ -233,7 +247,17 @@ def start_scheduler():
             name='Scrape BVB.ro Dividends',
             replace_existing=True
         )
-        
+
+        # Job 11: Refresh daily fundamentals cache (daily at 8:00 AM Bucharest time)
+        # Salvează P/E, ROE, EPS, D/E pentru toate acțiunile BVB (date reale, fără estimări)
+        scheduler.add_job(
+            refresh_fundamentals_cache_job,
+            trigger=CronTrigger(hour=8, minute=0, timezone='Europe/Bucharest'),
+            id='refresh_fundamentals_cache',
+            name='Refresh Daily Fundamentals Cache',
+            replace_existing=True
+        )
+
         # Start scheduler
         scheduler.start()
         logger.info("✅ Scheduler started with all jobs!")
@@ -246,6 +270,7 @@ def start_scheduler():
         logger.info("   • Price alerts: every 5 min")
         logger.info("   • Daily summary email: daily at 18:05 (Europe/Bucharest)")
         logger.info("   • BVB.ro dividends scrape: daily at 7:00 AM (Europe/Bucharest)")
+        logger.info("   • Fundamentals cache refresh: daily at 8:00 AM (Europe/Bucharest)")
         
         # DON'T run jobs immediately at startup - let the scheduler handle them
         # This prevents blocking the application startup

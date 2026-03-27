@@ -1,0 +1,81 @@
+{
+  "summary": "Tested Screener PRO financial data accuracy features for FinRomania 2.0. All 27 backend tests passed (100%). Frontend UI fully verified with PRO login. Key validations: dividend_yield STRICT from BVB.ro, P/E null when EPS ≤ 0, ROE reported values (including negative), D/E from balance sheet, filter by D/E, refresh fundamentals, and presets all working correctly.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "✅ GET /api/auth/demo-login?secret=finromania-demo-2026 — returns PRO session_token",
+    "✅ GET /api/screener-pro/scan — returns 200 with 87 stocks",
+    "✅ yield_source field present in ALL 87 stocks",
+    "✅ yield_source values ONLY 'BVB.ro (confirmat)' OR 'N/A' — no EODHD estimates",
+    "✅ 41 stocks with BVB-confirmed dividend_yield (all positive), 46 with null/N/A",
+    "✅ Stocks with yield_source='N/A' all have dividend_yield=null",
+    "✅ P/E is null for ALL stocks with EPS ≤ 0 (100% compliant)",
+    "✅ DIGI: EPS=-1.77, P/E correctly null",
+    "✅ M: EPS=-0.02 (manual override), P/E correctly null",
+    "✅ All P/E values in valid range (0-500), no negative P/E",
+    "✅ ROE present in 82 stocks, 18 with negative ROE (reported correctly, not estimated)",
+    "✅ D/E available for TLV=8.97 (exact), SNP=0.59 (exact), BRD=8.27 (exact)",
+    "✅ POST /api/screener-pro/filter max_debt_equity=2 — returns 50 stocks, all D/E ≤ 2",
+    "✅ Filter correctly excludes stocks with null D/E",
+    "✅ Filter min_dividend_yield=1.0 — all 38 returned stocks have BVB-confirmed yield",
+    "✅ Filter response has stocks, count, total_scanned, filters_applied",
+    "✅ POST /api/screener-pro/refresh-fundamentals — returns 200 with status=running",
+    "✅ Refresh fundamentals requires auth (401 without token)",
+    "✅ GET /api/screener-pro/presets — returns 200 with 6 presets",
+    "✅ All 6 preset IDs present: oversold_quality, momentum_play, dividend_hunters, value_play, strong_buy, contrarian",
+    "✅ Scan/Filter require auth (401 without token)",
+    "✅ Frontend: Div Yield column visible in Screener PRO table",
+    "✅ Frontend: D/E column visible in Screener PRO table",
+    "✅ Frontend: Div Yield shows green value (e.g., 6.62%) with tooltip 'Confirmat BVB.ro (dividende reale)'",
+    "✅ Frontend: CFH shows N/A for Div Yield (no BVB-confirmed dividends)",
+    "✅ Frontend: D/E for TLV=8.97 shown in ORANGE text (text-orange-500, rgb(249,115,22)) — > 2",
+    "✅ Frontend: DIGI P/E shows '-' (null, EPS=-1.77), ROE shows -2.67% (negative reported)",
+    "✅ Frontend: Expanded TLV row shows 'Div Yield: 6.62% BVB.ro' badge and 'Dat/Cap (D/E): 8.97' in orange",
+    "✅ Scheduler Job 11: refresh_fundamentals_cache_job defined at 8:00 AM Europe/Bucharest"
+  ],
+
+  "failed_tests": [],
+
+  "test_report_links": [
+    "/app/backend/tests/test_screener_pro.py",
+    "/app/test_reports/pytest/pytest_screener_pro.xml"
+  ],
+
+  "action_items": [],
+
+  "critical_code_review_comments": [
+    "BIO shows D/E=0.00 — this could be a near-zero debt value (legitimate) or a missing null check. Consider null-ing D/E if value < 0.001 to avoid confusion",
+    "MANUAL_OVERRIDES dict in fetch_fundamentals() is a fragile approach — consider moving to MongoDB config or .env for easier management without code deploys",
+    "The _extract_debt_equity function uses totalLiab (total liabilities) as fallback for debt — total liabilities includes operational liabilities, which inflates D/E. For banking stocks (TLV, BRD), D/E of 8+ is expected but for others this may be misleading. Current implementation acceptable for now.",
+    "screener_pro.py is 1002 lines — at the boundary of the 700-line limit; consider splitting into screener_fundamentals.py and screener_scan.py",
+    "Cache duration is 45 min for screener, 24h for fundamentals — these are documented and working correctly"
+  ],
+
+  "updated_files": [
+    "/app/backend/tests/test_screener_pro.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% (27/27 tests passed)",
+    "frontend": "100% (all UI checks passed)"
+  },
+
+  "test_credentials": "Demo PRO: GET /api/auth/demo-login?secret=finromania-demo-2026 → session_token. LocalStorage keys: finromania_token, finromania_user",
+
+  "seed_data_creation": "None — used existing screener_pro_cache (87 stocks) and fundamentals_daily_cache (83 documents)",
+
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "Screener PRO fully tested. Key validations: (1) dividend_yield is STRICT from BVB.ro — yield_source='BVB.ro (confirmat)' or 'N/A'. 41/87 stocks have BVB dividends, 46 have null. (2) P/E is null when EPS ≤ 0 — DIGI (EPS=-1.77) and M (EPS=-0.02 manual override) both show null P/E. (3) ROE includes negatives — 18/82 stocks with ROE. (4) D/E exact matches: TLV=8.97, SNP=0.59, BRD=8.27. (5) Auth: use localStorage keys finromania_token/finromania_user. (6) All 6 presets working. (7) /filter endpoint correctly excludes null D/E stocks."
+}

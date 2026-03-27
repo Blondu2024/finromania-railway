@@ -364,7 +364,7 @@ export default function ScreenerProPage() {
   
   // Export to CSV
   const exportCSV = () => {
-    const headers = ['Simbol', 'Nume', 'Preț (RON)', 'Variație %', 'RSI', 'MACD', 'P/E', 'ROE %', 'Semnal', 'Scor'];
+    const headers = ['Simbol', 'Nume', 'Preț (RON)', 'Variație %', 'RSI', 'MACD', 'P/E', 'ROE %', 'Div Yield % (BVB.ro)', 'D/E', 'Semnal', 'Scor'];
     const rows = sortedStocks.map(s => [
       s.symbol,
       `"${(s.name || '').replace(/"/g, '""')}"`,
@@ -374,6 +374,8 @@ export default function ScreenerProPage() {
       s.macd ?? '',
       s.pe_ratio ?? '',
       s.roe ?? '',
+      s.dividend_yield ?? 'N/A',
+      s.debt_equity ?? 'N/A',
       s.signal_text ?? '',
       s.signal_score ?? ''
     ]);
@@ -553,6 +555,12 @@ export default function ScreenerProPage() {
                       <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('roe')}>
                         ROE% <ArrowUpDown className="w-3 h-3 inline" />
                       </th>
+                      <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('dividend_yield')}>
+                        Div Yield <ArrowUpDown className="w-3 h-3 inline" />
+                      </th>
+                      <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('debt_equity')}>
+                        D/E <ArrowUpDown className="w-3 h-3 inline" />
+                      </th>
                       <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('signal_score')}>
                         Semnal <ArrowUpDown className="w-3 h-3 inline" />
                       </th>
@@ -591,6 +599,31 @@ export default function ScreenerProPage() {
                             <IndicatorCell value={stock.roe} type="roe" />
                           </td>
                           <td className="p-3 text-right">
+                            {stock.dividend_yield !== null && stock.dividend_yield !== undefined ? (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <span className="text-green-600 font-medium">{stock.dividend_yield.toFixed(2)}%</span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-xs">Confirmat BVB.ro (dividende reale)</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ) : (
+                              <span className="text-gray-400 text-xs">N/A</span>
+                            )}
+                          </td>
+                          <td className="p-3 text-right">
+                            {stock.debt_equity !== null && stock.debt_equity !== undefined ? (
+                              <span className={stock.debt_equity > 2 ? 'text-orange-500' : stock.debt_equity > 1 ? 'text-yellow-600' : 'text-gray-700 dark:text-gray-300'}>
+                                {stock.debt_equity.toFixed(2)}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 text-xs">N/A</span>
+                            )}
+                          </td>
+                          <td className="p-3 text-right">
                             <SignalBadge signal={stock.signal} score={stock.signal_score} />
                           </td>
                           <td className="p-3 text-center">
@@ -612,7 +645,7 @@ export default function ScreenerProPage() {
                               animate={{ opacity: 1, height: 'auto' }}
                               exit={{ opacity: 0, height: 0 }}
                             >
-                              <td colSpan={9} className="p-4 bg-muted/20">
+                              <td colSpan={11} className="p-4 bg-muted/20">
                                 <div className="grid md:grid-cols-3 gap-4">
                                   {/* Technicals */}
                                   <div className="space-y-2">
@@ -636,12 +669,32 @@ export default function ScreenerProPage() {
                                       <PieChart className="w-4 h-4" /> Fundamentale
                                     </h4>
                                     <div className="text-sm space-y-1">
-                                      <p>P/E Ratio: <span className="font-mono">{stock.pe_ratio?.toFixed(2) || '-'}</span></p>
-                                      <p>P/B Ratio: <span className="font-mono">{stock.pb_ratio?.toFixed(2) || '-'}</span></p>
-                                      <p>ROE: <span className="font-mono">{stock.roe?.toFixed(2) || '-'}%</span></p>
-                                      <p>EPS: <span className="font-mono">{stock.eps?.toFixed(2) || '-'}</span></p>
-                                      <p>Div Yield: <span className="font-mono">{stock.dividend_yield?.toFixed(2) || '-'}%</span></p>
-                                      <p>Market Cap: <span className="font-mono">{stock.market_cap ? (stock.market_cap/1e9).toFixed(2) + 'B' : '-'}</span></p>
+                                      <p>P/E Ratio: <span className="font-mono">{stock.pe_ratio?.toFixed(2) || <span className="text-gray-400">N/A</span>}</span></p>
+                                      <p>P/B Ratio: <span className="font-mono">{stock.pb_ratio?.toFixed(2) || <span className="text-gray-400">N/A</span>}</span></p>
+                                      <p>ROE: <span className="font-mono">{stock.roe !== null && stock.roe !== undefined ? `${stock.roe.toFixed(2)}%` : <span className="text-gray-400">N/A</span>}</span></p>
+                                      <p>EPS: <span className="font-mono">{stock.eps !== null && stock.eps !== undefined ? stock.eps.toFixed(2) : <span className="text-gray-400">N/A</span>}</span></p>
+                                      <p>
+                                        Div Yield:{' '}
+                                        {stock.dividend_yield !== null && stock.dividend_yield !== undefined ? (
+                                          <span>
+                                            <span className="font-mono text-green-600">{stock.dividend_yield.toFixed(2)}%</span>
+                                            <span className="ml-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-1.5 py-0.5 rounded font-normal">BVB.ro</span>
+                                          </span>
+                                        ) : (
+                                          <span className="text-gray-400 font-mono">N/A</span>
+                                        )}
+                                      </p>
+                                      <p>
+                                        Dat/Cap (D/E):{' '}
+                                        {stock.debt_equity !== null && stock.debt_equity !== undefined ? (
+                                          <span className={`font-mono ${stock.debt_equity > 2 ? 'text-orange-500' : ''}`}>
+                                            {stock.debt_equity.toFixed(2)}
+                                          </span>
+                                        ) : (
+                                          <span className="text-gray-400 font-mono">N/A</span>
+                                        )}
+                                      </p>
+                                      <p>Market Cap: <span className="font-mono">{stock.market_cap ? (stock.market_cap/1e9).toFixed(2) + 'B' : <span className="text-gray-400">N/A</span>}</span></p>
                                     </div>
                                   </div>
                                   
