@@ -1,506 +1,377 @@
 """
-Portofoliu BVB cu sistem "3 Straturi" (3 Tiers)
-ADAPTAT pentru FinRomania 2.0 Strategic Plan
-
-Tierele:
-- Începător: Acțiuni BET-index + tracking dividende
-- Mediu: + Indicatori tehnici (RSI, MA) + diversificare AI
-- Expert: + Analiză fundamentală completă (bilanț, cash flow)
+Portofoliu BVB PRO — Exclusiv pentru utilizatori PRO
+Date reale din EODHD, fără improvizații sau estimări.
 """
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict
 from datetime import datetime, timezone
+import asyncio
 import logging
 import os
 import httpx
+
 from config.database import get_database
 from routes.auth import require_auth
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/portfolio-bvb", tags=["portfolio-bvb"])
+router = APIRouter(prefix="/portfolio-bvb", tags=["Portfolio BVB PRO"])
 
 EODHD_API_KEY = os.environ.get("EODHD_API_KEY")
-EODHD_BASE_URL = "https://eodhd.com/api"
-
-# BET Index Stocks (pentru nivel Începător)
-BET_STOCKS = [
-    "TLV",  # Banca Transilvania
-    "H2O",  # Nuclearelectrica
-    "SNP",  # OMV Petrom
-    "FP",   # Fondul Proprietatea
-    "BRD",  # BRD
-    "SNG",  # Romgaz
-    "SNN",  # Nuclearelectrica
-    "TGN",  # Transgaz
-    "EL",   # Electrica
-    "ONE"   # One United
-]
-
-# Experience Levels Configuration
-LEVEL_CONFIG = {
-    "beginner": {
-        "name": "Începător",
-        "allowed_stocks": BET_STOCKS,
-        "features": [
-            "Doar acțiuni sigure din indicele BET",
-            "Tracking dividende",
-            "Preț și variație",
-            "Randament dividend"
-        ],
-        "indicators": ["price", "volume", "dividend_yield"]
-    },
-    "intermediate": {
-        "name": "Mediu",
-        "allowed_stocks": "ALL_BVB",
-        "features": [
-            "Toate acțiunile BVB",
-            "Indicatori tehnici (RSI, MA, MACD)",
-            "Analiză diversificare AI",
-            "Calendar dividende",
-            "P/E Ratio"
-        ],
-        "indicators": ["price", "volume", "rsi", "ma", "macd", "dividend_yield", "pe_ratio"]
-    },
-    "advanced": {
-        "name": "Expert",
-        "allowed_stocks": "ALL_BVB",
-        "features": [
-            "Toate acțiunile BVB",
-            "Analiză fundamentală completă",
-            "Date bilanț (active, datorii)",
-            "Cash Flow Analysis",
-            "P/E, P/B, ROE, Debt/Equity",
-            "AI trasează linii pe grafice"
-        ],
-        "indicators": ["all"]
-    }
-}
+EODHD_BASE = "https://eodhd.com/api"
 
 
-class PortfolioPosition(BaseModel):
-    symbol: str
-    shares: float
-    avg_purchase_price: float
-    current_price: float
-    total_value: float
-    profit_loss: float
-    profit_loss_percent: float
-    dividend_yield: Optional[float] = None
-    technical_indicators: Optional[Dict] = None
-    fundamentals: Optional[Dict] = None
-    added_date: str
-
+# ─────────────────────────────────────────
+# MODELS
+# ─────────────────────────────────────────
 
 class AddPositionRequest(BaseModel):
     symbol: str
-    shares: float = Field(gt=0)
-    purchase_price: float = Field(gt=0)
+    shares: float = Field(gt=0, description="Număr acțiuni")
+    purchase_price: float = Field(gt=0, description="Preț mediu de intrare (RON)")
+    purchase_date: Optional[str] = None   # YYYY-MM-DD
+    notes: Optional[str] = None
 
 
 class UpdatePositionRequest(BaseModel):
     shares: float = Field(gt=0)
-    avg_purchase_price: float = Field(gt=0)
+    purchase_price: float = Field(gt=0)
+    purchase_date: Optional[str] = None
+    notes: Optional[str] = None
 
 
-class PortfolioSummary(BaseModel):
-    total_value: float
-    total_invested: float
-    total_profit_loss: float
-    total_profit_loss_percent: float
-    positions_count: int
-    level: str
-    level_name: str
-    diversification_score: Optional[float] = None
-    dividend_income_annual: Optional[float] = None
+# ─────────────────────────────────────────
+# EODHD HELPERS — date reale, fără fallback inventat
+# ─────────────────────────────────────────
 
-
-async def fetch_current_price(symbol: str) -> Dict:
-    """Fetch current price from EODHD"""
+async def _get_live_price(client: httpx.AsyncClient, symbol: str) -> Dict:
+    """Preț live din EODHD. Dacă nu există → null (nu inventăm)."""
     if not EODHD_API_KEY:
-        return {"price": 0, "change_percent": 0}
-    
+        return {"price": None, "change": None, "change_percent": None, "volume": None}
     try:
-        async with httpx.AsyncClient() as client:
-            url = f"{EODHD_BASE_URL}/real-time/{symbol}.RO"
-            params = {"api_token": EODHD_API_KEY, "fmt": "json"}
-            response = await client.get(url, params=params, timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                return {
-                    "price": data.get("close", 0),
-                    "change_percent": data.get("change_p", 0),
-                    "volume": data.get("volume", 0)
-                }
+        r = await client.get(
+            f"{EODHD_BASE}/real-time/{symbol}.RO",
+            params={"api_token": EODHD_API_KEY, "fmt": "json"},
+            timeout=10,
+        )
+        if r.status_code == 200:
+            d = r.json()
+            price = d.get("close") or d.get("previousClose")
+            return {
+                "price": float(price) if price else None,
+                "change": d.get("change"),
+                "change_percent": d.get("change_p"),
+                "volume": d.get("volume"),
+            }
     except Exception as e:
-        logger.error(f"Error fetching price for {symbol}: {e}")
-    return {"price": 0, "change_percent": 0}
+        logger.warning(f"[PORTFOLIO] Live price error for {symbol}: {e}")
+    return {"price": None, "change": None, "change_percent": None, "volume": None}
 
 
-async def fetch_technical_indicators(symbol: str) -> Dict:
-    """Fetch RSI, MA for intermediate+ levels"""
+async def _get_rsi(client: httpx.AsyncClient, symbol: str) -> Optional[float]:
+    """RSI(14) din EODHD. Dacă nu există → null."""
     if not EODHD_API_KEY:
-        return {}
-    
-    indicators = {}
+        return None
     try:
-        async with httpx.AsyncClient() as client:
-            url = f"{EODHD_BASE_URL}/technical/{symbol}.RO"
-            
-            # RSI
-            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "rsi", "period": 14}
-            response = await client.get(url, params=params, timeout=10)
-            if response.status_code == 200:
-                data = response.json()
-                if data:
-                    indicators["rsi"] = data[-1].get("rsi")
-            
-            # SMA 50
-            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "sma", "period": 50}
-            response = await client.get(url, params=params, timeout=10)
-            if response.status_code == 200:
-                data = response.json()
-                if data:
-                    indicators["sma_50"] = data[-1].get("sma")
-            
-            # SMA 200
-            params = {"api_token": EODHD_API_KEY, "fmt": "json", "function": "sma", "period": 200}
-            response = await client.get(url, params=params, timeout=10)
-            if response.status_code == 200:
-                data = response.json()
-                if data:
-                    indicators["sma_200"] = data[-1].get("sma")
+        r = await client.get(
+            f"{EODHD_BASE}/technical/{symbol}.RO",
+            params={"api_token": EODHD_API_KEY, "fmt": "json", "function": "rsi", "period": 14},
+            timeout=10,
+        )
+        if r.status_code == 200:
+            data = r.json()
+            if data and isinstance(data, list) and len(data) > 0:
+                return data[-1].get("rsi")
     except Exception as e:
-        logger.error(f"Error fetching technical indicators for {symbol}: {e}")
-    
-    return indicators
+        logger.warning(f"[PORTFOLIO] RSI error for {symbol}: {e}")
+    return None
 
 
-async def fetch_fundamentals(symbol: str) -> Dict:
-    """Fetch fundamental data for advanced level"""
-    if not EODHD_API_KEY:
-        return {}
-    
-    try:
-        async with httpx.AsyncClient() as client:
-            url = f"{EODHD_BASE_URL}/fundamentals/{symbol}.RO"
-            params = {"api_token": EODHD_API_KEY, "fmt": "json"}
-            response = await client.get(url, params=params, timeout=15)
-            
-            if response.status_code == 200:
-                data = response.json()
-                highlights = data.get("Highlights", {})
-                valuation = data.get("Valuation", {})
-                
-                return {
-                    "sector": data.get("General", {}).get("Sector"),
-                    "market_cap": highlights.get("MarketCapitalization"),
-                    "pe_ratio": highlights.get("PERatio"),
-                    "pb_ratio": valuation.get("PriceBookMRQ"),
-                    "dividend_yield": highlights.get("DividendYield"),
-                    "roe": highlights.get("ReturnOnEquityTTM"),
-                    "profit_margin": highlights.get("ProfitMargin"),
-                    "debt_to_equity": valuation.get("DebtEquityMRQ")
-                }
-    except Exception as e:
-        logger.error(f"Error fetching fundamentals for {symbol}: {e}")
-    return {}
+def _rsi_signal(rsi: Optional[float]) -> Optional[str]:
+    if rsi is None:
+        return None
+    if rsi < 30:
+        return "SUPRAVÂNDUT"
+    if rsi < 45:
+        return "FAVORABIL"
+    if rsi > 70:
+        return "SUPRACUMPĂRAT"
+    if rsi > 55:
+        return "RIDICAT"
+    return "NEUTRU"
 
 
-def calculate_diversification_score(positions: List[Dict]) -> float:
-    """Calculate diversification score (0-100)"""
-    if len(positions) == 0:
-        return 0
-    
-    # Simple diversification: more positions = better diversification
-    # But diminishing returns after 8-10 positions
-    score = min(100, (len(positions) / 10) * 100)
-    
-    # Check if all value is in one stock
-    total_value = sum(p.get("total_value", 0) for p in positions)
-    if total_value > 0:
-        max_position_value = max(p.get("total_value", 0) for p in positions)
-        concentration = (max_position_value / total_value) * 100
-        
-        # Penalize high concentration
-        if concentration > 50:
-            score *= 0.5
-        elif concentration > 30:
-            score *= 0.75
-    
-    return round(score, 1)
-
-
-@router.get("/config")
-async def get_portfolio_config(user: dict = Depends(require_auth)):
-    """Get portfolio configuration based on user level"""
-    db = await get_database()
-    
-    user_data = await db.users.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    level = user_data.get("experience_level", "beginner") if user_data else "beginner"
-    
-    config = LEVEL_CONFIG.get(level, LEVEL_CONFIG["beginner"])
-    
-    return {
-        "level": level,
-        "level_name": config["name"],
-        "allowed_stocks": config["allowed_stocks"],
-        "features": config["features"],
-        "indicators": config["indicators"]
+def _rsi_color(signal: Optional[str]) -> str:
+    colors = {
+        "SUPRAVÂNDUT": "green",
+        "FAVORABIL": "green",
+        "NEUTRU": "gray",
+        "RIDICAT": "orange",
+        "SUPRACUMPĂRAT": "red",
     }
+    return colors.get(signal, "gray")
 
+
+def _require_pro(user: dict):
+    if user.get("subscription_level") not in ["pro", "premium"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Portofoliu PRO este exclusiv pentru abonații PRO."
+        )
+
+
+# ─────────────────────────────────────────
+# ENDPOINT: GET PORTFOLIO
+# ─────────────────────────────────────────
 
 @router.get("/")
 async def get_portfolio(user: dict = Depends(require_auth)):
-    """Get user's BVB portfolio"""
+    """
+    Returnează portofoliul PRO cu date live EODHD.
+    - Prețuri actuale (nu estimate)
+    - P&L RON și % per poziție
+    - RSI(14) per simbol
+    - Sumar total (valoare, P&L, P&L azi)
+    """
+    _require_pro(user)
+
     db = await get_database()
-    
-    # Get user level
-    user_data = await db.users.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    level = user_data.get("experience_level", "beginner") if user_data else "beginner"
-    
-    # Get portfolio
-    portfolio_doc = await db.portfolio_bvb.find_one(
-        {"user_id": user["user_id"]},
-        {"_id": 0}
-    )
-    
-    if not portfolio_doc:
+    raw = await db.portfolio_bvb_pro.find(
+        {"user_id": user["user_id"]}, {"_id": 0}
+    ).sort("added_at", 1).to_list(200)
+
+    if not raw:
         return {
             "positions": [],
-            "summary": PortfolioSummary(
-                total_value=0,
-                total_invested=0,
-                total_profit_loss=0,
-                total_profit_loss_percent=0,
-                positions_count=0,
-                level=level,
-                level_name=LEVEL_CONFIG[level]["name"]
-            )
+            "summary": {
+                "total_value": 0,
+                "total_invested": 0,
+                "pl_ron": 0,
+                "pl_percent": 0,
+                "today_pl": 0,
+                "positions_count": 0,
+            },
         }
-    
-    positions = portfolio_doc.get("positions", [])
-    level_config = LEVEL_CONFIG.get(level, LEVEL_CONFIG["beginner"])
-    
-    # Update current prices and add indicators based on level
-    updated_positions = []
-    total_value = 0
-    total_invested = 0
-    total_dividend_income = 0
-    
-    for pos in positions:
-        symbol = pos["symbol"]
-        
-        # Fetch current price
-        price_data = await fetch_current_price(symbol)
-        current_price = price_data.get("price", pos.get("current_price", 0))
-        
-        total_val = pos["shares"] * current_price
-        invested = pos["shares"] * pos["avg_purchase_price"]
-        pl = total_val - invested
-        pl_percent = (pl / invested * 100) if invested > 0 else 0
-        
-        position_data = {
-            "symbol": symbol,
-            "shares": pos["shares"],
-            "avg_purchase_price": pos["avg_purchase_price"],
-            "current_price": current_price,
-            "total_value": total_val,
-            "profit_loss": pl,
-            "profit_loss_percent": pl_percent,
-            "added_date": pos.get("added_date", "")
-        }
-        
-        # Add indicators based on level
-        if level in ["intermediate", "advanced"]:
-            tech_data = await fetch_technical_indicators(symbol)
-            position_data["technical_indicators"] = tech_data
-        
-        if level == "advanced":
-            fund_data = await fetch_fundamentals(symbol)
-            position_data["fundamentals"] = fund_data
-            
-            # Calculate annual dividend income
-            if fund_data.get("dividend_yield"):
-                annual_dividend = (fund_data["dividend_yield"] / 100) * total_val
-                total_dividend_income += annual_dividend
-                position_data["dividend_income_annual"] = annual_dividend
-        
-        # All levels get dividend yield
-        fundamentals = await fetch_fundamentals(symbol)
-        if fundamentals.get("dividend_yield"):
-            position_data["dividend_yield"] = fundamentals["dividend_yield"]
-        
-        updated_positions.append(position_data)
-        total_value += total_val
+
+    symbols = [p["symbol"] for p in raw]
+
+    # Fetch live data în paralel
+    async with httpx.AsyncClient() as client:
+        price_tasks = [_get_live_price(client, sym) for sym in symbols]
+        rsi_tasks = [_get_rsi(client, sym) for sym in symbols]
+        prices, rsis = await asyncio.gather(
+            asyncio.gather(*price_tasks),
+            asyncio.gather(*rsi_tasks),
+        )
+
+    # Company info din MongoDB (cache)
+    stocks_db = await db.stocks_bvb.find(
+        {"symbol": {"$in": symbols}},
+        {"_id": 0, "symbol": 1, "name": 1, "sector": 1},
+    ).to_list(200)
+    info_map = {s["symbol"]: s for s in stocks_db}
+
+    positions = []
+    total_value = 0.0
+    total_invested = 0.0
+    today_pl = 0.0
+
+    for i, pos in enumerate(raw):
+        sym = pos["symbol"]
+        pd = prices[i]
+        rsi_val = rsis[i]
+
+        current_price = pd.get("price")
+        shares = pos["shares"]
+        purchase_price = pos["purchase_price"]
+        invested = round(shares * purchase_price, 2)
+
+        current_value = round(shares * current_price, 2) if current_price else None
+        pl_ron = round(current_value - invested, 2) if current_value is not None else None
+        pl_pct = round((current_price - purchase_price) / purchase_price * 100, 2) if current_price else None
+
+        chg_pct = pd.get("change_percent") or 0
+        if current_value:
+            today_pl += round(chg_pct / 100 * current_value, 2)
+
         total_invested += invested
-    
-    total_pl = total_value - total_invested
-    total_pl_percent = (total_pl / total_invested * 100) if total_invested > 0 else 0
-    
-    # Calculate diversification for intermediate+
-    diversification_score = None
-    if level in ["intermediate", "advanced"]:
-        diversification_score = calculate_diversification_score(updated_positions)
-    
-    summary = PortfolioSummary(
-        total_value=total_value,
-        total_invested=total_invested,
-        total_profit_loss=total_pl,
-        total_profit_loss_percent=total_pl_percent,
-        positions_count=len(updated_positions),
-        level=level,
-        level_name=level_config["name"],
-        diversification_score=diversification_score,
-        dividend_income_annual=total_dividend_income if level == "advanced" else None
-    )
-    
+        if current_value is not None:
+            total_value += current_value
+
+        rsi_sig = _rsi_signal(rsi_val)
+        info = info_map.get(sym, {})
+
+        positions.append({
+            "symbol": sym,
+            "name": info.get("name", sym),
+            "sector": info.get("sector"),
+            "shares": shares,
+            "purchase_price": purchase_price,
+            "purchase_date": pos.get("purchase_date"),
+            "notes": pos.get("notes"),
+            "added_at": pos.get("added_at"),
+            # Live date
+            "current_price": current_price,
+            "price_change_percent": round(chg_pct, 2) if chg_pct else None,
+            "current_value": current_value,
+            "invested": invested,
+            "pl_ron": pl_ron,
+            "pl_percent": pl_pct,
+            # Tehnic
+            "rsi": round(rsi_val, 1) if rsi_val is not None else None,
+            "rsi_signal": rsi_sig,
+            "rsi_color": _rsi_color(rsi_sig),
+        })
+
+    total_pl = round(total_value - total_invested, 2)
+    total_pl_pct = round(total_pl / total_invested * 100, 2) if total_invested > 0 else 0
+
+    # Sortează descendent după valoare curentă
+    positions.sort(key=lambda x: x.get("current_value") or 0, reverse=True)
+
     return {
-        "positions": updated_positions,
-        "summary": summary,
-        "level_info": {
-            "level": level,
-            "name": level_config["name"],
-            "features": level_config["features"]
-        }
+        "positions": positions,
+        "summary": {
+            "total_value": round(total_value, 2),
+            "total_invested": round(total_invested, 2),
+            "pl_ron": total_pl,
+            "pl_percent": total_pl_pct,
+            "today_pl": round(today_pl, 2),
+            "positions_count": len(positions),
+        },
     }
 
+
+# ─────────────────────────────────────────
+# ENDPOINT: ADD POSITION
+# ─────────────────────────────────────────
 
 @router.post("/position")
 async def add_position(data: AddPositionRequest, user: dict = Depends(require_auth)):
-    """Add a new position to portfolio"""
+    """Adaugă o poziție nouă în portofoliu."""
+    _require_pro(user)
+
+    symbol = data.symbol.strip().upper()
+    if not symbol:
+        raise HTTPException(status_code=400, detail="Simbolul nu poate fi gol")
+
     db = await get_database()
-    
-    # Get user level
-    user_data = await db.users.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    level = user_data.get("experience_level", "beginner") if user_data else "beginner"
-    level_config = LEVEL_CONFIG.get(level, LEVEL_CONFIG["beginner"])
-    
-    # Check if symbol is allowed for this level
-    if isinstance(level_config["allowed_stocks"], list):
-        if data.symbol.upper() not in level_config["allowed_stocks"]:
-            raise HTTPException(
-                status_code=403,
-                detail={
-                    "error": "symbol_not_allowed",
-                    "message": f"La nivelul {level_config['name']}, poți adăuga doar acțiuni din indicele BET.",
-                    "allowed_stocks": level_config["allowed_stocks"],
-                    "upgrade_hint": "Treci la nivelul Mediu pentru a accesa toate acțiunile BVB."
-                }
-            )
-    
-    # Fetch current price to validate
-    price_data = await fetch_current_price(data.symbol.upper())
-    if price_data.get("price", 0) == 0:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Acțiunea {data.symbol} nu a fost găsită."
-        )
-    
-    # Add position
-    position = {
-        "symbol": data.symbol.upper(),
-        "shares": data.shares,
-        "avg_purchase_price": data.purchase_price,
-        "current_price": price_data["price"],
-        "added_date": datetime.now(timezone.utc).isoformat()
-    }
-    
-    await db.portfolio_bvb.update_one(
-        {"user_id": user["user_id"]},
-        {
-            "$push": {"positions": position},
-            "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
-        },
-        upsert=True
+
+    # Verifică dacă există deja
+    existing = await db.portfolio_bvb_pro.find_one(
+        {"user_id": user["user_id"], "symbol": symbol}
     )
-    
-    return {
-        "success": True,
-        "message": f"Poziție adăugată: {data.shares} acțiuni {data.symbol} @ {data.purchase_price} RON",
-        "position": position
+    if existing:
+        raise HTTPException(
+            status_code=409,
+            detail=f"{symbol} există deja în portofoliu. Folosește update pentru a modifica."
+        )
+
+    # Verifică că simbolul există în BVB
+    stock = await db.stocks_bvb.find_one({"symbol": symbol}, {"_id": 0, "name": 1})
+    if not stock:
+        raise HTTPException(status_code=404, detail=f"Acțiunea {symbol} nu a fost găsită pe BVB")
+
+    doc = {
+        "user_id": user["user_id"],
+        "symbol": symbol,
+        "shares": data.shares,
+        "purchase_price": data.purchase_price,
+        "purchase_date": data.purchase_date or datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "notes": data.notes,
+        "added_at": datetime.now(timezone.utc).isoformat(),
     }
 
+    await db.portfolio_bvb_pro.insert_one(doc)
+    logger.info(f"[PORTFOLIO] Added {symbol} for user {user['user_id']}")
+
+    return {
+        "status": "ok",
+        "message": f"{symbol} ({stock.get('name', '')}) adăugat în portofoliu",
+        "symbol": symbol,
+    }
+
+
+# ─────────────────────────────────────────
+# ENDPOINT: UPDATE POSITION
+# ─────────────────────────────────────────
+
+@router.put("/position/{symbol}")
+async def update_position(symbol: str, data: UpdatePositionRequest, user: dict = Depends(require_auth)):
+    """Actualizează o poziție existentă."""
+    _require_pro(user)
+
+    symbol = symbol.upper()
+    db = await get_database()
+
+    result = await db.portfolio_bvb_pro.update_one(
+        {"user_id": user["user_id"], "symbol": symbol},
+        {"$set": {
+            "shares": data.shares,
+            "purchase_price": data.purchase_price,
+            "purchase_date": data.purchase_date,
+            "notes": data.notes,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }}
+    )
+
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail=f"{symbol} nu a fost găsit în portofoliu")
+
+    return {"status": "ok", "message": f"{symbol} actualizat"}
+
+
+# ─────────────────────────────────────────
+# ENDPOINT: DELETE POSITION
+# ─────────────────────────────────────────
 
 @router.delete("/position/{symbol}")
-async def remove_position(symbol: str, user: dict = Depends(require_auth)):
-    """Remove a position from portfolio"""
+async def delete_position(symbol: str, user: dict = Depends(require_auth)):
+    """Șterge o poziție din portofoliu."""
+    _require_pro(user)
+
+    symbol = symbol.upper()
     db = await get_database()
-    
-    result = await db.portfolio_bvb.update_one(
-        {"user_id": user["user_id"]},
-        {
-            "$pull": {"positions": {"symbol": symbol.upper()}},
-            "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
-        }
+
+    result = await db.portfolio_bvb_pro.delete_one(
+        {"user_id": user["user_id"], "symbol": symbol}
     )
-    
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Poziție nu a fost găsită")
-    
-    return {
-        "success": True,
-        "message": f"Poziție {symbol} ștearsă cu succes"
-    }
+
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail=f"{symbol} nu a fost găsit")
+
+    return {"status": "ok", "message": f"{symbol} eliminat din portofoliu"}
 
 
-@router.post("/ai-analysis")
-async def get_ai_portfolio_analysis(user: dict = Depends(require_auth)):
-    """Get AI analysis of portfolio diversification (intermediate+ only)"""
+# ─────────────────────────────────────────
+# ENDPOINT: EXPORT CSV
+# ─────────────────────────────────────────
+
+@router.get("/export")
+async def export_portfolio(user: dict = Depends(require_auth)):
+    """Export poziții ca CSV (fără date live — doar date de intrare)."""
+    _require_pro(user)
+
     db = await get_database()
-    
-    user_data = await db.users.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    level = user_data.get("experience_level", "beginner") if user_data else "beginner"
-    
-    if level == "beginner":
-        raise HTTPException(
-            status_code=403,
-            detail={
-                "error": "feature_locked",
-                "message": "Analiza AI a portofoliului este disponibilă de la nivelul Mediu.",
-                "required_level": "intermediate"
-            }
-        )
-    
-    # Get portfolio
-    portfolio_doc = await db.portfolio_bvb.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    if not portfolio_doc or not portfolio_doc.get("positions"):
-        return {
-            "analysis": "Nu ai încă poziții în portofoliu. Adaugă câteva acțiuni pentru a primi o analiză AI."
-        }
-    
-    positions = portfolio_doc["positions"]
-    
-    # Build AI prompt
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
-    
-    api_key = os.environ.get("EMERGENT_UNIVERSAL_KEY") or os.environ.get("EMERGENT_LLM_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="AI service not configured")
-    
-    prompt = f"""Analizează următorul portofoliu BVB și oferă recomandări de diversificare:
+    raw = await db.portfolio_bvb_pro.find(
+        {"user_id": user["user_id"]}, {"_id": 0}
+    ).sort("added_at", 1).to_list(200)
 
-Poziții:
-{chr(10).join([f"- {p['symbol']}: {p['shares']} acțiuni @ {p['avg_purchase_price']} RON" for p in positions])}
+    rows = [["Simbol", "Cantitate", "Preț Intrare (RON)", "Dată Intrare", "Note"]]
+    for p in raw:
+        rows.append([
+            p["symbol"],
+            p["shares"],
+            p["purchase_price"],
+            p.get("purchase_date", ""),
+            p.get("notes", ""),
+        ])
 
-Oferă:
-1. Evaluarea diversificării (bună/medie/slabă)
-2. Riscurile identificate
-3. Sugestii de îmbunătățire (sectoare lipsă, concentrare prea mare)
-4. Acțiuni BVB pe care ar trebui să le considere pentru diversificare
+    csv = "\n".join([",".join([f'"{c}"' for c in row]) for row in rows])
 
-Răspunde în română, concis."""
-    
-    chat = LlmChat(
-        api_key=api_key,
-        session_id=f"portfolio_{user['user_id']}",
-        system_message="Ești un consultant financiar expert pentru piața BVB."
-    ).with_model("openai", "gpt-4o-mini")
-    
-    response = await chat.send_message(UserMessage(text=prompt))
-    
-    return {
-        "analysis": response,
-        "diversification_score": calculate_diversification_score(positions)
-    }
+    from fastapi.responses import Response
+    return Response(
+        content="\ufeff" + csv,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=portofoliu_bvb_{datetime.now().strftime('%Y%m%d')}.csv"},
+    )

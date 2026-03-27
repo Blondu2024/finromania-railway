@@ -1,541 +1,710 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, TrendingUp, TrendingDown, Trash2, PieChart, Target, Award, Lock, AlertCircle, BarChart3, DollarSign, Download } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Plus, Trash2, Download, RefreshCw, Crown, Edit2,
+  TrendingUp, TrendingDown, Minus, AlertCircle, Info
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { useAuth } from '../context/AuthContext';
+import { Textarea } from '../components/ui/textarea';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from '../components/ui/dialog';
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from '../components/ui/tooltip';
+import { toast } from 'sonner';
 import SEO from '../components/SEO';
+import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Format RON
-const formatRON = (value) => {
-  return new Intl.NumberFormat('ro-RO', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value) + ' RON';
-};
+// ─────────────────────────────────────────
+// FORMATTERS
+// ─────────────────────────────────────────
+const fmt = (v, dec = 2) =>
+  v != null ? Number(v).toLocaleString('ro-RO', { minimumFractionDigits: dec, maximumFractionDigits: dec }) : '—';
 
-// Level Badge
-const LevelBadge = ({ level }) => {
-  const config = {
-    beginner: { label: 'Începător', color: 'bg-green-500', icon: '🟢' },
-    intermediate: { label: 'Mediu', color: 'bg-blue-500', icon: '🟡' },
-    advanced: { label: 'Expert', color: 'bg-blue-500', icon: '🔴' }
-  };
-  
-  const c = config[level] || config.beginner;
-  
+const fmtRON = (v) => v != null ? `${fmt(v)} RON` : '—';
+
+const PLCell = ({ value, percent, size = 'sm' }) => {
+  if (value == null) return <span className="text-muted-foreground">—</span>;
+  const pos = value >= 0;
+  const cls = pos ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
   return (
-    <Badge className={`${c.color} text-white`}>
-      {c.icon} Nivel {c.label}
-    </Badge>
+    <div className={`${cls} font-mono ${size === 'lg' ? 'text-lg font-bold' : 'text-sm'}`}>
+      <span>{pos ? '+' : ''}{fmt(value)}</span>
+      {percent != null && (
+        <span className="ml-1.5 text-xs opacity-80">({pos ? '+' : ''}{fmt(percent)}%)</span>
+      )}
+    </div>
   );
 };
 
+const RSIBadge = ({ signal, rsi }) => {
+  if (!signal) return <span className="text-muted-foreground text-xs">—</span>;
+  const cfg = {
+    SUPRAVÂNDUT: { cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400', short: 'SV' },
+    FAVORABIL: { cls: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-500', short: 'FAV' },
+    NEUTRU: { cls: 'bg-muted text-muted-foreground', short: 'N' },
+    RIDICAT: { cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', short: 'RID' },
+    SUPRACUMPĂRAT: { cls: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', short: 'SC' },
+  };
+  const c = cfg[signal] || cfg.NEUTRU;
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <span className={`inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded font-medium ${c.cls}`}>
+            {c.short} {rsi != null ? <span className="opacity-70">{fmt(rsi, 1)}</span> : null}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="font-medium">{signal}</p>
+          {rsi != null && <p className="text-xs text-muted-foreground">RSI(14) = {fmt(rsi, 1)}</p>}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+// ─────────────────────────────────────────
+// PRO PAYWALL
+// ─────────────────────────────────────────
+const ProPaywall = () => (
+  <div className="flex flex-col items-center justify-center py-24 gap-6">
+    <div className="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center">
+      <Crown className="w-10 h-10 text-amber-500" />
+    </div>
+    <div className="text-center">
+      <h2 className="text-2xl font-bold mb-2">Portofoliu PRO</h2>
+      <p className="text-muted-foreground max-w-md">
+        Urmărire poziții BVB cu date live EODHD, P&L în timp real, RSI per acțiune, AI Advisor și dividende estimate.
+      </p>
+    </div>
+    <Link to="/pricing">
+      <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-white">
+        <Crown className="w-4 h-4 mr-2" />
+        Upgrade la PRO
+      </Button>
+    </Link>
+  </div>
+);
+
+// ─────────────────────────────────────────
+// METRIC CARD
+// ─────────────────────────────────────────
+const MetricCard = ({ label, value, sub, highlight, icon: Icon }) => (
+  <Card className={`${highlight ? 'border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-500/5' : ''}`}>
+    <CardContent className="p-4">
+      <div className="flex items-start justify-between">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+        {Icon && <Icon className="w-4 h-4 text-muted-foreground" />}
+      </div>
+      <div className="text-2xl font-bold font-mono mt-1">{value}</div>
+      {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
+    </CardContent>
+  </Card>
+);
+
+// ─────────────────────────────────────────
+// ADD / EDIT DIALOG
+// ─────────────────────────────────────────
+const PositionDialog = ({ open, onClose, onSave, editData, bvbSymbols, loading }) => {
+  const [form, setForm] = useState({
+    symbol: '', shares: '', purchase_price: '', purchase_date: '', notes: ''
+  });
+  const [err, setErr] = useState('');
+
+  useEffect(() => {
+    if (editData) {
+      setForm({
+        symbol: editData.symbol || '',
+        shares: String(editData.shares || ''),
+        purchase_price: String(editData.purchase_price || ''),
+        purchase_date: editData.purchase_date || '',
+        notes: editData.notes || '',
+      });
+    } else {
+      setForm({ symbol: '', shares: '', purchase_price: '', purchase_date: '', notes: '' });
+    }
+    setErr('');
+  }, [editData, open]);
+
+  const handleSave = () => {
+    if (!form.symbol.trim()) return setErr('Introdu simbolul acțiunii (ex: TLV)');
+    if (!form.shares || isNaN(Number(form.shares)) || Number(form.shares) <= 0)
+      return setErr('Cantitate invalidă');
+    if (!form.purchase_price || isNaN(Number(form.purchase_price)) || Number(form.purchase_price) <= 0)
+      return setErr('Preț de intrare invalid');
+    setErr('');
+    onSave({
+      symbol: form.symbol.trim().toUpperCase(),
+      shares: Number(form.shares),
+      purchase_price: Number(form.purchase_price),
+      purchase_date: form.purchase_date || undefined,
+      notes: form.notes || undefined,
+    });
+  };
+
+  const isEdit = !!editData;
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{isEdit ? `Editează ${editData?.symbol}` : 'Adaugă Poziție Nouă'}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          {!isEdit && (
+            <div>
+              <Label>Simbol BVB <span className="text-red-500">*</span></Label>
+              <Input
+                placeholder="ex: TLV, SNP, BRD, H2O"
+                value={form.symbol}
+                onChange={e => setForm(p => ({ ...p, symbol: e.target.value.toUpperCase() }))}
+                data-testid="portfolio-symbol-input"
+                className="font-mono uppercase"
+              />
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Cantitate (nr. acțiuni) <span className="text-red-500">*</span></Label>
+              <Input
+                type="number"
+                min="1"
+                step="1"
+                placeholder="ex: 500"
+                value={form.shares}
+                onChange={e => setForm(p => ({ ...p, shares: e.target.value }))}
+                data-testid="portfolio-shares-input"
+                className="font-mono"
+              />
+            </div>
+            <div>
+              <Label>Preț mediu intrare (RON) <span className="text-red-500">*</span></Label>
+              <Input
+                type="number"
+                min="0.01"
+                step="0.01"
+                placeholder="ex: 22.50"
+                value={form.purchase_price}
+                onChange={e => setForm(p => ({ ...p, purchase_price: e.target.value }))}
+                data-testid="portfolio-price-input"
+                className="font-mono"
+              />
+            </div>
+          </div>
+          <div>
+            <Label>Dată intrare</Label>
+            <Input
+              type="date"
+              value={form.purchase_date}
+              onChange={e => setForm(p => ({ ...p, purchase_date: e.target.value }))}
+              max={new Date().toISOString().split('T')[0]}
+            />
+          </div>
+          <div>
+            <Label>Note (opțional)</Label>
+            <Textarea
+              placeholder="ex: Cumpărat la anunț dividende..."
+              value={form.notes}
+              onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
+              rows={2}
+            />
+          </div>
+          {err && (
+            <div className="flex items-center gap-2 text-red-500 text-sm">
+              <AlertCircle className="w-4 h-4" />
+              {err}
+            </div>
+          )}
+        </div>
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onClose}>Anulează</Button>
+          <Button
+            onClick={handleSave}
+            disabled={loading}
+            data-testid="portfolio-save-btn"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {loading ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : null}
+            {isEdit ? 'Salvează' : 'Adaugă'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// ─────────────────────────────────────────
+// MAIN COMPONENT
+// ─────────────────────────────────────────
 export default function PortfolioBVBPage() {
   const { user, token } = useAuth();
   const [portfolio, setPortfolio] = useState(null);
-  const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [aiAnalysis, setAiAnalysis] = useState(null);
-  const [loadingAI, setLoadingAI] = useState(false);
-  
-  // Add position form
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [newPosition, setNewPosition] = useState({
-    symbol: '',
-    shares: '',
-    purchase_price: ''
-  });
+  const [refreshing, setRefreshing] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (user && token) {
-      fetchPortfolio();
-      fetchConfig();
-    }
-  }, [user, token]);
+  // Dialogs
+  const [showAdd, setShowAdd] = useState(false);
+  const [editPos, setEditPos] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  const fetchPortfolio = async () => {
+  const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
+
+  const fetchPortfolio = useCallback(async (quiet = false) => {
+    if (!token) return;
+    if (!quiet) setLoading(true);
+    else setRefreshing(true);
     try {
-      const response = await fetch(`${API_URL}/api/portfolio-bvb/`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const r = await fetch(`${API_URL}/api/portfolio-bvb/`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (response.ok) {
-        const data = await response.json();
-        setPortfolio(data);
+      if (r.ok) {
+        setPortfolio(await r.json());
+      } else if (r.status === 403) {
+        setPortfolio(null);
       }
-    } catch (error) {
-      console.error('Error fetching portfolio:', error);
+    } catch (e) {
+      toast.error('Eroare la încărcare date');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, [token]);
 
-  const fetchConfig = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/portfolio-bvb/config`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setConfig(data);
-      }
-    } catch (error) {
-      console.error('Error fetching config:', error);
-    }
-  };
+  useEffect(() => {
+    if (user && isPro) fetchPortfolio();
+    else setLoading(false);
+  }, [user, isPro, fetchPortfolio]);
 
-  const handleAddPosition = async () => {
+  const handleAdd = async (data) => {
+    setSaving(true);
     try {
-      const response = await fetch(`${API_URL}/api/portfolio-bvb/position`, {
+      const r = await fetch(`${API_URL}/api/portfolio-bvb/position`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          symbol: newPosition.symbol.toUpperCase(),
-          shares: parseFloat(newPosition.shares),
-          purchase_price: parseFloat(newPosition.purchase_price)
-        })
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
       });
-
-      if (response.ok) {
-        setShowAddDialog(false);
-        setNewPosition({ symbol: '', shares: '', purchase_price: '' });
-        fetchPortfolio();
+      const res = await r.json();
+      if (r.ok) {
+        toast.success(res.message || `${data.symbol} adăugat`);
+        setShowAdd(false);
+        fetchPortfolio(true);
       } else {
-        const error = await response.json();
-        alert(error.detail?.message || 'Eroare la adăugarea poziției');
+        toast.error(res.detail || 'Eroare la adăugare');
       }
-    } catch (error) {
-      console.error('Error adding position:', error);
-      alert('Eroare la adăugarea poziției');
-    }
-  };
-
-  const handleRemovePosition = async (symbol) => {
-    if (!confirm(`Sigur vrei să ștergi poziția ${symbol}?`)) return;
-    
-    try {
-      const response = await fetch(`${API_URL}/api/portfolio-bvb/position/${symbol}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        fetchPortfolio();
-      }
-    } catch (error) {
-      console.error('Error removing position:', error);
-    }
-  };
-
-  const handleGetAIAnalysis = async () => {
-    setLoadingAI(true);
-    try {
-      const response = await fetch(`${API_URL}/api/portfolio-bvb/ai-analysis`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAiAnalysis(data);
-      } else {
-        const error = await response.json();
-        alert(error.detail?.message || 'Funcție disponibilă de la nivelul Mediu');
-      }
-    } catch (error) {
-      console.error('Error getting AI analysis:', error);
+    } catch {
+      toast.error('Eroare de conexiune');
     } finally {
-      setLoadingAI(false);
+      setSaving(false);
     }
   };
 
-  const exportPortfolioCSV = () => {
-    const positions = portfolio?.positions || [];
-    if (positions.length === 0) return;
-    
-    const headers = ['Simbol', 'Acțiuni', 'Preț Achiziție (RON)', 'Preț Curent (RON)', 'Valoare Totală (RON)', 'Profit/Pierdere (RON)', 'Profit/Pierdere (%)'];
-    const rows = positions.map(p => [
-      p.symbol,
-      p.shares,
-      p.avg_purchase_price?.toFixed(2) ?? '',
-      p.current_price?.toFixed(2) ?? '',
-      p.total_value?.toFixed(2) ?? '',
-      p.profit_loss?.toFixed(2) ?? '',
-      p.profit_loss_percent?.toFixed(2) ?? ''
-    ]);
-
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `portofoliu_bvb_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleUpdate = async (data) => {
+    if (!editPos) return;
+    setSaving(true);
+    try {
+      const r = await fetch(`${API_URL}/api/portfolio-bvb/position/${editPos.symbol}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
+      });
+      const res = await r.json();
+      if (r.ok) {
+        toast.success(res.message || `${editPos.symbol} actualizat`);
+        setEditPos(null);
+        fetchPortfolio(true);
+      } else {
+        toast.error(res.detail || 'Eroare la actualizare');
+      }
+    } catch {
+      toast.error('Eroare de conexiune');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const handleDelete = async (symbol) => {
+    try {
+      const r = await fetch(`${API_URL}/api/portfolio-bvb/position/${symbol}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const res = await r.json();
+      if (r.ok) {
+        toast.success(res.message || `${symbol} eliminat`);
+        fetchPortfolio(true);
+      } else {
+        toast.error(res.detail || 'Eroare');
+      }
+    } catch {
+      toast.error('Eroare de conexiune');
+    } finally {
+      setDeleteConfirm(null);
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const r = await fetch(`${API_URL}/api/portfolio-bvb/export`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (r.ok) {
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `portofoliu_bvb_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch {
+      toast.error('Eroare export');
+    }
+  };
+
+  // ── RENDER ──
 
   if (!user) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Lock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Autentificare necesară</h2>
-            <p className="text-gray-500 mb-4">Conectează-te pentru a accesa portofoliul tău BVB.</p>
-            <Button onClick={() => window.location.href = '/login'}>Conectează-te</Button>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-center py-24">
+        <div className="text-center">
+          <Crown className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Autentificare necesară</h2>
+          <Link to="/login">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">Conectare</Button>
+          </Link>
+        </div>
       </div>
     );
   }
+
+  if (!isPro) return <ProPaywall />;
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-32 bg-gray-200 rounded"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+      <div className="space-y-4 animate-pulse">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-xl bg-muted" />)}
         </div>
+        <div className="h-96 rounded-xl bg-muted" />
       </div>
     );
   }
 
-  const summary = portfolio?.summary || {};
   const positions = portfolio?.positions || [];
-  const level = summary.level || 'beginner';
-  const levelInfo = portfolio?.level_info || {};
+  const summary = portfolio?.summary || {};
+  const isEmpty = positions.length === 0;
+
+  const plPos = (summary.pl_ron || 0) >= 0;
+  const todayPos = (summary.today_pl || 0) >= 0;
 
   return (
     <>
-      <SEO 
-        title="Portofoliu BVB cu 3 Straturi | FinRomania"
-        description="Urmărește portofoliul tău BVB cu indicatori adaptați nivelului tău de experiență."
-      />
-      
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Portofoliu BVB</h1>
-            <p className="text-muted-foreground">Sistemul "3 Straturi" - adaptat pentru nivelul tău</p>
-          </div>
-          <LevelBadge level={level} />
-        </div>
+      <SEO title="Portofoliu BVB PRO | FinRomania" />
 
-        {/* Level Features */}
-        <Card className="bg-gradient-to-r from-blue-500/10 to-blue-500/10 border-blue-500/30">
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-2 flex items-center gap-2">
-              <Target className="w-5 h-5" />
-              Ce îți oferă nivelul {levelInfo.name}:
-            </h3>
-            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-              {levelInfo.features?.map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-2">
-                  <span className="text-blue-500">✓</span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
+      {/* ── HEADER ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Crown className="w-6 h-6 text-amber-500" />
+            Portofoliu BVB PRO
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Date live EODHD · Doar acțiuni BVB · Exclusiv PRO
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchPortfolio(true)}
+            disabled={refreshing}
+            data-testid="portfolio-refresh-btn"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+          </Button>
+          {!isEmpty && (
+            <Button variant="outline" size="sm" onClick={handleExport} data-testid="portfolio-export-btn">
+              <Download className="w-4 h-4 mr-1.5" />
+              CSV
+            </Button>
+          )}
+          <Button
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={() => setShowAdd(true)}
+            data-testid="portfolio-add-btn"
+          >
+            <Plus className="w-4 h-4 mr-1.5" />
+            Adaugă Poziție
+          </Button>
+        </div>
+      </div>
+
+      {/* ── SUMMARY METRICS ── */}
+      {!isEmpty && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          <MetricCard
+            label="Valoare Totală"
+            value={fmtRON(summary.total_value)}
+            sub={`Investit: ${fmtRON(summary.total_invested)}`}
+            highlight={plPos}
+          />
+          <MetricCard
+            label="P&L Total"
+            value={
+              <PLCell
+                value={summary.pl_ron}
+                percent={summary.pl_percent}
+                size="lg"
+              />
+            }
+            sub={summary.pl_ron != null ? (plPos ? '▲ Profit' : '▼ Pierdere') : '—'}
+          />
+          <MetricCard
+            label="P&L Astăzi"
+            value={
+              <PLCell
+                value={summary.today_pl}
+                size="lg"
+              />
+            }
+            sub="Variație intraday"
+            icon={todayPos ? TrendingUp : TrendingDown}
+          />
+          <MetricCard
+            label="Poziții Active"
+            value={summary.positions_count ?? '—'}
+            sub="acțiuni BVB"
+          />
+        </div>
+      )}
+
+      {/* ── EMPTY STATE ── */}
+      {isEmpty ? (
+        <Card className="border-dashed">
+          <CardContent className="py-16 text-center">
+            <TrendingUp className="w-14 h-14 text-muted-foreground mx-auto mb-4 opacity-40" />
+            <h3 className="text-lg font-semibold mb-2">Portofoliu gol</h3>
+            <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">
+              Adaugă prima ta poziție BVB. Introdu simbolul, cantitatea și prețul de intrare
+              — restul se calculează automat cu date live.
+            </p>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => setShowAdd(true)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Adaugă Prima Poziție
+            </Button>
           </CardContent>
         </Card>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Valoare Totală</p>
-              <p className="text-2xl font-bold">{formatRON(summary.total_value || 0)}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Investit</p>
-              <p className="text-2xl font-bold">{formatRON(summary.total_invested || 0)}</p>
-            </CardContent>
-          </Card>
-          <Card className={summary.total_profit_loss >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'}>
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Profit/Pierdere</p>
-              <p className={`text-2xl font-bold ${summary.total_profit_loss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {summary.total_profit_loss >= 0 ? '+' : ''}{formatRON(summary.total_profit_loss || 0)}
-                <span className="text-sm ml-2">({summary.total_profit_loss_percent?.toFixed(2)}%)</span>
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Poziții</p>
-              <p className="text-2xl font-bold">{summary.positions_count || 0}</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Diversification Score (Mediu+) */}
-        {level !== 'beginner' && summary.diversification_score !== null && (
-          <Card>
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold flex items-center gap-2">
-                  <PieChart className="w-5 h-5" />
-                  Scor Diversificare
-                </h3>
-                <p className="text-sm text-muted-foreground">Măsoară echilibrul portofoliului tău</p>
-              </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold">{summary.diversification_score}/100</p>
-                <Badge className={summary.diversification_score >= 70 ? 'bg-green-500' : summary.diversification_score >= 40 ? 'bg-yellow-500' : 'bg-red-500'}>
-                  {summary.diversification_score >= 70 ? 'Bună' : summary.diversification_score >= 40 ? 'Medie' : 'Slabă'}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Dividend Income (Expert only) */}
-        {level === 'advanced' && summary.dividend_income_annual !== null && (
-          <Card className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/30">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-green-600" />
-                  Venit din Dividende (estimat anual)
-                </h3>
-                <p className="text-sm text-muted-foreground">Bazat pe dividend yield actual</p>
-              </div>
-              <p className="text-2xl font-bold text-green-600">{formatRON(summary.dividend_income_annual || 0)}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Positions */}
+      ) : (
+        /* ── POSITIONS TABLE ── */
         <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <CardTitle>Poziții Active</CardTitle>
-              <div className="flex gap-2">
-                {positions.length > 0 && (
-                  <Button variant="outline" size="sm" onClick={exportPortfolioCSV} data-testid="export-portfolio-csv">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export CSV
-                  </Button>
-                )}
-                <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Adaugă Poziție
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Adaugă Poziție Nouă</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 pt-4">
-                    <div>
-                      <Label>Simbol (ex: TLV, SNP)</Label>
-                      <Input 
-                        value={newPosition.symbol}
-                        onChange={(e) => setNewPosition({...newPosition, symbol: e.target.value})}
-                        placeholder="TLV"
-                      />
-                    </div>
-                    <div>
-                      <Label>Număr Acțiuni</Label>
-                      <Input 
-                        type="number"
-                        value={newPosition.shares}
-                        onChange={(e) => setNewPosition({...newPosition, shares: e.target.value})}
-                        placeholder="100"
-                      />
-                    </div>
-                    <div>
-                      <Label>Preț Achiziție (RON)</Label>
-                      <Input 
-                        type="number"
-                        step="0.01"
-                        value={newPosition.purchase_price}
-                        onChange={(e) => setNewPosition({...newPosition, purchase_price: e.target.value})}
-                        placeholder="2.50"
-                      />
-                    </div>
-                    <Button onClick={handleAddPosition} className="w-full">
-                      Adaugă
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-            </div>
+          <CardHeader className="py-3 px-4 border-b">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              Poziții Active — {positions.length}
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            {positions.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <PieChart className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>Nu ai încă poziții în portofoliu.</p>
-                <p className="text-sm">Adaugă prima ta acțiune BVB!</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm" data-testid="portfolio-table">
+              <thead>
+                <tr className="border-b bg-muted/40">
+                  <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Simbol</th>
+                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Cant.</th>
+                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Intrare</th>
+                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Curent</th>
+                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Valoare</th>
+                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">P&L</th>
+                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Azi</th>
+                  <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">RSI</th>
+                  <th className="px-4 py-2.5"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
                 {positions.map((pos) => {
-                  const isProfit = pos.profit_loss >= 0;
+                  const posPlus = (pos.pl_percent || 0) >= 0;
+                  const todayPlus = (pos.price_change_percent || 0) >= 0;
                   return (
-                    <Card key={pos.symbol} className="bg-gray-50 dark:bg-zinc-900">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h3 className="text-xl font-bold">{pos.symbol}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {pos.shares} acțiuni @ {pos.avg_purchase_price.toFixed(2)} RON
-                            </p>
-                          </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleRemovePosition(pos.symbol)}
+                    <tr
+                      key={pos.symbol}
+                      className="hover:bg-muted/30 transition-colors group"
+                      data-testid={`portfolio-row-${pos.symbol}`}
+                    >
+                      {/* Simbol */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Link
+                            to={`/stocks/bvb/${pos.symbol}`}
+                            className="font-bold text-blue-600 hover:underline"
                           >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div>
-                            <p className="text-xs text-muted-foreground">Preț Curent</p>
-                            <p className="font-bold">{pos.current_price.toFixed(2)} RON</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground">Valoare Totală</p>
-                            <p className="font-bold">{formatRON(pos.total_value)}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground">Profit/Pierdere</p>
-                            <p className={`font-bold ${isProfit ? 'text-green-600' : 'text-red-600'}`}>
-                              {isProfit ? <TrendingUp className="w-4 h-4 inline mr-1" /> : <TrendingDown className="w-4 h-4 inline mr-1" />}
-                              {isProfit ? '+' : ''}{formatRON(pos.profit_loss)}
-                              <span className="text-sm ml-1">({pos.profit_loss_percent.toFixed(2)}%)</span>
-                            </p>
-                          </div>
-                          {pos.dividend_yield && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Dividend Yield</p>
-                              <p className="font-bold text-green-600">{pos.dividend_yield.toFixed(2)}%</p>
-                            </div>
+                            {pos.symbol}
+                          </Link>
+                          {pos.notes && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Info className="w-3 h-3 text-muted-foreground" />
+                                </TooltipTrigger>
+                                <TooltipContent>{pos.notes}</TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           )}
                         </div>
+                        <p className="text-xs text-muted-foreground truncate max-w-[140px]">
+                          {pos.name}
+                        </p>
+                      </td>
 
-                        {/* Technical Indicators (Mediu+) */}
-                        {level !== 'beginner' && pos.technical_indicators && (
-                          <div className="mt-4 pt-4 border-t">
-                            <p className="text-xs font-semibold mb-2">📈 Indicatori Tehnici:</p>
-                            <div className="grid grid-cols-3 gap-2 text-sm">
-                              {pos.technical_indicators.rsi && (
-                                <div>
-                                  <p className="text-xs text-muted-foreground">RSI(14)</p>
-                                  <p className="font-medium">{pos.technical_indicators.rsi.toFixed(1)}</p>
-                                </div>
-                              )}
-                              {pos.technical_indicators.sma_50 && (
-                                <div>
-                                  <p className="text-xs text-muted-foreground">SMA 50</p>
-                                  <p className="font-medium">{pos.technical_indicators.sma_50.toFixed(2)}</p>
-                                </div>
-                              )}
-                              {pos.technical_indicators.sma_200 && (
-                                <div>
-                                  <p className="text-xs text-muted-foreground">SMA 200</p>
-                                  <p className="font-medium">{pos.technical_indicators.sma_200.toFixed(2)}</p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
+                      {/* Cantitate */}
+                      <td className="px-4 py-3 text-right font-mono">
+                        {fmt(pos.shares, 0)}
+                      </td>
 
-                        {/* Fundamentals (Expert only) */}
-                        {level === 'advanced' && pos.fundamentals && (
-                          <div className="mt-4 pt-4 border-t">
-                            <p className="text-xs font-semibold mb-2">📋 Date Fundamentale:</p>
-                            <div className="grid grid-cols-3 gap-2 text-sm">
-                              {pos.fundamentals.pe_ratio && (
-                                <div>
-                                  <p className="text-xs text-muted-foreground">P/E</p>
-                                  <p className="font-medium">{pos.fundamentals.pe_ratio.toFixed(2)}</p>
-                                </div>
-                              )}
-                              {pos.fundamentals.pb_ratio && (
-                                <div>
-                                  <p className="text-xs text-muted-foreground">P/B</p>
-                                  <p className="font-medium">{pos.fundamentals.pb_ratio.toFixed(2)}</p>
-                                </div>
-                              )}
-                              {pos.fundamentals.roe && (
-                                <div>
-                                  <p className="text-xs text-muted-foreground">ROE</p>
-                                  <p className="font-medium">{pos.fundamentals.roe.toFixed(2)}%</p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                      {/* Preț intrare */}
+                      <td className="px-4 py-3 text-right font-mono text-muted-foreground">
+                        {fmt(pos.purchase_price)} RON
+                      </td>
+
+                      {/* Preț curent */}
+                      <td className="px-4 py-3 text-right font-mono font-medium">
+                        {pos.current_price != null ? (
+                          <span>{fmt(pos.current_price)} RON</span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">N/A</span>
                         )}
-                      </CardContent>
-                    </Card>
+                      </td>
+
+                      {/* Valoare totală */}
+                      <td className="px-4 py-3 text-right font-mono font-medium">
+                        {pos.current_value != null ? fmtRON(pos.current_value) : '—'}
+                      </td>
+
+                      {/* P&L total */}
+                      <td className="px-4 py-3 text-right">
+                        <PLCell value={pos.pl_ron} percent={pos.pl_percent} />
+                      </td>
+
+                      {/* Variație azi */}
+                      <td className="px-4 py-3 text-right">
+                        {pos.price_change_percent != null ? (
+                          <span className={`font-mono text-xs ${todayPlus ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                            {todayPlus ? '+' : ''}{fmt(pos.price_change_percent)}%
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">—</span>
+                        )}
+                      </td>
+
+                      {/* RSI */}
+                      <td className="px-4 py-3 text-center">
+                        <RSIBadge signal={pos.rsi_signal} rsi={pos.rsi} />
+                      </td>
+
+                      {/* Acțiuni */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => setEditPos(pos)}
+                            data-testid={`edit-${pos.symbol}`}
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-red-500 hover:text-red-600"
+                            onClick={() => setDeleteConfirm(pos.symbol)}
+                            data-testid={`delete-${pos.symbol}`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
                   );
                 })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              </tbody>
 
-        {/* AI Analysis (Mediu+) */}
-        {level !== 'beginner' && positions.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                Analiză AI Diversificare
-              </CardTitle>
-              <CardDescription>
-                AI analizează portofoliul tău și oferă sugestii de diversificare
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {aiAnalysis ? (
-                <div className="space-y-4">
-                  <div className="prose dark:prose-invert max-w-none">
-                    <p className="whitespace-pre-wrap">{aiAnalysis.analysis}</p>
-                  </div>
-                  {aiAnalysis.diversification_score !== undefined && (
-                    <p className="text-sm text-muted-foreground">
-                      Scor diversificare: <strong>{aiAnalysis.diversification_score}/100</strong>
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <Button onClick={handleGetAIAnalysis} disabled={loadingAI}>
-                  {loadingAI ? (
-                    <span className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Se analizează...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4" />
-                      Solicită Analiză AI
-                    </span>
-                  )}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        )}
-      </div>
+              {/* TOTAL ROW */}
+              <tfoot>
+                <tr className="border-t-2 bg-muted/20">
+                  <td className="px-4 py-3 font-bold text-sm" colSpan={4}>TOTAL</td>
+                  <td className="px-4 py-3 text-right font-bold font-mono">
+                    {fmtRON(summary.total_value)}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <PLCell value={summary.pl_ron} percent={summary.pl_percent} />
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <PLCell value={summary.today_pl} />
+                  </td>
+                  <td colSpan={2}></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          {/* DATA NOTE */}
+          <div className="px-4 py-2.5 border-t bg-muted/10">
+            <p className="text-xs text-muted-foreground">
+              Date live EODHD · RSI(14) · Prețuri BVB cu delay 15min · Actualizare la refresh
+            </p>
+          </div>
+        </Card>
+      )}
+
+      {/* ── DIALOGS ── */}
+      <PositionDialog
+        open={showAdd}
+        onClose={() => setShowAdd(false)}
+        onSave={handleAdd}
+        editData={null}
+        loading={saving}
+      />
+
+      <PositionDialog
+        open={!!editPos}
+        onClose={() => setEditPos(null)}
+        onSave={handleUpdate}
+        editData={editPos}
+        loading={saving}
+      />
+
+      {/* Delete confirm */}
+      <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Elimini {deleteConfirm}?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Poziția va fi eliminată definitiv din portofoliu.
+          </p>
+          <DialogFooter className="gap-2 mt-4">
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>Anulează</Button>
+            <Button
+              variant="destructive"
+              onClick={() => handleDelete(deleteConfirm)}
+              data-testid="confirm-delete-btn"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Elimină
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
