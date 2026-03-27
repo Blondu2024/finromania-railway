@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Coins, TrendingUp, Calendar, Calculator, Plus, Trash2, Download,
-  PiggyBank, Percent, Clock, DollarSign, BarChart3, RefreshCw, Info
+  PiggyBank, Percent, Clock, DollarSign, BarChart3, RefreshCw, Info,
+  Lock, Award, Shield, History, ChevronRight, Star
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -33,8 +34,10 @@ import {
   TooltipTrigger,
 } from '../components/ui/tooltip';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
 import { toast } from 'sonner';
 import SEO from '../components/SEO';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -360,9 +363,329 @@ const ResultsDisplay = ({ results }) => {
 };
 
 // ============================================
+// SCORE BADGE COMPONENT
+// ============================================
+const ScoreBadge = ({ score, rating, size = 'md' }) => {
+  const colors = {
+    'Excelent': 'from-emerald-500 to-green-600 text-white',
+    'Foarte Bun': 'from-blue-500 to-indigo-600 text-white',
+    'Bun': 'from-amber-400 to-yellow-500 text-black',
+    'Mediu': 'from-orange-400 to-orange-500 text-white',
+    'Slab': 'from-red-400 to-red-500 text-white',
+  };
+
+  const sizeClasses = size === 'lg'
+    ? 'w-16 h-16 text-xl'
+    : 'w-10 h-10 text-sm';
+
+  return (
+    <div className="flex flex-col items-center gap-0.5">
+      <div className={`${sizeClasses} rounded-full bg-gradient-to-br ${colors[rating] || colors['Mediu']} flex items-center justify-center font-bold shadow-lg`}>
+        {score}
+      </div>
+      <span className="text-[10px] font-medium text-muted-foreground">{rating}</span>
+    </div>
+  );
+};
+
+// ============================================
+// DIVIDEND HISTORY TAB (PRO)
+// ============================================
+const DividendHistoryTab = ({ isPro }) => {
+  const [rankings, setRankings] = useState([]);
+  const [loadingRankings, setLoadingRankings] = useState(false);
+  const [selectedSymbol, setSelectedSymbol] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
+  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+
+  useEffect(() => {
+    if (!isPro) return;
+    const fetchRankings = async () => {
+      setLoadingRankings(true);
+      try {
+        const res = await fetch(`${API_URL}/api/bvb-dividends/rankings`);
+        if (res.ok) {
+          const data = await res.json();
+          setRankings(data.rankings || []);
+          // If cache is refreshing, poll every 5 seconds
+          if (data.cache_refreshing && (!data.rankings || data.rankings.length === 0)) {
+            setTimeout(fetchRankings, 5000);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching rankings:', err);
+      } finally {
+        setLoadingRankings(false);
+      }
+    };
+    fetchRankings();
+  }, [isPro]);
+
+  const fetchAnalysis = async (symbol) => {
+    setSelectedSymbol(symbol);
+    setLoadingAnalysis(true);
+    try {
+      const res = await fetch(`${API_URL}/api/bvb-dividends/analysis/${symbol}`);
+      if (res.ok) {
+        const data = await res.json();
+        setAnalysis(data);
+      }
+    } catch (err) {
+      console.error('Error fetching analysis:', err);
+      toast.error('Eroare la încărcarea analizei');
+    } finally {
+      setLoadingAnalysis(false);
+    }
+  };
+
+  if (!isPro) {
+    return (
+      <Card className="border-amber-200">
+        <CardContent className="py-16 text-center">
+          <Lock className="w-12 h-12 mx-auto mb-4 text-amber-500 opacity-60" />
+          <h3 className="text-xl font-bold mb-2">Istoric Dividende PRO</h3>
+          <p className="text-muted-foreground mb-4 max-w-md mx-auto">
+            Acces la analiza avansată: Dividend Score, CAGR, stabilitate, grafice pe ani și clasamentul complet BVB.
+          </p>
+          <Button onClick={() => window.location.href = '/pricing'} className="bg-gradient-to-r from-amber-500 to-orange-500">
+            <Award className="w-4 h-4 mr-2" />
+            Upgrade la PRO
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Analysis Panel */}
+      <AnimatePresence>
+        {analysis && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <Card className="border-2 border-blue-200 bg-gradient-to-br from-slate-50 to-blue-50/30">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <History className="w-5 h-5 text-blue-600" />
+                      {analysis.symbol} — {analysis.company}
+                    </CardTitle>
+                    <CardDescription>
+                      {analysis.current_price} RON • {analysis.data_years} ani de date • Sursa: BVB.ro + EODHD
+                    </CardDescription>
+                  </div>
+                  <ScoreBadge score={analysis.dividend_score.score} rating={analysis.dividend_score.rating} size="lg" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  <div className="bg-white rounded-lg p-3 shadow-sm border">
+                    <div className="text-xs text-muted-foreground">Yield Actual</div>
+                    <div className="text-lg font-bold text-green-600">{analysis.current_yield}%</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 shadow-sm border">
+                    <div className="text-xs text-muted-foreground">CAGR</div>
+                    <div className={`text-lg font-bold ${analysis.metrics.cagr >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      {analysis.metrics.cagr != null ? `${analysis.metrics.cagr}%` : 'N/A'}
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 shadow-sm border">
+                    <div className="text-xs text-muted-foreground">Ani Consecutivi</div>
+                    <div className="text-lg font-bold">{analysis.metrics.consecutive_years}</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 shadow-sm border">
+                    <div className="text-xs text-muted-foreground">Total Ani cu Div.</div>
+                    <div className="text-lg font-bold">{analysis.metrics.total_paying_years}</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 shadow-sm border">
+                    <div className="text-xs text-muted-foreground">Consistență</div>
+                    <div className={`text-lg font-bold ${analysis.metrics.consistency_cv < 50 ? 'text-green-600' : analysis.metrics.consistency_cv < 80 ? 'text-amber-500' : 'text-red-500'}`}>
+                      {analysis.metrics.consistency_cv < 30 ? 'Stabil' : analysis.metrics.consistency_cv < 60 ? 'Moderat' : 'Variabil'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Score Breakdown */}
+                <div className="bg-white rounded-lg p-4 shadow-sm border">
+                  <h4 className="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                    <Shield className="w-4 h-4 text-blue-500" />
+                    Dividend Score — Detalii
+                  </h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { label: 'Stabilitate', value: analysis.dividend_score.breakdown.stability, max: 40, color: 'bg-emerald-500' },
+                      { label: 'Creștere', value: analysis.dividend_score.breakdown.growth, max: 30, color: 'bg-blue-500' },
+                      { label: 'Randament', value: analysis.dividend_score.breakdown.yield_score, max: 30, color: 'bg-amber-500' },
+                    ].map((item) => (
+                      <div key={item.label}>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-muted-foreground">{item.label}</span>
+                          <span className="font-bold">{item.value}/{item.max}</span>
+                        </div>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${item.color} rounded-full transition-all`}
+                            style={{ width: `${(item.value / item.max) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Yearly Dividend Chart */}
+                {analysis.yearly_dividends.length > 0 && (
+                  <div className="bg-white rounded-lg p-4 shadow-sm border">
+                    <h4 className="text-sm font-semibold mb-3">Dividend per An (RON/acțiune)</h4>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <BarChart data={analysis.yearly_dividends} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+                        <YAxis tick={{ fontSize: 11 }} />
+                        <RechartsTooltip
+                          formatter={(value) => [`${Number(value).toFixed(4)} RON`, 'Dividend']}
+                          contentStyle={{ borderRadius: '8px', fontSize: '13px' }}
+                        />
+                        <Bar dataKey="dividend" radius={[4, 4, 0, 0]}>
+                          {analysis.yearly_dividends.map((entry, idx) => (
+                            <Cell key={idx} fill={idx === analysis.yearly_dividends.length - 1 ? '#10b981' : '#3b82f6'} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+
+                {/* Payment History Table */}
+                <details className="bg-white rounded-lg shadow-sm border">
+                  <summary className="px-4 py-3 cursor-pointer text-sm font-semibold hover:bg-gray-50">
+                    Toate plățile ({analysis.payments.length})
+                  </summary>
+                  <div className="px-4 pb-3 overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Data</TableHead>
+                          <TableHead className="text-right">Dividend</TableHead>
+                          <TableHead className="text-right">Sursă</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {analysis.payments.map((p, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell className="font-mono text-sm">{p.date}</TableCell>
+                            <TableCell className="text-right font-mono font-semibold text-green-600">{p.dividend.toFixed(4)} RON</TableCell>
+                            <TableCell className="text-right text-xs text-muted-foreground">{p.source}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </details>
+
+                <Button variant="ghost" size="sm" onClick={() => { setAnalysis(null); setSelectedSymbol(null); }}>
+                  Închide analiza
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Rankings Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2" data-testid="dividend-history-title">
+            <Award className="w-5 h-5 text-amber-500" />
+            Clasament Dividend Score BVB
+          </CardTitle>
+          <CardDescription>
+            Scor calculat din: Stabilitate (40%) + Creștere (30%) + Randament (30%) • Sursa: BVB.ro + EODHD
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loadingRankings ? (
+            <div className="text-center py-8">
+              <RefreshCw className="w-8 h-8 mx-auto animate-spin text-muted-foreground" />
+              <p className="text-sm text-muted-foreground mt-2">Se calculează scorurile...</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-10">#</TableHead>
+                    <TableHead>Acțiune</TableHead>
+                    <TableHead className="text-center">Score</TableHead>
+                    <TableHead className="text-right">Yield</TableHead>
+                    <TableHead className="text-right">CAGR</TableHead>
+                    <TableHead className="text-right">Ani Consec.</TableHead>
+                    <TableHead className="text-center">Detalii</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rankings.map((r, idx) => (
+                    <TableRow
+                      key={r.symbol}
+                      className={`hover:bg-muted/50 cursor-pointer ${selectedSymbol === r.symbol ? 'bg-blue-50' : ''}`}
+                      onClick={() => fetchAnalysis(r.symbol)}
+                      data-testid={`ranking-row-${r.symbol}`}
+                    >
+                      <TableCell className="font-bold text-muted-foreground">{idx + 1}</TableCell>
+                      <TableCell>
+                        <div>
+                          <span className="font-bold text-blue-600">{r.symbol}</span>
+                          <p className="text-xs text-muted-foreground truncate max-w-[200px]">{r.company}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <ScoreBadge score={r.dividend_score} rating={r.rating} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Badge variant={r.current_yield >= 5 ? 'default' : 'secondary'} className={r.current_yield >= 5 ? 'bg-green-600' : ''}>
+                          {r.current_yield}%
+                        </Badge>
+                      </TableCell>
+                      <TableCell className={`text-right font-mono ${r.cagr != null && r.cagr >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                        {r.cagr != null ? `${r.cagr}%` : '—'}
+                      </TableCell>
+                      <TableCell className="text-right font-mono">{r.consecutive_years}</TableCell>
+                      <TableCell className="text-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={loadingAnalysis && selectedSymbol === r.symbol}
+                        >
+                          {loadingAnalysis && selectedSymbol === r.symbol ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// ============================================
 // MAIN COMPONENT
 // ============================================
 export default function DividendCalculatorPage() {
+  const { user } = useAuth();
+  const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
   const [stocks, setStocks] = useState([]);
   const [portfolio, setPortfolio] = useState([]);
   const [results, setResults] = useState(null);
@@ -465,6 +788,11 @@ export default function DividendCalculatorPage() {
             <TabsTrigger value="stocks">
               <BarChart3 className="w-4 h-4 mr-2" />
               Acțiuni cu Dividende
+            </TabsTrigger>
+            <TabsTrigger value="history" data-testid="tab-istoric-dividende">
+              <History className="w-4 h-4 mr-2" />
+              Istoric Dividende
+              {!isPro && <Lock className="w-3 h-3 ml-1 opacity-50" />}
             </TabsTrigger>
           </TabsList>
 
@@ -605,6 +933,10 @@ export default function DividendCalculatorPage() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="history">
+            <DividendHistoryTab isPro={isPro} />
           </TabsContent>
         </Tabs>
 
