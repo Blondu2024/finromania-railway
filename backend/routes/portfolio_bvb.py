@@ -1,8 +1,11 @@
 """
 Portofoliu BVB PRO — Exclusiv pentru utilizatori PRO
 Date reale din EODHD, fără improvizații sau estimări.
+Faza 1: CRUD + Live P&L + RSI
+Faza 2: Grafic evoluție + Alocare sector + Fundamentale
 """
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict
 from datetime import datetime, timezone
@@ -369,9 +372,122 @@ async def export_portfolio(user: dict = Depends(require_auth)):
 
     csv = "\n".join([",".join([f'"{c}"' for c in row]) for row in rows])
 
-    from fastapi.responses import Response
-    return Response(
+    from fastapi.responses import Response as FResponse
+    return FResponse(
         content="\ufeff" + csv,
         media_type="text/csv",
         headers={"Content-Disposition": f"attachment; filename=portofoliu_bvb_{datetime.now().strftime('%Y%m%d')}.csv"},
     )
+
+
+
+# ─────────────────────────────────────────
+# FAZA 2: ANALIZĂ — Grafic + Sector + Fundamentale
+# ─────────────────────────────────────────
+
+@router.get("/analysis")
+async def get_portfolio_analysis(user: dict = Depends(require_auth)):
+    """
+    Faza 2 — Analiză completă portofoliu:
+    - Istoric valoare zilnică (pentru grafic evoluție)
+    - Alocare per sector (pentru donut chart)
+    - Fundamentale per poziție din cache zilnic (P/E, ROE, EPS, D/E)
+      STRICT: null dacă nu există în cache — fără improvizații
+    """
+    _require_pro(user)
+
+    db = await get_database()
+    raw = await db.portfolio_bvb_pro.find(
+        {"user_id": user["user_id"]}, {"_id": 0}
+    ).to_list(200)
+
+    if not raw:
+        return {"sector_allocation": [], "fundamentals": [], "history": []}
+
+    symbols = [p["symbol"] for p in raw]
+
+    # ── Prețuri live pentru calcul valori actuale ──
+    async with httpx.AsyncClient() as client:
+        price_tasks = [_get_live_price(client, sym) for sym in symbols]
+        prices = await asyncio.gather(*price_tasks)
+
+    # ── Info stocuri din MongoDB ──
+    stocks_db = await db.stocks_bvb.find(
+        {"symbol": {"$in": symbols}},
+        {"_id": 0, "symbol": 1, "sector": 1, "name": 1},
+    ).to_list(200)
+    info_map = {s["symbol"]: s for s in stocks_db}
+
+    # ── Calcul valori per poziție ──
+    position_values: Dict[str, float] = {}
+    total_value = 0.0
+    for i, pos in enumerate(raw):
+        price = prices[i].get("price") or pos["purchase_price"]
+        val = pos["shares"] * price
+        position_values[pos["symbol"]] = round(val, 2)
+        total_value += val
+
+    # ── Alocare per sector ──
+    sector_totals: Dict[str, float] = {}
+    for sym, val in position_values.items():
+        sector = info_map.get(sym, {}).get("sector") or "Altele"
+        sector_totals[sector] = sector_totals.get(sector, 0) + val
+
+    sector_allocation = sorted(
+        [
+            {
+                "sector": sector,
+                "value": round(val, 2),
+                "percent": round(val / total_value * 100, 1) if total_value > 0 else 0,
+            }
+            for sector, val in sector_totals.items()
+        ],
+        key=lambda x: -x["value"],
+    )
+
+    # ── Fundamentale din cache zilnic (STRICT: null dacă lipsesc) ──
+    fundamentals = []
+    for sym in symbols:
+        cached = await db.fundamentals_daily_cache.find_one(
+            {"symbol": sym}, {"_id": 0}
+        )
+        roe_raw = cached.get("roe") if cached else None
+        roe_pct = round(roe_raw * 100, 1) if roe_raw is not None and abs(roe_raw) < 10 else roe_raw
+        fundamentals.append({
+            "symbol": sym,
+            "name": info_map.get(sym, {}).get("name", sym),
+            "pe_ratio": cached.get("pe_ratio") if cached else None,
+            "roe_percent": roe_pct,
+            "eps": cached.get("eps") if cached else None,
+            "debt_equity": cached.get("debt_equity") if cached else None,
+            "pb_ratio": cached.get("pb_ratio") if cached else None,
+            "cached_at": cached.get("cached_at") if cached else None,
+        })
+
+    # ── Salvare snapshot zilnic (o dată pe zi) ──
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    existing_snap = await db.portfolio_value_history.find_one(
+        {"user_id": user["user_id"], "date": today}
+    )
+    if not existing_snap and total_value > 0:
+        await db.portfolio_value_history.insert_one({
+            "user_id": user["user_id"],
+            "date": today,
+            "value": round(total_value, 2),
+        })
+        logger.info(f"[PORTFOLIO] Snapshot saved for {user['user_id']}: {total_value:.2f} RON")
+
+    # ── Istoric (ultimele 90 de zile) ──
+    history_docs = await db.portfolio_value_history.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "date": 1, "value": 1},
+    ).sort("date", 1).limit(90).to_list(90)
+
+    history = [{"date": h["date"], "value": h["value"]} for h in history_docs]
+
+    return {
+        "sector_allocation": sector_allocation,
+        "fundamentals": fundamentals,
+        "history": history,
+        "total_value": round(total_value, 2),
+    }
