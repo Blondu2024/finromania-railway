@@ -1,77 +1,107 @@
 import React, { useState, useEffect } from 'react';
-import { Download, X } from 'lucide-react';
+import { Download, X, Share } from 'lucide-react';
 import { Button } from './ui/button';
 
-export default function InstallPWA() {
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [showBanner, setShowBanner] = useState(false);
+// ─── Detectare platformă ──────────────────────────────────────────────────────
+function getInstallContext() {
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isAndroid = /Android/.test(ua);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+  const isChrome = /Chrome/.test(ua) && /Google Inc/.test(navigator.vendor);
+  const isInStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
 
-  useEffect(() => {
-    // Check if already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    if (isStandalone) return;
+  return { isIOS, isAndroid, isSafari, isChrome, isInStandalone };
+}
 
-    // Check if dismissed recently (24 hours)
-    const dismissedTime = localStorage.getItem('pwa_banner_dismissed');
-    if (dismissedTime && Date.now() - parseInt(dismissedTime) < 24 * 60 * 60 * 1000) {
-      return;
-    }
-
-    // Listen for beforeinstallprompt (Chrome Android/Desktop)
-    const handleBeforeInstall = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      // Show banner after 5 seconds
-      setTimeout(() => setShowBanner(true), 5000);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
-  }, []);
-
-  const handleInstall = async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setShowBanner(false);
-    }
-    setDeferredPrompt(null);
-  };
-
-  const handleDismiss = () => {
-    setShowBanner(false);
-    localStorage.setItem('pwa_banner_dismissed', Date.now().toString());
-  };
-
-  // Only show on Chrome/Android/Desktop - not iOS
-  if (!showBanner || !deferredPrompt) return null;
-
+// ─── Banner iOS (instrucțiuni Share → Adaugă la ecran) ───────────────────────
+function IOSInstallBanner({ onDismiss }) {
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-4 shadow-2xl z-50 animate-in slide-in-from-bottom-5">
-      <button 
-        onClick={handleDismiss}
-        className="absolute top-2 right-2 p-1 hover:bg-white/20 rounded-full transition-colors"
+    <div
+      className="fixed bottom-4 left-3 right-3 bg-white dark:bg-zinc-900 border border-border rounded-2xl p-4 shadow-2xl z-50 animate-in slide-in-from-bottom-4"
+      data-testid="pwa-ios-banner"
+    >
+      {/* Close */}
+      <button
+        onClick={onDismiss}
+        className="absolute top-3 right-3 p-1 hover:bg-muted rounded-full transition-colors"
+        aria-label="Închide"
+      >
+        <X className="w-4 h-4 text-muted-foreground" />
+      </button>
+
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-3 pr-6">
+        <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <span className="text-white font-bold text-lg">F</span>
+        </div>
+        <div>
+          <p className="font-bold text-sm">Instalează FinRomania</p>
+          <p className="text-xs text-muted-foreground">Acces rapid de pe ecranul principal</p>
+        </div>
+      </div>
+
+      {/* Steps */}
+      <div className="space-y-2.5">
+        <div className="flex items-center gap-3 text-sm">
+          <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+          <span>Apasă butonul <strong className="inline-flex items-center gap-1">Share <Share className="w-3.5 h-3.5 text-blue-600" /></strong> din bara Safari</span>
+        </div>
+        <div className="flex items-center gap-3 text-sm">
+          <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+          <span>Selectează <strong>"Adaugă la ecranul de start"</strong></span>
+        </div>
+        <div className="flex items-center gap-3 text-sm">
+          <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
+          <span>Apasă <strong>"Adaugă"</strong> — gata!</span>
+        </div>
+      </div>
+
+      {/* Arrow pointing down to share button */}
+      <div className="flex justify-center mt-3">
+        <p className="text-xs text-muted-foreground text-center">
+          Aplicația funcționează offline și se actualizează automat
+        </p>
+      </div>
+
+      {/* Bottom triangle pointing to bottom bar */}
+      <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-white dark:bg-zinc-900 border-r border-b border-border rotate-45" />
+    </div>
+  );
+}
+
+// ─── Banner Android/Desktop (beforeinstallprompt) ────────────────────────────
+function AndroidInstallBanner({ onInstall, onDismiss }) {
+  return (
+    <div
+      className="fixed bottom-4 left-3 right-3 sm:left-auto sm:right-4 sm:w-80 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl p-4 shadow-2xl z-50 animate-in slide-in-from-bottom-4"
+      data-testid="pwa-android-banner"
+    >
+      <button
+        onClick={onDismiss}
+        className="absolute top-2.5 right-2.5 p-1 hover:bg-white/20 rounded-full transition-colors"
+        aria-label="Închide"
       >
         <X className="w-4 h-4" />
       </button>
-      
+
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
           <Download className="w-6 h-6" />
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 pr-4">
           <h4 className="font-bold text-sm">Instalează FinRomania</h4>
           <p className="text-xs text-blue-100 mt-0.5">
-            Adaugă aplicația pe telefon pentru acces rapid
+            Adaugă aplicația pe telefon pentru acces rapid, chiar și offline
           </p>
-          <Button 
-            onClick={handleInstall}
+          <Button
+            onClick={onInstall}
             size="sm"
             variant="secondary"
             className="mt-2 text-xs h-8"
+            data-testid="pwa-install-btn"
           >
             Instalează Acum
           </Button>
@@ -79,4 +109,56 @@ export default function InstallPWA() {
       </div>
     </div>
   );
+}
+
+// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
+export default function InstallPWA() {
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showAndroidBanner, setShowAndroidBanner] = useState(false);
+  const [showIOSBanner, setShowIOSBanner] = useState(false);
+
+  useEffect(() => {
+    const { isIOS, isSafari, isInStandalone } = getInstallContext();
+
+    // Dacă e deja instalată — nu arăta nimic
+    if (isInStandalone) return;
+
+    // Verifică dacă bannerul a fost dat dismiss recent (48 ore)
+    const dismissedAt = localStorage.getItem('pwa_banner_dismissed');
+    if (dismissedAt && Date.now() - parseInt(dismissedAt) < 48 * 60 * 60 * 1000) return;
+
+    if (isIOS && isSafari) {
+      // iOS Safari — arată instrucțiunile manuale după 4 secunde
+      const timer = setTimeout(() => setShowIOSBanner(true), 4000);
+      return () => clearTimeout(timer);
+    }
+
+    // Android Chrome / Desktop — ascultă beforeinstallprompt
+    const handleBeforeInstall = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setTimeout(() => setShowAndroidBanner(true), 5000);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+  }, []);
+
+  const handleAndroidInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') setShowAndroidBanner(false);
+    setDeferredPrompt(null);
+  };
+
+  const handleDismiss = () => {
+    setShowAndroidBanner(false);
+    setShowIOSBanner(false);
+    localStorage.setItem('pwa_banner_dismissed', Date.now().toString());
+  };
+
+  if (showIOSBanner) return <IOSInstallBanner onDismiss={handleDismiss} />;
+  if (showAndroidBanner && deferredPrompt) return <AndroidInstallBanner onInstall={handleAndroidInstall} onDismiss={handleDismiss} />;
+  return null;
 }
