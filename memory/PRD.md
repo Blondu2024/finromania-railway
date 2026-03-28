@@ -32,6 +32,19 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - News system (Romanian RSS + international)
 - In-app notifications for price alerts
 - Interactive onboarding tour
+- **Mobile Responsive Overhaul** (March 28, 2026):
+  - Global overflow-x: hidden on html/body/#root prevents horizontal scroll on ALL pages
+  - Main content div has min-w-0 + overflow-x-hidden
+  - StocksPage: Table wrapped in overflow-x-auto, columns hidden on mobile (Companie, Sector, Volum), smaller heading
+  - GlobalMarketsPage: Tabs shortened labels for mobile, flex-col layout on small screens
+  - ScreenerProPage: Signal summary grid cols-2→3→5 responsive
+  - DividendCalculatorPage: Tabs with abbreviated mobile labels, overflow-x-auto wrapper
+  - FiscalCalculatorPage: Responsive h1 (text-2xl→4xl→5xl)
+  - PricingPage, FAQPage, DividendCalendarPage, StockDetailPage: Responsive headings
+  - PortfolioBVBPage: Sector donut chart flex-col on mobile, subscription loading state prevents paywall flash
+  - BetaDisclaimer banner: Compact on mobile (1 line)
+  - PRO status fix: ScreenerPro, DividendCalc, PortfolioBVB now fetch /api/subscriptions/status on mount (no stale context after PRO activation)
+  - PaymentSuccessPage: Calls checkAuth() after payment confirmed (instant PRO unlock)
 
 ### PRO Features (NEW - March 26, 2026)
 - **Screener PRO** - Advanced stock screener with:

@@ -804,12 +804,22 @@ export default function GlobalMarketsPage() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="overflow-x-auto">
-              <TabsList className="flex-shrink-0">
-                <TabsTrigger value="all">🌐 Toate</TabsTrigger>
-                <TabsTrigger value="indices">📊 Indici</TabsTrigger>
-                <TabsTrigger value="commodities">🛢️ Comodități</TabsTrigger>
-                <TabsTrigger value="crypto">₿ Crypto</TabsTrigger>
-                <TabsTrigger value="forex">💱 Forex</TabsTrigger>
+              <TabsList className="flex-shrink-0 w-full sm:w-auto">
+                <TabsTrigger value="all">
+                  <span className="hidden sm:inline">🌐 </span>Toate
+                </TabsTrigger>
+                <TabsTrigger value="indices">
+                  <span className="hidden sm:inline">📊 </span>Indici
+                </TabsTrigger>
+                <TabsTrigger value="commodities">
+                  <span className="hidden sm:inline">🛢️ </span>Materii
+                </TabsTrigger>
+                <TabsTrigger value="crypto">
+                  <span className="hidden sm:inline">₿ </span>Crypto
+                </TabsTrigger>
+                <TabsTrigger value="forex">
+                  <span className="hidden sm:inline">💱 </span>Forex
+                </TabsTrigger>
               </TabsList>
             </div>
             

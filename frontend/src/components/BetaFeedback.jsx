@@ -28,26 +28,26 @@ export function BetaDisclaimer() {
   if (dismissed) return null;
   
   return (
-    <div className="bg-amber-500 text-amber-950 py-2 px-4">
-      <div className="container mx-auto flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-2 flex-1">
-          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-          <span className="text-sm">
-            <strong>Versiune BETA</strong> - Platforma este în dezvoltare activă. 
-            Datele pot conține erori. Nu luați decizii financiare bazate exclusiv pe aceste informații.
+    <div className="bg-amber-500 text-amber-950 py-1.5 px-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="text-xs">
+            <strong>BETA</strong>
+            <span className="hidden sm:inline"> - Datele pot conține erori. Nu luați decizii financiare exclusiv pe baza acestor date.</span>
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <a href="mailto:feedback@finromania.ro?subject=Feedback%20FinRomania%20BETA" className="text-amber-950 hover:underline text-sm font-medium">
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <a href="mailto:feedback@finromania.ro?subject=Feedback%20FinRomania%20BETA" className="text-amber-950 hover:underline text-xs font-medium hidden sm:inline">
             Trimite feedback →
           </a>
           <Button 
             variant="ghost" 
             size="sm" 
-            className="h-6 w-6 p-0 hover:bg-amber-400"
+            className="h-5 w-5 p-0 hover:bg-amber-400"
             onClick={handleDismiss}
           >
-            <X className="w-4 h-4" />
+            <X className="w-3 h-3" />
           </Button>
         </div>
       </div>
