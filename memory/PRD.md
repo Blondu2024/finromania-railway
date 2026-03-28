@@ -351,3 +351,10 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - /app/frontend/src/components/MarketSignals.jsx - 52 Week Extremes + Unusual Volume widgets
 - /app/backend/services/daily_summary_service.py
 - /app/backend/services/notification_service.py
+
+## CSV Import & Refactorizare (March 28, 2026)
+- Refactorizare PortfolioBVBPage: 1402 → 484 linii, componente în /components/portfolio/
+- Import CSV Brokeri: XTB (TLVRO→TLV), Tradeville (semicolon, română), Generic
+- Endpoint: POST /api/portfolio-bvb/parse-csv + /import-positions
+- CSVImportDialog: drag&drop, preview, confirmare, medie ponderată la duplicate
+

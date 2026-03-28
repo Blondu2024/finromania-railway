@@ -932,3 +932,338 @@ async def get_portfolio_news(user: dict = Depends(require_auth)):
         "symbols_searched": symbols,
         "count": len(tagged),
     }
+
+
+# ─────────────────────────────────────────
+# CSV IMPORT — Parse + Bulk Import
+# ─────────────────────────────────────────
+
+from fastapi import UploadFile, File
+import csv
+import io
+import re
+
+
+# BVB symbols whitelist (known valid symbols — fallback: accept anything 2-6 uppercase letters)
+BVB_SYMBOL_RE = re.compile(r'^[A-Z0-9]{2,6}$')
+
+
+def _normalize_symbol(raw: str) -> str:
+    """Normalizează simbolul: elimină sufixe broker (RO, .BVB, etc.)"""
+    s = raw.strip().upper()
+    # XTB: TLVRO → TLV, SNPRO → SNP
+    if s.endswith('RO') and len(s) > 4:
+        candidate = s[:-2]
+        if BVB_SYMBOL_RE.match(candidate):
+            return candidate
+    # Tradeville/generic: TLV.BVB → TLV
+    s = s.split('.')[0].split('/')[0]
+    return s
+
+
+def _detect_broker(headers: list[str]) -> str:
+    """Detectează brokerul din antetul CSV."""
+    h = [c.lower().strip() for c in headers]
+    # XTB: Position, Symbol, Type, Open price, Volume
+    if any(x in h for x in ['position', 'open price', 'volume', 'open time']):
+        return 'xtb'
+    # Tradeville: Simbol, Cantitate, Pret mediu cumparare
+    if any(x in h for x in ['simbol', 'cantitate', 'pret mediu', 'pret mediu cumparare']):
+        return 'tradeville'
+    return 'generic'
+
+
+def _parse_xtb(reader) -> tuple[list, list]:
+    """Parsează CSV de la XTB — poziții deschise."""
+    positions = []
+    errors = []
+    for i, row in enumerate(reader):
+        try:
+            # XTB headers: Position, Symbol, Type, Open time, Open price, Nominal value, ...
+            # sau: Position ID, Symbol, Volume, Open Price, ...
+            symbol_raw = row.get('Symbol') or row.get('symbol') or ''
+            volume_raw = row.get('Volume') or row.get('volume') or row.get('Qty') or ''
+            price_raw = (
+                row.get('Open price') or row.get('Open Price') or
+                row.get('open price') or row.get('Open_price') or ''
+            )
+            if not symbol_raw or not volume_raw or not price_raw:
+                errors.append(f"Rând {i+2}: câmpuri lipsă ({symbol_raw})")
+                continue
+
+            symbol = _normalize_symbol(symbol_raw)
+            if not BVB_SYMBOL_RE.match(symbol):
+                errors.append(f"Rând {i+2}: simbol invalid '{symbol_raw}'")
+                continue
+
+            shares = float(str(volume_raw).replace(',', '.'))
+            price = float(str(price_raw).replace(',', '.'))
+
+            if shares <= 0 or price <= 0:
+                errors.append(f"Rând {i+2}: cantitate/preț invalid")
+                continue
+
+            positions.append({
+                "symbol": symbol,
+                "shares": shares,
+                "purchase_price": round(price, 4),
+            })
+        except (ValueError, TypeError) as e:
+            errors.append(f"Rând {i+2}: eroare de parsare — {e}")
+
+    return positions, errors
+
+
+def _parse_tradeville(reader) -> tuple[list, list]:
+    """Parsează CSV de la Tradeville."""
+    positions = []
+    errors = []
+    for i, row in enumerate(reader):
+        try:
+            symbol_raw = (
+                row.get('Simbol') or row.get('simbol') or
+                row.get('Symbol') or row.get('symbol') or ''
+            )
+            qty_raw = (
+                row.get('Cantitate') or row.get('cantitate') or
+                row.get('Qty') or row.get('Quantity') or ''
+            )
+            price_raw = (
+                row.get('Pret mediu cumparare') or row.get('Pret mediu') or
+                row.get('Pret') or row.get('Price') or row.get('price') or ''
+            )
+            if not symbol_raw or not qty_raw or not price_raw:
+                errors.append(f"Rând {i+2}: câmpuri lipsă")
+                continue
+
+            symbol = _normalize_symbol(symbol_raw)
+            if not BVB_SYMBOL_RE.match(symbol):
+                errors.append(f"Rând {i+2}: simbol invalid '{symbol_raw}'")
+                continue
+
+            shares = float(str(qty_raw).replace(',', '.').replace(' ', ''))
+            price = float(str(price_raw).replace(',', '.').replace(' ', ''))
+
+            if shares <= 0 or price <= 0:
+                errors.append(f"Rând {i+2}: cantitate/preț invalid")
+                continue
+
+            positions.append({
+                "symbol": symbol,
+                "shares": shares,
+                "purchase_price": round(price, 4),
+            })
+        except (ValueError, TypeError) as e:
+            errors.append(f"Rând {i+2}: eroare — {e}")
+
+    return positions, errors
+
+
+def _parse_generic(reader) -> tuple[list, list]:
+    """Parsează CSV generic: Symbol/Simbol, Quantity/Cantitate, Price/Pret."""
+    positions = []
+    errors = []
+    for i, row in enumerate(reader):
+        try:
+            symbol_raw = (
+                row.get('Symbol') or row.get('symbol') or
+                row.get('Simbol') or row.get('simbol') or
+                row.get('Ticker') or row.get('ticker') or ''
+            )
+            qty_raw = (
+                row.get('Quantity') or row.get('quantity') or
+                row.get('Cantitate') or row.get('cantitate') or
+                row.get('Shares') or row.get('shares') or
+                row.get('Qty') or row.get('qty') or ''
+            )
+            price_raw = (
+                row.get('Price') or row.get('price') or
+                row.get('Pret') or row.get('pret') or
+                row.get('Avg Price') or row.get('Purchase Price') or
+                row.get('Pret mediu') or ''
+            )
+            if not symbol_raw or not qty_raw or not price_raw:
+                errors.append(f"Rând {i+2}: câmpuri lipsă")
+                continue
+
+            symbol = _normalize_symbol(symbol_raw)
+            if not BVB_SYMBOL_RE.match(symbol):
+                errors.append(f"Rând {i+2}: simbol invalid '{symbol_raw}'")
+                continue
+
+            shares = float(str(qty_raw).replace(',', '.').replace(' ', ''))
+            price = float(str(price_raw).replace(',', '.').replace(' ', ''))
+
+            if shares <= 0 or price <= 0:
+                errors.append(f"Rând {i+2}: cantitate/preț invalid")
+                continue
+
+            positions.append({
+                "symbol": symbol,
+                "shares": shares,
+                "purchase_price": round(price, 4),
+            })
+        except (ValueError, TypeError) as e:
+            errors.append(f"Rând {i+2}: eroare — {e}")
+
+    return positions, errors
+
+
+@router.post("/parse-csv")
+async def parse_csv(
+    file: UploadFile = File(...),
+    user: dict = Depends(require_auth)
+):
+    """
+    Parsează un CSV de la XTB, Tradeville sau format generic.
+    Returnează pozițiile detectate + eventuale erori de parsare.
+    Nu salvează nimic — doar preview.
+    """
+    _require_pro(user)
+
+    if not file.filename.endswith(('.csv', '.txt')):
+        raise HTTPException(status_code=400, detail="Fișierul trebuie să fie .csv")
+
+    if file.size and file.size > 5 * 1024 * 1024:  # 5MB limit
+        raise HTTPException(status_code=400, detail="Fișierul este prea mare (max 5MB)")
+
+    try:
+        content = await file.read()
+        # Detectează encoding
+        try:
+            text = content.decode('utf-8-sig')  # BOM handling
+        except UnicodeDecodeError:
+            text = content.decode('latin-1')
+
+        # Detectează delimitatorul (comma sau semicolon)
+        delimiter = ';' if text.count(';') > text.count(',') else ','
+
+        reader = csv.DictReader(io.StringIO(text), delimiter=delimiter)
+        headers = reader.fieldnames or []
+
+        if not headers:
+            raise HTTPException(status_code=400, detail="CSV gol sau fără antet")
+
+        broker = _detect_broker(list(headers))
+
+        rows = list(reader)
+        if broker == 'xtb':
+            positions, errors = _parse_xtb(rows)
+        elif broker == 'tradeville':
+            positions, errors = _parse_tradeville(rows)
+        else:
+            positions, errors = _parse_generic(rows)
+
+        # Deduplicare — merge poziții cu același simbol (preț mediu ponderat)
+        merged = {}
+        for p in positions:
+            sym = p['symbol']
+            if sym in merged:
+                existing = merged[sym]
+                total_shares = existing['shares'] + p['shares']
+                avg_price = (
+                    (existing['shares'] * existing['purchase_price']) +
+                    (p['shares'] * p['purchase_price'])
+                ) / total_shares
+                merged[sym] = {
+                    'symbol': sym,
+                    'shares': total_shares,
+                    'purchase_price': round(avg_price, 4),
+                }
+            else:
+                merged[sym] = p
+
+        final_positions = list(merged.values())
+
+        return {
+            "broker": broker,
+            "positions": final_positions,
+            "errors": errors,
+            "total_rows": len(rows),
+            "valid_positions": len(final_positions),
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"CSV parse error: {e}")
+        raise HTTPException(status_code=500, detail=f"Eroare la parsarea CSV: {str(e)}")
+
+
+class ImportPositionsRequest(BaseModel):
+    positions: List[AddPositionRequest]
+
+
+@router.post("/import-positions")
+async def import_positions(
+    data: ImportPositionsRequest,
+    user: dict = Depends(require_auth)
+):
+    """
+    Importă bulk pozițiile parsate din CSV în portofoliu.
+    Dacă există deja o poziție cu același simbol, face medie ponderată.
+    """
+    _require_pro(user)
+    db = await get_database()
+    user_id = user["user_id"]
+
+    imported = 0
+    updated = 0
+    skipped = 0
+    errors = []
+
+    for pos in data.positions:
+        try:
+            symbol = pos.symbol.upper()
+
+            existing = await db.portfolio_holdings.find_one(
+                {"user_id": user_id, "symbol": symbol},
+                {"_id": 0}
+            )
+
+            if existing:
+                # Medie ponderată pentru preț de intrare
+                old_shares = existing.get("shares", 0)
+                old_price = existing.get("purchase_price", 0)
+                new_shares = old_shares + pos.shares
+                new_price = (
+                    (old_shares * old_price + pos.shares * pos.purchase_price) / new_shares
+                )
+
+                await db.portfolio_holdings.update_one(
+                    {"user_id": user_id, "symbol": symbol},
+                    {"$set": {
+                        "shares": new_shares,
+                        "purchase_price": round(new_price, 4),
+                        "updated_at": datetime.now(timezone.utc).isoformat(),
+                    }}
+                )
+                updated += 1
+            else:
+                await db.portfolio_holdings.insert_one({
+                    "user_id": user_id,
+                    "symbol": symbol,
+                    "shares": pos.shares,
+                    "purchase_price": pos.purchase_price,
+                    "purchase_date": pos.purchase_date,
+                    "notes": pos.notes,
+                    "added_at": datetime.now(timezone.utc).isoformat(),
+                })
+                imported += 1
+
+        except Exception as e:
+            logger.error(f"Import error for {pos.symbol}: {e}")
+            errors.append(str(e))
+            skipped += 1
+
+    logger.info(f"CSV import for {user_id}: {imported} imported, {updated} updated, {skipped} skipped")
+
+    return {
+        "success": True,
+        "imported": imported,
+        "updated": updated,
+        "skipped": skipped,
+        "errors": errors,
+        "message": f"Import complet: {imported} noi, {updated} actualizate",
+    }
+
