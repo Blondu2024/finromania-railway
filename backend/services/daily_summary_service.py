@@ -4,6 +4,7 @@ Generează și trimite rezumatul zilnic BVB prin email
 IMPORTANT: Rezumatul se generează O SINGURĂ DATĂ pe zi și se salvează în MongoDB
 """
 import os
+import asyncio
 import resend
 import logging
 from datetime import datetime, timezone, timedelta
@@ -620,7 +621,7 @@ Cea mai mare lichiditate a fost pe {top_vol.get('symbol')}, cu un volum de {vol_
                 "html": html
             }
             
-            email = resend.Emails.send(params)
+            email = await asyncio.to_thread(resend.Emails.send, params)
             logger.info(f"Daily summary sent to {user_email}: {email}")
             return True
             

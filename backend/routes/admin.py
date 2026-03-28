@@ -264,3 +264,55 @@ async def update_feedback_status(
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"ID invalid: {str(e)}")
+
+
+
+class TestEmailRequest(BaseModel):
+    email: str
+    email_type: str  # "welcome", "price_alert_test", "watchlist_big_moves_test"
+
+
+@router.post("/test-email")
+async def send_test_email(request: TestEmailRequest, admin: dict = Depends(require_admin)):
+    """Trimite un email de test pentru diverse tipuri de notificări"""
+    from services.notification_service import notification_service
+    
+    if request.email_type == "welcome":
+        success = await notification_service.send_welcome_email(
+            user_email=request.email,
+            user_name="Test Admin"
+        )
+    elif request.email_type == "early_adopter_expiring":
+        success = await notification_service.send_early_adopter_expiring_email(
+            user_email=request.email,
+            user_name="Test Admin",
+            days_left=7,
+            expires_at="2026-06-05T23:59:59Z"
+        )
+    elif request.email_type == "watchlist_big_moves_test":
+        success = await notification_service.send_watchlist_big_moves_email(
+            user_email=request.email,
+            user_name="Test Admin",
+            movers=[
+                {"symbol": "TLV", "name": "Banca Transilvania SA", "price": 28.40, "change_pct": 5.8},
+                {"symbol": "SNP", "name": "OMV Petrom SA", "price": 0.62, "change_pct": -6.2},
+            ]
+        )
+    else:
+        raise HTTPException(status_code=400, detail=f"Tip email necunoscut: {request.email_type}")
+    
+    return {
+        "success": success,
+        "message": f"Email '{request.email_type}' {'trimis' if success else 'EȘUAT'} la {request.email}"
+    }
+
+
+@router.post("/check-watchlist-moves")
+async def trigger_watchlist_moves_check(admin: dict = Depends(require_admin)):
+    """Declanșează manual verificarea mișcărilor mari din watchlist"""
+    from services.notification_service import notification_service
+    results = await notification_service.check_watchlist_big_moves()
+    return {
+        "success": True,
+        "results": results
+    }

@@ -92,6 +92,16 @@ async def check_price_alerts_job():
     except Exception as e:
         logger.error(f"❌ [JOB] Error checking price alerts: {e}")
 
+async def check_watchlist_big_moves_job():
+    """Job: Verifică mișcările mari (>5%) din watchlist-uri și trimite emailuri"""
+    try:
+        logger.info("🔄 [JOB] Checking watchlist big moves...")
+        results = await notification_service.check_watchlist_big_moves()
+        logger.info(f"✅ [JOB] Watchlist big moves: checked={results['checked']}, emails={results['emails_sent']}")
+    except Exception as e:
+        logger.error(f"❌ [JOB] Error checking watchlist big moves: {e}")
+
+
 async def send_daily_summary_job():
     """
     Job: Generează rezumatul zilnic și îl trimite abonaților.
@@ -218,6 +228,15 @@ def start_scheduler():
             trigger=IntervalTrigger(minutes=5),  # Verifică alertele la fiecare 5 minute
             id='check_price_alerts',
             name='Check Price Alerts',
+            replace_existing=True
+        )
+
+        # Job 7b: Check watchlist big moves (every 30 min during market hours)
+        scheduler.add_job(
+            check_watchlist_big_moves_job,
+            trigger=IntervalTrigger(minutes=30),
+            id='check_watchlist_big_moves',
+            name='Check Watchlist Big Moves (>5%)',
             replace_existing=True
         )
         

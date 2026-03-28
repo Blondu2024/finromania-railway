@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timezone, timedelta
+import asyncio
 import httpx
 import logging
 import uuid
@@ -134,8 +135,32 @@ async def firebase_login(request: FirebaseLoginRequest):
                 "total_logins": 1
             }
             
+            # Auto-activate PRO gratuit pentru toți userii până pe 5 iunie 2026
+            free_pro_deadline = datetime(2026, 6, 5, tzinfo=timezone.utc)
+            if datetime.now(timezone.utc) < free_pro_deadline:
+                new_user.update({
+                    "is_early_adopter": True,
+                    "subscription_level": "pro",
+                    "subscription_expires_at": free_pro_deadline.isoformat(),
+                    "subscription_source": "free_pro_june2026",
+                    "unlocked_levels": ["beginner", "intermediate", "advanced"],
+                    "experience_level": "advanced",
+                    "daily_summary_enabled": True
+                })
+                logger.info(f"🎉 New FREE PRO user (until June 5): {user_info['email']}")
+            
             await db.users.insert_one(new_user)
             logger.info(f"New user created via Firebase: {user_info['email']} (admin: {new_user['is_admin']})")
+            
+            # Trimite email de bun venit (non-blocking, în background)
+            try:
+                from services.notification_service import notification_service
+                asyncio.create_task(notification_service.send_welcome_email(
+                    user_email=user_info["email"],
+                    user_name=user_info.get("name", "")
+                ))
+            except Exception as e:
+                logger.warning(f"Welcome email task failed: {e}")
         
         # Create session token
         session_token = str(uuid.uuid4())

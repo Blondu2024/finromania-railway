@@ -32,7 +32,14 @@ Build "FinRomania 2.0", a comprehensive financial platform for the Romanian mark
 - News system (Romanian RSS + international)
 - In-app notifications for price alerts
 - Interactive onboarding tour
-- **Mobile Responsive Overhaul** (March 28, 2026):
+- **Email Notifications via Resend** (March 28, 2026) — domeniu finromania.ro verificat:
+  - Welcome email la prima înregistrare (Firebase Auth)
+  - Early Adopter expiring email (7 zile, 3 zile, 1 zi înainte de expirare)
+  - Watchlist Big Moves email (variație ≥5%) cu comentariu AI (date REALE din DB, nu hallucinate)
+  - Daily Summary email (18:05, deja funcțional, acum non-blocking cu asyncio.to_thread)
+  - Price Alert email (watchlist target price, deja funcțional)
+  - Test endpoint: POST /api/admin/test-email (welcome/early_adopter_expiring/watchlist_big_moves_test)
+  - Firebase new users primesc PRO gratuit automat (bug fix)
   - Global overflow-x: hidden on html/body/#root prevents horizontal scroll on ALL pages
   - Main content div has min-w-0 + overflow-x-hidden
   - StocksPage: Table wrapped in overflow-x-auto, columns hidden on mobile (Companie, Sector, Volum), smaller heading
