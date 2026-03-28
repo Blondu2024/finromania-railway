@@ -20,7 +20,8 @@ class Settings:
     API_KEY_FMP = os.getenv('API_KEY_FMP')
     API_KEY_TWELVEDATA = os.getenv('API_KEY_TWELVEDATA')
     API_KEY_NEWSAPI = os.getenv('API_KEY_NEWSAPI')
-    EMERGENT_UNIVERSAL_KEY = os.getenv('EMERGENT_UNIVERSAL_KEY')
+    EMERGENT_UNIVERSAL_KEY = os.getenv('EMERGENT_UNIVERSAL_KEY')  # Legacy - use OPENAI_API_KEY instead
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
     
     # AI Settings
     AI_MODEL = os.getenv('AI_MODEL', 'gpt-4o-mini')

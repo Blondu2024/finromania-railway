@@ -658,7 +658,7 @@ app.include_router(bvb_dividends_router)  # BVB.ro Dividends (scraped)
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest
-from emergentintegrations.payments.stripe.checkout import StripeCheckout
+from utils.stripe_checkout import StripeCheckout
 
 @app.post("/api/webhook/stripe")
 async def stripe_webhook(request: FastAPIRequest):

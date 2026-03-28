@@ -13,13 +13,8 @@ from routes.auth import require_auth, get_current_user_optional
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/companion", tags=["AI Trading Companion"])
 
-# Try to import emergent integrations for AI
-try:
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
-    HAS_AI = True
-except ImportError:
-    HAS_AI = False
-    logger.warning("AI integration not available for Trading Companion")
+from utils.llm import LlmChat, UserMessage
+HAS_AI = True
 
 
 class CompanionRequest(BaseModel):
@@ -83,7 +78,7 @@ async def get_companion_response(prompt: str, user_level: str = "incepator") -> 
     if not HAS_AI:
         return "Serviciul AI nu este disponibil momentan. Dar amintește-ți: nu lua decizii bazate pe emoții! Gândește-te de ce vrei să faci această mișcare și care e planul tău dacă merge prost."
     
-    api_key = os.environ.get("EMERGENT_UNIVERSAL_KEY")
+    api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY")
     if not api_key:
         return "Configurare AI lipsă. Între timp, întreabă-te: ai un plan clar? Știi cât poți pierde maxim?"
     

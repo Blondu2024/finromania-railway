@@ -24,7 +24,7 @@ router = APIRouter(prefix="/portfolio-bvb", tags=["Portfolio BVB PRO"])
 
 EODHD_API_KEY = os.environ.get("EODHD_API_KEY")
 EODHD_BASE = "https://eodhd.com/api"
-EMERGENT_KEY = os.environ.get("EMERGENT_UNIVERSAL_KEY") or os.environ.get("EMERGENT_LLM_KEY")
+EMERGENT_KEY = os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY") or os.environ.get("EMERGENT_LLM_KEY")
 AI_CACHE_MINUTES = 60  # cache AI response 1 oră
 
 
@@ -718,7 +718,7 @@ async def get_ai_portfolio_analysis(user: dict = Depends(require_auth)):
     logger.info(f"[AI PORTFOLIO] Generating analysis for user {user['user_id']} ({len(positions_data)} positions)")
 
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        from utils.llm import LlmChat, UserMessage
 
         chat = LlmChat(
             api_key=EMERGENT_KEY,

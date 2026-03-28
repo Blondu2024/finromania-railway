@@ -11,7 +11,7 @@ import logging
 import httpx
 from config.database import get_database
 from routes.auth import require_auth
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from utils.llm import LlmChat, UserMessage
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ai-advisor", tags=["ai-advisor"])
@@ -732,7 +732,7 @@ async def ai_chat(query: AIQuery, user: dict = Depends(require_auth)):
     
     # Call AI
     try:
-        api_key = os.environ.get("EMERGENT_UNIVERSAL_KEY") or os.environ.get("EMERGENT_LLM_KEY")
+        api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY") or os.environ.get("EMERGENT_LLM_KEY")
         if not api_key:
             raise HTTPException(status_code=500, detail="AI service not configured")
         
@@ -825,7 +825,7 @@ async def analyze_chart(request: ChartAnalysisRequest, user: dict = Depends(requ
     
     # Generate AI analysis
     try:
-        api_key = os.environ.get("EMERGENT_UNIVERSAL_KEY") or os.environ.get("EMERGENT_LLM_KEY")
+        api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY") or os.environ.get("EMERGENT_LLM_KEY")
         
         analysis_prompt = f"""Analizează acțiunea {symbol} și oferă o analiză tehnică și fundamentală completă.
 

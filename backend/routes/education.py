@@ -7,9 +7,7 @@ import uuid
 import os
 from config.database import get_database
 from routes.auth import get_current_user, require_auth
-from emergentintegrations.payments.stripe.checkout import (
-    StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
-)
+from utils.stripe_checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 from routes.education_content import EDUCATION_PACKAGES, COURSE_LESSONS, GLOSSARY
 
 router = APIRouter(prefix="/education", tags=["education"])

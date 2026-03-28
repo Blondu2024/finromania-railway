@@ -1608,7 +1608,7 @@ async def get_progress(user: dict = Depends(require_auth)):
 async def purchase_premium(user: dict = Depends(require_auth)):
     """Create Stripe checkout for premium access"""
     try:
-        from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+        from utils.stripe_checkout import StripeCheckout, CheckoutSessionRequest
         import os
         
         api_key = os.environ.get("STRIPE_API_KEY")
@@ -1628,7 +1628,7 @@ async def purchase_premium(user: dict = Depends(require_auth)):
             product_description="Acces complet la toate cele 25 lecții interactive de trading"
         )
         
-        response = stripe_client.create_checkout_session(request)
+        response = await stripe_client.create_checkout_session(request)
         
         # Save pending purchase
         db = await get_database()

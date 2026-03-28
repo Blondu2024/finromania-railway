@@ -303,7 +303,7 @@ class DailySummaryService:
     async def generate_ai_summary(self, market_data: Dict) -> str:
         """Generează rezumatul AI folosind Emergent LLM"""
         try:
-            from emergentintegrations.llm.chat import LlmChat, UserMessage
+            from utils.llm import LlmChat, UserMessage
             
             # Construiește contextul pentru AI cu indicii BVB reali
             indices = market_data.get('indices', {})
@@ -380,7 +380,7 @@ STRUCTURĂ FIXĂ:
 LUNGIME: 100-130 cuvinte. TON: factual, profesionist, fără emoție."""
 
             chat = LlmChat(
-                api_key=os.environ.get("EMERGENT_UNIVERSAL_KEY"),
+                api_key=os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY"),
                 session_id=f"daily_summary_{market_data['date']}",
                 system_message=system_prompt
             ).with_model("openai", "gpt-4o")

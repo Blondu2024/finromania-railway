@@ -2,7 +2,7 @@
 import logging
 import os
 from typing import Optional
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from utils.llm import LlmChat, UserMessage
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,7 +14,7 @@ class AIService:
     
     def __init__(self):
         # Try both key names
-        self.api_key = os.getenv('EMERGENT_LLM_KEY') or os.getenv('EMERGENT_UNIVERSAL_KEY')
+        self.api_key = os.getenv('OPENAI_API_KEY') or os.getenv('EMERGENT_LLM_KEY') or os.getenv('EMERGENT_UNIVERSAL_KEY')
         self.model_provider = "openai"
         self.model_name = "gpt-4o-mini"
     

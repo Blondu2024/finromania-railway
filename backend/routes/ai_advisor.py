@@ -15,13 +15,8 @@ router = APIRouter(prefix="/advisor", tags=["ai-advisor"])
 # AI Monthly Limit
 AI_MONTHLY_LIMIT = 10
 
-# Try to import emergent integrations for AI
-try:
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
-    HAS_AI = True
-except ImportError:
-    HAS_AI = False
-    logger.warning("AI integration not available")
+from utils.llm import LlmChat, UserMessage
+HAS_AI = True
 
 class AdviceRequest(BaseModel):
     symbol: Optional[str] = None
@@ -116,10 +111,10 @@ async def get_assistant_response(user_message: str) -> str:
     if not HAS_AI:
         return "Asistentul FinRomania nu este disponibil momentan. Te rog încearcă mai târziu."
     
-    api_key = os.environ.get("EMERGENT_UNIVERSAL_KEY")
+    api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY")
     if not api_key:
         return "Configurare AI lipsă."
-    
+
     try:
         session_id = f"assistant_{uuid.uuid4().hex[:8]}"
         
@@ -239,10 +234,10 @@ async def get_ai_response(prompt: str, system_prompt: str = None) -> str:
     if not HAS_AI:
         return "Serviciul AI nu este disponibil momentan."
     
-    api_key = os.environ.get("EMERGENT_UNIVERSAL_KEY")
+    api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY")
     if not api_key:
         return "Configurare AI lipsă."
-    
+
     try:
         session_id = f"advisor_{uuid.uuid4().hex[:8]}"
         system_msg = system_prompt or "Ești un consilier financiar expert pentru investitori români. Răspunzi în română, ești prietenos și educativ."

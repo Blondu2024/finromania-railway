@@ -13,13 +13,8 @@ from routes.auth import require_auth
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/ai-analysis", tags=["AI Analysis"])
 
-# Try to import emergent integrations for AI
-try:
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
-    HAS_AI = True
-except ImportError:
-    HAS_AI = False
-    logger.warning("AI integration not available for technical analysis")
+from utils.llm import LlmChat, UserMessage
+HAS_AI = True
 
 
 class AnalysisRequest(BaseModel):
@@ -511,7 +506,7 @@ async def generate_ai_interpretation(analysis_data: Dict) -> str:
     if not HAS_AI:
         return "Interpretarea AI nu este disponibilă momentan."
     
-    api_key = os.environ.get("EMERGENT_UNIVERSAL_KEY")
+    api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY")
     if not api_key:
         return "Configurare AI lipsă."
     

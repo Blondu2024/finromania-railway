@@ -16,7 +16,7 @@ FROM_EMAIL = "FinRomania <noreply@finromania.ro>"
 SITE_URL = "https://finromania.ro"
 
 # Emergent LLM Key for AI commentary
-EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "sk-emergent-5C341A28678CfD18c0")
+EMERGENT_LLM_KEY = os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_LLM_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY")
 
 # ─── Helper: trimitere email non-blocking ────────────────────────────────────
 async def _send_email(params: dict) -> bool:
@@ -34,7 +34,7 @@ async def _send_email(params: dict) -> bool:
 async def _generate_ai_comment(context: str) -> str:
     """Generează 1-2 propoziții de context cu AI. Returnează '' dacă eșuează."""
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        from utils.llm import LlmChat, UserMessage
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"email-ai-{uuid.uuid4().hex[:8]}",

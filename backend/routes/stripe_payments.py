@@ -7,7 +7,7 @@ import os
 import logging
 from config.database import get_database
 from routes.auth import get_current_user_optional
-from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+from utils.stripe_checkout import StripeCheckout, CheckoutSessionRequest
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/payments", tags=["Payments"])
