@@ -871,8 +871,23 @@ const DividendHistoryTab = ({ isPro }) => {
 // MAIN COMPONENT
 // ============================================
 export default function DividendCalculatorPage() {
-  const { user } = useAuth();
-  const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
+  const { user, token } = useAuth();
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+
+  // Fetch subscription status live (avoid stale context after PRO activation)
+  useEffect(() => {
+    if (!token) return;
+    fetch(`${API_URL}/api/subscriptions/status`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(data => setSubscriptionStatus(data))
+      .catch(console.error);
+  }, [token]);
+
+  const isPro = subscriptionStatus?.subscription?.is_pro
+    || user?.subscription_level === 'pro'
+    || user?.subscription_level === 'premium';
   const [stocks, setStocks] = useState([]);
   const [portfolio, setPortfolio] = useState([]);
   const [results, setResults] = useState(null);

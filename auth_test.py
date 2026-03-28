@@ -16,7 +16,7 @@ from datetime import datetime, timezone, timedelta
 import subprocess
 
 class FirebaseAuthTester:
-    def __init__(self, base_url="https://finromania-pro-2.preview.emergentagent.com"):
+    def __init__(self, base_url="https://bvb-portfolio-pro.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0

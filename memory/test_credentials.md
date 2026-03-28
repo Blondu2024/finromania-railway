@@ -15,5 +15,5 @@
 - DB Name: stock_news_romania
 
 ## External Preview URL
-- Frontend: https://finromania-pro-2.preview.emergentagent.com
-- Backend: https://finromania-pro-2.preview.emergentagent.com/api
+- Frontend: https://bvb-portfolio-pro.preview.emergentagent.com
+- Backend: https://bvb-portfolio-pro.preview.emergentagent.com/api

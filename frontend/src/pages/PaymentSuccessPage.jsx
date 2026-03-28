@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, Loader2, Crown, ArrowRight } from 'lucide-react';
+import { CheckCircle, Loader2, Crown, ArrowRight, TrendingUp, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import SEO from '../components/SEO';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -11,6 +12,7 @@ export default function PaymentSuccessPage() {
   const [status, setStatus] = useState('checking'); // checking, success, error
   const [paymentInfo, setPaymentInfo] = useState(null);
   const navigate = useNavigate();
+  const { user, checkAuth } = useAuth();
 
   useEffect(() => {
     // Get session_id from URL
@@ -46,6 +48,8 @@ export default function PaymentSuccessPage() {
       if (data.payment_status === 'paid') {
         setStatus('success');
         setPaymentInfo(data);
+        // Refresh user context so PRO features unlock immediately without page reload
+        checkAuth();
         return;
       } else if (data.status === 'expired') {
         setStatus('error');

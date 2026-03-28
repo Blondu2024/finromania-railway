@@ -193,6 +193,7 @@ export default function ScreenerProPage() {
   const [expandedStock, setExpandedStock] = useState(null);
   const [isRefreshingBackground, setIsRefreshingBackground] = useState(false);
   const [cacheAge, setCacheAge] = useState(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const pollingRef = useRef(null);
   
   // Filters state
@@ -206,8 +207,21 @@ export default function ScreenerProPage() {
     min_roe: null,
     signal_filter: null,
   });
+
+  // Fetch subscription status live (avoid stale context after PRO activation)
+  useEffect(() => {
+    if (!token) return;
+    fetch(`${API_URL}/api/subscriptions/status`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(data => setSubscriptionStatus(data))
+      .catch(console.error);
+  }, [token]);
   
-  const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
+  const isPro = subscriptionStatus?.subscription?.is_pro
+    || user?.subscription_level === 'pro'
+    || user?.subscription_level === 'premium';
 
   // Funcție de polling — verifică la fiecare 8s dacă cache-ul e gata
   const startPolling = useCallback((currentToken) => {

@@ -762,6 +762,8 @@ const FundCell = ({ value, suffix = '', good, bad }) => {
 // ─────────────────────────────────────────
 export default function PortfolioBVBPage() {
   const { user, token } = useAuth();
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const [portfolio, setPortfolio] = useState(null);
   const [analysis, setAnalysis] = useState(null);
   const [aiAdvice, setAiAdvice] = useState(null);
@@ -778,7 +780,20 @@ export default function PortfolioBVBPage() {
   const [editPos, setEditPos] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
+  // Fetch subscription status live (avoid stale context after PRO activation)
+  useEffect(() => {
+    if (!token) { setSubscriptionLoading(false); return; }
+    fetch(`${API_URL}/api/subscriptions/status`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(data => { setSubscriptionStatus(data); setSubscriptionLoading(false); })
+      .catch(() => setSubscriptionLoading(false));
+  }, [token]);
+
+  const isPro = subscriptionStatus?.subscription?.is_pro
+    || user?.subscription_level === 'pro'
+    || user?.subscription_level === 'premium';
 
   const fetchAnalysis = useCallback(async () => {
     if (!token) return;
@@ -957,6 +972,18 @@ export default function PortfolioBVBPage() {
           <Link to="/login">
             <Button className="bg-blue-600 hover:bg-blue-700 text-white">Conectare</Button>
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Wait for subscription check before showing paywall (avoids flash for PRO users after activation)
+  if (subscriptionLoading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="text-center">
+          <Crown className="w-10 h-10 text-amber-500 mx-auto mb-3 animate-pulse" />
+          <p className="text-muted-foreground text-sm">Se verifică abonamentul...</p>
         </div>
       </div>
     );
