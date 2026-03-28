@@ -1,0 +1,89 @@
+{
+  "summary": "Mobile responsiveness testing at 390x844 viewport (iPhone 14). All core requirements verified via Playwright with evaluate() for overflow detection. Key results: No page-level horizontal scroll on any tested page. Hamburger menu visible+functional (opens sidebar Sheet with all nav sections). Stock table and tabs properly contained in overflow-x-auto. No text cut-off on main pages.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "GlobalMarketsPage — TabsList",
+        "issue": "5 tabs (🌐 Toate, 📊 Indici, 🛢️ Comodități, ₿ Crypto, 💱 Forex) total width=433px extends beyond 390px viewport (tabsRight=445px). Contained within overflow-x-auto wrapper so page does NOT scroll horizontally, but last 2 tabs (₿ Crypto, 💱 Forex) are not immediately visible — user must manually scroll the tab bar. UX concern: no visual indicator that more tabs exist.",
+        "selector": "[role='tablist']",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "All pages — BetaDisclaimer banner",
+        "issues": [
+          "BetaDisclaimer orange banner wraps to 3+ lines on mobile (~140px height), consuming significant screen real estate on a 844px viewport. Consider truncating or making collapsible on mobile."
+        ]
+      },
+      {
+        "screen": "GlobalMarketsPage — Exchange status grid",
+        "issues": [
+          "grid-cols-2 md:grid-cols-4 lg:grid-cols-7 on mobile renders 2 columns for 7 exchange cards — looks correct. Some exchange names truncated ('Frankfurt /...') due to limited card width, which is expected behavior."
+        ]
+      }
+    ]
+  },
+
+  "passed_tests": [
+    "✅ HomePage (/) - No horizontal scroll at 390px (html.scrollWidth=390 == window.innerWidth=390)",
+    "✅ StocksPage (/stocks) - No page-level horizontal scroll (html.scrollWidth=390, overflow=0px)",
+    "✅ GlobalMarketsPage (/global) - No page-level horizontal scroll (html.scrollWidth=390, overflow=0px)",
+    "✅ Hamburger menu [data-testid='mobile-menu-btn'] visible at mobile viewport (x=342, y=156, w=32, h=32)",
+    "✅ Hamburger opens sidebar Sheet with all sections: PIEȚE, PRO TOOLS, INSTRUMENTE, ACADEMIA",
+    "✅ Sidebar contains: Acțiuni BVB, Piețe Globale, Calendar Dividende, Știri Financiare, Screener PRO (PRO badge), Calculator Dividende (NOU badge), Calculator Fiscal, Simulator Antreprenor, Convertor Valutar, Rezumat Zilnic, Trading School, Educație Financiară, CFD vs Acțiuni (NOU badge), Glosar",
+    "✅ StocksPage - overflow-x-auto wrapper present for stock table (scrollWidth=316, clientWidth=316 at 390px - table fits without scroll at this width)",
+    "✅ StocksPage - All 65 detected 'cut-off' text elements are inside TickerBar animation (expected overflow, not litere mancate)",
+    "✅ FiscalCalculatorPage (/calculator-fiscal) - No page horizontal scroll. ProPaywall shows 'Funcție PRO Exclusivă' heading, text wraps correctly, fits in 390px.",
+    "✅ DividendCalculatorPage (/calculator-dividende) - No page horizontal scroll. TabsList tabs don't overflow (right=378px < window=390px). Tabs abbreviated for mobile: 'Calc.', 'Acțiuni', 'Istoric'. overflow-x-auto wrapper found.",
+    "✅ ScreenerProPage (/screener-pro) - No page horizontal scroll. ProPaywall shows correctly on mobile with 2-column grid layout.",
+    "✅ App.css has overflow-x: hidden on html/body and #root - confirmed protection layer",
+    "✅ Main content div has min-w-0 + overflow-x-hidden CSS classes in App.js layout"
+  ],
+
+  "failed_tests": [
+    "⚠️ GlobalMarketsPage tabs: TabsList extends to 445px right edge (beyond 390px viewport), last 2 tabs not immediately visible. Page scroll is contained by overflow-x-auto wrapper so this is NOT a full-page horizontal scroll issue."
+  ],
+
+  "test_report_links": [],
+
+  "action_items": [
+    "OPTIONAL: GlobalMarketsPage - Consider adding a visual scroll indicator or reduce tab label length for the 5-tab layout on mobile (e.g., use icon-only on xs screens, or reduce 'Comodități' to 'Materii'). This is a UX polish item, not a blocking issue.",
+    "OPTIONAL: BetaDisclaimer banner could be made collapsible or shortened on mobile to reduce wasted vertical space."
+  ],
+
+  "critical_code_review_comments": [
+    "App.css: overflow-x:hidden on html/body + #root is the correct approach and prevents any page-level horizontal scroll.",
+    "App.js main layout: flex-1 min-w-0 overflow-x-hidden on the content wrapper properly constrains content.",
+    "StocksPage: Table correctly wrapped in overflow-x-auto div (line 927). Hidden columns use hidden sm:table-cell for Company and Volume columns.",
+    "GlobalMarketsPage: Tabs wrapped in overflow-x-auto div (line 806-808). However TabsList with 5 tabs (total width 433px) extends beyond 390px viewport — the overflow-x-auto wrapper correctly contains this without causing page scroll.",
+    "DividendCalculatorPage: TabsList correctly shortened labels on mobile via <span class='hidden sm:inline'> pattern.",
+    "FiscalCalculatorPage: h1 uses responsive text-2xl sm:text-4xl md:text-5xl — fits correctly at mobile.",
+    "ScreenerProPage: Signal summary grid uses grid-cols-2 sm:grid-cols-3 md:grid-cols-5 — correct responsive grid."
+  ],
+
+  "updated_files": [],
+
+  "success_rate": {
+    "backend": "N/A (frontend-only testing)",
+    "frontend": "92% - All core mobile requirements pass. Minor UX note on GlobalMarketsPage 5-tab overflow within container."
+  },
+
+  "test_credentials": "No login required for mobile layout testing. Note: FiscalCalculatorPage and ScreenerProPage show ProPaywall for unauthenticated users.",
+
+  "seed_data_creation": "None",
+
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+
+  "context_for_next_testing_agent": "Mobile responsiveness iteration 21. All pages tested at 390x844 viewport. Key findings: (1) No page-level horizontal scroll on ANY page (html/body overflow-x:hidden works). (2) Hamburger [data-testid='mobile-menu-btn'] works after dismissing InteractiveTour overlay. (3) Sidebar Sheet opens correctly. (4) DividendCalculator tabs: 3 tabs with abbreviated labels fit at 390px. (5) GlobalMarketsPage: 5 tabs extend 433px scrollWidth inside overflow-x-auto wrapper — last 2 tabs not visible initially but scrollable within container — this is a UX polish issue not a bug. (6) StocksPage text cut-offs are all from TickerBar animation (expected). (7) FiscalCalculator shows ProPaywall for unauthenticated users.",
+
+  "rca_of_issue": "GlobalMarketsPage tabs UX issue: 5 tabs (with emoji prefix) total 433px in a 390px viewport. The overflow-x-auto wrapper correctly prevents page-level scroll, but users may not discover the last 2 tabs (₿ Crypto, 💱 Forex) without knowing to swipe. Fix: either shorten labels (remove emoji prefix on xs screens), or add a visual scroll hint (fade-right gradient on tab container)."
+}

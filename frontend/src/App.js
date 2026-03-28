@@ -518,7 +518,7 @@ function App() {
               onMobileClose={() => setSidebarOpen(false)}
             />
             <div className="flex-1 min-w-0 flex flex-col">
-              <main className="flex-1 px-4 lg:px-6 py-5 bg-background">
+            <main className="flex-1 px-3 lg:px-6 py-4 lg:py-5 bg-background min-w-0 overflow-x-hidden">
                 <AppRouter />
               </main>
               <Footer />

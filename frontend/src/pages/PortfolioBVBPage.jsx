@@ -611,8 +611,9 @@ const AnalysisSection = ({ analysis, loading }) => {
                 Nu există date de sector
               </div>
             ) : (
-              <div className="flex items-center gap-4">
-                <ResponsiveContainer width="60%" height={180}>
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <div className="w-full sm:w-[60%] flex-shrink-0">
+                <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
                     <Pie
                       data={sector_allocation}
@@ -629,7 +630,8 @@ const AnalysisSection = ({ analysis, loading }) => {
                     <ReTooltip content={<SectorTooltip />} />
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="flex-1 space-y-1.5 min-w-0">
+                </div>
+                <div className="flex-1 space-y-1.5 min-w-0 w-full">
                   {sector_allocation.map((s, i) => (
                     <div key={s.sector} className="flex items-center gap-2 text-xs">
                       <div

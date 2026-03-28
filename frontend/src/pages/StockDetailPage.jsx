@@ -212,7 +212,7 @@ export default function StockDetailPage() {
         </div>
         
         <div className="text-left lg:text-right space-y-1">
-          <p className="text-4xl font-bold">
+          <p className="text-2xl sm:text-4xl font-bold">
             {lastPrice.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             <span className="text-lg font-normal text-muted-foreground ml-2">{data.currency || 'RON'}</span>
           </p>

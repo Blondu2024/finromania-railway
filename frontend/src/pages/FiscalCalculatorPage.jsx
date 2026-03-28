@@ -313,10 +313,10 @@ export default function FiscalCalculatorPage() {
           <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-1">
             🏆 Actualizat 2026
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold">
             Calculator <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-500">Fiscal BVB</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Știai că pe BVB plătești doar <strong className="text-green-600">1-3% impozit</strong> pe câștiguri?
             Calculează exact cât datorezi statului.
           </p>

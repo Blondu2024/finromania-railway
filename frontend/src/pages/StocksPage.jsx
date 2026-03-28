@@ -706,7 +706,7 @@ export default function StocksPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-20 w-full" />
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-24" />)}
         </div>
         <Skeleton className="h-96" />
@@ -730,7 +730,7 @@ export default function StocksPage() {
           className="text-center py-4"
         >
           <div className="flex items-center justify-center gap-3 mb-2">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
               🏛️ Bursa de Valori București
             </h1>
             <Badge className={`${delayInfo.color} text-white`}>
@@ -860,10 +860,10 @@ export default function StocksPage() {
                 <BarChart3 className="w-5 h-5" />
                 Toate Acțiunile BVB ({filteredStocks.length})
               </CardTitle>
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2">
                 {/* Sector Filter */}
                 <Select value={selectedSector} onValueChange={setSelectedSector}>
-                  <SelectTrigger className="w-[180px]" data-testid="sector-filter">
+                  <SelectTrigger className="w-[160px] sm:w-[180px]" data-testid="sector-filter">
                     <Filter className="w-4 h-4 mr-2" />
                     <SelectValue placeholder="Toate Sectoarele" />
                   </SelectTrigger>
@@ -924,6 +924,7 @@ export default function StocksPage() {
             )}
           </CardHeader>
           <CardContent>
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -935,19 +936,19 @@ export default function StocksPage() {
                       Simbol <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
-                  <TableHead>Companie</TableHead>
-                  <TableHead>Sector</TableHead>
+                  <TableHead className="hidden sm:table-cell">Companie</TableHead>
+                  <TableHead className="hidden md:table-cell">Sector</TableHead>
                   <TableHead className="text-right cursor-pointer" onClick={() => handleSort('price')}>
                     <div className="flex items-center justify-end gap-1">
-                      Preț (RON) <ArrowUpDown className="w-4 h-4" />
+                      Preț <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
                   <TableHead className="text-right cursor-pointer" onClick={() => handleSort('change_percent')}>
                     <div className="flex items-center justify-end gap-1">
-                      Variație <ArrowUpDown className="w-4 h-4" />
+                      Var. <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
-                  <TableHead className="text-right cursor-pointer" onClick={() => handleSort('volume')}>
+                  <TableHead className="text-right hidden sm:table-cell cursor-pointer" onClick={() => handleSort('volume')}>
                     <div className="flex items-center justify-end gap-1">
                       Volum <ArrowUpDown className="w-4 h-4" />
                     </div>
@@ -978,12 +979,12 @@ export default function StocksPage() {
                         {stock.symbol}
                       </Link>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <Link to={`/stocks/bvb/${stock.symbol}`} className="hover:text-blue-600">
                         {stock.name}
                       </Link>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <Badge variant="outline">{stock.sector || 'N/A'}</Badge>
                     </TableCell>
                     <TableCell className="text-right font-medium">
@@ -999,13 +1000,14 @@ export default function StocksPage() {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
+                    <TableCell className="text-right text-muted-foreground hidden sm:table-cell">
                       {(stock.volume || 0).toLocaleString('ro-RO')}
                     </TableCell>
                   </motion.tr>
                 ))}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
 

@@ -135,7 +135,7 @@ export default function FAQPage() {
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         <div className="text-center space-y-4">
           <Badge className="bg-blue-500 text-white">Întrebări Frecvente</Badge>
-          <h1 className="text-4xl font-bold">Ai întrebări? Avem răspunsuri!</h1>
+          <h1 className="text-2xl font-bold">Ai întrebări? Avem răspunsuri!</h1>
           <p className="text-xl text-muted-foreground">Tot ce trebuie să știi despre FinRomania</p>
         </div>
 

@@ -717,7 +717,7 @@ export default function GlobalMarketsPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-12 w-64" />
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-32" />)}
         </div>
       </div>
@@ -757,7 +757,7 @@ export default function GlobalMarketsPage() {
           className="text-center py-4"
         >
           <div className="flex items-center justify-center gap-3 mb-2">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
               🌍 Piețe Globale
             </h1>
             <Badge className={`${delayInfo.color} text-white ${isPro ? 'animate-pulse' : ''}`}>
@@ -802,16 +802,18 @@ export default function GlobalMarketsPage() {
 
         {/* Tabs for Categories */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <div className="flex items-center justify-between">
-            <TabsList>
-              <TabsTrigger value="all">🌐 Toate</TabsTrigger>
-              <TabsTrigger value="indices">📊 Indici</TabsTrigger>
-              <TabsTrigger value="commodities">🛢️ Comodități</TabsTrigger>
-              <TabsTrigger value="crypto">₿ Crypto</TabsTrigger>
-              <TabsTrigger value="forex">💱 Forex</TabsTrigger>
-            </TabsList>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="overflow-x-auto">
+              <TabsList className="flex-shrink-0">
+                <TabsTrigger value="all">🌐 Toate</TabsTrigger>
+                <TabsTrigger value="indices">📊 Indici</TabsTrigger>
+                <TabsTrigger value="commodities">🛢️ Comodități</TabsTrigger>
+                <TabsTrigger value="crypto">₿ Crypto</TabsTrigger>
+                <TabsTrigger value="forex">💱 Forex</TabsTrigger>
+              </TabsList>
+            </div>
             
-            <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing} className="self-end sm:self-auto">
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
               Actualizează
             </Button>

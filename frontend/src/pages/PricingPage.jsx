@@ -112,10 +112,10 @@ export default function PricingPage() {
           <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1">
             💎 Planuri & Prețuri
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold">
             Alege Planul <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-500">Potrivit</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Începe gratuit, treci la PRO pentru funcții avansate
           </p>
         </div>

@@ -548,7 +548,7 @@ const DividendHistoryTab = ({ isPro }) => {
                     <Shield className="w-4 h-4 text-blue-500" />
                     Dividend Score — Detalii
                   </h4>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
                       { label: 'Stabilitate', value: analysis.dividend_score.breakdown.stability, max: 40, color: 'bg-emerald-500' },
                       { label: 'Creștere', value: analysis.dividend_score.breakdown.growth, max: 30, color: 'bg-blue-500' },
@@ -982,21 +982,25 @@ export default function DividendCalculatorPage() {
 
         {/* Main Content */}
         <Tabs defaultValue="calculator" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="calculator">
-              <Calculator className="w-4 h-4 mr-2" />
-              Calculator
-            </TabsTrigger>
-            <TabsTrigger value="stocks">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Acțiuni cu Dividende
-            </TabsTrigger>
-            <TabsTrigger value="history" data-testid="tab-istoric-dividende">
-              <History className="w-4 h-4 mr-2" />
-              Istoric Dividende
-              {!isPro && <Lock className="w-3 h-3 ml-1 opacity-50" />}
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="flex-shrink-0 w-full sm:w-auto">
+              <TabsTrigger value="calculator">
+                <Calculator className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Calculator</span>
+                <span className="sm:hidden">Calc.</span>
+              </TabsTrigger>
+              <TabsTrigger value="stocks">
+                <BarChart3 className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Acțiuni cu Dividende</span>
+                <span className="sm:hidden">Acțiuni</span>
+              </TabsTrigger>
+              <TabsTrigger value="history" data-testid="tab-istoric-dividende">
+                <History className="w-4 h-4 mr-1 sm:mr-2" />
+                Istoric
+                {!isPro && <Lock className="w-3 h-3 ml-1 opacity-50" />}
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="calculator" className="space-y-6">
             <div className="grid lg:grid-cols-3 gap-6">

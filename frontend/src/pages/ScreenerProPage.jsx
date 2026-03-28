@@ -165,7 +165,7 @@ const SignalSummary = ({ summary }) => {
   };
   
   return (
-    <div className="grid grid-cols-5 gap-2">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
       {signals.map(signal => (
         <div key={signal} className="text-center">
           <div className={`${colors[signal]} text-white rounded-lg p-3 mb-1`}>
