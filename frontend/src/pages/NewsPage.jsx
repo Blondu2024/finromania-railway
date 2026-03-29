@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Newspaper, RefreshCw, Clock, Building2, Globe, Flag } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -10,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 function NewsCard({ article, isInternational }) {
+  const { t } = useTranslation();
   const publishedDate = new Date(article.published_at);
   const timeAgo = getTimeAgo(publishedDate, isInternational);
   
@@ -52,7 +54,7 @@ function NewsCard({ article, isInternational }) {
                 {article.description || article.content}
               </p>
               <p className="text-sm text-blue-600 mt-3 font-medium">
-                {isInternational ? 'Read article →' : 'Citește articolul →'}
+                {t('news.readArticle')} →
               </p>
             </div>
           </div>
@@ -83,6 +85,7 @@ function getTimeAgo(date, isEnglish = false) {
 }
 
 export default function NewsPage() {
+  const { t } = useTranslation();
   const [roNews, setRoNews] = useState([]);
   const [intlNews, setIntlNews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -140,13 +143,13 @@ export default function NewsPage() {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Newspaper className="w-8 h-8 text-blue-600" />
-            Știri Financiare
+            {t('news.title')}
           </h1>
-          <p className="text-muted-foreground">Știri din România și surse internaționale</p>
+          <p className="text-muted-foreground">{t('news.subtitle')}</p>
         </div>
         <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
           <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-          Actualizează
+          {t('common.refresh')}
         </Button>
       </div>
 
@@ -155,12 +158,12 @@ export default function NewsPage() {
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="romania" className="flex items-center gap-2">
             <span className="text-lg">🇷🇴</span>
-            România & BVB
+            {t('news.romaniaTab')}
             <Badge variant="secondary" className="ml-1">{roNews.length}</Badge>
           </TabsTrigger>
           <TabsTrigger value="international" className="flex items-center gap-2">
             <span className="text-lg">🌍</span>
-            Internațional
+            {t('news.internationalTab')}
             <Badge variant="secondary" className="ml-1">{intlNews.length}</Badge>
           </TabsTrigger>
         </TabsList>
@@ -172,7 +175,7 @@ export default function NewsPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {roNews.length} articole din surse românești
+                  {t('news.roArticleCount', { count: roNews.length })}
                 </span>
                 <div className="flex gap-2 flex-wrap">
                   <Badge variant="outline">ZF</Badge>
@@ -190,10 +193,10 @@ export default function NewsPage() {
               <Card>
                 <CardContent className="p-8 text-center">
                   <Newspaper className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">Nu sunt știri românești disponibile momentan.</p>
+                  <p className="text-muted-foreground">{t('news.noRomanianNews')}</p>
                   <Button onClick={handleRefresh} className="mt-4">
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Încearcă din nou
+                    {t('news.tryAgain')}
                   </Button>
                 </CardContent>
               </Card>
@@ -212,7 +215,7 @@ export default function NewsPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {intlNews.length} articole din surse internaționale
+                  {t('news.intlArticleCount', { count: intlNews.length })}
                 </span>
                 <div className="flex gap-2 flex-wrap">
                   <Badge variant="outline">Yahoo Finance</Badge>
@@ -230,11 +233,11 @@ export default function NewsPage() {
               <Card>
                 <CardContent className="p-8 text-center">
                   <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">Se încarcă știrile internaționale...</p>
-                  <p className="text-xs text-muted-foreground mt-2">Prima încărcare poate dura câteva secunde.</p>
+                  <p className="text-muted-foreground">{t('news.loadingIntl')}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{t('news.firstLoadNote')}</p>
                   <Button onClick={handleRefresh} className="mt-4">
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Încarcă știri
+                    {t('news.loadNews')}
                   </Button>
                 </CardContent>
               </Card>
@@ -252,12 +255,12 @@ export default function NewsPage() {
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="text-center sm:text-left">
-              <h3 className="font-bold">💰 Vrei Să Înțelegi Mai Bine Ce Citești?</h3>
-              <p className="text-green-100 text-sm">15 lecții gratuite de educație financiară - de la bazele bugetării la investiții</p>
+              <h3 className="font-bold">💰 {t('news.learnMore')}</h3>
+              <p className="text-green-100 text-sm">{t('news.learnMoreDesc')}</p>
             </div>
             <Link to="/financial-education">
               <Button className="bg-white text-green-600 hover:bg-green-50 whitespace-nowrap">
-                Începe Gratuit →
+                {t('home.startFree')} →
               </Button>
             </Link>
           </div>

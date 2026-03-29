@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
@@ -306,6 +307,7 @@ function fmtCountdown(totalMin) {
 }
 
 const ExchangeCard = ({ ex, nowUTC }) => {
+  const { t } = useTranslation();
   const { isOpen, nextEventMin, nextEventType } = getExchangeStatus(ex, nowUTC);
 
   return (
@@ -345,7 +347,7 @@ const ExchangeCard = ({ ex, nowUTC }) => {
           ex.alwaysOpen ? 'bg-blue-500/20 text-blue-400' :
           isOpen ? 'bg-green-500/20 text-green-400' : 'bg-slate-500/20 text-slate-400'
         }`}>
-          {ex.alwaysOpen ? 'LIVE 24/7' : isOpen ? 'DESCHISĂ' : 'ÎNCHISĂ'}
+          {ex.alwaysOpen ? 'LIVE 24/7' : isOpen ? t('global.open') : t('global.closed')}
         </span>
         {!ex.alwaysOpen && nextEventMin !== null && (
           <span className="text-xs text-muted-foreground">
@@ -464,6 +466,7 @@ const AssetCard = ({ asset, index, onClick }) => {
 // GLOBAL HEATMAP
 // ============================================
 const GlobalHeatmap = ({ assets, onAssetClick }) => {
+  const { t } = useTranslation();
   const getColor = (changePercent) => {
     if (changePercent >= 3) return 'from-green-500 to-green-600';
     if (changePercent >= 1) return 'from-green-400 to-green-500';
@@ -479,8 +482,8 @@ const GlobalHeatmap = ({ assets, onAssetClick }) => {
       <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="w-5 h-5" />
-          🗺️ Heatmap Global
-          <span className="text-xs font-normal ml-2 opacity-80">Click pe orice activ pentru grafic</span>
+          {t('global.heatmap')}
+          <span className="text-xs font-normal ml-2 opacity-80">{t('global.clickForChart')}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 bg-zinc-900">
@@ -512,15 +515,15 @@ const GlobalHeatmap = ({ assets, onAssetClick }) => {
         <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-zinc-700">
           <div className="flex items-center gap-2 text-sm text-slate-300">
             <div className="w-4 h-4 rounded bg-gradient-to-br from-red-500 to-red-600" />
-            <span>Scădere</span>
+            <span>{t('global.decrease')}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-300">
             <div className="w-4 h-4 rounded bg-gradient-to-br from-slate-400 to-slate-500" />
-            <span>Neutru</span>
+            <span>{t('global.neutral')}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-300">
             <div className="w-4 h-4 rounded bg-gradient-to-br from-green-500 to-green-600" />
-            <span>Creștere</span>
+            <span>{t('global.increase')}</span>
           </div>
         </div>
       </CardContent>
@@ -532,6 +535,7 @@ const GlobalHeatmap = ({ assets, onAssetClick }) => {
 // TOP MOVERS COMPONENT
 // ============================================
 const TopMovers = ({ assets, onAssetClick }) => {
+  const { t } = useTranslation();
   const sorted = [...assets].sort((a, b) => Math.abs(b.change_percent) - Math.abs(a.change_percent));
   const topMovers = sorted.slice(0, 5);
 
@@ -540,7 +544,7 @@ const TopMovers = ({ assets, onAssetClick }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Flame className="w-5 h-5 text-orange-500" />
-          🔥 Cele Mai Active
+          {t('global.mostActive')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
@@ -587,6 +591,7 @@ const TopMovers = ({ assets, onAssetClick }) => {
 // MAIN PAGE COMPONENT
 // ============================================
 export default function GlobalMarketsPage() {
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -758,7 +763,7 @@ export default function GlobalMarketsPage() {
         >
           <div className="flex items-center justify-center gap-3 mb-2">
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
-              🌍 Piețe Globale
+              {t('global.title')}
             </h1>
             <Badge className={`${delayInfo.color} text-white ${isPro ? 'animate-pulse' : ''}`}>
               <Zap className="w-3 h-3 mr-1" />
@@ -806,26 +811,26 @@ export default function GlobalMarketsPage() {
             <div className="overflow-x-auto">
               <TabsList className="flex-shrink-0 w-full sm:w-auto">
                 <TabsTrigger value="all">
-                  <span className="hidden sm:inline">🌐 </span>Toate
+                  <span className="hidden sm:inline">🌐 </span>{t('global.all')}
                 </TabsTrigger>
                 <TabsTrigger value="indices">
-                  <span className="hidden sm:inline">📊 </span>Indici
+                  <span className="hidden sm:inline">📊 </span>{t('global.indices')}
                 </TabsTrigger>
                 <TabsTrigger value="commodities">
-                  <span className="hidden sm:inline">🛢️ </span>Materii
+                  <span className="hidden sm:inline">🛢️ </span>{t('global.commodities')}
                 </TabsTrigger>
                 <TabsTrigger value="crypto">
-                  <span className="hidden sm:inline">₿ </span>Crypto
+                  <span className="hidden sm:inline">₿ </span>{t('global.crypto')}
                 </TabsTrigger>
                 <TabsTrigger value="forex">
-                  <span className="hidden sm:inline">💱 </span>Forex
+                  <span className="hidden sm:inline">💱 </span>{t('global.forex')}
                 </TabsTrigger>
               </TabsList>
             </div>
             
             <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing} className="self-end sm:self-auto">
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              Actualizează
+              {t('common.refresh')}
             </Button>
           </div>
 
@@ -875,7 +880,7 @@ export default function GlobalMarketsPage() {
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
-                <h3 className="text-xl font-bold mb-1">💡 De Ce Contează Piețele Globale?</h3>
+                <h3 className="text-xl font-bold mb-1">{t('global.whyGlobalMatters')}</h3>
                 <p className="text-blue-100">
                   BVB este influențată de piețele internaționale. Când S&P 500 scade, de obicei și BET scade.
                 </p>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -49,7 +50,7 @@ const Toggle = ({ label, description, checked, onChange, icon: Icon }) => (
 );
 
 // Notification Settings Dialog
-const NotificationSettingsDialog = ({ token }) => {
+const NotificationSettingsDialog = ({ token, t }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [testingSending, setTestingSending] = useState(false);
@@ -158,7 +159,7 @@ const NotificationSettingsDialog = ({ token }) => {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Bell className="w-4 h-4 mr-2" />
-          Setări Notificări
+          {t('watchlist.notifSettings')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
@@ -331,7 +332,7 @@ const NotificationSettingsDialog = ({ token }) => {
 };
 
 // Add Stock Dialog
-const AddStockDialog = ({ onAdd, existingSymbols }) => {
+const AddStockDialog = ({ onAdd, existingSymbols, t }) => {
   const [symbol, setSymbol] = useState('');
   const [alertAbove, setAlertAbove] = useState('');
   const [alertBelow, setAlertBelow] = useState('');
@@ -362,12 +363,12 @@ const AddStockDialog = ({ onAdd, existingSymbols }) => {
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="w-4 h-4" />
-          Adaugă Acțiune
+          {t('watchlist.addStock')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Adaugă în Watchlist</DialogTitle>
+          <DialogTitle>{t('watchlist.addToWatchlist')}</DialogTitle>
           <DialogDescription>
             Adaugă o acțiune BVB și setează alerte de preț opționale
           </DialogDescription>
@@ -375,7 +376,7 @@ const AddStockDialog = ({ onAdd, existingSymbols }) => {
         
         <div className="space-y-4 py-4">
           <div>
-            <label className="text-sm font-medium">Simbol *</label>
+            <label className="text-sm font-medium">{t('watchlist.symbolRequired')}</label>
             <Input
               value={symbol}
               onChange={(e) => setSymbol(e.target.value.toUpperCase())}
@@ -386,7 +387,7 @@ const AddStockDialog = ({ onAdd, existingSymbols }) => {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-green-600">🔔 Alertă peste (RON)</label>
+              <label className="text-sm font-medium text-green-600">{t('watchlist.alertAbove')}</label>
               <Input
                 type="number"
                 value={alertAbove}
@@ -396,7 +397,7 @@ const AddStockDialog = ({ onAdd, existingSymbols }) => {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-red-600">🔔 Alertă sub (RON)</label>
+              <label className="text-sm font-medium text-red-600">{t('watchlist.alertBelow')}</label>
               <Input
                 type="number"
                 value={alertBelow}
@@ -408,7 +409,7 @@ const AddStockDialog = ({ onAdd, existingSymbols }) => {
           </div>
           
           <div>
-            <label className="text-sm font-medium">Note (opțional)</label>
+            <label className="text-sm font-medium">{t('watchlist.notesOptional')}</label>
             <Input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -420,10 +421,10 @@ const AddStockDialog = ({ onAdd, existingSymbols }) => {
         
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => setIsOpen(false)}>
-            Anulează
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleAdd} disabled={!symbol.trim() || loading}>
-            {loading ? 'Se adaugă...' : 'Adaugă'}
+            {loading ? t('watchlist.adding') : t('watchlist.addStock')}
           </Button>
         </div>
       </DialogContent>
@@ -557,6 +558,7 @@ const WatchlistItem = ({ item, onRemove, onUpdate }) => {
 
 // Main Page Component
 export default function WatchlistPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -660,7 +662,7 @@ export default function WatchlistPage() {
         <Card className="max-w-md">
           <CardContent className="p-8 text-center">
             <Star className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Watchlist Personal</h2>
+            <h2 className="text-2xl font-bold mb-2">{t('watchlist.title')}</h2>
             <p className="text-muted-foreground mb-6">
               Creează-ți un cont gratuit pentru a urmări acțiunile preferate și a seta alerte de preț.
             </p>
@@ -691,7 +693,7 @@ export default function WatchlistPage() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Star className="w-8 h-8 text-yellow-500" />
-              Watchlist Personal
+              {t('watchlist.title')}
             </h1>
             <p className="text-muted-foreground">
               {watchlist.length} acțiuni urmărite • Actualizare la 30 secunde
@@ -701,12 +703,13 @@ export default function WatchlistPage() {
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
               <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              Actualizează
+              {t('common.refresh')}
             </Button>
-            <NotificationSettingsDialog token={token} />
-            <AddStockDialog 
-              onAdd={handleAdd} 
-              existingSymbols={watchlist.map(w => w.symbol)} 
+            <NotificationSettingsDialog token={token} t={t} />
+            <AddStockDialog
+              onAdd={handleAdd}
+              existingSymbols={watchlist.map(w => w.symbol)}
+              t={t}
             />
           </div>
         </div>
@@ -723,34 +726,35 @@ export default function WatchlistPage() {
           <Card>
             <CardContent className="p-12 text-center">
               <Eye className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-bold mb-2">Watchlist-ul tău este gol</h3>
+              <h3 className="text-xl font-bold mb-2">{t('watchlist.emptyTitle')}</h3>
               <p className="text-muted-foreground mb-6">
-                Adaugă acțiuni pentru a le urmări și a primi alerte când prețul atinge valorile setate.
+                {t('watchlist.emptyDescription')}
               </p>
-              <AddStockDialog 
-                onAdd={handleAdd} 
-                existingSymbols={[]} 
+              <AddStockDialog
+                onAdd={handleAdd}
+                existingSymbols={[]}
+                t={t}
               />
               
               {/* Explicație cum funcționează */}
               <div className="mt-8 pt-8 border-t text-left max-w-lg mx-auto">
-                <h4 className="font-bold text-lg mb-4">📖 Cum funcționează Watchlist-ul?</h4>
+                <h4 className="font-bold text-lg mb-4">{t('watchlist.howItWorksTitle')}</h4>
                 <div className="space-y-3 text-sm text-muted-foreground">
                   <div className="flex items-start gap-3">
                     <span className="text-xl">1️⃣</span>
-                    <p><strong>Adaugă acțiuni</strong> - Caută simbolul (ex: TLV, SNP) și adaugă în listă</p>
+                    <p>{t('watchlist.howStep1')}</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="text-xl">2️⃣</span>
-                    <p><strong>Setează alerte</strong> - Primești notificare când prețul depășește/scade sub o valoare</p>
+                    <p>{t('watchlist.howStep2')}</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="text-xl">3️⃣</span>
-                    <p><strong>Urmărește live</strong> - Vezi prețurile actualizate la fiecare 30 secunde</p>
+                    <p>{t('watchlist.howStep3')}</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="text-xl">4️⃣</span>
-                    <p><strong>Adaugă note</strong> - Notează prețul la care ai cumpărat sau alte detalii</p>
+                    <p>{t('watchlist.howStep4')}</p>
                   </div>
                 </div>
               </div>
@@ -778,7 +782,7 @@ export default function WatchlistPage() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
                 <AlertTriangle className="w-5 h-5" />
-                <span className="font-bold">Alerte Declanșate!</span>
+                <span className="font-bold">{t('watchlist.alertsTriggered')}</span>
               </div>
               <ul className="mt-2 space-y-1 text-sm">
                 {watchlist.filter(w => w.alert_triggered_above).map(w => (
@@ -800,7 +804,7 @@ export default function WatchlistPage() {
         {watchlist.length < 5 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Sugestii Populare</CardTitle>
+              <CardTitle className="text-lg">{t('watchlist.popularSuggestions')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">

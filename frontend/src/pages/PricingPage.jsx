@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check, Crown, Sparkles, Zap, Shield, Star, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -9,30 +10,31 @@ import EarlyAdopterBanner from '../components/EarlyAdopterBanner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const FEATURES = {
+const FEATURE_KEYS = {
   free: [
-    "5 întrebări AI pe zi",
-    "Nivel Începător BVB",
-    "Date BVB de bază",
-    "Fear & Greed Index",
-    "Știri financiare",
-    "Portofoliu simplu"
+    "pricing.featureFreeAi",
+    "pricing.featureFreeBeginner",
+    "pricing.featureFreeData",
+    "pricing.featureFreeFearGreed",
+    "pricing.featureFreeNews",
+    "pricing.featureFreePortfolio"
   ],
   pro: [
-    "Întrebări AI NELIMITATE",
-    "Toate nivelurile (Începător, Mediu, Expert)",
-    "Acces FĂRĂ quiz",
-    "Calculator Fiscal complet (BVB + Internațional)",
-    "AI Fiscal Advisor",
-    "Indicatori tehnici avansați (RSI, MA, MACD)",
-    "Analiză fundamentală completă",
-    "AI trasează linii pe grafice",
-    "Portofoliu avansat cu AI",
-    "Suport prioritar"
+    "pricing.featureProUnlimitedAi",
+    "pricing.featureProAllLevels",
+    "pricing.featureProNoQuiz",
+    "pricing.featureProTaxCalc",
+    "pricing.featureProFiscalAdvisor",
+    "pricing.featureProTechIndicators",
+    "pricing.featureProFundAnalysis",
+    "pricing.featureProAiCharts",
+    "pricing.featureProAdvPortfolio",
+    "pricing.featureProPrioritySupport"
   ]
 };
 
 export default function PricingPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [loadingCheckout, setLoadingCheckout] = useState(false);
@@ -110,13 +112,13 @@ export default function PricingPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1">
-            💎 Planuri & Prețuri
+            💎 {t('pricing.plansAndPricing')}
           </Badge>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold">
-            Alege Planul <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-500">Potrivit</span>
+            {t('pricing.title')}
           </h1>
           <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Începe gratuit, treci la PRO pentru funcții avansate
+            {t('pricing.subtitle')}
           </p>
         </div>
 
@@ -130,12 +132,12 @@ export default function PricingPage() {
               <div className="flex items-center justify-center gap-3 mb-2">
                 {isPro ? <Crown className="w-6 h-6 text-amber-500" /> : <Shield className="w-6 h-6 text-gray-500" />}
                 <p className="text-lg font-semibold">
-                  Plan curent: <strong>{isPro ? 'PRO' : 'Gratuit'}</strong>
+                  {t('pricing.currentPlan')} <strong>{isPro ? t('pricing.proPlan') : t('pricing.freePlan')}</strong>
                 </p>
               </div>
               {isPro && subscriptionStatus.subscription.expires_at && (
                 <p className="text-sm text-muted-foreground">
-                  Expiră la: {new Date(subscriptionStatus.subscription.expires_at).toLocaleDateString('ro-RO')}
+                  {t('pricing.expiresAt')} {new Date(subscriptionStatus.subscription.expires_at).toLocaleDateString('ro-RO')}
                 </p>
               )}
             </CardContent>
@@ -149,10 +151,10 @@ export default function PricingPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <Shield className="w-10 h-10 text-gray-500" />
-                <Badge variant="outline">Gratuit</Badge>
+                <Badge variant="outline">{t('pricing.freePlan')}</Badge>
               </div>
-              <CardTitle className="text-2xl">Gratuit</CardTitle>
-              <CardDescription>Perfect pentru a începe</CardDescription>
+              <CardTitle className="text-2xl">{t('pricing.freePlan')}</CardTitle>
+              <CardDescription>{t('pricing.freeDescription')}</CardDescription>
               <div className="pt-4">
                 <span className="text-4xl font-bold">0 RON</span>
                 <span className="text-muted-foreground">/lună</span>
@@ -160,10 +162,10 @@ export default function PricingPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                {FEATURES.free.map((feature, idx) => (
+                {FEATURE_KEYS.free.map((key, idx) => (
                   <div key={idx} className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-500 mt-0.5" />
-                    <span className="text-sm">{feature}</span>
+                    <span className="text-sm">{t(key)}</span>
                   </div>
                 ))}
               </div>
@@ -173,7 +175,7 @@ export default function PricingPage() {
                 onClick={() => !user && (window.location.href = '/login')}
                 disabled={user}
               >
-                {user ? 'Plan Actual' : 'Începe Gratuit'}
+                {user ? t('pricing.currentPlanBtn') : t('pricing.startFree')}
               </Button>
             </CardContent>
           </Card>
@@ -184,31 +186,31 @@ export default function PricingPage() {
             <div className="absolute top-4 right-4">
               <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
                 <Star className="w-3 h-3 mr-1" />
-                RECOMANDATĂ
+                {t('pricing.recommended')}
               </Badge>
             </div>
 
             <CardHeader>
               <Crown className="w-10 h-10 text-amber-500" />
-              <CardTitle className="text-2xl">PRO</CardTitle>
-              <CardDescription>Toate funcțiile avansate</CardDescription>
+              <CardTitle className="text-2xl">{t('pricing.proPlan')}</CardTitle>
+              <CardDescription>{t('pricing.proDescription')}</CardDescription>
               <div className="pt-4 space-y-2">
                 <div>
-                  <span className="text-4xl font-bold">49 RON</span>
+                  <span className="text-4xl font-bold">{t('pricing.monthlyPrice')}</span>
                   <span className="text-muted-foreground">/lună</span>
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  sau <strong className="text-green-600">490 RON/an</strong> (economisești 2 luni!)
+                  sau <strong className="text-green-600">{t('pricing.annualPrice')}</strong> ({t('pricing.annualSavings')}!)
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-amber-600 mb-2">Tot ce e în GRATUIT, PLUS:</p>
-                {FEATURES.pro.map((feature, idx) => (
+                <p className="text-xs font-semibold text-amber-600 mb-2">{t('pricing.everythingInFree')}</p>
+                {FEATURE_KEYS.pro.map((key, idx) => (
                   <div key={idx} className="flex items-start gap-2">
                     <Sparkles className="w-5 h-5 text-amber-500 mt-0.5" />
-                    <span className="text-sm font-medium">{feature}</span>
+                    <span className="text-sm font-medium">{t(key)}</span>
                   </div>
                 ))}
               </div>
@@ -219,7 +221,7 @@ export default function PricingPage() {
                   disabled
                 >
                   <Check className="w-4 h-4 mr-2" />
-                  Plan Activ
+                  {t('pricing.planActive')}
                 </Button>
               ) : (
                 <Button 
@@ -230,12 +232,12 @@ export default function PricingPage() {
                   {loadingCheckout ? (
                     <span className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Se procesează...
+                      {t('pricing.processing')}
                     </span>
                   ) : (
                     <>
                       <Crown className="w-5 h-5 mr-2" />
-                      Activează PRO Acum
+                      {t('pricing.activatePro')}
                     </>
                   )}
                 </Button>
@@ -247,58 +249,58 @@ export default function PricingPage() {
         {/* Feature Comparison Table */}
         <Card className="max-w-5xl mx-auto">
           <CardHeader>
-            <CardTitle className="text-center">Comparație Detalii Planuri</CardTitle>
+            <CardTitle className="text-center">{t('pricing.detailedComparison')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-3">Funcție</th>
-                    <th className="text-center p-3">Gratuit</th>
-                    <th className="text-center p-3 bg-amber-500/10">PRO</th>
+                    <th className="text-left p-3">{t('pricing.feature')}</th>
+                    <th className="text-center p-3">{t('pricing.freePlan')}</th>
+                    <th className="text-center p-3 bg-amber-500/10">{t('pricing.proPlan')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
                   <tr>
-                    <td className="p-3">Întrebări AI</td>
-                    <td className="text-center p-3">5/zi</td>
-                    <td className="text-center p-3 bg-amber-500/10 font-bold text-amber-600">NELIMITATE</td>
+                    <td className="p-3">{t('pricing.tableAiQuestions')}</td>
+                    <td className="text-center p-3">{t('pricing.tableFivePerDay')}</td>
+                    <td className="text-center p-3 bg-amber-500/10 font-bold text-amber-600">{t('pricing.tableUnlimited')}</td>
                   </tr>
                   <tr>
-                    <td className="p-3">Niveluri Acces</td>
-                    <td className="text-center p-3">Începător</td>
-                    <td className="text-center p-3 bg-amber-500/10 font-bold text-amber-600">Toate (3)</td>
+                    <td className="p-3">{t('pricing.tableAccessLevels')}</td>
+                    <td className="text-center p-3">{t('pricing.tableBeginner')}</td>
+                    <td className="text-center p-3 bg-amber-500/10 font-bold text-amber-600">{t('pricing.tableAllLevels')}</td>
                   </tr>
                   <tr>
-                    <td className="p-3">Calculator Fiscal</td>
+                    <td className="p-3">{t('pricing.tableTaxCalc')}</td>
                     <td className="text-center p-3">❌</td>
                     <td className="text-center p-3 bg-amber-500/10">✅</td>
                   </tr>
                   <tr>
-                    <td className="p-3">Indicatori Tehnici</td>
+                    <td className="p-3">{t('pricing.tableTechIndicators')}</td>
                     <td className="text-center p-3">❌</td>
                     <td className="text-center p-3 bg-amber-500/10">✅ RSI, MA, MACD</td>
                   </tr>
                   <tr>
-                    <td className="p-3">Analiză Fundamentală</td>
+                    <td className="p-3">{t('pricing.tableFundAnalysis')}</td>
                     <td className="text-center p-3">❌</td>
-                    <td className="text-center p-3 bg-amber-500/10">✅ Completă</td>
+                    <td className="text-center p-3 bg-amber-500/10">{t('pricing.tableComplete')}</td>
                   </tr>
                   <tr>
-                    <td className="p-3">AI Grafice</td>
+                    <td className="p-3">{t('pricing.tableAiCharts')}</td>
                     <td className="text-center p-3">❌</td>
-                    <td className="text-center p-3 bg-amber-500/10">✅ Linii suport/rezistență</td>
+                    <td className="text-center p-3 bg-amber-500/10">{t('pricing.tableSupportResistance')}</td>
                   </tr>
                   <tr>
-                    <td className="p-3">Portofoliu Avansat</td>
+                    <td className="p-3">{t('pricing.tableAdvPortfolio')}</td>
                     <td className="text-center p-3">Basic</td>
-                    <td className="text-center p-3 bg-amber-500/10">✅ Cu AI</td>
+                    <td className="text-center p-3 bg-amber-500/10">{t('pricing.tableWithAi')}</td>
                   </tr>
                   <tr>
-                    <td className="p-3">Quiz-uri pentru Nivele</td>
-                    <td className="text-center p-3">Da (7/10)</td>
-                    <td className="text-center p-3 bg-amber-500/10">✅ SKIP direct</td>
+                    <td className="p-3">{t('pricing.tableQuizLevels')}</td>
+                    <td className="text-center p-3">{t('pricing.tableYesScore')}</td>
+                    <td className="text-center p-3 bg-amber-500/10">{t('pricing.tableSkipDirect')}</td>
                   </tr>
                 </tbody>
               </table>
@@ -309,31 +311,31 @@ export default function PricingPage() {
         {/* FAQ */}
         <Card className="max-w-5xl mx-auto">
           <CardHeader>
-            <CardTitle>Întrebări Frecvente</CardTitle>
+            <CardTitle>{t('pricing.faqTitle')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="font-semibold mb-1">Pot anula oricând?</h3>
+              <h3 className="font-semibold mb-1">{t('pricing.faqCancelQ')}</h3>
               <p className="text-sm text-muted-foreground">
-                Da! Poți anula abonamentul PRO oricând. Vei avea acces până la sfârșitul perioadei plătite.
+                {t('pricing.faqCancelA')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-1">Ce metode de plată acceptați?</h3>
+              <h3 className="font-semibold mb-1">{t('pricing.faqPaymentQ')}</h3>
               <p className="text-sm text-muted-foreground">
-                Acceptăm carduri bancare prin Stripe (securizat). În curând și alte metode.
+                {t('pricing.faqPaymentA')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-1">Pot schimba planul din Lunar în Anual?</h3>
+              <h3 className="font-semibold mb-1">{t('pricing.faqSwitchQ')}</h3>
               <p className="text-sm text-muted-foreground">
-                Da! Contactează-ne și îți facem upgrade cu discount proporțional.
+                {t('pricing.faqSwitchA')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-1">Există trial gratuit pentru PRO?</h3>
+              <h3 className="font-semibold mb-1">{t('pricing.faqTrialQ')}</h3>
               <p className="text-sm text-muted-foreground">
-                Momentan nu, dar planul Gratuit îți oferă o previzualizare bună a platformei. PRO deblochează funcții avansate.
+                {t('pricing.faqTrialA')}
               </p>
             </div>
           </CardContent>
@@ -344,15 +346,15 @@ export default function PricingPage() {
           <div className="inline-flex items-center gap-6 p-4 bg-gray-100 dark:bg-zinc-800 rounded-lg">
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-green-500" />
-              <span className="text-sm">Plată Securizată</span>
+              <span className="text-sm">{t('pricing.securePayment')}</span>
             </div>
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-blue-500" />
-              <span className="text-sm">Date Reale BVB</span>
+              <span className="text-sm">{t('pricing.realData')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Zap className="w-5 h-5 text-amber-500" />
-              <span className="text-sm">Activare Instant</span>
+              <span className="text-sm">{t('pricing.instantActivation')}</span>
             </div>
           </div>
         </div>

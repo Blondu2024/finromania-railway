@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -26,6 +27,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 // Fear & Greed Style Indicator
 // ============================================
 const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
+  const { t } = useTranslation();
   // Calculate sentiment score (0-100)
   const sentimentScore = useMemo(() => {
     if (totalStocks === 0) return 50;
@@ -36,11 +38,11 @@ const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
   }, [gainers, losers, avgChange, totalStocks]);
 
   const getSentimentLabel = (score) => {
-    if (score >= 80) return { text: 'LĂCOMIE EXTREMĂ', color: 'text-green-500', emoji: '🚀' };
-    if (score >= 60) return { text: 'LĂCOMIE', color: 'text-green-400', emoji: '📈' };
-    if (score >= 40) return { text: 'NEUTRU', color: 'text-yellow-500', emoji: '⚖️' };
-    if (score >= 20) return { text: 'FRICĂ', color: 'text-orange-500', emoji: '😰' };
-    return { text: 'FRICĂ EXTREMĂ', color: 'text-red-500', emoji: '😱' };
+    if (score >= 80) return { text: t('stocks.extremeGreed'), color: 'text-green-500', emoji: '🚀' };
+    if (score >= 60) return { text: t('stocks.greed'), color: 'text-green-400', emoji: '📈' };
+    if (score >= 40) return { text: t('stocks.neutral'), color: 'text-yellow-500', emoji: '⚖️' };
+    if (score >= 20) return { text: t('stocks.fear'), color: 'text-orange-500', emoji: '😰' };
+    return { text: t('stocks.extremeFear'), color: 'text-red-500', emoji: '😱' };
   };
 
   const sentiment = getSentimentLabel(sentimentScore);
@@ -57,9 +59,9 @@ const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
           <div className="text-center mb-4">
             <h3 className="text-lg font-bold text-white flex items-center justify-center gap-2">
               <Gauge className="w-5 h-5 text-blue-400" />
-              Market Pulse
+              {t('stocks.marketPulse')}
             </h3>
-            <p className="text-xs text-slate-400">Sentimentul pieței BVB</p>
+            <p className="text-xs text-slate-400">{t('stocks.bvbSentiment')}</p>
           </div>
 
           {/* Gauge Visual */}
@@ -107,8 +109,8 @@ const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
             </svg>
 
             {/* Labels - positioned below the gauge */}
-            <div className="absolute -bottom-6 left-0 text-xs text-red-400 font-bold">FRICĂ</div>
-            <div className="absolute -bottom-6 right-0 text-xs text-green-400 font-bold">LĂCOMIE</div>
+            <div className="absolute -bottom-6 left-0 text-xs text-red-400 font-bold">{t('stocks.fear')}</div>
+            <div className="absolute -bottom-6 right-0 text-xs text-green-400 font-bold">{t('stocks.greed')}</div>
           </div>
 
           {/* Score Display */}
@@ -126,8 +128,8 @@ const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
             </div>
             <p className={`text-lg font-bold ${sentiment.color}`}>{sentiment.text}</p>
             <div className="flex justify-center gap-4 mt-3 text-sm">
-              <span className="text-green-400">📈 {gainers} creșteri</span>
-              <span className="text-red-400">📉 {losers} scăderi</span>
+              <span className="text-green-400">📈 {gainers} {t('stocks.rises')}</span>
+              <span className="text-red-400">📉 {losers} {t('stocks.falls')}</span>
             </div>
           </motion.div>
         </CardContent>
@@ -140,6 +142,7 @@ const MarketPulseGauge = ({ gainers, losers, avgChange, totalStocks }) => {
 // COUNTDOWN TIMER COMPONENT
 // ============================================
 const MarketCountdown = () => {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0, isOpen: false, status: '' });
 
   useEffect(() => {
@@ -161,21 +164,21 @@ const MarketCountdown = () => {
         const msUntilOpen = daysUntilMonday * 24 * 60 * 60 * 1000 - (hours * 60 + minutes) * 60 * 1000 + openMinutes * 60 * 1000;
         const h = Math.floor(msUntilOpen / (1000 * 60 * 60));
         const m = Math.floor((msUntilOpen % (1000 * 60 * 60)) / (1000 * 60));
-        setTimeLeft({ hours: h, minutes: m, seconds: 0, isOpen: false, status: 'Weekend - Deschidere Luni' });
+        setTimeLeft({ hours: h, minutes: m, seconds: 0, isOpen: false, status: t('stocks.weekendOpenMonday') });
       } else if (currentMinutes < openMinutes) {
         // Before market opens
         const diff = openMinutes - currentMinutes;
-        setTimeLeft({ hours: Math.floor(diff / 60), minutes: diff % 60, seconds: 0, isOpen: false, status: 'Până la deschidere' });
+        setTimeLeft({ hours: Math.floor(diff / 60), minutes: diff % 60, seconds: 0, isOpen: false, status: t('stocks.untilOpen') });
       } else if (currentMinutes < closeMinutes) {
         // Market is open
         const diff = closeMinutes - currentMinutes;
-        setTimeLeft({ hours: Math.floor(diff / 60), minutes: diff % 60, seconds: 60 - now.getSeconds(), isOpen: true, status: 'Până la închidere' });
+        setTimeLeft({ hours: Math.floor(diff / 60), minutes: diff % 60, seconds: 60 - now.getSeconds(), isOpen: true, status: t('stocks.untilClose') });
       } else {
         // After market closes
         const tomorrow = new Date(now);
         tomorrow.setDate(tomorrow.getDate() + 1);
         const nextOpen = day === 5 ? 3 : 1; // If Friday, next is Monday (3 days)
-        setTimeLeft({ hours: nextOpen * 24 - (hours - 10), minutes: 60 - minutes, seconds: 0, isOpen: false, status: 'Închis - Deschidere mâine' });
+        setTimeLeft({ hours: nextOpen * 24 - (hours - 10), minutes: 60 - minutes, seconds: 0, isOpen: false, status: t('stocks.closedOpenTomorrow') });
       }
     };
 
@@ -204,7 +207,7 @@ const MarketCountdown = () => {
           </motion.div>
           <div>
             <p className="text-white font-bold">
-              {timeLeft.isOpen ? '🟢 BURSA DESCHISĂ' : '🔴 BURSA ÎNCHISĂ'}
+              {timeLeft.isOpen ? `🟢 ${t('stocks.exchangeOpen')}` : `🔴 ${t('stocks.exchangeClosed')}`}
             </p>
             <p className="text-xs text-white/80">{timeLeft.status}</p>
           </div>
@@ -236,6 +239,7 @@ const MarketCountdown = () => {
 // HEATMAP COMPONENT
 // ============================================
 const StockHeatmap = ({ stocks }) => {
+  const { t } = useTranslation();
   const [hoveredStock, setHoveredStock] = useState(null);
 
   // Calculate sizes based on volume/market presence
@@ -264,9 +268,9 @@ const StockHeatmap = ({ stocks }) => {
       <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="w-5 h-5" />
-          🗺️ Heatmap BVB
+          🗺️ {t('stocks.heatmapBVB')}
           <Badge variant="secondary" className="ml-auto bg-white/20 text-white">
-            Top 30 după volum
+            {t('stocks.topByVolume')}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -310,15 +314,15 @@ const StockHeatmap = ({ stocks }) => {
         <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-zinc-700">
           <div className="flex items-center gap-2 text-sm text-slate-300">
             <div className="w-4 h-4 rounded bg-gradient-to-br from-red-500 to-red-600" />
-            <span>Scădere mare</span>
+            <span>{t('stocks.largeDrop')}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-300">
             <div className="w-4 h-4 rounded bg-gradient-to-br from-slate-400 to-slate-500" />
-            <span>Neutru</span>
+            <span>{t('stocks.neutralLabel')}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-300">
             <div className="w-4 h-4 rounded bg-gradient-to-br from-green-500 to-green-600" />
-            <span>Creștere mare</span>
+            <span>{t('stocks.largeRise')}</span>
           </div>
         </div>
 
@@ -358,12 +362,13 @@ const StockHeatmap = ({ stocks }) => {
 // ANIMATED TOP MOVERS COMPONENT
 // ============================================
 const AnimatedTopMovers = ({ gainers, losers, mostTraded }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('gainers');
 
   const tabs = [
-    { id: 'gainers', label: '🚀 Creșteri', data: gainers, color: 'green' },
-    { id: 'losers', label: '📉 Scăderi', data: losers, color: 'red' },
-    { id: 'volume', label: '📊 Volum', data: mostTraded, color: 'blue' },
+    { id: 'gainers', label: `🚀 ${t('stocks.risesTab')}`, data: gainers, color: 'green' },
+    { id: 'losers', label: `📉 ${t('stocks.fallsTab')}`, data: losers, color: 'red' },
+    { id: 'volume', label: `📊 ${t('stocks.volumeTab')}`, data: mostTraded, color: 'blue' },
   ];
 
   const currentTab = tabs.find(t => t.id === activeTab);
@@ -373,7 +378,7 @@ const AnimatedTopMovers = ({ gainers, losers, mostTraded }) => {
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2">
           <Flame className="w-5 h-5 text-orange-500" />
-          Top Movers Live
+          {t('stocks.topMoversLive')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -445,7 +450,7 @@ const AnimatedTopMovers = ({ gainers, losers, mostTraded }) => {
                         {activeTab === 'volume' ? (
                           <>
                             <p className="font-bold">{(stock.volume || 0).toLocaleString('ro-RO')}</p>
-                            <p className="text-xs text-muted-foreground">volum</p>
+                            <p className="text-xs text-muted-foreground">{t('common.volume').toLowerCase()}</p>
                           </>
                         ) : (
                           <>
@@ -519,6 +524,7 @@ const IndicesCarousel = ({ indices }) => {
 // SECTOR PERFORMANCE BARS
 // ============================================
 const SectorPerformance = ({ sectors }) => {
+  const { t } = useTranslation();
   const maxChange = Math.max(...sectors.map(s => Math.abs(s.average_change_percent || 0)), 1);
 
   return (
@@ -526,7 +532,7 @@ const SectorPerformance = ({ sectors }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Building2 className="w-5 h-5 text-blue-600" />
-          Performanță pe Sectoare
+          {t('stocks.sectorPerformance')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -568,6 +574,7 @@ const SectorPerformance = ({ sectors }) => {
 // MAIN STOCKS PAGE COMPONENT
 // ============================================
 export default function StocksPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [stocks, setStocks] = useState([]);
   const [indices, setIndices] = useState([]);
@@ -608,8 +615,8 @@ export default function StocksPage() {
   
   // Delay info - BVB data refresh (fără a menționa delay)
   const delayInfo = isPro
-    ? { text: 'PRO', color: 'bg-green-500', description: 'Date BVB profesionale', refresh: 30000 }
-    : { text: 'Live', color: 'bg-blue-500', description: 'Date BVB actualizate automat', refresh: 60000 };
+    ? { text: 'PRO', color: 'bg-green-500', description: t('stocks.proDataDesc'), refresh: 30000 }
+    : { text: 'Live', color: 'bg-blue-500', description: t('stocks.liveDataDesc'), refresh: 60000 };
 
   const fetchAllData = async () => {
     try {
@@ -723,9 +730,9 @@ export default function StocksPage() {
 
   return (
     <>
-      <SEO 
-        title="Bursa de Valori București | Date Live BVB | FinRomania"
-        description="Date în timp real de pe Bursa de Valori București. Heatmap BVB, indicatori Market Pulse, top movers și analiză completă a pieței românești."
+      <SEO
+        title={t('stocks.seoTitle')}
+        description={t('stocks.seoDescription')}
         keywords="BVB, bursa bucuresti, actiuni romania, TLV, SNP, BRD, indici BVB, market pulse"
       />
 
@@ -738,7 +745,7 @@ export default function StocksPage() {
         >
           <div className="flex items-center justify-center gap-3 mb-2">
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
-              🏛️ Bursa de Valori București
+              🏛️ {t('stocks.bvbExchange')}
             </h1>
             <Badge className={`${delayInfo.color} text-white`}>
               <Clock className="w-3 h-3 mr-1" />
@@ -749,7 +756,7 @@ export default function StocksPage() {
             {delayInfo.description}
             {subscriptionLevel === 'free' && (
               <Link to="/pricing" className="text-amber-600 hover:underline ml-2">
-                → PRO: Refresh mai rapid!
+                → {t('stocks.proFasterRefresh')}
               </Link>
             )}
           </p>
@@ -773,11 +780,11 @@ export default function StocksPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Activity className="w-5 h-5 text-blue-600" />
-                Indicii BVB
+                {t('stocks.bvbIndices')}
               </h2>
               <Button variant="outline" onClick={handleRefresh} disabled={refreshing} size="sm">
                 <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                Actualizează
+                {t('common.refresh')}
               </Button>
             </div>
             <IndicesCarousel indices={indices} />
@@ -808,7 +815,7 @@ export default function StocksPage() {
           <motion.div whileHover={{ scale: 1.05 }}>
             <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
               <CardContent className="p-4">
-                <p className="text-sm text-blue-100">Total Acțiuni</p>
+                <p className="text-sm text-blue-100">{t('stocks.totalStocks')}</p>
                 <p className="text-3xl font-bold">{stocks.length}</p>
               </CardContent>
             </Card>
@@ -816,7 +823,7 @@ export default function StocksPage() {
           <motion.div whileHover={{ scale: 1.05 }}>
             <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0">
               <CardContent className="p-4">
-                <p className="text-sm text-green-100">În Creștere</p>
+                <p className="text-sm text-green-100">{t('stocks.rising')}</p>
                 <p className="text-3xl font-bold">{marketStats.gainers}</p>
               </CardContent>
             </Card>
@@ -824,7 +831,7 @@ export default function StocksPage() {
           <motion.div whileHover={{ scale: 1.05 }}>
             <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white border-0">
               <CardContent className="p-4">
-                <p className="text-sm text-red-100">În Scădere</p>
+                <p className="text-sm text-red-100">{t('stocks.falling')}</p>
                 <p className="text-3xl font-bold">{marketStats.losers}</p>
               </CardContent>
             </Card>
@@ -832,7 +839,7 @@ export default function StocksPage() {
           <motion.div whileHover={{ scale: 1.05 }}>
             <Card className={`bg-gradient-to-br ${marketStats.avgChange >= 0 ? 'from-emerald-500 to-emerald-600' : 'from-orange-500 to-orange-600'} text-white border-0`}>
               <CardContent className="p-4">
-                <p className="text-sm opacity-90">Media Piață</p>
+                <p className="text-sm opacity-90">{t('stocks.marketAvg')}</p>
                 <p className="text-3xl font-bold">{marketStats.avgChange >= 0 ? '+' : ''}{marketStats.avgChange.toFixed(2)}%</p>
               </CardContent>
             </Card>
@@ -865,19 +872,19 @@ export default function StocksPage() {
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5" />
-                Toate Acțiunile BVB ({filteredStocks.length})
+                {t('stocks.allStocksBVB')} ({filteredStocks.length})
               </CardTitle>
               <div className="flex flex-wrap items-center gap-2">
                 {/* Sector Filter */}
                 <Select value={selectedSector} onValueChange={setSelectedSector}>
                   <SelectTrigger className="w-[160px] sm:w-[180px]" data-testid="sector-filter">
                     <Filter className="w-4 h-4 mr-2" />
-                    <SelectValue placeholder="Toate Sectoarele" />
+                    <SelectValue placeholder={t('stocks.allSectors')} />
                   </SelectTrigger>
                   <SelectContent>
                     {uniqueSectors.map(sector => (
                       <SelectItem key={sector} value={sector}>
-                        {sector === 'all' ? 'Toate Sectoarele' : sector}
+                        {sector === 'all' ? t('stocks.allSectors') : sector}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -892,7 +899,7 @@ export default function StocksPage() {
                   data-testid="compare-stocks-btn"
                 >
                   <GitCompare className="w-4 h-4" />
-                  Compară ({compareSymbols.length}/4)
+                  {t('stocks.compare')} ({compareSymbols.length}/4)
                 </Button>
 
                 {compareSymbols.length > 0 && (
@@ -905,7 +912,7 @@ export default function StocksPage() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Caută acțiune..."
+                    placeholder={t('stocks.searchStock')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 w-64"
@@ -918,7 +925,7 @@ export default function StocksPage() {
             {/* Selected for comparison */}
             {compareSymbols.length > 0 && (
               <div className="flex items-center gap-2 mt-3 pt-3 border-t">
-                <span className="text-sm text-muted-foreground">Selectate:</span>
+                <span className="text-sm text-muted-foreground">{t('stocks.selected')}</span>
                 {compareSymbols.map(symbol => (
                   <Badge key={symbol} variant="secondary" className="flex items-center gap-1">
                     {symbol}
@@ -940,23 +947,23 @@ export default function StocksPage() {
                   </TableHead>
                   <TableHead className="cursor-pointer" onClick={() => handleSort('symbol')}>
                     <div className="flex items-center gap-1">
-                      Simbol <ArrowUpDown className="w-4 h-4" />
+                      {t('common.symbol')} <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
-                  <TableHead className="hidden md:table-cell">Sector</TableHead>
+                  <TableHead className="hidden md:table-cell">{t('common.sector')}</TableHead>
                   <TableHead className="text-right cursor-pointer" onClick={() => handleSort('price')}>
                     <div className="flex items-center justify-end gap-1">
-                      Preț <ArrowUpDown className="w-4 h-4" />
+                      {t('common.price')} <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
                   <TableHead className="text-right cursor-pointer" onClick={() => handleSort('change_percent')}>
                     <div className="flex items-center justify-end gap-1">
-                      Var. <ArrowUpDown className="w-4 h-4" />
+                      {t('common.change')} <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
                   <TableHead className="text-right hidden sm:table-cell cursor-pointer" onClick={() => handleSort('volume')}>
                     <div className="flex items-center justify-end gap-1">
-                      Volum <ArrowUpDown className="w-4 h-4" />
+                      {t('common.volume')} <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
                 </TableRow>
@@ -1024,12 +1031,12 @@ export default function StocksPage() {
           <CardContent className="relative p-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-center md:text-left">
-                <h3 className="text-xl font-bold mb-1">💰 Vrei Să Înțelegi Mai Bine Piața?</h3>
-                <p className="text-green-100">Învață bazele investițiilor în 15 lecții gratuite</p>
+                <h3 className="text-xl font-bold mb-1">💰 {t('stocks.wantToUnderstand')}</h3>
+                <p className="text-green-100">{t('stocks.learnInvesting')}</p>
               </div>
               <Link to="/financial-education">
                 <Button className="bg-white text-green-600 hover:bg-green-50">
-                  Începe Educația Financiară →
+                  {t('stocks.startFinEd')} →
                 </Button>
               </Link>
             </div>
@@ -1040,7 +1047,7 @@ export default function StocksPage() {
       {/* Trading Companion - Verifică Înainte */}
       <TradingCompanion 
         stockSymbol="BVB"
-        stockName="Bursa de Valori București"
+        stockName={t('stocks.bvbExchange')}
         currentPrice={null}
         changePercent={marketStats.avgChange}
         stockType="bvb"

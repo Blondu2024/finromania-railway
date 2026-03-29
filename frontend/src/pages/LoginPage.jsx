@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
@@ -8,6 +9,7 @@ import { BarChart3, TrendingUp, Star, Briefcase, Loader2 } from 'lucide-react';
 export default function LoginPage() {
   const { login, user, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Redirect if already logged in
   useEffect(() => {
@@ -42,24 +44,24 @@ export default function LoginPage() {
           <div className="flex justify-center mb-4">
             <BarChart3 className="w-12 h-12 text-blue-600" />
           </div>
-          <CardTitle className="text-2xl">Bine ai venit la FinRomania</CardTitle>
+          <CardTitle className="text-2xl">{t('login.welcome')}</CardTitle>
           <CardDescription>
-            Conectează-te pentru a accesa funcționalitățile complete
+            {t('login.subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Star className="w-5 h-5 text-yellow-500" />
-              <span>Salvează acțiuni în Watchlist</span>
+              <span>{t('login.watchlistBenefit')}</span>
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Briefcase className="w-5 h-5 text-green-500" />
-              <span>Portofoliu virtual pentru simulare</span>
+              <span>{t('login.portfolioBenefit')}</span>
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <TrendingUp className="w-5 h-5 text-blue-500" />
-              <span>Alerte de preț personalizate</span>
+              <span>{t('login.alertsBenefit')}</span>
             </div>
           </div>
           
@@ -70,11 +72,11 @@ export default function LoginPage() {
               <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            Continuă cu Google
+            {t('login.continueGoogle')}
           </Button>
           
           <p className="text-xs text-center text-muted-foreground">
-            Prin conectare, accepți <a href="/terms" className="underline">Termenii și Condițiile</a> și <a href="/privacy" className="underline">Politica de Confidențialitate</a>
+            {t('login.acceptTerms')} <a href="/terms" className="underline">{t('login.termsLink')}</a> {t('common.and', 'și')} <a href="/privacy" className="underline">{t('login.privacyLink')}</a>
           </p>
         </CardContent>
       </Card>
