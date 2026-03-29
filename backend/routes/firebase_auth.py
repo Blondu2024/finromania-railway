@@ -13,7 +13,7 @@ from config.database import get_database
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/auth/firebase", tags=["Firebase Auth"])
 
-FIREBASE_PROJECT_ID = "finromania-40cf3"
+FIREBASE_PROJECT_ID = "fin-romania"
 
 
 class FirebaseLoginRequest(BaseModel):
