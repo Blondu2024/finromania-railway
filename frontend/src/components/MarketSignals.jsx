@@ -9,6 +9,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Skeleton } from './ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import StockLogo from './StockLogo';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -82,6 +83,7 @@ export function Week52Extremes() {
                         <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                           {idx + 1}
                         </div>
+                        <StockLogo symbol={stock.symbol} logoUrl={stock.logo_url} size="sm" />
                         <div>
                           <p className="font-bold">{stock.symbol}</p>
                           <p className="text-xs text-muted-foreground">{stock.name}</p>
@@ -117,6 +119,7 @@ export function Week52Extremes() {
                         <div className="w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                           {idx + 1}
                         </div>
+                        <StockLogo symbol={stock.symbol} logoUrl={stock.logo_url} size="sm" />
                         <div>
                           <p className="font-bold">{stock.symbol}</p>
                           <p className="text-xs text-muted-foreground">{stock.name}</p>
@@ -217,6 +220,7 @@ export function UnusualVolume() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
+                        <StockLogo symbol={stock.symbol} logoUrl={stock.logo_url} size="sm" />
                         <p className="font-bold">{stock.symbol}</p>
                         <Badge variant="outline" className="text-xs">
                           {stock.alert_level}

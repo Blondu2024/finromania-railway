@@ -22,6 +22,7 @@ import {
 } from '../components/ui/dialog';
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
+import StockLogo from '../components/StockLogo';
 import {
   isPushSupported,
   getPermissionStatus,
@@ -463,8 +464,9 @@ const WatchlistItem = ({ item, onRemove, onUpdate }) => {
             {/* Stock Info */}
             <div className="flex items-center gap-4">
               <Link to={`/stocks/bvb/${item.symbol}`}>
-                <div className="text-center hover:text-blue-600 transition-colors">
-                  <p className="font-bold text-lg">{item.symbol}</p>
+                <div className="flex flex-col items-center text-center hover:text-blue-600 transition-colors">
+                  <StockLogo symbol={item.symbol} logoUrl={item.logo_url} size="lg" />
+                  <p className="font-bold text-lg mt-1">{item.symbol}</p>
                   <p className="text-xs text-muted-foreground truncate max-w-[100px]">
                     {item.name}
                   </p>

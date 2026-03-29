@@ -38,6 +38,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
 import { toast } from 'sonner';
 import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
+import StockLogo from '../components/StockLogo';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -63,12 +64,15 @@ const DividendStocksTable = ({ stocks, onAddToPortfolio }) => {
           {stocks.map((stock) => (
             <TableRow key={stock.symbol} className="hover:bg-muted/50">
               <TableCell>
-                <div>
-                  <span className="font-bold text-blue-600">{stock.symbol}</span>
-                  <p className="text-xs text-muted-foreground">{stock.name}</p>
-                  {stock.data_source?.includes('BVB') && (
-                    <span className="text-[10px] text-green-600 font-medium">BVB.ro</span>
-                  )}
+                <div className="flex items-center gap-2">
+                  <StockLogo symbol={stock.symbol} logoUrl={stock.logo_url} />
+                  <div>
+                    <span className="font-bold text-blue-600">{stock.symbol}</span>
+                    <p className="text-xs text-muted-foreground">{stock.name}</p>
+                    {stock.data_source?.includes('BVB') && (
+                      <span className="text-[10px] text-green-600 font-medium">BVB.ro</span>
+                    )}
+                  </div>
                 </div>
               </TableCell>
               <TableCell className="text-right font-mono">{stock.price?.toFixed(2)} RON</TableCell>
@@ -149,6 +153,7 @@ const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
+                      <StockLogo symbol={holding.symbol} logoUrl={stock?.logo_url} size="sm" />
                       <span className="font-bold">{holding.symbol}</span>
                       <span className="text-sm text-muted-foreground">{stock?.name}</span>
                     </div>
@@ -824,9 +829,12 @@ const DividendHistoryTab = ({ isPro }) => {
                         />
                       </TableCell>
                       <TableCell className="cursor-pointer" onClick={() => fetchAnalysis(r.symbol)}>
-                        <div>
-                          <span className="font-bold text-blue-600">{r.symbol}</span>
-                          <p className="text-xs text-muted-foreground truncate max-w-[200px]">{r.company}</p>
+                        <div className="flex items-center gap-2">
+                          <StockLogo symbol={r.symbol} logoUrl={r.logo_url} />
+                          <div>
+                            <span className="font-bold text-blue-600">{r.symbol}</span>
+                            <p className="text-xs text-muted-foreground truncate max-w-[200px]">{r.company}</p>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="text-center">

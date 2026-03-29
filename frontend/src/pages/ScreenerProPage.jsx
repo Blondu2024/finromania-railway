@@ -29,6 +29,7 @@ import {
 import { toast } from 'sonner';
 import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
+import StockLogo from '../components/StockLogo';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -592,11 +593,7 @@ export default function ScreenerProPage() {
                         >
                           <td className="p-3">
                             <div className="flex items-center gap-2">
-                              {stock.logo_url ? (
-                                <img src={stock.logo_url} alt={stock.symbol} className="w-6 h-6 rounded-full object-contain bg-white" onError={(e) => { e.target.style.display = 'none'; }} />
-                              ) : (
-                                <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-xs font-bold text-blue-600">{stock.symbol?.charAt(0)}</div>
-                              )}
+                              <StockLogo symbol={stock.symbol} logoUrl={stock.logo_url} />
                               <div>
                                 <Link to={`/stocks/bvb/${stock.symbol}`} className="font-bold text-blue-600 hover:underline">
                                   {stock.symbol}

@@ -25,6 +25,7 @@ import AnalysisSection from '../components/portfolio/AnalysisSection';
 import AIAdvisorSection from '../components/portfolio/AIAdvisorSection';
 import PortfolioNewsSection from '../components/portfolio/PortfolioNewsSection';
 import CSVImportDialog from '../components/portfolio/CSVImportDialog';
+import StockLogo from '../components/StockLogo';
 
 // ── Methodology collapsible section ─────────────────────────────────────────
 function SourcesSection({ items }) {
@@ -468,6 +469,7 @@ export default function PortfolioBVBPage() {
                         <tr key={pos.symbol} className="hover:bg-muted/30 transition-colors group">
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
+                              <StockLogo symbol={pos.symbol} logoUrl={pos.logo_url} />
                               <Link to={`/stocks/bvb/${pos.symbol}`} className="font-bold text-blue-600 hover:underline">{pos.symbol}</Link>
                               {pos.notes && (
                                 <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-3 h-3 text-muted-foreground" /></TooltipTrigger><TooltipContent>{pos.notes}</TooltipContent></Tooltip></TooltipProvider>
@@ -644,7 +646,10 @@ export default function PortfolioBVBPage() {
                           .map(d => (
                           <tr key={d.symbol} className="hover:bg-muted/30">
                             <td className="px-4 py-3">
-                              <Link to={`/stocks/bvb/${d.symbol}`} className="font-bold text-blue-600 hover:underline">{d.symbol}</Link>
+                              <div className="flex items-center gap-2">
+                                <StockLogo symbol={d.symbol} logoUrl={d.logo_url} size="sm" />
+                                <Link to={`/stocks/bvb/${d.symbol}`} className="font-bold text-blue-600 hover:underline">{d.symbol}</Link>
+                              </div>
                             </td>
                             <td className="px-4 py-3 text-right font-mono">{fmt(d.shares, 0)}</td>
                             <td className="px-4 py-3 text-right font-mono">

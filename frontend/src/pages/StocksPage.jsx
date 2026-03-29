@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import SEO from '../components/SEO';
 import TradingCompanion from '../components/TradingCompanion';
 import StockCompare from '../components/StockCompare';
+import StockLogo from '../components/StockLogo';
 import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -331,9 +332,12 @@ const StockHeatmap = ({ stocks }) => {
               className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white dark:bg-zinc-800 rounded-lg shadow-2xl p-4 z-50"
             >
               <div className="flex items-center gap-4">
-                <div>
-                  <p className="font-bold text-lg">{hoveredStock.symbol}</p>
-                  <p className="text-sm text-muted-foreground">{hoveredStock.name}</p>
+                <div className="flex items-center gap-2">
+                  <StockLogo symbol={hoveredStock.symbol} logoUrl={hoveredStock.logo_url} size="lg" />
+                  <div>
+                    <p className="font-bold text-lg">{hoveredStock.symbol}</p>
+                    <p className="text-sm text-muted-foreground">{hoveredStock.name}</p>
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">{hoveredStock.price?.toFixed(2)} RON</p>
@@ -427,11 +431,14 @@ const AnimatedTopMovers = ({ gainers, losers, mostTraded }) => {
                         >
                           {idx + 1}
                         </motion.div>
-                        <div>
-                          <p className="font-bold">{stock.symbol}</p>
-                          <p className="text-xs text-muted-foreground truncate max-w-[120px]">
-                            {stock.name}
-                          </p>
+                        <div className="flex items-center gap-2">
+                          <StockLogo symbol={stock.symbol} logoUrl={stock.logo_url} size="sm" />
+                          <div>
+                            <p className="font-bold">{stock.symbol}</p>
+                            <p className="text-xs text-muted-foreground truncate max-w-[120px]">
+                              {stock.name}
+                            </p>
+                          </div>
                         </div>
                       </div>
                       <div className="text-right">
@@ -936,7 +943,6 @@ export default function StocksPage() {
                       Simbol <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
-                  <TableHead className="hidden sm:table-cell">Companie</TableHead>
                   <TableHead className="hidden md:table-cell">Sector</TableHead>
                   <TableHead className="text-right cursor-pointer" onClick={() => handleSort('price')}>
                     <div className="flex items-center justify-end gap-1">
@@ -975,14 +981,15 @@ export default function StocksPage() {
                       />
                     </TableCell>
                     <TableCell>
-                      <Link to={`/stocks/bvb/${stock.symbol}`} className="font-bold text-blue-600 hover:underline">
-                        {stock.symbol}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      <Link to={`/stocks/bvb/${stock.symbol}`} className="hover:text-blue-600">
-                        {stock.name}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <StockLogo symbol={stock.symbol} logoUrl={stock.logo_url} />
+                        <div>
+                          <Link to={`/stocks/bvb/${stock.symbol}`} className="font-bold text-blue-600 hover:underline">
+                            {stock.symbol}
+                          </Link>
+                          <p className="text-xs text-muted-foreground hidden sm:block">{stock.name}</p>
+                        </div>
+                      </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       <Badge variant="outline">{stock.sector || 'N/A'}</Badge>

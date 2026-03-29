@@ -10,6 +10,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Skeleton } from './ui/skeleton';
 import CompareChart from './CompareChart';
+import StockLogo from './StockLogo';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -154,6 +155,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
                     className="w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors disabled:opacity-50"
                   >
                     <div className="flex items-center gap-2">
+                      <StockLogo symbol={stock.symbol} logoUrl={stock.logo_url} size="sm" />
                       <span className="font-bold">{stock.symbol}</span>
                       <span className="text-sm text-muted-foreground">{stock.name}</span>
                     </div>
@@ -203,9 +205,12 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
                   {comparisonData.map(stock => (
                     <th key={stock.symbol} className="text-center p-2">
                       <Link to={`/stocks/bvb/${stock.symbol}`} className="hover:text-blue-600">
-                        <div className="font-bold">{stock.symbol}</div>
-                        <div className="text-xs text-muted-foreground font-normal truncate max-w-[100px]">
-                          {stock.name}
+                        <div className="flex flex-col items-center gap-1">
+                          <StockLogo symbol={stock.symbol} logoUrl={stock.logo_url} />
+                          <div className="font-bold">{stock.symbol}</div>
+                          <div className="text-xs text-muted-foreground font-normal truncate max-w-[100px]">
+                            {stock.name}
+                          </div>
                         </div>
                       </Link>
                     </th>
