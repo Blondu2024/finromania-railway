@@ -5,6 +5,14 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime
+import pytz
+
+BUCHAREST_TZ = pytz.timezone('Europe/Bucharest')
+
+def _is_market_day() -> bool:
+    """Verifică dacă e zi de bursă (Luni-Vineri)"""
+    return datetime.now(BUCHAREST_TZ).weekday() < 5
+
 from services.stock_service import StockService
 from services.news_service import NewsService
 from services.currency_service import CurrencyService
@@ -84,7 +92,9 @@ async def check_subscription_expirations_job():
         logger.error(f"❌ [JOB] Error checking expirations: {e}")
 
 async def check_price_alerts_job():
-    """Job: Check price alerts and send notifications"""
+    """Job: Check price alerts and send notifications (doar in zilele de bursa)"""
+    if not _is_market_day():
+        return
     try:
         logger.info("🔄 [JOB] Checking price alerts...")
         results = await notification_service.check_price_alerts()
@@ -93,7 +103,9 @@ async def check_price_alerts_job():
         logger.error(f"❌ [JOB] Error checking price alerts: {e}")
 
 async def check_watchlist_big_moves_job():
-    """Job: Verifică mișcările mari (>5%) din watchlist-uri și trimite emailuri"""
+    """Job: Verifică mișcările mari (>5%) din watchlist-uri (doar in zilele de bursa)"""
+    if not _is_market_day():
+        return
     try:
         logger.info("🔄 [JOB] Checking watchlist big moves...")
         results = await notification_service.check_watchlist_big_moves()
