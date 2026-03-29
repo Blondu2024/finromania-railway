@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Plus, Trash2, Download, RefreshCw, Crown, Edit2, Upload,
-  TrendingUp, TrendingDown, Info,
+  TrendingUp, TrendingDown, Info, BarChart3, Brain, Banknote, Newspaper,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { toast } from 'sonner';
@@ -23,13 +25,10 @@ import AIAdvisorSection from '../components/portfolio/AIAdvisorSection';
 import PortfolioNewsSection from '../components/portfolio/PortfolioNewsSection';
 import CSVImportDialog from '../components/portfolio/CSVImportDialog';
 
-// ─────────────────────────────────────────
-// MAIN COMPONENT
-// ─────────────────────────────────────────
 export default function PortfolioBVBPage() {
   const { user, token } = useAuth();
 
-  // Subscription check (live — avoids stale context after PRO activation)
+  // Subscription check
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
 
@@ -52,6 +51,9 @@ export default function PortfolioBVBPage() {
   const [showCSVImport, setShowCSVImport] = useState(false);
   const [editPos, setEditPos] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  // Active tab
+  const [activeTab, setActiveTab] = useState('positions');
 
   // ── Subscription check ───────────────────────────────────────────────────
   useEffect(() => {
@@ -85,17 +87,27 @@ export default function PortfolioBVBPage() {
     }
   }, [token]);
 
-  const fetchDividendsAndNews = useCallback(async () => {
+  const fetchDividends = useCallback(async () => {
     if (!token) return;
     try {
-      const [divRes, newsRes] = await Promise.all([
-        fetch(`${API_URL}/api/portfolio-bvb/dividends`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API_URL}/api/portfolio-bvb/news`, { headers: { Authorization: `Bearer ${token}` } }),
-      ]);
-      if (divRes.ok) setDividends(await divRes.json());
-      if (newsRes.ok) setNews(await newsRes.json());
+      const r = await fetch(`${API_URL}/api/portfolio-bvb/dividends`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (r.ok) setDividends(await r.json());
     } catch (e) {
-      console.error('Dividends/news fetch error:', e);
+      console.error('Dividends fetch error:', e);
+    }
+  }, [token]);
+
+  const fetchNews = useCallback(async () => {
+    if (!token) return;
+    try {
+      const r = await fetch(`${API_URL}/api/portfolio-bvb/news`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (r.ok) setNews(await r.json());
+    } catch (e) {
+      console.error('News fetch error:', e);
     }
   }, [token]);
 
@@ -123,22 +135,31 @@ export default function PortfolioBVBPage() {
       if (r.ok) {
         const data = await r.json();
         setPortfolio(data);
+        // Fetch dividends with positions (needed for table)
         if ((data.positions || []).length > 0) {
-          fetchAnalysis();
-          fetchDividendsAndNews();
+          fetchDividends();
         }
       } else if (r.status === 403) {
         setPortfolio(null);
       }
     } catch { toast.error('Eroare la încărcare date'); }
     finally { setLoading(false); setRefreshing(false); }
-  }, [token, fetchAnalysis, fetchDividendsAndNews]);
+  }, [token, fetchDividends]);
 
   useEffect(() => {
     if (user && isPro) fetchPortfolio();
     else setLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isPro]);
+
+  // Lazy-load tab data on tab change
+  useEffect(() => {
+    if (!portfolio || (portfolio.positions || []).length === 0) return;
+    if (activeTab === 'analysis' && !analysis && !loadingAnalysis) fetchAnalysis();
+    if (activeTab === 'ai' && !aiAdvice && !loadingAI) fetchAIAdvice();
+    if (activeTab === 'news' && !news) fetchNews();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, portfolio]);
 
   // ── CRUD handlers ────────────────────────────────────────────────────────
   const handleAdd = async (data) => {
@@ -207,27 +228,20 @@ export default function PortfolioBVBPage() {
         <div className="text-center">
           <Crown className="w-12 h-12 text-amber-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Autentificare necesară</h2>
-          <Link to="/login">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">Conectare</Button>
-          </Link>
+          <Link to="/login"><Button className="bg-blue-600 hover:bg-blue-700 text-white">Conectare</Button></Link>
         </div>
       </div>
     );
   }
-
   if (subscriptionLoading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="text-center">
-          <Crown className="w-10 h-10 text-amber-500 mx-auto mb-3 animate-pulse" />
-          <p className="text-muted-foreground text-sm">Se verifică abonamentul...</p>
-        </div>
+        <Crown className="w-10 h-10 text-amber-500 mx-auto mb-3 animate-pulse" />
+        <p className="text-muted-foreground text-sm">Se verifică abonamentul...</p>
       </div>
     );
   }
-
   if (!isPro) return <ProPaywall />;
-
   if (loading) {
     return (
       <div className="space-y-4 animate-pulse">
@@ -245,7 +259,7 @@ export default function PortfolioBVBPage() {
   const plPos = (summary.pl_ron || 0) >= 0;
   const todayPos = (summary.today_pl || 0) >= 0;
 
-  // Dividend map per symbol for fast lookup
+  // Dividend map per symbol
   const divMap = {};
   (dividends?.dividends || []).forEach(d => { divMap[d.symbol] = d; });
 
@@ -263,22 +277,19 @@ export default function PortfolioBVBPage() {
           <p className="text-sm text-muted-foreground mt-0.5">Date live BVB · Exclusiv PRO</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={() => fetchPortfolio(true)} disabled={refreshing} data-testid="portfolio-refresh-btn">
+          <Button variant="outline" size="sm" onClick={() => fetchPortfolio(true)} disabled={refreshing}>
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           </Button>
           {!isEmpty && (
-            <Button variant="outline" size="sm" onClick={handleExport} data-testid="portfolio-export-btn">
-              <Download className="w-4 h-4 mr-1.5" />
-              Export CSV
+            <Button variant="outline" size="sm" onClick={handleExport}>
+              <Download className="w-4 h-4 mr-1.5" /> Export
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={() => setShowCSVImport(true)} data-testid="portfolio-import-btn">
-            <Upload className="w-4 h-4 mr-1.5" />
-            Import CSV
+          <Button variant="outline" size="sm" onClick={() => setShowCSVImport(true)}>
+            <Upload className="w-4 h-4 mr-1.5" /> Import
           </Button>
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setShowAdd(true)} data-testid="portfolio-add-btn">
-            <Plus className="w-4 h-4 mr-1.5" />
-            Adaugă Poziție
+          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setShowAdd(true)}>
+            <Plus className="w-4 h-4 mr-1.5" /> Adaugă
           </Button>
         </div>
       </div>
@@ -330,150 +341,293 @@ export default function PortfolioBVBPage() {
           </CardContent>
         </Card>
       ) : (
-        /* ── POSITIONS TABLE ── */
-        <Card>
-          <CardHeader className="py-3 px-4 border-b">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              Poziții Active — {positions.length}
-            </CardTitle>
-          </CardHeader>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm" data-testid="portfolio-table">
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Simbol</th>
-                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Cant.</th>
-                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Intrare</th>
-                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Curent</th>
-                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Valoare</th>
-                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">P&L</th>
-                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Azi</th>
-                  <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">RSI</th>
-                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
-                    <TooltipProvider><Tooltip><TooltipTrigger className="cursor-help">Div Yield</TooltipTrigger><TooltipContent>Randament dividend trailing 12 luni (BVB.ro confirmat)</TooltipContent></Tooltip></TooltipProvider>
-                  </th>
-                  <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
-                    <TooltipProvider><Tooltip><TooltipTrigger className="cursor-help">Income/an</TooltipTrigger><TooltipContent>Venit estimat anual din dividende pentru cantitatea deținută</TooltipContent></Tooltip></TooltipProvider>
-                  </th>
-                  <th className="px-4 py-2.5"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {positions.map((pos) => {
-                  const posPlus = (pos.pl_percent || 0) >= 0;
-                  const todayPlus = (pos.price_change_percent || 0) >= 0;
-                  return (
-                    <tr key={pos.symbol} className="hover:bg-muted/30 transition-colors group" data-testid={`portfolio-row-${pos.symbol}`}>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <Link to={`/stocks/bvb/${pos.symbol}`} className="font-bold text-blue-600 hover:underline">{pos.symbol}</Link>
-                          {pos.notes && (
-                            <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-3 h-3 text-muted-foreground" /></TooltipTrigger><TooltipContent>{pos.notes}</TooltipContent></Tooltip></TooltipProvider>
-                          )}
-                        </div>
-                        <p className="text-xs text-muted-foreground truncate max-w-[140px]">{pos.name}</p>
-                      </td>
-                      <td className="px-4 py-3 text-right font-mono">{fmt(pos.shares, 0)}</td>
-                      <td className="px-4 py-3 text-right font-mono text-muted-foreground">{fmt(pos.purchase_price)} RON</td>
-                      <td className="px-4 py-3 text-right font-mono font-medium">
-                        {pos.current_price != null ? <span>{fmt(pos.current_price)} RON</span> : <span className="text-muted-foreground text-xs">N/A</span>}
-                      </td>
-                      <td className="px-4 py-3 text-right font-mono font-medium">{pos.current_value != null ? fmtRON(pos.current_value) : '—'}</td>
-                      <td className="px-4 py-3 text-right"><PLCell value={pos.pl_ron} percent={pos.pl_percent} /></td>
-                      <td className="px-4 py-3 text-right">
-                        {pos.price_change_percent != null ? (
-                          <span className={`font-mono text-xs ${todayPlus ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
-                            {todayPlus ? '+' : ''}{fmt(pos.price_change_percent)}%
-                          </span>
-                        ) : <span className="text-muted-foreground text-xs">—</span>}
-                      </td>
-                      <td className="px-4 py-3 text-center"><RSIBadge signal={pos.rsi_signal} rsi={pos.rsi} /></td>
-                      <td className="px-4 py-3 text-right">
-                        {divMap[pos.symbol]?.dividend_yield_pct != null ? (
-                          <TooltipProvider><Tooltip><TooltipTrigger>
-                            <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                              {fmt(divMap[pos.symbol].dividend_yield_pct)}%
-                            </span>
-                          </TooltipTrigger><TooltipContent>
-                            <p className="text-xs">Dividend trailing: {fmt(divMap[pos.symbol].trailing_annual_dividend, 4)} RON</p>
-                            <p className="text-xs text-emerald-400">BVB.ro confirmat</p>
-                          </TooltipContent></Tooltip></TooltipProvider>
-                        ) : <span className="text-muted-foreground text-xs">N/A</span>}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {divMap[pos.symbol]?.annual_income_ron != null ? (
-                          <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">{fmtRON(divMap[pos.symbol].annual_income_ron)}</span>
-                        ) : <span className="text-muted-foreground text-xs">—</span>}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditPos(pos)} data-testid={`edit-${pos.symbol}`}>
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-red-500 hover:text-red-600" onClick={() => setDeleteConfirm(pos.symbol)} data-testid={`delete-${pos.symbol}`}>
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </td>
+        /* ── TAB NAVIGATION ── */
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="w-full justify-start mb-4 h-auto flex-wrap gap-1 bg-muted/50 p-1">
+            <TabsTrigger value="positions" className="flex items-center gap-1.5 data-[state=active]:bg-background">
+              <TrendingUp className="w-4 h-4" />
+              <span className="hidden sm:inline">Poziții</span>
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{positions.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="analysis" className="flex items-center gap-1.5 data-[state=active]:bg-background">
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Analiză</span>
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="flex items-center gap-1.5 data-[state=active]:bg-background">
+              <Brain className="w-4 h-4" />
+              <span className="hidden sm:inline">AI Advisor</span>
+            </TabsTrigger>
+            <TabsTrigger value="dividends" className="flex items-center gap-1.5 data-[state=active]:bg-background">
+              <Banknote className="w-4 h-4" />
+              <span className="hidden sm:inline">Dividende</span>
+              {dividends?.total_annual_income > 0 && (
+                <Badge className="bg-emerald-500 text-white text-[10px] px-1.5 py-0">{fmtRON(dividends.total_annual_income)}/an</Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="news" className="flex items-center gap-1.5 data-[state=active]:bg-background">
+              <Newspaper className="w-4 h-4" />
+              <span className="hidden sm:inline">Știri</span>
+            </TabsTrigger>
+          </TabsList>
+
+          {/* ── TAB: POSITIONS ── */}
+          <TabsContent value="positions">
+            <Card>
+              <CardHeader className="py-3 px-4 border-b">
+                <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                  Poziții Active — {positions.length}
+                </CardTitle>
+              </CardHeader>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/40">
+                      <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Simbol</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Cant.</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Intrare</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Curent</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Valoare</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">P&L</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Azi</th>
+                      <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">RSI</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Div Yield</th>
+                      <th className="px-4 py-2.5"></th>
                     </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr className="border-t-2 bg-muted/20">
-                  <td className="px-4 py-3 font-bold text-sm" colSpan={4}>TOTAL</td>
-                  <td className="px-4 py-3 text-right font-bold font-mono">{fmtRON(summary.total_value)}</td>
-                  <td className="px-4 py-3 text-right"><PLCell value={summary.pl_ron} percent={summary.pl_percent} /></td>
-                  <td className="px-4 py-3 text-right"><PLCell value={summary.today_pl} /></td>
-                  <td colSpan={2}></td>
-                  <td className="px-4 py-3 text-right">
-                    {dividends?.total_annual_income > 0 && (
-                      <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                        {fmtRON(dividends.total_annual_income)}/an
-                      </span>
-                    )}
-                  </td>
-                  <td></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-          <div className="px-4 py-2.5 border-t bg-muted/10">
-            <p className="text-xs text-muted-foreground">Date live BVB · RSI(14) · Prețuri cu delay 15min · Actualizare la refresh</p>
-          </div>
-        </Card>
+                  </thead>
+                  <tbody className="divide-y">
+                    {positions.map((pos) => {
+                      const todayPlus = (pos.price_change_percent || 0) >= 0;
+                      return (
+                        <tr key={pos.symbol} className="hover:bg-muted/30 transition-colors group">
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <Link to={`/stocks/bvb/${pos.symbol}`} className="font-bold text-blue-600 hover:underline">{pos.symbol}</Link>
+                              {pos.notes && (
+                                <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-3 h-3 text-muted-foreground" /></TooltipTrigger><TooltipContent>{pos.notes}</TooltipContent></Tooltip></TooltipProvider>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground truncate max-w-[140px]">{pos.name}</p>
+                          </td>
+                          <td className="px-4 py-3 text-right font-mono">{fmt(pos.shares, 0)}</td>
+                          <td className="px-4 py-3 text-right font-mono text-muted-foreground">{fmt(pos.purchase_price)} RON</td>
+                          <td className="px-4 py-3 text-right font-mono font-medium">
+                            {pos.current_price != null ? <span>{fmt(pos.current_price)} RON</span> : <span className="text-muted-foreground text-xs">N/A</span>}
+                          </td>
+                          <td className="px-4 py-3 text-right font-mono font-medium">{pos.current_value != null ? fmtRON(pos.current_value) : '—'}</td>
+                          <td className="px-4 py-3 text-right"><PLCell value={pos.pl_ron} percent={pos.pl_percent} /></td>
+                          <td className="px-4 py-3 text-right">
+                            {pos.price_change_percent != null ? (
+                              <span className={`font-mono text-xs ${todayPlus ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                                {todayPlus ? '+' : ''}{fmt(pos.price_change_percent)}%
+                              </span>
+                            ) : <span className="text-muted-foreground text-xs">—</span>}
+                          </td>
+                          <td className="px-4 py-3 text-center"><RSIBadge signal={pos.rsi_signal} rsi={pos.rsi} /></td>
+                          <td className="px-4 py-3 text-right">
+                            {divMap[pos.symbol]?.dividend_yield_pct != null ? (
+                              <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                {fmt(divMap[pos.symbol].dividend_yield_pct)}%
+                              </span>
+                            ) : <span className="text-muted-foreground text-xs">—</span>}
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditPos(pos)}>
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-red-500 hover:text-red-600" onClick={() => setDeleteConfirm(pos.symbol)}>
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 bg-muted/20">
+                      <td className="px-4 py-3 font-bold text-sm" colSpan={4}>TOTAL</td>
+                      <td className="px-4 py-3 text-right font-bold font-mono">{fmtRON(summary.total_value)}</td>
+                      <td className="px-4 py-3 text-right"><PLCell value={summary.pl_ron} percent={summary.pl_percent} /></td>
+                      <td className="px-4 py-3 text-right"><PLCell value={summary.today_pl} /></td>
+                      <td></td>
+                      <td className="px-4 py-3 text-right">
+                        {dividends?.total_annual_income > 0 && (
+                          <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                            {fmtRON(dividends.total_annual_income)}/an
+                          </span>
+                        )}
+                      </td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <div className="px-4 py-2.5 border-t bg-muted/10">
+                <p className="text-xs text-muted-foreground">Date live BVB · RSI(14) · Prețuri cu delay 15min · Actualizare la refresh</p>
+              </div>
+            </Card>
+          </TabsContent>
+
+          {/* ── TAB: ANALYSIS ── */}
+          <TabsContent value="analysis">
+            <AnalysisSection analysis={analysis} loading={loadingAnalysis} />
+            {!analysis && !loadingAnalysis && (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <BarChart3 className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-40" />
+                  <p className="text-muted-foreground text-sm">Se încarcă analiza portofoliului...</p>
+                  <Button variant="outline" size="sm" className="mt-4" onClick={fetchAnalysis}>
+                    <RefreshCw className="w-4 h-4 mr-2" /> Încarcă Analiza
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* ── TAB: AI ADVISOR ── */}
+          <TabsContent value="ai">
+            <AIAdvisorSection advice={aiAdvice} loading={loadingAI} onGenerate={fetchAIAdvice} />
+          </TabsContent>
+
+          {/* ── TAB: DIVIDENDS ── */}
+          <TabsContent value="dividends">
+            {dividends ? (
+              <div className="space-y-4">
+                {/* Dividend Summary */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="p-5 text-center">
+                      <p className="text-sm text-muted-foreground mb-1">Income Anual Estimat</p>
+                      <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                        {fmtRON(dividends.total_annual_income || 0)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">din dividende BVB</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-5 text-center">
+                      <p className="text-sm text-muted-foreground mb-1">Yield Mediu Portofoliu</p>
+                      <p className="text-2xl font-bold">
+                        {dividends.dividends?.length > 0
+                          ? fmt(dividends.dividends.filter(d => d.dividend_yield_pct).reduce((s, d) => s + d.dividend_yield_pct, 0) / dividends.dividends.filter(d => d.dividend_yield_pct).length)
+                          : '0'}%
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">trailing 12 luni</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-5 text-center">
+                      <p className="text-sm text-muted-foreground mb-1">Acțiuni cu Dividende</p>
+                      <p className="text-2xl font-bold">
+                        {dividends.dividends?.filter(d => d.trailing_annual_dividend > 0).length || 0}
+                        <span className="text-base text-muted-foreground"> / {positions.length}</span>
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">plătesc dividende</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Dividend per Position Table */}
+                <Card>
+                  <CardHeader className="py-3 px-4 border-b">
+                    <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                      Dividende per Poziție
+                    </CardTitle>
+                  </CardHeader>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b bg-muted/40">
+                          <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Simbol</th>
+                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Acțiuni</th>
+                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Dividend/Acțiune</th>
+                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Yield</th>
+                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Income Anual</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {(dividends.dividends || [])
+                          .sort((a, b) => (b.annual_income_ron || 0) - (a.annual_income_ron || 0))
+                          .map(d => (
+                          <tr key={d.symbol} className="hover:bg-muted/30">
+                            <td className="px-4 py-3">
+                              <Link to={`/stocks/bvb/${d.symbol}`} className="font-bold text-blue-600 hover:underline">{d.symbol}</Link>
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono">{fmt(d.shares, 0)}</td>
+                            <td className="px-4 py-3 text-right font-mono">
+                              {d.trailing_annual_dividend > 0 ? `${fmt(d.trailing_annual_dividend, 4)} RON` : <span className="text-muted-foreground">—</span>}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              {d.dividend_yield_pct > 0 ? (
+                                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-medium">{fmt(d.dividend_yield_pct)}%</span>
+                              ) : <span className="text-muted-foreground">—</span>}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              {d.annual_income_ron > 0 ? (
+                                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{fmtRON(d.annual_income_ron)}</span>
+                              ) : <span className="text-muted-foreground">—</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="border-t-2 bg-muted/20">
+                          <td className="px-4 py-3 font-bold" colSpan={4}>TOTAL INCOME ANUAL</td>
+                          <td className="px-4 py-3 text-right font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                            {fmtRON(dividends.total_annual_income || 0)}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                  <div className="px-4 py-2.5 border-t bg-muted/10">
+                    <p className="text-xs text-muted-foreground">Sursa: BVB.ro · Trailing 12 luni · Dividend per acțiune brut</p>
+                  </div>
+                </Card>
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Banknote className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-40" />
+                  <p className="text-muted-foreground text-sm">Se încarcă datele de dividende...</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* ── TAB: NEWS ── */}
+          <TabsContent value="news">
+            {news ? (
+              <PortfolioNewsSection news={news} />
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Newspaper className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-40" />
+                  <p className="text-muted-foreground text-sm">Se încarcă știrile relevante...</p>
+                  <Button variant="outline" size="sm" className="mt-4" onClick={fetchNews}>
+                    <RefreshCw className="w-4 h-4 mr-2" /> Încarcă Știrile
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
       )}
-
-      {/* ── ANALYSIS (Faza 2) ── */}
-      {!isEmpty && <AnalysisSection analysis={analysis} loading={loadingAnalysis} />}
-
-      {/* ── AI ADVISOR (Faza 3) ── */}
-      {!isEmpty && <AIAdvisorSection advice={aiAdvice} loading={loadingAI} onGenerate={fetchAIAdvice} />}
-
-      {/* ── NEWS (Faza 4) ── */}
-      {!isEmpty && news && <PortfolioNewsSection news={news} />}
 
       {/* ── DIALOGS ── */}
       <PositionDialog open={showAdd} onClose={() => setShowAdd(false)} onSave={handleAdd} editData={null} loading={saving} />
       <PositionDialog open={!!editPos} onClose={() => setEditPos(null)} onSave={handleUpdate} editData={editPos} loading={saving} />
-
-      <CSVImportDialog
-        open={showCSVImport}
-        onClose={() => setShowCSVImport(false)}
-        token={token}
-        onImportComplete={() => fetchPortfolio(true)}
-      />
+      <CSVImportDialog open={showCSVImport} onClose={() => setShowCSVImport(false)} token={token} onImportComplete={() => fetchPortfolio(true)} />
 
       {/* Delete confirm */}
       <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
         <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Elimini {deleteConfirm}?</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>Elimini {deleteConfirm}?</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">Poziția va fi eliminată definitiv din portofoliu.</p>
           <DialogFooter className="gap-2 mt-4">
             <Button variant="outline" onClick={() => setDeleteConfirm(null)}>Anulează</Button>
-            <Button variant="destructive" onClick={() => handleDelete(deleteConfirm)} data-testid="confirm-delete-btn">
+            <Button variant="destructive" onClick={() => handleDelete(deleteConfirm)}>
               <Trash2 className="w-4 h-4 mr-2" /> Elimină
             </Button>
           </DialogFooter>
