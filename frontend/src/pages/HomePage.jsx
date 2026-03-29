@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Newspaper, ArrowRight, GraduationCap, Globe, Search, Activity, Zap, Crown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Newspaper, ArrowRight, GraduationCap, Globe, Search, Activity, Zap, Crown, Gift } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -158,12 +158,25 @@ export default function HomePage() {
               </p>
             </div>
 
+            {/* PRO Gratuit - Early Adopter Offer (only for non-PRO users) */}
+            {(!user || (!user.is_early_adopter && user.subscription_level !== 'pro')) && (
+              <div className="bg-green-600/20 border border-green-500/40 rounded-xl p-4 max-w-lg mx-auto mb-6 text-center">
+                <p className="flex items-center justify-center gap-2 font-bold text-green-300 text-lg">
+                  <Gift className="w-5 h-5" />
+                  PRO GRATUIT până pe 5 Iunie!
+                </p>
+                <p className="text-sm text-green-200/80 mt-1">
+                  Înregistrează-te acum — acces complet la AI Advisor, Analiză Tehnică, Calculator Fiscal și toate funcțiile PRO. Fără card bancar.
+                </p>
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {!user ? (
                 <Link to="/login">
                   <Button size="lg" className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
-                    <TrendingUp className="w-5 h-5 mr-2" />
-                    Creează Cont Gratuit
+                    <Gift className="w-5 h-5 mr-2" />
+                    Începe GRATUIT cu PRO
                   </Button>
                 </Link>
               ) : (
