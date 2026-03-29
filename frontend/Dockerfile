@@ -8,6 +8,8 @@ RUN yarn install --frozen-lockfile
 
 # Copy source and build
 COPY . .
+ARG REACT_APP_BACKEND_URL
+ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
 RUN yarn build
 
 # Production stage with nginx
