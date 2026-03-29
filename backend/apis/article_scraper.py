@@ -29,6 +29,11 @@ class ArticleScraper:
             'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement', '.social-share', '.related'],
             'image_selector': 'article img, .article-image img, meta[property="og:image"]'
         },
+        'bvb.ro': {
+            'content_selector': 'div.article-content, div.content, .press-release-content, article, .main-content',
+            'remove_selectors': ['script', 'style', 'aside', '.ad', 'nav', 'header', 'footer', '.menu'],
+            'image_selector': 'meta[property="og:image"], article img'
+        },
         'bursa.ro': {
             'content_selector': 'div.article-content, div.content-article, article .text, .article-text',
             'remove_selectors': ['script', 'style', 'aside', '.ad', '.advertisement'],
