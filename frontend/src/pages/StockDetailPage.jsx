@@ -7,8 +7,7 @@ import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import AddToWatchlistButton from '../components/AddToWatchlistButton';
 import SocialShare from '../components/SocialShare';
-import AdvancedStockChart from '../components/AdvancedStockChart';
-import ProStockChart from '../components/ProStockChart';
+import UnifiedChart from '../components/UnifiedChart';
 import AITechnicalAnalysis from '../components/AITechnicalAnalysis';
 import TradingCompanion, { TradingReminder, shouldShowReminder, markReminderShown } from '../components/TradingCompanion';
 import { useAuth } from '../context/AuthContext';
@@ -289,8 +288,8 @@ export default function StockDetailPage() {
         </Card>
       </div>
 
-      {/* PRO Chart Component */}
-      <ProStockChart
+      {/* Unified Chart (lightweight-charts) */}
+      <UnifiedChart
         symbol={symbol}
         type={type}
         isPro={isPro}
