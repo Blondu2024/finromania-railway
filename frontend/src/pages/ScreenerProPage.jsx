@@ -591,10 +591,19 @@ export default function ScreenerProPage() {
                           className="border-b hover:bg-muted/30"
                         >
                           <td className="p-3">
-                            <Link to={`/stocks/bvb/${stock.symbol}`} className="font-bold text-blue-600 hover:underline">
-                              {stock.symbol}
-                            </Link>
-                            <p className="text-xs text-muted-foreground">{stock.name}</p>
+                            <div className="flex items-center gap-2">
+                              {stock.logo_url ? (
+                                <img src={stock.logo_url} alt={stock.symbol} className="w-6 h-6 rounded-full object-contain bg-white" onError={(e) => { e.target.style.display = 'none'; }} />
+                              ) : (
+                                <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-xs font-bold text-blue-600">{stock.symbol?.charAt(0)}</div>
+                              )}
+                              <div>
+                                <Link to={`/stocks/bvb/${stock.symbol}`} className="font-bold text-blue-600 hover:underline">
+                                  {stock.symbol}
+                                </Link>
+                                <p className="text-xs text-muted-foreground">{stock.name}</p>
+                              </div>
+                            </div>
                           </td>
                           <td className="p-3 text-right font-medium">{stock.price?.toFixed(2)} RON</td>
                           <td className="p-3 text-right">

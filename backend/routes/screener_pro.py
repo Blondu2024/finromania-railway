@@ -199,8 +199,10 @@ async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional
             debt_equity = _extract_debt_equity(data)
 
             technicals_data = data.get("Technicals", {})
+            general_data = data.get("General", {})
 
             return {
+                "logo_url": general_data.get("LogoURL"),
                 "pe_ratio": pe_ratio,
                 "eps": eps,
                 "roe": roe,
@@ -471,6 +473,7 @@ async def refresh_fundamentals_daily_cache():
                             {"symbol": symbol},
                             {
                                 "symbol": symbol,
+                                "logo_url": fund.get("logo_url"),
                                 "pe_ratio": fund.get("pe_ratio"),
                                 "eps": fund.get("eps"),
                                 "roe": fund.get("roe"),
@@ -706,6 +709,7 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict, bvb_records: Opt
         "symbol": symbol,
         "name": stock.get("name"),
         "sector": stock.get("sector"),
+        "logo_url": fundamentals.get("logo_url") if fundamentals else None,
         "price": price,
         "change": stock.get("change"),
         "change_percent": stock.get("change_percent"),

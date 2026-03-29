@@ -352,6 +352,7 @@ class EODHDClient:
                     data = response.json()
                     
                     # Extract key fundamental metrics
+                    general = data.get("General", {})
                     highlights = data.get("Highlights", {})
                     valuation = data.get("Valuation", {})
                     financials = data.get("Financials", {})
@@ -371,6 +372,7 @@ class EODHDClient:
                     
                     return {
                         "symbol": symbol,
+                        "logo_url": general.get("LogoURL"),
                         "pe_ratio": highlights.get("PERatio"),
                         "pb_ratio": valuation.get("PriceBookMRQ"),
                         "ps_ratio": valuation.get("PriceSalesTTM"),

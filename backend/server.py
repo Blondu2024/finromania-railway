@@ -150,6 +150,7 @@ class StockResponse(BaseModel):
     market: Optional[str] = None
     source: Optional[str] = None
     is_mock: Optional[bool] = False
+    logo_url: Optional[str] = None
 
 class IndexResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -269,16 +270,26 @@ async def get_bvb_stocks(response: Response):
     # Prevent caching for live data
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
-    
+
     try:
         db = await get_database()
         stocks = await db.stocks_bvb.find({}, {"_id": 0}).limit(100).to_list(100)
-        
+
         if not stocks:
             # Dacă nu există date, forțează update
             await stock_service.update_bvb_stocks()
             stocks = await db.stocks_bvb.find({}, {"_id": 0}).limit(100).to_list(100)
-        
+
+        # Enrich with logo_url from fundamentals cache
+        logo_cache = {}
+        fund_docs = await db.fundamentals_daily_cache.find({}, {"_id": 0, "symbol": 1, "logo_url": 1}).to_list(200)
+        for doc in fund_docs:
+            if doc.get("logo_url"):
+                logo_cache[doc["symbol"]] = doc["logo_url"]
+        for stock in stocks:
+            if stock.get("symbol") in logo_cache:
+                stock["logo_url"] = logo_cache[stock["symbol"]]
+
         return stocks
     except Exception as e:
         logger.error(f"Error getting BVB stocks: {e}")
