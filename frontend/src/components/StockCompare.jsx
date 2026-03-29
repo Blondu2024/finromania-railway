@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  BarChart3, TrendingUp, TrendingDown, X, Plus, Search, 
+import {
+  BarChart3, TrendingUp, TrendingDown, X, Plus, Search,
   ArrowUpDown, Target, Activity, DollarSign, Percent
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
@@ -9,6 +9,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Skeleton } from './ui/skeleton';
+import CompareChart from './CompareChart';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -180,6 +181,11 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
             )}
           </div>
         </div>
+
+        {/* Comparison Chart */}
+        {symbols.length >= 2 && (
+          <CompareChart symbols={symbols} />
+        )}
 
         {/* Comparison Table */}
         {loading ? (
