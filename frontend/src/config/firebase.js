@@ -4,7 +4,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/
 
 const firebaseConfig = {
   apiKey: "AIzaSyAd-6BrYhjACidqiE6fEx_HjzgB3RT-cNc",
-  authDomain: "finromania.ro",
+  authDomain: "fin-romania.firebaseapp.com",
   projectId: "fin-romania",
   storageBucket: "fin-romania.firebasestorage.app",
   messagingSenderId: "767909387138",
