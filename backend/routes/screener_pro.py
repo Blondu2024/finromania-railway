@@ -147,6 +147,7 @@ async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional
     # Manual overrides pentru valori confirmate BVB.ro (EODHD incorect)
     MANUAL_OVERRIDES = {
         "M": {"eps_override": -0.02, "pe_override": None},
+        "H2O": {"eps_override": 8.99, "pe_override": 16.44},  # Hidroelectrica: profit net ~4 mld RON, 449.69M actiuni
     }
 
     try:
@@ -237,8 +238,8 @@ async def fetch_stock_technicals(client: httpx.AsyncClient, symbol: str) -> Dict
     return {
         "rsi": rsi_data.get("rsi") if isinstance(rsi_data, dict) else None,
         "macd": macd_data.get("macd") if isinstance(macd_data, dict) else None,
-        "macd_signal": macd_data.get("macd_signal") if isinstance(macd_data, dict) else None,
-        "macd_histogram": macd_data.get("macd_hist") if isinstance(macd_data, dict) else None,
+        "macd_signal": macd_data.get("signal", macd_data.get("macd_signal")) if isinstance(macd_data, dict) else None,
+        "macd_histogram": macd_data.get("divergence", macd_data.get("macd_hist")) if isinstance(macd_data, dict) else None,
         "bb_upper": bb_data.get("uband") if isinstance(bb_data, dict) else None,
         "bb_middle": bb_data.get("mband") if isinstance(bb_data, dict) else None,
         "bb_lower": bb_data.get("lband") if isinstance(bb_data, dict) else None,
@@ -529,7 +530,11 @@ async def run_scan_and_cache():
 
     try:
         db = await get_database()
+        # Actiuni excluse din screener (delisting, date invalide)
+        EXCLUDED_SYMBOLS = {"FP"}  # FP - Fondul Proprietatea: delisting in curs, date tehnice aberante
+
         stocks = await db.stocks_bvb.find({}, {"_id": 0}).to_list(100)
+        stocks = [s for s in stocks if s.get("symbol") not in EXCLUDED_SYMBOLS]
 
         if not stocks:
             return
