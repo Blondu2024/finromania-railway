@@ -16,6 +16,7 @@ import { initializePushNotifications } from './utils/pushNotifications';
 import NotificationBell, { CriticalNotificationBanner } from './components/NotificationBell';
 import FeedbackButton, { BetaDisclaimer, BetaBadge } from './components/BetaFeedback';
 import FinAssistant from './components/FinAssistant';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import './App.css';
 
 initializePushNotifications();
@@ -201,6 +202,7 @@ function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen }) {
             </Suspense>
           </div>
           <NotificationBell />
+          <LanguageSwitcher />
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleDarkMode}>
             {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>

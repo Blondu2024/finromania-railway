@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 import "@/index.css";
+import "@/i18n";
 import App from "@/App";
 import { initGA } from './utils/analytics';
 
