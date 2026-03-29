@@ -123,7 +123,11 @@ class RomanianRSSClient:
             for link in links:
                 try:
                     title = link.get_text(strip=True)
-                    if not title or len(title) < 10:
+                    if not title or len(title) < 15:
+                        continue
+
+                    # Skip "Mai multe informatii" read-more links
+                    if 'mai multe' in title.lower() or 'more info' in title.lower():
                         continue
 
                     href = link.get('href', '')

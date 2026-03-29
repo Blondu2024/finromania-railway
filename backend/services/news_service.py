@@ -19,9 +19,14 @@ class NewsService:
         self.scraper = article_scraper
     
     async def fetch_and_store_news(self) -> int:
-        """Fetch știri noi din surse românești și salvează în DB"""
+        """Fetch știri BVB din surse românești și salvează în DB"""
         try:
-            logger.info("🔄 Fetching Romanian news from RSS sources...")
+            # One-time cleanup of articles from removed sources
+            if not getattr(self, '_sources_cleaned', False):
+                await self.cleanup_removed_sources()
+                self._sources_cleaned = True
+
+            logger.info("🔄 Fetching BVB news from RSS sources...")
             
             # Get news from Romanian RSS sources
             articles = self.ro_rss_client.fetch_all_news(limit_per_source=15)
@@ -212,13 +217,26 @@ class NewsService:
     async def clear_old_articles(self, days: int = 30) -> int:
         """Șterge articolele mai vechi de X zile"""
         from datetime import timedelta
-        
+
         db = await get_database()
         cutoff_date = (datetime.utcnow() - timedelta(days=days)).isoformat()
-        
+
         result = await db.articles.delete_many({
             'published_at': {'$lt': cutoff_date}
         })
-        
+
         logger.info(f"Deleted {result.deleted_count} old articles")
+        return result.deleted_count
+
+    async def cleanup_removed_sources(self) -> int:
+        """Șterge articolele din surse care nu mai sunt active"""
+        removed_sources = [
+            'Capital.ro', 'Economica.net', 'Hotnews Economie',
+            'Digi24 Economie', 'Mediafax',
+        ]
+        db = await get_database()
+        result = await db.articles.delete_many({
+            'source.name': {'$in': removed_sources}
+        })
+        logger.info(f"Cleaned up {result.deleted_count} articles from removed sources")
         return result.deleted_count
