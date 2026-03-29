@@ -284,7 +284,12 @@ export default function DividendCalendarPage() {
             Calendar Dividende & Evenimente
           </h1>
           <p className="text-muted-foreground mb-1">Toate datele importante pentru investitorii BVB</p>
-          <p className="text-xs text-green-600 font-medium mb-4">Sursa: BVB.ro (date oficiale)</p>
+          <p className="text-xs text-green-600 font-medium mb-4">
+            Sursa: BVB.ro (date oficiale) ·{' '}
+            <a href="https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar" target="_blank" rel="noopener noreferrer" className="underline hover:text-green-800">
+              Verifică pe BVB.ro ↗
+            </a>
+          </p>
           
           {/* Export Button */}
           <div className="flex justify-center gap-2">
@@ -389,16 +394,35 @@ export default function DividendCalendarPage() {
           <div>
             <DividendKings kings={kings} />
             
-            {/* Info Card */}
+            {/* Info Card - Glosar */}
             <Card className="mt-6">
               <CardContent className="p-4 text-sm text-muted-foreground">
-                <h4 className="font-semibold text-foreground mb-2">ℹ️ Ce înseamnă?</h4>
+                <h4 className="font-semibold text-foreground mb-2">ℹ️ Glosar Dividende</h4>
                 <ul className="space-y-2">
-                  <li><strong>Ex-Dividend:</strong> Data până la care trebuie să deții acțiunile</li>
-                  <li><strong>Record Date:</strong> Data la care se verifică acționariatul</li>
-                  <li><strong>Payment Date:</strong> Data la care primești dividendul</li>
-                  <li><strong>Randament:</strong> Dividend / Preț acțiune × 100</li>
+                  <li><strong>Ex-Dividend:</strong> Ultima zi în care poți cumpăra acțiunea și primi dividendul. După această dată, cumpărătorul NU mai primește dividendul.</li>
+                  <li><strong>Record Date:</strong> Data la care depozitarul central verifică cine deține acțiunile.</li>
+                  <li><strong>Payment Date:</strong> Data la care dividendul este virat în contul tău de broker.</li>
+                  <li><strong>Randament (Yield):</strong> Cât primești dividende raportat la prețul acțiunii.</li>
                 </ul>
+                <div className="mt-3 p-2 bg-muted rounded text-xs font-mono">
+                  Yield = (Dividend per acțiune / Preț curent) × 100
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Surse & Fiscalitate */}
+            <Card className="mt-4">
+              <CardContent className="p-4 text-sm text-muted-foreground">
+                <h4 className="font-semibold text-foreground mb-2">📋 Surse & Fiscalitate</h4>
+                <ul className="space-y-2">
+                  <li><strong>Sursa date:</strong> Dividendele sunt extrase de pe{' '}
+                    <a href="https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">BVB.ro (oficial) ↗</a>
+                  </li>
+                  <li><strong>Impozit dividende:</strong> 16% reținut la sursă (Legea 141/2025, aplicabil din 01.01.2026)</li>
+                  <li><strong>CASS:</strong> Se poate aplica contribuție la sănătate de 10% dacă veniturile din investiții depășesc 6 salarii minime brute (28.200 RON în 2026)</li>
+                  <li><strong>Estimări:</strong> Dividendele marcate "Estimare" sunt bazate pe datele anunțate de companii, nu sunt confirmate oficial</li>
+                </ul>
+                <p className="mt-3 text-xs italic">Baza legală: Codul Fiscal 2026 — art. 97 (impozit dividende) + art. 156 (CASS)</p>
               </CardContent>
             </Card>
           </div>

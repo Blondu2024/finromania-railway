@@ -1146,11 +1146,42 @@ export default function DividendCalculatorPage() {
           </TabsContent>
         </Tabs>
 
-        {/* Disclaimer */}
-        <p className="text-xs text-center text-muted-foreground">
-          Datele despre dividende provin de pe BVB.ro (sursa oficială). 
-          Dividendele viitoare pot varia. Aceasta nu constituie sfat de investiții.
-        </p>
+        {/* Surse, Metodologie & Disclaimer */}
+        <Card className="bg-muted/30 border-dashed">
+          <CardContent className="p-5 text-sm text-muted-foreground space-y-3">
+            <h4 className="font-semibold text-foreground flex items-center gap-2">
+              📋 Surse, Metodologie & Bază Legală
+            </h4>
+            <div className="grid md:grid-cols-2 gap-4 text-xs">
+              <div className="space-y-2">
+                <p><strong>Sursa dividende:</strong> Date oficiale extrase de pe{' '}
+                  <a href="https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">BVB.ro ↗</a>
+                  . Dividendele afișate sunt valori BRUTE (înainte de impozit).
+                </p>
+                <p><strong>Prețuri acțiuni:</strong> Prețurile provin de pe Bursa de Valori București cu delay ~15 min.</p>
+                <p><strong>Dividend Yield:</strong>{' '}
+                  <code className="px-1.5 py-0.5 bg-muted rounded font-mono">Yield = (Dividend/acțiune / Preț curent) × 100</code>
+                </p>
+                <p><strong>Proiecție 5 ani:</strong> Folosește o rată de creștere implicită de 3%/an. Dividendele viitoare nu sunt garantate și depind de performanța companiei și deciziile AGA.</p>
+              </div>
+              <div className="space-y-2">
+                <p><strong>Impozit dividende:</strong> 16% reținut la sursă — Legea 141/2025 (aplicabil din 01.01.2026)</p>
+                <p><strong>CASS (Contribuție Sănătate):</strong> 10% se aplică dacă veniturile din investiții depășesc 6 salarii minime brute. Salariu minim brut 2026: 4.700 RON.</p>
+                <div className="p-2 bg-muted rounded font-mono text-[11px] space-y-0.5">
+                  <p>Venit {'<'} 28.200 RON → CASS = 0</p>
+                  <p>28.200 - 56.400 RON → CASS = 2.820 RON</p>
+                  <p>56.400 - 112.800 RON → CASS = 5.640 RON</p>
+                  <p>{'>'} 112.800 RON → CASS = 11.280 RON (maxim)</p>
+                </div>
+                <p className="italic">Bază legală: Codul Fiscal 2026 — art. 97 (impozit) + art. 156 (CASS)</p>
+              </div>
+            </div>
+            <p className="text-xs border-t pt-2 mt-2">
+              Calculele sunt educative și orientative. Dividendele viitoare pot varia. Aceasta nu constituie sfat de investiții sau consiliere fiscală.
+              Pentru situația ta specifică, consultă un consilier fiscal autorizat.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </>
   );
