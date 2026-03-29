@@ -13,7 +13,7 @@ class UserMessage:
 
 class LlmChat:
     def __init__(self, api_key: str, session_id: str = None, system_message: str = None):
-        self.api_key = api_key
+        self.api_key = api_key.strip().replace("\n", "").replace("\r", "") if api_key else api_key
         self.session_id = session_id
         self.system_message = system_message
         self.model_provider = "openai"
