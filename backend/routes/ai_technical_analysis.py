@@ -291,17 +291,17 @@ def calculate_rsi(prices: List[float], period: int = 14) -> Optional[float]:
 def determine_trend(prices: List[float], ma20: float = None, ma50: float = None) -> Dict:
     """Determine trend direction and strength"""
     if len(prices) < 5:
-        return {"direction": "neutral", "strength": 0}
-    
+        return {"direction": "neutral", "strength": 0, "short_term_change": 0, "medium_term_change": 0}
+
     current_price = prices[-1]
-    
+
     # Short-term trend (last 5 days)
     short_trend = (prices[-1] - prices[-5]) / prices[-5] * 100 if len(prices) >= 5 else 0
-    
+
     # Medium-term trend (last 20 days)
     medium_trend = (prices[-1] - prices[-20]) / prices[-20] * 100 if len(prices) >= 20 else short_trend
-    
-    # Determine direction
+
+    # Determine direction from price movement
     if short_trend > 1 and medium_trend > 2:
         direction = "bullish"
         strength = min(abs(medium_trend) / 5, 1)  # 0-1 scale
@@ -311,16 +311,24 @@ def determine_trend(prices: List[float], ma20: float = None, ma50: float = None)
     else:
         direction = "neutral"
         strength = 0.3
-    
-    # MA confirmation
+
+    # MA confirmation - can also ESTABLISH trend direction
     if ma20 and ma50:
         if current_price > ma20 > ma50:
             if direction == "bullish":
                 strength = min(strength + 0.2, 1)
-        elif current_price < ma20 < ma50:
+            elif direction == "neutral":
+                # Price above both MAs suggests bullish bias even if recent moves are flat
+                direction = "bullish"
+                strength = 0.3
+        elif current_price < ma20 and current_price < ma50:
             if direction == "bearish":
                 strength = min(strength + 0.2, 1)
-    
+            elif direction == "neutral":
+                # Price below both MAs suggests bearish bias
+                direction = "bearish"
+                strength = 0.3
+
     return {
         "direction": direction,
         "strength": float(round(strength, 2)),
@@ -329,12 +337,12 @@ def determine_trend(prices: List[float], ma20: float = None, ma50: float = None)
     }
 
 
-def generate_signal(rsi: float, trend: Dict, current_price: float, support: float, resistance: float, volume_data: Dict = None, market_context: Dict = None) -> Dict:
+def generate_signal(rsi: float, trend: Dict, current_price: float, support: float, resistance: float, volume_data: Dict = None, market_context: Dict = None, ma_data: Dict = None) -> Dict:
     """Generate trading signal based on ALL technical indicators"""
     score = 50  # Neutral starting point
     reasons = []
     warnings = []
-    
+
     # RSI analysis
     if rsi:
         if rsi < 30:
@@ -349,7 +357,7 @@ def generate_signal(rsi: float, trend: Dict, current_price: float, support: floa
         elif rsi > 55:
             score -= 10
             reasons.append(f"RSI ridicat ({rsi})")
-    
+
     # Trend analysis
     if trend["direction"] == "bullish":
         score += int(trend["strength"] * 20)
@@ -357,24 +365,60 @@ def generate_signal(rsi: float, trend: Dict, current_price: float, support: floa
     elif trend["direction"] == "bearish":
         score -= int(trend["strength"] * 20)
         reasons.append(f"Trend descendent ({trend['strength']*100:.0f}% putere)")
-    
+
     # Support/Resistance proximity
     if support and resistance:
         range_size = resistance - support
         if range_size > 0:
-            position = (current_price - support) / range_size
-            if position < 0.2:  # Near support
-                score += 15
-                reasons.append("Aproape de suport")
-            elif position > 0.8:  # Near resistance
+            if current_price < support:
+                # Price BELOW support = support broken = BEARISH
+                pct_below = (support - current_price) / support * 100
                 score -= 15
-                reasons.append("Aproape de rezistență")
-    
+                reasons.append(f"Preț sub suport ({current_price:.2f} < {support})")
+                warnings.append("⚠️ Suportul a fost spart!")
+                if pct_below > 5:
+                    score -= 10
+                    warnings.append(f"⚠️ Preț cu {pct_below:.1f}% sub suport")
+            elif current_price > resistance:
+                # Price ABOVE resistance = potential breakout
+                score += 10
+                reasons.append(f"Breakout peste rezistență ({current_price:.2f} > {resistance})")
+            else:
+                position = (current_price - support) / range_size
+                if position < 0.2:
+                    score += 15
+                    reasons.append("Aproape de suport")
+                elif position > 0.8:
+                    score -= 15
+                    reasons.append("Aproape de rezistență")
+
+    # Moving Averages analysis - price vs MA20/MA50
+    if ma_data:
+        ma20 = ma_data.get("ma20")
+        ma50 = ma_data.get("ma50")
+
+        if ma20 and ma50:
+            if current_price < ma20 and current_price < ma50:
+                score -= 10
+                reasons.append(f"Preț sub MA20 ({ma20}) și MA50 ({ma50})")
+            elif current_price > ma20 and current_price > ma50:
+                score += 10
+                reasons.append(f"Preț peste MA20 ({ma20}) și MA50 ({ma50})")
+            elif current_price > ma20 and current_price < ma50:
+                reasons.append(f"Preț între MA20 ({ma20}) și MA50 ({ma50})")
+        elif ma20:
+            if current_price < ma20:
+                score -= 5
+                reasons.append(f"Preț sub MA20 ({ma20})")
+            elif current_price > ma20:
+                score += 5
+                reasons.append(f"Preț peste MA20 ({ma20})")
+
     # VOLUME analysis - CRUCIAL for BVB!
     if volume_data:
         vol_ratio = volume_data.get("ratio", 1)
         vol_status = volume_data.get("status", "NORMAL")
-        
+
         # Volume confirms trend
         if volume_data.get("is_confirmation"):
             if trend["direction"] == "bullish":
@@ -387,26 +431,29 @@ def generate_signal(rsi: float, trend: Dict, current_price: float, support: floa
             # Volume divergence warning
             if trend["direction"] != "neutral":
                 warnings.append("⚠️ Volumul NU confirmă mișcarea de preț")
-        
+
         # Volume spike alerts
         if vol_status == "FOARTE_MARE":
             warnings.append("🔔 Volum excepțional - verifică știrile!")
         elif vol_status == "FOARTE_MIC":
             score -= 5
             warnings.append("⚠️ Lichiditate foarte scăzută")
-    
+
     # MARKET CONTEXT - BET index sentiment
     if market_context:
         sentiment = market_context.get("sentiment", "NEUTRU")
         bet_change = market_context.get("bet_change", 0)
-        
+
         if sentiment in ["FOARTE_BULLISH", "BULLISH"]:
             score += 5
             reasons.append(f"Piață pozitivă (BET {bet_change:+.1f}%)")
         elif sentiment in ["FOARTE_BEARISH", "BEARISH"]:
             score -= 5
             reasons.append(f"Piață negativă (BET {bet_change:+.1f}%)")
-    
+
+    # Clamp score to 0-100
+    score = max(0, min(100, score))
+
     # Determine signal - NEUTRAL terminology (not investment advice)
     if score >= 70:
         signal = "FOARTE FAVORABIL"
@@ -423,7 +470,7 @@ def generate_signal(rsi: float, trend: Dict, current_price: float, support: floa
     else:
         signal = "NEUTRU"
         signal_color = "gray"
-    
+
     return {
         "signal": signal,
         "signal_color": signal_color,
@@ -646,7 +693,7 @@ async def analyze_stock(request: AnalysisRequest, user: dict = Depends(require_a
         signal = generate_signal(
             rsi, trend, current_price,
             sr_levels["support"], sr_levels["resistance"],
-            volume_data, market_context
+            volume_data, market_context, mas
         )
         
         # Prepare comprehensive analysis data
