@@ -69,7 +69,7 @@ const ResultCard = ({ scenario, isBest, isWorst }) => {
       
       <CardContent className="space-y-4">
         {/* Key Numbers */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white dark:bg-zinc-900 rounded-lg p-3">
             <p className="text-sm text-muted-foreground">Total Taxe</p>
             <p className="text-lg font-semibold text-red-600">{formatRON(scenario.total_taxe)}</p>
@@ -337,7 +337,7 @@ export default function FiscalCalculatorPage() {
           <TabsContent value="calculator" className="mt-6 space-y-8">
 
         {/* Key Info Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
           <Card className="bg-green-500/10 border-green-500/30">
             <CardContent className="p-4 text-center">
               <Calendar className="w-6 h-6 text-green-600 mx-auto mb-2" />

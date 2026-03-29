@@ -241,7 +241,7 @@ export default function StockDetailPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -315,7 +315,7 @@ export default function StockDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               <div>
                 <p className="text-sm text-muted-foreground">Deschidere</p>
                 <p className="text-xl font-bold">{history[history.length - 1]?.open?.toFixed(2)} {data.currency}</p>

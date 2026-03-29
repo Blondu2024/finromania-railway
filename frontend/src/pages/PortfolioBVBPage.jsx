@@ -298,7 +298,7 @@ export default function PortfolioBVBPage() {
   if (loading) {
     return (
       <div className="space-y-4 animate-pulse">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[...Array(4)].map((_, i) => <div key={i} className="h-24 rounded-xl bg-muted" />)}
         </div>
         <div className="h-96 rounded-xl bg-muted" />
@@ -349,7 +349,7 @@ export default function PortfolioBVBPage() {
 
       {/* ── SUMMARY METRICS ── */}
       {!isEmpty && (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
           <MetricCard label="Valoare Totală" value={fmtRON(summary.total_value)} sub={`Investit: ${fmtRON(summary.total_invested)}`} highlight={plPos} />
           <MetricCard
             label="P&L Total"

@@ -92,7 +92,7 @@ const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-auto"
+          className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-2xl lg:max-w-6xl max-h-[90vh] overflow-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -379,7 +379,7 @@ const MarketStatusBar = ({ marketStatus }) => {
         <Clock className="w-4 h-4" />
         <span>Orar Burse Mondiale — UTC acum: <strong className="text-foreground">{nowUTC.toUTCString().slice(17, 22)}</strong></span>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
         {EXCHANGES.map(ex => (
           <ExchangeCard key={ex.key} ex={ex} nowUTC={nowUTC} />
         ))}
@@ -496,7 +496,7 @@ const GlobalHeatmap = ({ assets, onAssetClick }) => {
                 transition={{ delay: idx * 0.03 }}
                 whileHover={{ scale: 1.1, zIndex: 10 }}
                 onClick={() => onAssetClick && onAssetClick(asset)}
-                className={`relative cursor-pointer rounded-lg bg-gradient-to-br ${colorClass} shadow-lg flex flex-col items-center justify-center text-white p-3 min-w-[100px] hover:ring-2 hover:ring-white/50`}
+                className={`relative cursor-pointer rounded-lg bg-gradient-to-br ${colorClass} shadow-lg flex flex-col items-center justify-center text-white p-3 min-w-0 hover:ring-2 hover:ring-white/50`}
               >
                 <span className="text-xl mb-1">{asset.flag}</span>
                 <span className="font-bold text-sm">{asset.name}</span>
