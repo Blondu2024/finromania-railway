@@ -66,14 +66,11 @@ def verify_firebase_token(id_token: str) -> dict:
     """
     try:
         decoded_token = firebase_auth_sdk.verify_id_token(id_token)
+        logger.info(f"✅ Token verified for: {decoded_token.get('email')}")
         return decoded_token
-    except firebase_auth_sdk.ExpiredIdTokenError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except firebase_auth_sdk.InvalidIdTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
-        logger.error(f"Token verification error: {e}")
-        raise HTTPException(status_code=401, detail="Authentication failed")
+        logger.error(f"❌ Token verification failed: {type(e).__name__}: {e}")
+        raise HTTPException(status_code=401, detail=f"Token verification failed: {type(e).__name__}")
 
 
 @router.post("/login", response_model=FirebaseLoginResponse)
