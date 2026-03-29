@@ -324,6 +324,7 @@ export default function HomePage() {
             <Link to="/converter"><Badge variant="outline" className="cursor-pointer hover:bg-muted py-1.5 px-3">Convertor Valutar</Badge></Link>
             <Link to="/portfolio-bvb"><Badge variant="outline" className="cursor-pointer hover:bg-muted py-1.5 px-3">Portofoliu BVB</Badge></Link>
             <Link to="/calculator-fiscal"><Badge variant="outline" className="cursor-pointer hover:bg-muted py-1.5 px-3">Calculator Fiscal</Badge></Link>
+            <Link to="/simulator-fiscal"><Badge variant="outline" className="cursor-pointer hover:bg-muted py-1.5 px-3">Simulator Antreprenor</Badge></Link>
             <Link to="/financial-education"><Badge variant="outline" className="cursor-pointer hover:bg-muted py-1.5 px-3">Educație Financiară</Badge></Link>
           </div>
         </section>

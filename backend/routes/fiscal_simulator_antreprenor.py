@@ -92,6 +92,7 @@ class EntitateInput(BaseModel):
     # CÂMPURI NOI
     norma_venit_anuala: Optional[float] = Field(default=None, description="Norma de venit ANAF pentru PFA normă")
     an_infiintare: Optional[int] = Field(default=None, description="Anul înființării firmei")
+    marja_profit: Optional[float] = Field(default=20, ge=1, le=90, description="Marjă profit % pentru SRL Profit")
     
 class SimulatorInput(BaseModel):
     """Input pentru simulatorul fiscal"""
@@ -275,8 +276,12 @@ def calculeaza_impozit_entitate(entitate: EntitateInput, an_curent: int = 2026) 
             observatii.append("ATENȚIE: Scutirea se aplică doar dacă îndeplinești TOATE condițiile!")
         else:
             rata = IMPOZIT_MICRO
-            impozit = venit * rata / 100
-            
+            impozit_micro = venit * rata / 100
+            # Impozit dividende pe profitul net distribuit
+            profit_net_micro = venit - impozit_micro
+            impozit_div_micro = profit_net_micro * IMPOZIT_DIVIDENDE / 100
+            impozit = impozit_micro + impozit_div_micro
+
             pasi_calcul.append(PasCalcul(
                 descriere="Pas 1: Verificare eligibilitate micro",
                 formula=f"Venit {venit:,.0f} RON < Prag {prag_ron:,.0f} RON?",
@@ -284,11 +289,16 @@ def calculeaza_impozit_entitate(entitate: EntitateInput, an_curent: int = 2026) 
             ))
             pasi_calcul.append(PasCalcul(
                 descriere="Pas 2: Calcul impozit micro (cotă unică 2026)",
-                formula=f"{venit:,.0f} × {rata}% = {impozit:,.0f} RON",
-                rezultat=f"Impozit: {impozit:,.0f} RON"
+                formula=f"{venit:,.0f} × {rata}% = {impozit_micro:,.0f} RON",
+                rezultat=f"Impozit micro: {impozit_micro:,.0f} RON"
             ))
-            
-            observatii.append(f"Micro {IMPOZIT_MICRO}% pe cifra de afaceri (cotă unică din 2026)")
+            pasi_calcul.append(PasCalcul(
+                descriere=f"Pas 3: Impozit dividende ({IMPOZIT_DIVIDENDE}%) pe profitul net",
+                formula=f"({venit:,.0f} - {impozit_micro:,.0f}) × {IMPOZIT_DIVIDENDE}% = {impozit_div_micro:,.0f} RON",
+                rezultat=f"Impozit dividende: {impozit_div_micro:,.0f} RON"
+            ))
+
+            observatii.append(f"Micro {IMPOZIT_MICRO}% + {IMPOZIT_DIVIDENDE}% dividende (cotă unică din 2026)")
             
             if este_primul_an:
                 observatii.append("✅ Primul an de activitate - poți alege micro indiferent de estimări")
@@ -297,47 +307,69 @@ def calculeaza_impozit_entitate(entitate: EntitateInput, an_curent: int = 2026) 
             observatii.append(f"⚠️ ATENȚIE: Depășești pragul micro de {PRAG_MICRO_EUR:,} EUR!")
             observatii.append("Trebuie să treci la impozit pe profit 16%!")
             
-            # Recalculăm ca SRL profit
-            impozit_profit = venit * 0.20 * IMPOZIT_PROFIT / 100
+            # Recalculăm ca SRL profit (marjă 20% default)
+            profit_est = venit * 0.20
+            imp_profit = profit_est * IMPOZIT_PROFIT / 100
+            imp_div = (profit_est - imp_profit) * IMPOZIT_DIVIDENDE / 100
+            total_profit = imp_profit + imp_div
             comparatii.append(ComparatieAlternativa(
                 alternativa="SRL Profit (obligatoriu la depășire)",
-                impozit_alternativ=impozit_profit,
-                diferenta=impozit_profit - impozit,
-                recomandare=f"La depășirea pragului vei plăti ~{impozit_profit:,.0f} RON (16% pe profit)"
+                impozit_alternativ=total_profit,
+                diferenta=total_profit - impozit,
+                recomandare=f"La depășirea pragului: ~{total_profit:,.0f} RON (16% profit + 16% dividende)"
             ))
             
     elif entitate.tip == TipEntitate.SRL_PROFIT:
-        profit_estimat = venit * 0.20  # 20% marjă de profit
-        
+        marja = (entitate.marja_profit or 20) / 100
+        profit_estimat = venit * marja
+
         if info_caen.get("scutire_profit"):
             scutiri.append(f"Scutire impozit profit - {info_caen.get('conditii', '')}")
             rata = 0
             impozit = 0
         else:
             rata = IMPOZIT_PROFIT
-            impozit = profit_estimat * rata / 100
-            
+            impozit_profit = profit_estimat * rata / 100
+            # Impozit dividende pe profitul net distribuit
+            profit_net = profit_estimat - impozit_profit
+            impozit_div = profit_net * IMPOZIT_DIVIDENDE / 100
+            impozit = impozit_profit + impozit_div
+
             pasi_calcul.append(PasCalcul(
-                descriere="Pas 1: Estimare profit (venit - cheltuieli)",
-                formula=f"{venit:,.0f} × 20% marjă = {profit_estimat:,.0f} RON profit",
+                descriere=f"Pas 1: Estimare profit (marjă {entitate.marja_profit or 20}%)",
+                formula=f"{venit:,.0f} × {entitate.marja_profit or 20}% = {profit_estimat:,.0f} RON",
                 rezultat=f"Profit estimat: {profit_estimat:,.0f} RON"
             ))
             pasi_calcul.append(PasCalcul(
-                descriere="Pas 2: Calcul impozit pe profit",
-                formula=f"{profit_estimat:,.0f} × {rata}% = {impozit:,.0f} RON",
-                rezultat=f"Impozit: {impozit:,.0f} RON"
+                descriere="Pas 2: Impozit pe profit",
+                formula=f"{profit_estimat:,.0f} × {rata}% = {impozit_profit:,.0f} RON",
+                rezultat=f"Impozit profit: {impozit_profit:,.0f} RON"
             ))
-            
-            observatii.append(f"{rata}% impozit pe profit (calculat pe marjă estimată 20%)")
-            
+            pasi_calcul.append(PasCalcul(
+                descriere=f"Pas 3: Impozit dividende ({IMPOZIT_DIVIDENDE}%) pe profitul net distribuit",
+                formula=f"({profit_estimat:,.0f} - {impozit_profit:,.0f}) × {IMPOZIT_DIVIDENDE}% = {impozit_div:,.0f} RON",
+                rezultat=f"Impozit dividende: {impozit_div:,.0f} RON"
+            ))
+            pasi_calcul.append(PasCalcul(
+                descriere="Total taxe SRL Profit",
+                formula=f"{impozit_profit:,.0f} + {impozit_div:,.0f} = {impozit:,.0f} RON",
+                rezultat=f"Total: {impozit:,.0f} RON"
+            ))
+
+            observatii.append(f"{rata}% impozit profit + {IMPOZIT_DIVIDENDE}% impozit dividende (marjă {entitate.marja_profit or 20}%)")
+            observatii.append("Poți ajusta marja de profit în funcție de activitatea ta")
+
         # Comparație cu micro (dacă ar fi eligibil)
         if venit <= PRAG_MICRO_EUR * CURS_EUR:
             impozit_micro = venit * IMPOZIT_MICRO / 100
+            profit_micro_net = venit - impozit_micro
+            div_micro = profit_micro_net * IMPOZIT_DIVIDENDE / 100
+            total_micro = impozit_micro + div_micro
             comparatii.append(ComparatieAlternativa(
-                alternativa="SRL Micro (dacă ești eligibil)",
-                impozit_alternativ=impozit_micro,
-                diferenta=impozit_micro - impozit,
-                recomandare=f"{'Micro ar fi mai avantajos' if impozit_micro < impozit else 'Profit e mai avantajos'}"
+                alternativa=f"SRL Micro (1% + {IMPOZIT_DIVIDENDE}% dividende)",
+                impozit_alternativ=total_micro,
+                diferenta=total_micro - impozit,
+                recomandare=f"{'Micro ar fi mai avantajos' if total_micro < impozit else 'Profit e mai avantajos'}"
             ))
     
     # Verifică TVA
@@ -518,19 +550,42 @@ async def simuleaza_situatie_fiscala(input_data: SimulatorInput):
         # Verifică TVA
         avertismente.extend(verifica_tva_global(input_data.entitati))
         
-        # Verifică CASS
-        if not input_data.are_salariu:
-            total_venituri_pfa = sum(
-                e.venit_anual_estimat for e in input_data.entitati 
-                if e.tip in [TipEntitate.PFA_NORMA, TipEntitate.PFA_REAL, TipEntitate.PFI]
-            )
-            if total_venituri_pfa > CASS_BAZA_MINIMA:
-                cass_estimat = min(total_venituri_pfa, CASS_BAZA_MAXIMA) * 0.10
+        # Verifică CASS - se aplică pe TOATE veniturile din investiții/activități independente
+        # Inclusiv dividende SRL dacă nu ai salariu!
+        total_venituri_pfa = sum(
+            e.venit_anual_estimat for e in input_data.entitati
+            if e.tip in [TipEntitate.PFA_NORMA, TipEntitate.PFA_REAL, TipEntitate.PFI]
+        )
+        # Dividendele din SRL intră în baza CASS
+        total_dividende_srl = sum(
+            e.venit_anual_estimat * (1 - IMPOZIT_MICRO / 100) * (1 - IMPOZIT_DIVIDENDE / 100)
+            if e.tip == TipEntitate.SRL_MICRO else
+            e.venit_anual_estimat * ((e.marja_profit or 20) / 100) * (1 - IMPOZIT_PROFIT / 100) * (1 - IMPOZIT_DIVIDENDE / 100)
+            if e.tip == TipEntitate.SRL_PROFIT else 0
+            for e in input_data.entitati
+        )
+        total_baza_cass = total_venituri_pfa + total_dividende_srl
+
+        if total_baza_cass > CASS_BAZA_MINIMA:
+            cass_estimat = min(total_baza_cass, CASS_BAZA_MAXIMA) * 0.10
+            surse = []
+            if total_venituri_pfa > 0:
+                surse.append(f"PFA/PFI: {total_venituri_pfa:,.0f} RON")
+            if total_dividende_srl > 0:
+                surse.append(f"Dividende SRL: {total_dividende_srl:,.0f} RON")
+            if input_data.are_salariu:
                 avertismente.append(AvertismentFiscal(
                     tip="info",
-                    titlu="CASS datorat din PFA/PFI",
-                    descriere=f"Veniturile din PFA/PFI depășesc {CASS_BAZA_MINIMA:,} RON. Datorezi CASS 10%.",
-                    actiune_recomandata=f"CASS estimat: {cass_estimat:,.0f} RON/an (max {CASS_BAZA_MAXIMA:,.0f} RON bază)"
+                    titlu="CASS suplimentar posibil",
+                    descriere=f"Veniturile din investiții/activități ({' + '.join(surse)}) depășesc {CASS_BAZA_MINIMA:,} RON. Chiar și cu salariu, datorezi CASS 10% suplimentar.",
+                    actiune_recomandata=f"CASS estimat suplimentar: {cass_estimat:,.0f} RON/an"
+                ))
+            else:
+                avertismente.append(AvertismentFiscal(
+                    tip="warning",
+                    titlu="CASS datorat din venituri independente",
+                    descriere=f"Veniturile totale ({' + '.join(surse)}) depășesc {CASS_BAZA_MINIMA:,} RON. Datorezi CASS 10%.",
+                    actiune_recomandata=f"CASS estimat: {cass_estimat:,.0f} RON/an (bază plafonată la {CASS_BAZA_MAXIMA:,.0f} RON)"
                 ))
         
         # Calculează totaluri
@@ -538,12 +593,18 @@ async def simuleaza_situatie_fiscala(input_data: SimulatorInput):
         total_impozite = sum(r.impozit_estimat for r in rezultate_entitati)
         rata_efectiva = (total_impozite / total_venituri * 100) if total_venituri > 0 else 0
         
-        # Sumar comparativ global
+        # Sumar comparativ global (inclusiv dividende)
+        total_venit_all = sum(e.venit_anual_estimat for e in input_data.entitati)
+        micro_tax = total_venit_all * IMPOZIT_MICRO / 100
+        micro_div = (total_venit_all - micro_tax) * IMPOZIT_DIVIDENDE / 100
+        profit_est = total_venit_all * 0.20
+        profit_tax = profit_est * IMPOZIT_PROFIT / 100
+        profit_div = (profit_est - profit_tax) * IMPOZIT_DIVIDENDE / 100
         sumar_comparativ = {
-            "total_ca_micro": sum(e.venit_anual_estimat for e in input_data.entitati) * IMPOZIT_MICRO / 100,
-            "total_ca_profit": sum(e.venit_anual_estimat for e in input_data.entitati) * 0.20 * IMPOZIT_PROFIT / 100,
-            "total_ca_pfa": sum(e.venit_anual_estimat for e in input_data.entitati) * PFA_IMPOZIT / 100,
-            "economie_vs_profit": (sum(e.venit_anual_estimat for e in input_data.entitati) * 0.20 * IMPOZIT_PROFIT / 100) - total_impozite
+            "total_ca_micro": round(micro_tax + micro_div, 0),
+            "total_ca_profit": round(profit_tax + profit_div, 0),
+            "total_ca_pfa": round(total_venit_all * PFA_IMPOZIT / 100, 0),
+            "economie_vs_profit": round((profit_tax + profit_div) - total_impozite, 0)
         }
         
         return SimulatorOutput(

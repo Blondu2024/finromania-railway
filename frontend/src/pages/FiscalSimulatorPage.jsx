@@ -37,7 +37,7 @@ const CAEN_CODES = [
 
 export default function FiscalSimulatorPage() {
   const [entities, setEntities] = useState([
-    { tip: 'srl_micro', nume: '', cod_caen: 'none', venit_anual_estimat: 0, procent_detinere: 100, are_angajati: false, platitor_tva: false, norma_venit_anuala: 0, an_infiintare: null }
+    { tip: 'srl_micro', nume: '', cod_caen: 'none', venit_anual_estimat: 0, procent_detinere: 100, are_angajati: false, platitor_tva: false, norma_venit_anuala: 0, an_infiintare: null, marja_profit: 20 }
   ]);
   const [areSalariu, setAreSalariu] = useState(false);
   const [salariuBrut, setSalariuBrut] = useState(0);
@@ -56,7 +56,8 @@ export default function FiscalSimulatorPage() {
       are_angajati: false,
       platitor_tva: false,
       norma_venit_anuala: 0,
-      an_infiintare: null
+      an_infiintare: null,
+      marja_profit: 20
     }]);
   };
 
@@ -246,7 +247,7 @@ export default function FiscalSimulatorPage() {
                 {(entity.tip === 'srl_micro' || entity.tip === 'srl_profit') && (
                   <div className="space-y-2">
                     <Label>An Înființare</Label>
-                    <Input 
+                    <Input
                       type="number"
                       min="2000"
                       max="2026"
@@ -255,6 +256,22 @@ export default function FiscalSimulatorPage() {
                       onChange={(e) => updateEntity(index, 'an_infiintare', parseInt(e.target.value) || null)}
                     />
                     <p className="text-xs text-muted-foreground">Important pentru regimul fiscal în primul an</p>
+                  </div>
+                )}
+
+                {entity.tip === 'srl_profit' && (
+                  <div className="space-y-2">
+                    <Label>Marjă Profit Estimată (%)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="90"
+                      value={entity.marja_profit || 20}
+                      onChange={(e) => updateEntity(index, 'marja_profit', parseFloat(e.target.value) || 20)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Profit / Venit × 100. Ex: IT/Consulting ~40-50%, Retail ~5-10%, Servicii ~20-30%
+                    </p>
                   </div>
                 )}
 

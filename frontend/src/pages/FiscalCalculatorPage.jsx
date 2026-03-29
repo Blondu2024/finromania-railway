@@ -682,6 +682,19 @@ export default function FiscalCalculatorPage() {
           <FiscalAIChat />
         </div>
 
+        {/* Cross-link to Simulator */}
+        <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-sm">Ai SRL, PFA sau mai multe entități?</p>
+              <p className="text-xs text-muted-foreground">Simulator fiscal cu calcul dividende, CASS, agregare micro</p>
+            </div>
+            <a href="/simulator-fiscal">
+              <Button variant="outline" size="sm">Simulator Antreprenor</Button>
+            </a>
+          </CardContent>
+        </Card>
+
         {/* Disclaimer */}
         <Card className="bg-gray-100 dark:bg-zinc-800 border-slate-300 dark:border-slate-600">
           <CardContent className="p-6">
