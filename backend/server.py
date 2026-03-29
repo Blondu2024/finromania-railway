@@ -66,6 +66,7 @@ from routes.ai_technical_analysis import router as ai_technical_analysis_router
 from routes.daily_summary import router as daily_summary_router
 from routes.stock_compare import router as stock_compare_router
 from routes.bvb_dividends import router as bvb_dividends_router
+from routes.portfolio_import import router as portfolio_import_router
 
 # Configure logging
 logging.basicConfig(
@@ -655,6 +656,7 @@ app.include_router(fiscal_calculator_router, prefix="/api")
 app.include_router(ai_fiscal_router, prefix="/api")
 app.include_router(fiscal_simulator_router, prefix="/api")  # Simulator Fiscal Antreprenor
 app.include_router(portfolio_bvb_router, prefix="/api")
+app.include_router(portfolio_import_router, prefix="/api")  # Portfolio Import with GPT-4o parsing
 app.include_router(intraday_router, prefix="/api")
 app.include_router(bvb_charts_router)  # Already has /api/bvb prefix
 app.include_router(stripe_payments_router)  # Already has /api/payments prefix

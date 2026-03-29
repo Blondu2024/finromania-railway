@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { useAuth } from '../context/AuthContext';
 import SEO from '../components/SEO';
 import FiscalAIChat from '../components/FiscalAIChat';
+import PortfolioImport from '../components/PortfolioImport';
 import ProPaywall from '../components/ProPaywall';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -321,6 +322,19 @@ export default function FiscalCalculatorPage() {
             Calculează exact cât datorezi statului.
           </p>
         </div>
+
+        {/* Main Tabs: Calculator vs Import */}
+        <Tabs defaultValue="calculator" className="w-full">
+          <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto">
+            <TabsTrigger value="calculator">Calculator Manual</TabsTrigger>
+            <TabsTrigger value="import">Import Portofoliu</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="import" className="mt-6">
+            <PortfolioImport />
+          </TabsContent>
+
+          <TabsContent value="calculator" className="mt-6 space-y-8">
 
         {/* Key Info Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -694,6 +708,9 @@ export default function FiscalCalculatorPage() {
             </a>
           </CardContent>
         </Card>
+
+          </TabsContent>
+        </Tabs>
 
         {/* Disclaimer */}
         <Card className="bg-gray-100 dark:bg-zinc-800 border-slate-300 dark:border-slate-600">
