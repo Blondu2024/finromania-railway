@@ -7,7 +7,7 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from config.database import get_database
 from services.daily_summary_service import daily_summary_service
-from routes.auth import get_current_user
+from routes.auth import get_current_user, require_auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ async def preview_daily_summary():
 
 
 @router.post("/generate")
-async def force_generate_summary():
+async def force_generate_summary(user: dict = Depends(require_auth)):
     """
     Forțează generarea și salvarea rezumatului zilnic.
     Util pentru admin sau pentru testare.
@@ -72,7 +72,7 @@ async def force_generate_summary():
 
 
 @router.post("/test-email")
-async def send_test_email(request: TestEmailRequest):
+async def send_test_email(request: TestEmailRequest, user: dict = Depends(require_auth)):
     """
     Trimite un email de test cu rezumatul zilnic.
     Doar pentru testare!

@@ -140,11 +140,10 @@ export default function AIAdvisorPage() {
             ) : (
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Badge style={{ 
-                    backgroundColor: portfolioAdvice?.profile === 'conservative' ? '#3B82F6' :
-                                     portfolioAdvice?.profile === 'moderate' ? '#10B981' : '#EF4444',
-                    color: 'white'
-                  }}>
+                  <Badge className={
+                    portfolioAdvice?.profile === 'conservative' ? 'bg-blue-500 text-white' :
+                    portfolioAdvice?.profile === 'moderate' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+                  }>
                     Profil: {portfolioAdvice?.profile === 'conservative' ? 'Conservator' :
                              portfolioAdvice?.profile === 'moderate' ? 'Moderat' : 'Agresiv'}
                   </Badge>

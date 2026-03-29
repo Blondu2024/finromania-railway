@@ -67,5 +67,10 @@ async def create_indexes():
     
     # Currencies indexes
     await db.currencies.create_index('date', unique=True)
-    
+
+    # Users and sessions indexes
+    await db.users.create_index('user_id', unique=True)
+    await db.user_sessions.create_index('session_token')
+    await db.user_portfolios.create_index('user_id')
+
     logger.info("✅ Database indexes created")

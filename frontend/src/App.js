@@ -365,55 +365,57 @@ function AppRouter() {
   }
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/stocks" element={<StocksPage />} />
-        <Route path="/stocks/:type/:symbol" element={<StockDetailPage />} />
-        <Route path="/news" element={<NewsPage />} />
-        <Route path="/news/:articleId" element={<ArticleDetailPage />} />
-        <Route path="/currencies" element={<CurrenciesPage />} />
-        <Route path="/privacy" element={<PrivacyPolicyPage />} />
-        <Route path="/terms" element={<TermsOfServicePage />} />
-        <Route path="/cookies" element={<CookiePolicyPage />} />
-        <Route path="/disclaimer" element={<DisclaimerPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/watchlist" element={<WatchlistPage />} />
-        <Route path="/portfolio" element={<PortfolioPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/education" element={<EducationPage />} />
-        <Route path="/education/success" element={<EducationPage />} />
-        <Route path="/education/lesson/:lessonId" element={<LessonPage />} />
-        <Route path="/risk-assessment" element={<RiskAssessmentPage />} />
-        <Route path="/advisor" element={<AIAdvisorPage />} />
-        <Route path="/converter" element={<CurrencyConverterPage />} />
-        <Route path="/glossary" element={<GlossaryPage />} />
-        <Route path="/learn" element={<LearnTradingPage />} />
-        <Route path="/trading-school" element={<TradingSchoolPage />} />
-        <Route path="/trading-school/:lessonId" element={<LessonPage />} />
-        <Route path="/financial-education" element={<FinancialEducationPage />} />
-        <Route path="/financial-education/:lessonId" element={<FinLessonPage />} />
-        <Route path="/faq" element={<FAQPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/calendar" element={<DividendCalendarPage />} />
-        <Route path="/calculator-dividende" element={<DividendCalculatorPage />} />
-        <Route path="/screener" element={<StockScreenerPage />} />
-        <Route path="/screener-pro" element={<ScreenerProPage />} />
-        <Route path="/notifications" element={<NotificationSettingsPage />} />
-        <Route path="/global" element={<GlobalMarketsPage />} />
-        <Route path="/quiz/:level" element={<QuizPage />} />
-        <Route path="/calculator-fiscal" element={<FiscalCalculatorPage />} />
-        <Route path="/simulator-fiscal" element={<FiscalSimulatorPage />} />
-        <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/portfolio-bvb" element={<PortfolioBVBPage />} />
-        <Route path="/incearca-pro" element={<TryProPage />} />
-        <Route path="/rezumat-zilnic" element={<DailySummaryPage />} />
-        <Route path="/payment/success" element={<PaymentSuccessPage />} />
-        <Route path="/educatie-cfd-vs-actiuni" element={<CFDvsActiuniPage />} />
-      </Routes>
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/stocks" element={<StocksPage />} />
+          <Route path="/stocks/:type/:symbol" element={<StockDetailPage />} />
+          <Route path="/news" element={<NewsPage />} />
+          <Route path="/news/:articleId" element={<ArticleDetailPage />} />
+          <Route path="/currencies" element={<CurrenciesPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/cookies" element={<CookiePolicyPage />} />
+          <Route path="/disclaimer" element={<DisclaimerPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/watchlist" element={<WatchlistPage />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/education" element={<EducationPage />} />
+          <Route path="/education/success" element={<EducationPage />} />
+          <Route path="/education/lesson/:lessonId" element={<LessonPage />} />
+          <Route path="/risk-assessment" element={<RiskAssessmentPage />} />
+          <Route path="/advisor" element={<AIAdvisorPage />} />
+          <Route path="/converter" element={<CurrencyConverterPage />} />
+          <Route path="/glossary" element={<GlossaryPage />} />
+          <Route path="/learn" element={<LearnTradingPage />} />
+          <Route path="/trading-school" element={<TradingSchoolPage />} />
+          <Route path="/trading-school/:lessonId" element={<LessonPage />} />
+          <Route path="/financial-education" element={<FinancialEducationPage />} />
+          <Route path="/financial-education/:lessonId" element={<FinLessonPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/calendar" element={<DividendCalendarPage />} />
+          <Route path="/calculator-dividende" element={<DividendCalculatorPage />} />
+          <Route path="/screener" element={<StockScreenerPage />} />
+          <Route path="/screener-pro" element={<ScreenerProPage />} />
+          <Route path="/notifications" element={<NotificationSettingsPage />} />
+          <Route path="/global" element={<GlobalMarketsPage />} />
+          <Route path="/quiz/:level" element={<QuizPage />} />
+          <Route path="/calculator-fiscal" element={<FiscalCalculatorPage />} />
+          <Route path="/simulator-fiscal" element={<FiscalSimulatorPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/portfolio-bvb" element={<PortfolioBVBPage />} />
+          <Route path="/incearca-pro" element={<TryProPage />} />
+          <Route path="/rezumat-zilnic" element={<DailySummaryPage />} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/educatie-cfd-vs-actiuni" element={<CFDvsActiuniPage />} />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
@@ -473,6 +475,35 @@ function Footer() {
   );
 }
 
+
+// ============================================
+// ERROR BOUNDARY
+// ============================================
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Ceva nu a mers bine</h1>
+            <p className="text-muted-foreground mb-4">Reincarca pagina pentru a continua.</p>
+            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+              Reincarca
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // ============================================
 // MAIN APP

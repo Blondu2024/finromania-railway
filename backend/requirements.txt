@@ -44,8 +44,6 @@ google-cloud-core==2.5.0
 google-cloud-firestore==2.22.0
 google-cloud-storage==3.7.0
 google-crc32c==1.8.0
-google-genai==1.56.0
-google-generativeai==0.8.6
 google-resumable-media==2.8.0
 googleapis-common-protos==1.72.0
 grpcio==1.76.0
@@ -72,7 +70,6 @@ jsonschema==4.25.1
 jsonschema-specifications==2025.9.1
 kiwisolver==1.4.9
 librt==0.7.3
-litellm==1.80.0
 lxml==6.0.2
 markdown-it-py==4.0.0
 MarkupSafe==3.0.3

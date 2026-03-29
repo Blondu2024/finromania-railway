@@ -668,7 +668,7 @@ export default function WatchlistPage() {
               <Link to="/login">
                 <Button>Conectare</Button>
               </Link>
-              <Link to="/register">
+              <Link to="/login">
                 <Button variant="outline">Înregistrare</Button>
               </Link>
             </div>

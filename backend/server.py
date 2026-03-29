@@ -56,7 +56,6 @@ from routes.ai_fiscal import router as ai_fiscal_router
 from routes.fiscal_simulator_antreprenor import router as fiscal_simulator_router
 from routes.portfolio_bvb import router as portfolio_bvb_router
 from routes.intraday_data import router as intraday_router
-from routes.admin import router as admin_router_new
 from routes.bvb_charts import router as bvb_charts_router
 from routes.stripe_payments import router as stripe_payments_router
 from routes.early_adopter import router as early_adopter_router
@@ -660,7 +659,6 @@ app.include_router(portfolio_import_router, prefix="/api")  # Portfolio Import w
 app.include_router(intraday_router, prefix="/api")
 app.include_router(bvb_charts_router)  # Already has /api/bvb prefix
 app.include_router(stripe_payments_router)  # Already has /api/payments prefix
-app.include_router(admin_router_new)  # Already has /api/admin prefix
 app.include_router(early_adopter_router, prefix="/api")  # Early Adopter Program
 app.include_router(notifications_router, prefix="/api")  # Notifications
 app.include_router(sitemap_router, prefix="/api")  # Sitemap generator
