@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   BarChart3, Menu, Moon, Sun, User, LogOut, Star, Briefcase, Shield,
   TrendingUp, Globe, Calendar, Crown, Calculator, Building2, RefreshCw,
@@ -78,14 +79,17 @@ const InteractiveTour = lazy(() => import('./components/InteractiveTour'));
 // ============================================
 // LOADERS
 // ============================================
-const PageLoader = () => (
-  <div className="min-h-[60vh] flex items-center justify-center">
-    <div className="text-center space-y-4">
-      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
-      <p className="text-muted-foreground text-sm">Se încarcă...</p>
+const PageLoader = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-muted-foreground text-sm">{t('nav.loading')}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 const TickerLoader = () => <div className="h-10 bg-gray-100 dark:bg-zinc-800 animate-pulse" />;
 const SearchLoader = () => <Skeleton className="h-9 w-36" />;
 
@@ -96,12 +100,13 @@ const SearchLoader = () => <Skeleton className="h-9 w-36" />;
 function UserMenu() {
   const { user, logout, login } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   if (!user) {
     return (
       <Button onClick={login} variant="default" size="sm" className="h-8 text-sm">
         <User className="w-4 h-4 mr-1.5" />
-        Conectare
+        {t('nav.login')}
       </Button>
     );
   }
@@ -127,13 +132,13 @@ function UserMenu() {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/watchlist')}>
-          <Star className="w-4 h-4 mr-2" /> Watchlist
+          <Star className="w-4 h-4 mr-2" /> {t('nav.watchlist')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/portfolio-bvb')}>
-          <Briefcase className="w-4 h-4 mr-2" /> Portofoliu BVB
+          <Briefcase className="w-4 h-4 mr-2" /> {t('nav.portfolio')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/notifications')}>
-          <Bell className="w-4 h-4 mr-2" /> Notificări
+          <Bell className="w-4 h-4 mr-2" /> {t('nav.notifications')}
         </DropdownMenuItem>
         {user.is_admin && (
           <>
@@ -145,7 +150,7 @@ function UserMenu() {
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout} className="text-red-600">
-          <LogOut className="w-4 h-4 mr-2" /> Deconectare
+          <LogOut className="w-4 h-4 mr-2" /> {t('nav.logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -158,13 +163,14 @@ function UserMenu() {
 // ============================================
 function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen }) {
   const location = useLocation();
+  const { t } = useTranslation();
 
   const mainItems = [
-    { path: '/', label: 'Acasă' },
-    { path: '/stocks', label: 'Acțiuni BVB' },
-    { path: '/global', label: 'Piețe Globale' },
-    { path: '/news', label: 'Știri' },
-    { path: '/rezumat-zilnic', label: 'Rezumat' },
+    { path: '/', label: t('nav.home') },
+    { path: '/stocks', label: t('nav.stocks') },
+    { path: '/global', label: t('nav.globalMarkets') },
+    { path: '/news', label: t('nav.news') },
+    { path: '/rezumat-zilnic', label: t('nav.summary') },
   ];
 
   return (
@@ -231,49 +237,50 @@ function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen }) {
 function Sidebar({ mobileOpen, onMobileClose }) {
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const sections = [
     {
-      label: 'PIEȚE',
+      label: t('nav.markets'),
       items: [
-        { path: '/stocks', label: 'Acțiuni BVB', icon: TrendingUp },
-        { path: '/global', label: 'Piețe Globale', icon: Globe },
-        { path: '/calendar', label: 'Calendar Dividende', icon: Calendar },
-        { path: '/news', label: 'Știri Financiare', icon: Newspaper },
+        { path: '/stocks', label: t('nav.stocks'), icon: TrendingUp },
+        { path: '/global', label: t('nav.globalMarkets'), icon: Globe },
+        { path: '/calendar', label: t('nav.dividendCalc'), icon: Calendar },
+        { path: '/news', label: t('nav.news'), icon: Newspaper },
       ],
     },
     {
-      label: 'PRO TOOLS',
+      label: t('nav.proTools'),
       items: [
-        { path: '/screener-pro', label: 'Screener PRO', icon: Crown, badge: 'PRO', badgeColor: 'bg-amber-500' },
-        { path: '/calculator-dividende', label: 'Calculator Dividende', icon: Coins, badge: 'NOU', badgeColor: 'bg-blue-500' },
-        { path: '/screener', label: 'Screener Basic', icon: Search },
+        { path: '/screener-pro', label: t('nav.screenerPro'), icon: Crown, badge: t('nav.pro'), badgeColor: 'bg-amber-500' },
+        { path: '/calculator-dividende', label: t('nav.dividendCalc'), icon: Coins, badge: t('nav.new'), badgeColor: 'bg-blue-500' },
+        { path: '/screener', label: t('nav.screenerBasic'), icon: Search },
       ],
     },
     {
-      label: 'INSTRUMENTE',
+      label: t('nav.tools'),
       items: [
-        { path: '/calculator-fiscal', label: 'Calculator Fiscal', icon: Calculator },
-        { path: '/simulator-fiscal', label: 'Simulator Antreprenor', icon: Building2 },
-        { path: '/converter', label: 'Convertor Valutar', icon: RefreshCw },
-        { path: '/rezumat-zilnic', label: 'Rezumat Zilnic', icon: FileText },
+        { path: '/calculator-fiscal', label: t('nav.fiscalCalc'), icon: Calculator },
+        { path: '/simulator-fiscal', label: t('nav.simulator'), icon: Building2 },
+        { path: '/converter', label: t('nav.converter'), icon: RefreshCw },
+        { path: '/rezumat-zilnic', label: t('nav.dailySummary'), icon: FileText },
       ],
     },
     {
-      label: 'ACADEMIA',
+      label: t('nav.academy'),
       items: [
-        { path: '/trading-school', label: 'Trading School', icon: GraduationCap },
-        { path: '/financial-education', label: 'Educație Financiară', icon: BookOpen },
-        { path: '/educatie-cfd-vs-actiuni', label: 'CFD vs Acțiuni', icon: AlertTriangle, badge: 'NOU', badgeColor: 'bg-orange-500' },
-        { path: '/glossary', label: 'Glosar', icon: BookMarked },
+        { path: '/trading-school', label: t('nav.tradingSchool'), icon: GraduationCap },
+        { path: '/financial-education', label: t('nav.financialEducation'), icon: BookOpen },
+        { path: '/educatie-cfd-vs-actiuni', label: t('nav.cfdVsStocks'), icon: AlertTriangle, badge: t('nav.new'), badgeColor: 'bg-orange-500' },
+        { path: '/glossary', label: t('nav.glossary'), icon: BookMarked },
       ],
     },
     ...(user ? [{
-      label: 'CONTUL MEU',
+      label: t('nav.myAccount'),
       items: [
-        { path: '/watchlist', label: 'Watchlist', icon: Star },
-        { path: '/portfolio-bvb', label: 'Portofoliu BVB', icon: Briefcase },
-        { path: '/notifications', label: 'Notificări & Alerte', icon: Bell },
+        { path: '/watchlist', label: t('nav.watchlist'), icon: Star },
+        { path: '/portfolio-bvb', label: t('nav.portfolio'), icon: Briefcase },
+        { path: '/notifications', label: t('nav.notifications'), icon: Bell },
       ],
     }] : []),
   ];
@@ -426,6 +433,8 @@ function AppRouter() {
 // FOOTER — Compact
 // ============================================
 function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="border-t py-6 mt-8 bg-muted/30">
       <div className="px-4 lg:px-6">
@@ -433,34 +442,34 @@ function Footer() {
           <div>
             <h4 className="font-semibold mb-2 text-sm">FinRomania</h4>
             <p className="text-xs text-muted-foreground">
-              Platformă de educație și date financiare pentru România
+              {t('footer.description')}
             </p>
           </div>
           <div>
-            <h4 className="font-semibold mb-2 text-sm">Navigare</h4>
+            <h4 className="font-semibold mb-2 text-sm">{t('footer.navigation')}</h4>
             <ul className="space-y-1 text-xs">
-              <li><Link to="/" className="text-muted-foreground hover:text-foreground">Acasă</Link></li>
-              <li><Link to="/stocks" className="text-muted-foreground hover:text-foreground">Acțiuni BVB</Link></li>
-              <li><Link to="/trading-school" className="text-muted-foreground hover:text-foreground">Trading School</Link></li>
-              <li><Link to="/financial-education" className="text-muted-foreground hover:text-foreground">Educație Financiară</Link></li>
-              <li><Link to="/educatie-cfd-vs-actiuni" className="text-muted-foreground hover:text-foreground">CFD vs Acțiuni</Link></li>
-              <li><Link to="/glossary" className="text-muted-foreground hover:text-foreground">Glosar</Link></li>
+              <li><Link to="/" className="text-muted-foreground hover:text-foreground">{t('nav.home')}</Link></li>
+              <li><Link to="/stocks" className="text-muted-foreground hover:text-foreground">{t('nav.stocks')}</Link></li>
+              <li><Link to="/trading-school" className="text-muted-foreground hover:text-foreground">{t('nav.tradingSchool')}</Link></li>
+              <li><Link to="/financial-education" className="text-muted-foreground hover:text-foreground">{t('nav.financialEducation')}</Link></li>
+              <li><Link to="/educatie-cfd-vs-actiuni" className="text-muted-foreground hover:text-foreground">{t('nav.cfdVsStocks')}</Link></li>
+              <li><Link to="/glossary" className="text-muted-foreground hover:text-foreground">{t('nav.glossary')}</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-2 text-sm">Legal</h4>
+            <h4 className="font-semibold mb-2 text-sm">{t('footer.legal')}</h4>
             <ul className="space-y-1 text-xs">
-              <li><Link to="/about" className="text-muted-foreground hover:text-foreground">Despre Noi</Link></li>
-              <li><Link to="/privacy" className="text-muted-foreground hover:text-foreground">Confidențialitate</Link></li>
-              <li><Link to="/terms" className="text-muted-foreground hover:text-foreground">Termeni</Link></li>
-              <li><Link to="/disclaimer" className="text-muted-foreground hover:text-foreground">Disclaimer</Link></li>
-              <li><Link to="/faq" className="text-muted-foreground hover:text-foreground">FAQ</Link></li>
+              <li><Link to="/about" className="text-muted-foreground hover:text-foreground">{t('footer.about')}</Link></li>
+              <li><Link to="/privacy" className="text-muted-foreground hover:text-foreground">{t('footer.privacy')}</Link></li>
+              <li><Link to="/terms" className="text-muted-foreground hover:text-foreground">{t('footer.terms')}</Link></li>
+              <li><Link to="/disclaimer" className="text-muted-foreground hover:text-foreground">{t('footer.disclaimer')}</Link></li>
+              <li><Link to="/faq" className="text-muted-foreground hover:text-foreground">{t('footer.faq')}</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-2 text-sm">Newsletter</h4>
             <p className="text-xs text-muted-foreground mb-2">
-              Primește seara rezumatul pieței
+              {t('footer.newsletterDesc')}
             </p>
             <Suspense fallback={<Skeleton className="h-10 w-full" />}>
               <NewsletterSignup variant="inline" />
