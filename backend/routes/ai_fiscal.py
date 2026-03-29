@@ -17,41 +17,47 @@ router = APIRouter(prefix="/ai-fiscal", tags=["ai-fiscal"])
 
 # Context fiscal pentru AI
 FISCAL_CONTEXT = """
-# LEGISLAȚIE FISCALĂ ROMÂNĂ PENTRU INVESTIȚII LA BURSĂ (2024-2025)
+# LEGISLAȚIE FISCALĂ ROMÂNĂ PENTRU INVESTIȚII LA BURSĂ (2026)
+# Actualizat conform Codului Fiscal 2026 și Legea 141/2025
 
 ## 1. IMPOZIT PE CÂȘTIGURI DE CAPITAL
 
 ### BVB (Bursa de Valori București):
-- Deținere ≥ 365 zile: **1%** impozit
-- Deținere < 365 zile: **3%** impozit
-- Impozitul este reținut la sursă de broker
+- Deținere ≥ 365 zile: **3%** impozit (crescut de la 1% în 2025)
+- Deținere < 365 zile: **6%** impozit (crescut de la 3% în 2025)
+- Impozitul este reținut la sursă de broker, per tranzacție
 - NU trebuie completată Declarația Unică pentru câștiguri BVB (broker-ul plătește)
+- Pierderile NU se compensează cu câștigurile la nivel de investitor
 
 ### Piețe Internaționale (SUA, UE, etc.):
-- Impozit: **10%** indiferent de perioada de deținere
+- Impozit: **16%** pe câștigul NET anual (crescut de la 10% în 2025)
 - TREBUIE completată Declarația Unică (formularul 212)
 - Termen: 25 mai anul următor
 - Pierderile se pot compensa cu câștigurile (max 70% din câștiguri)
+- Pierderile necompensate se pot reporta 7 ani
 
 ## 2. IMPOZIT PE DIVIDENDE
 
 ### Dividende BVB:
-- Impozit: **8%** reținut la sursă
+- Impozit: **16%** reținut la sursă (crescut de la 10% în 2025, conform Legea 141/2025)
 - Compania plătește direct, nu trebuie să faci nimic
 
 ### Dividende Internaționale:
 - SUA: **15%** reținut la sursă (cu W-8BEN) sau 30% (fără W-8BEN)
-- În România se datorează 10%, dar se acordă credit fiscal pentru impozitul plătit în străinătate
-- Dacă s-a reținut 15% în SUA, NU mai datorezi nimic în RO (15% > 10%)
-- UE: Variază 10-25% în funcție de țară
+- În România se datorează **16%**, dar se acordă credit fiscal pentru impozitul plătit în străinătate
+- Dacă s-a reținut 15% în SUA, mai datorezi doar 1% în RO (16% - 15% = 1%)
+- UE: Variază 10-25% în funcție de țară, se aplică credit fiscal
 
 ## 3. CASS (Contribuția de Asigurări Sociale de Sănătate)
 
 - Rată: **10%**
-- Se datorează DOAR dacă:
-  1. NU ai alte venituri din care plătești CASS (ex: salariu)
-  2. Venitul total din investiții > 6 salarii minime brute (~22.200 RON/an în 2024)
-- Baza de calcul: plafonată la 6, 12 sau 24 salarii minime
+- Se datorează dacă venitul total din investiții > 6 salarii minime brute
+- Prag 2026: **24.300 RON/an** (6 × 4.050 RON salariu minim Ian-Iun 2026)
+- IMPORTANT: CASS se datorează INCLUSIV de cei cu salariu, dacă au venituri din investiții peste prag
+- Baze de calcul plafonate:
+  * Venit 24.300 - 48.600 RON → CASS = 2.430 RON (10% × 24.300)
+  * Venit 48.600 - 97.200 RON → CASS = 4.860 RON (10% × 48.600)
+  * Venit > 97.200 RON → CASS = 9.720 RON (10% × 97.200, plafonat)
 - Termen plată: odată cu Declarația Unică
 
 ## 4. DECLARAȚIA UNICĂ (Formularul 212)
@@ -72,36 +78,25 @@ FISCAL_CONTEXT = """
 - Valabil 3 ani, apoi trebuie reînnoit
 - OBLIGATORIU pentru a beneficia de tratatul de evitare a dublei impuneri RO-SUA
 
-## 6. COMPENSAREA PIERDERILOR
-
-### Piețe internaționale:
-- Pierderile se pot compensa cu câștigurile din același an
-- Maxim 70% din câștiguri pot fi compensate
-- Pierderile necompensate se pot reporta 7 ani
-
-### BVB:
-- NU se pot compensa pierderile cu câștigurile la nivel de investitor
-- Broker-ul calculează per tranzacție
-
-## 7. PFA/SRL PENTRU INVESTIȚII
+## 6. PFA/SRL PENTRU INVESTIȚII
 
 ### PFA:
 - NU este recomandat pentru investiții pasive
 - Impozit 10% + CAS 25% + CASS 10% = ~45%
 - Are sens doar pentru trading activ ca activitate principală
 
-### SRL Micro:
-- 1% (cu angajat) sau 3% (fără angajat) pe venituri
-- + 8% impozit dividende la retragere
-- Total: ~9-11% + costuri administrative
-- NU are sens vs PF pe BVB (1-3%)
+### SRL Micro (2026):
+- 1% impozit pe venit (plafon 100.000 EUR cifră de afaceri)
+- + 16% impozit dividende la retragere (crescut de la 8%)
+- Total: ~17% + costuri administrative (~8.000 RON/an)
+- NU are sens vs PF pe BVB (3-6%)
 
-## 8. SFATURI PRACTICE
+## 7. SFATURI PRACTICE
 
-1. Pentru BVB: Rămâi ca PF, e cel mai avantajos
+1. Pentru BVB: Rămâi ca PF, e cel mai avantajos (3-6% vs 45% PFA)
 2. Pentru internațional: Completează W-8BEN la broker
 3. Păstrează toate rapoartele de la broker
-4. Consultă un contabil pentru sume mari sau situații complexe
+4. Consultă un contabil CECCAR pentru sume mari (>100.000 RON)
 5. Folosește SPV ANAF pentru declarații
 """
 
@@ -294,11 +289,11 @@ async def get_quick_answers():
         "answers": [
             {
                 "question": "Cât e impozitul pe BVB?",
-                "answer": "1% pentru deținere ≥1 an, 3% pentru <1 an. Reținut automat de broker."
+                "answer": "3% pentru deținere ≥1 an, 6% pentru <1 an (2026). Reținut automat de broker."
             },
             {
                 "question": "Cât e impozitul pe dividende?",
-                "answer": "8% pentru dividende românești (reținut la sursă). Pentru SUA: 15% cu W-8BEN."
+                "answer": "16% pentru dividende românești (reținut la sursă, 2026). Pentru SUA: 15% cu W-8BEN."
             },
             {
                 "question": "Trebuie să fac Declarația Unică?",
@@ -310,11 +305,11 @@ async def get_quick_answers():
             },
             {
                 "question": "Când datorez CASS?",
-                "answer": "Dacă NU ai salariu și venitul din investiții > 22.200 RON/an (6 salarii minime)."
+                "answer": "Dacă venitul din investiții > 24.300 RON/an (6 salarii minime 2026). Se aplică inclusiv celor cu salariu."
             },
             {
                 "question": "PFA sau PF pentru investiții?",
-                "answer": "PF aproape întotdeauna! Pe BVB plătești 1-3% vs ~45% ca PFA."
+                "answer": "PF aproape întotdeauna! Pe BVB plătești 3-6% vs ~45% ca PFA."
             }
         ]
     }

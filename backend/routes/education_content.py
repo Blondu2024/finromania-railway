@@ -351,33 +351,35 @@ Revizuiește lunar și învață din greșeli."""
         "duration": "20 min",
         "tier": "premium",
         "quiz": [
-            {"q": "Impozitul pe dividende în România este...", "options": ["5%", "8%", "16%"], "correct": 1},
-            {"q": "Câștigurile din acțiuni se impozitează cu...", "options": ["5%", "10%", "16%"], "correct": 1}
+            {"q": "Impozitul pe dividende în România este (2026)...", "options": ["5%", "8%", "16%"], "correct": 2},
+            {"q": "Câștigurile din acțiuni internaționale se impozitează cu...", "options": ["5%", "10%", "16%"], "correct": 2}
         ],
-        "content": """## Fiscalitatea Investițiilor în România
+        "content": """## Fiscalitatea Investițiilor în România (2026)
 
 ### Impozit pe Câștiguri de Capital
-**10%** pe profitul realizat din vânzarea acțiunilor.
+**BVB:** 3% (deținere ≥1 an) sau 6% (deținere <1 an) - reținut de broker.
+**Internațional:** 16% pe profitul net anual - declarat prin Declarația Unică.
 
-**Exemplu:**
+**Exemplu BVB (deținere <1 an):**
 - Cumperi acțiuni cu 1000 RON
 - Vinzi cu 1500 RON
 - Profit: 500 RON
-- Impozit: 50 RON (10%)
+- Impozit: 30 RON (6%)
 
 ### Impozit pe Dividende
-**8%** reținut la sursă.
+**16%** reținut la sursă (conform Legea 141/2025).
 
 ### Contribuția la Sănătate (CASS)
-**10%** se aplică dacă veniturile din investiții depășesc 6 salarii minime/an.
+**10%** se aplică dacă veniturile din investiții depășesc 6 salarii minime/an (24.300 RON în 2026).
 
 ### Declarația Unică
-Dacă ai câștiguri din investiții, trebuie să depui **Declarația Unică** până pe 25 mai.
+Dacă ai câștiguri din piețe internaționale sau datorezi CASS, trebuie să depui **Declarația Unică** până pe 25 mai.
 
 ### Tips pentru Optimizare
+- Pe BVB, deținerea peste 1 an reduce impozitul de la 6% la 3%
 - Păstrează evidența tuturor tranzacțiilor
-- Compensează pierderile cu câștigurile
-- Folosește un contabil dacă ai multe tranzacții
+- Compensează pierderile cu câștigurile (doar piețe internaționale, max 70%)
+- Folosește un contabil CECCAR dacă ai multe tranzacții
 
 ### ⚠️ Disclaimer
 Legislația se poate schimba. Consultă un specialist fiscal."""

@@ -686,7 +686,7 @@ export default function PortfolioBVBPage() {
                 <SourcesSection items={[
                   {
                     label: 'Sursa dividendelor',
-                    description: 'Datele sunt extrase direct de pe BVB.ro (Calendarul Dividendelor). Sunt dividendele brute (înainte de impozitul de 8%).',
+                    description: 'Datele sunt extrase direct de pe BVB.ro (Calendarul Dividendelor). Sunt dividendele brute (înainte de impozitul de 16%).',
                     link: 'https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar',
                   },
                   {
@@ -701,8 +701,8 @@ export default function PortfolioBVBPage() {
                   },
                   {
                     label: 'Impozit dividende România',
-                    description: 'Dividendele afișate sunt BRUTE. Impozitul pe dividende în România este de 8%, reținut la sursă.',
-                    formula: 'Dividend net = Dividend brut × (1 - 0.08)',
+                    description: 'Dividendele afișate sunt BRUTE. Impozitul pe dividende în România este de 16%, reținut la sursă (2026, Legea 141/2025).',
+                    formula: 'Dividend net = Dividend brut × (1 - 0.16)',
                   },
                 ]} />
               </div>

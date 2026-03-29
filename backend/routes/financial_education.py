@@ -882,11 +882,12 @@ Include:
 ## 📊 Alte Taxe Importante
 
 ### Impozit pe Dividende
-- **8%** din dividende primite
+- **16%** din dividende primite (2026, conform Legea 141/2025)
 - Plătit de companie la sursă
 
 ### Impozit pe Câștiguri din Investiții
-- **10%** din profit (acțiuni, ETF-uri)
+- BVB: **3%** (≥1 an) sau **6%** (<1 an) - reținut de broker
+- Internațional: **16%** din profit net anual
 - Plătit DOAR când vinzi cu profit
 
 ### Impozit pe Chirii

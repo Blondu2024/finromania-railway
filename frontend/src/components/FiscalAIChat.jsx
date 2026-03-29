@@ -9,10 +9,10 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Quick answers pentru afișare inițială
 const QUICK_ANSWERS = [
-  { q: "Cât e impozitul pe BVB?", a: "1% pentru deținere ≥1 an, 3% pentru <1 an" },
+  { q: "Cât e impozitul pe BVB?", a: "3% pentru deținere ≥1 an, 6% pentru <1 an (2026)" },
   { q: "Trebuie Declarația Unică?", a: "DA pentru international, NU pentru BVB" },
   { q: "Ce e W-8BEN?", a: "Formular SUA - reduce impozitul de la 30% la 15%" },
-  { q: "Când datorez CASS?", a: "Fără salariu + venit > 22.200 RON/an" },
+  { q: "Când datorez CASS?", a: "Venit investiții > 24.300 RON/an (inclusiv cu salariu)" },
 ];
 
 const SUGGESTED_QUESTIONS = [

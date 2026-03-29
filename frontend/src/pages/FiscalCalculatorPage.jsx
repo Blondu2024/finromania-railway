@@ -267,7 +267,7 @@ export default function FiscalCalculatorPage() {
       "url": "https://finromania.ro/calculator-fiscal",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Any",
-      "featureList": ["Calcul impozit BVB 3-6%", "Calcul SRL Micro 1-3%", "Comparație economii", "Legislatie 2026"],
+      "featureList": ["Calcul impozit BVB 3-6%", "Calcul SRL Micro 1%+16%", "Comparație economii", "Legislatie 2026"],
       "inLanguage": "ro",
       "areaServed": "RO"
     };
@@ -290,10 +290,10 @@ export default function FiscalCalculatorPage() {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Calculator Fiscal PRO - Investiții BVB",
-    "description": "Calculator fiscal avansat pentru investiții la Bursa București. Compară PF vs SRL pentru acțiuni BVB. Impozit 1-3% optimizat.",
+    "description": "Calculator fiscal avansat pentru investiții la Bursa București. Compară PF vs SRL pentru acțiuni BVB. Impozit 3-6% optimizat.",
     "url": "https://finromania.ro/calculator-fiscal",
     "applicationCategory": "FinanceApplication",
-    "featureList": ["Calcul impozit BVB", "PF vs SRL comparație", "Optimizare fiscală", "AI Advisor fiscal"],
+    "featureList": ["Calcul impozit BVB 3-6%", "PF vs SRL comparație", "Optimizare fiscală", "AI Advisor fiscal"],
     "inLanguage": "ro",
     "areaServed": "RO"
   };
@@ -317,7 +317,7 @@ export default function FiscalCalculatorPage() {
             Calculator <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-500">Fiscal BVB</span>
           </h1>
           <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Știai că pe BVB plătești doar <strong className="text-green-600">1-3% impozit</strong> pe câștiguri?
+            Știai că pe BVB plătești doar <strong className="text-green-600">3-6% impozit</strong> pe câștiguri?
             Calculează exact cât datorezi statului.
           </p>
         </div>
@@ -327,28 +327,28 @@ export default function FiscalCalculatorPage() {
           <Card className="bg-green-500/10 border-green-500/30">
             <CardContent className="p-4 text-center">
               <Calendar className="w-6 h-6 text-green-600 mx-auto mb-2" />
-              <p className="text-xl font-bold text-green-600">1%</p>
+              <p className="text-xl font-bold text-green-600">3%</p>
               <p className="text-xs text-muted-foreground">🇷🇴 BVB ≥1 an</p>
             </CardContent>
           </Card>
           <Card className="bg-yellow-500/10 border-yellow-500/30">
             <CardContent className="p-4 text-center">
               <Clock className="w-6 h-6 text-yellow-600 mx-auto mb-2" />
-              <p className="text-xl font-bold text-yellow-600">3%</p>
+              <p className="text-xl font-bold text-yellow-600">6%</p>
               <p className="text-xs text-muted-foreground">🇷🇴 BVB &lt;1 an</p>
             </CardContent>
           </Card>
           <Card className="bg-blue-500/10 border-blue-500/30">
             <CardContent className="p-4 text-center">
               <TrendingUp className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-              <p className="text-xl font-bold text-blue-600">10%</p>
+              <p className="text-xl font-bold text-blue-600">16%</p>
               <p className="text-xs text-muted-foreground">🌍 Internațional</p>
             </CardContent>
           </Card>
           <Card className="bg-blue-500/10 border-blue-500/30">
             <CardContent className="p-4 text-center">
               <TrendingUp className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-              <p className="text-xl font-bold text-blue-600">8%</p>
+              <p className="text-xl font-bold text-blue-600">16%</p>
               <p className="text-xs text-muted-foreground">Dividende RO</p>
             </CardContent>
           </Card>
@@ -441,10 +441,10 @@ export default function FiscalCalculatorPage() {
                   </TabsList>
                 </Tabs>
                 {tipPiata === 'bvb' && (
-                  <p className="text-xs text-green-600">✅ Impozit avantajos: 1-3%</p>
+                  <p className="text-xs text-green-600">✅ Impozit avantajos: 3-6%</p>
                 )}
                 {tipPiata === 'international' && (
-                  <p className="text-xs text-yellow-600">⚠️ Impozit: 10%</p>
+                  <p className="text-xs text-yellow-600">⚠️ Impozit: 16%</p>
                 )}
               </div>
 
@@ -454,8 +454,8 @@ export default function FiscalCalculatorPage() {
                   <Label>Perioada de deținere</Label>
                   <Tabs value={perioadaDetinere} onValueChange={setPerioadaDetinere}>
                     <TabsList className="grid grid-cols-3 w-full">
-                      <TabsTrigger value="peste_1_an" className="text-xs">≥1 an (1%)</TabsTrigger>
-                      <TabsTrigger value="sub_1_an" className="text-xs">&lt;1 an (3%)</TabsTrigger>
+                      <TabsTrigger value="peste_1_an" className="text-xs">≥1 an (3%)</TabsTrigger>
+                      <TabsTrigger value="sub_1_an" className="text-xs">&lt;1 an (6%)</TabsTrigger>
                       <TabsTrigger value="mixt" className="text-xs">Mixt</TabsTrigger>
                     </TabsList>
                   </Tabs>
@@ -489,7 +489,7 @@ export default function FiscalCalculatorPage() {
                 </div>
                 {!areSalariu && (
                   <p className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-2 rounded">
-                    ⚠️ Fără salariu, vei datora CASS (10%) dacă venitul &gt; 22.200 RON/an
+                    ⚠️ Fără salariu, vei datora CASS (10%) dacă venitul &gt; 24.300 RON/an
                   </p>
                 )}
               </div>
@@ -594,8 +594,8 @@ export default function FiscalCalculatorPage() {
                   </div>
                   <h3 className="text-xl font-semibold">Investești pe BVB?</h3>
                   <p className="text-muted-foreground max-w-md">
-                    Vești bune! România are unul dintre cele mai avantajoase regimuri fiscale 
-                    pentru investitorii la bursă: doar <strong className="text-green-600">1-3%</strong> impozit pe câștiguri!
+                    Vești bune! România are unul dintre cele mai avantajoase regimuri fiscale
+                    pentru investitorii la bursă: doar <strong className="text-green-600">3-6%</strong> impozit pe câștiguri!
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Completează formularul pentru a calcula exact cât datorezi.
@@ -620,14 +620,14 @@ export default function FiscalCalculatorPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
                   <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">🇷🇴 BVB</h4>
-                  <p className="text-sm text-muted-foreground">Câștig ≥1 an: <strong>1%</strong></p>
-                  <p className="text-sm text-muted-foreground">Câștig &lt;1 an: <strong>3%</strong></p>
-                  <p className="text-sm text-muted-foreground">Dividende: <strong>8%</strong></p>
+                  <p className="text-sm text-muted-foreground">Câștig ≥1 an: <strong>3%</strong></p>
+                  <p className="text-sm text-muted-foreground">Câștig &lt;1 an: <strong>6%</strong></p>
+                  <p className="text-sm text-muted-foreground">Dividende: <strong>16%</strong></p>
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                   <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🌍 Internațional</h4>
-                  <p className="text-sm text-muted-foreground">Câștig capital: <strong>10%</strong></p>
-                  <p className="text-sm text-muted-foreground">Dividende: <strong>10%</strong></p>
+                  <p className="text-sm text-muted-foreground">Câștig capital: <strong>16%</strong></p>
+                  <p className="text-sm text-muted-foreground">Dividende: <strong>16%</strong></p>
                 </div>
                 <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
                   <h4 className="font-semibold text-amber-700 dark:text-amber-300 mb-2">🏥 CASS</h4>

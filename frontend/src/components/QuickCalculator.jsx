@@ -14,20 +14,20 @@ export default function QuickCalculator({ user }) {
   // Calcul simplu pentru preview
   const calculateQuickPreview = () => {
     if (tipPiata === 'bvb') {
-      // Asumăm 50% termen lung (1%), 50% termen scurt (3%)
-      const impozitPF = venit * 0.02; // Media 2%
-      const impozitSRL = venit * 0.09; // 1% micro + 8% dividend
+      // Asumăm 50% termen lung (3%), 50% termen scurt (6%)
+      const impozitPF = venit * 0.045; // Media 4.5%
+      const impozitSRL = venit * 0.17; // 1% micro + 16% dividend
       const economie = impozitSRL - impozitPF;
-      
+
       return {
         impozitPF: Math.round(impozitPF),
         impozitSRL: Math.round(impozitSRL),
         economie: Math.round(economie)
       };
     } else {
-      // Internațional: 10% PF vs 11% SRL
-      const impozitPF = venit * 0.10;
-      const impozitSRL = venit * 0.11;
+      // Internațional: 16% PF vs 17% SRL
+      const impozitPF = venit * 0.16;
+      const impozitSRL = venit * 0.17;
       const economie = impozitSRL - impozitPF;
       
       return {
