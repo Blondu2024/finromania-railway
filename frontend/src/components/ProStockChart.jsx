@@ -165,7 +165,18 @@ export default function ProStockChart({ symbol, type = 'bvb', isPro = false, tok
   };
   
   if (loading) return <Card><CardContent className="p-8 text-center"><div className="animate-spin h-12 w-12 border-2 border-blue-500 rounded-full border-t-transparent mx-auto"></div></CardContent></Card>;
-  if (processedData.length === 0) return <Card><CardContent className="p-8 text-center"><p>Nu există date</p></CardContent></Card>;
+  if (!loading && processedData.length === 0) return (
+    <Card>
+      <CardContent className="p-8 text-center">
+        <BarChart3 className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-40" />
+        <p className="font-medium mb-1">Date istorice indisponibile pentru {symbol}</p>
+        <p className="text-sm text-muted-foreground">
+          Acest simbol nu are încă date istorice suficiente pe BVB. Verifică direct pe{' '}
+          <a href={`https://bvb.ro/FinancialInstruments/Details/FinancialInstrumentsDetails.aspx?s=${symbol}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">BVB.ro ↗</a>
+        </p>
+      </CardContent>
+    </Card>
+  );
   
   return (
     <Card>

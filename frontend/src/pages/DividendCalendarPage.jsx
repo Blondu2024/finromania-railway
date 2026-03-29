@@ -190,7 +190,7 @@ export default function DividendCalendarPage() {
     const fetchData = async () => {
       try {
         const [divRes, eventsRes, kingsRes] = await Promise.all([
-          fetch(`${API_URL}/api/calendar/dividends`),
+          fetch(`${API_URL}/api/calendar/dividends?upcoming_only=false&include_past=true`),
           fetch(`${API_URL}/api/calendar/events`),
           fetch(`${API_URL}/api/calendar/dividend-kings`)
         ]);
