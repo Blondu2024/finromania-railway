@@ -21,10 +21,10 @@ class NewsService:
     async def fetch_and_store_news(self) -> int:
         """Fetch știri BVB din surse românești și salvează în DB"""
         try:
-            # Cleanup junk articles on first run after deploy
-            if not getattr(self, '_cleanup_done', False):
+            # Cleanup junk articles on first run after deploy (v2)
+            if not getattr(self, '_cleanup_v2', False):
                 await self.cleanup_removed_sources()
-                self._cleanup_done = True
+                self._cleanup_v2 = True
 
             logger.info("🔄 Fetching BVB news from RSS sources...")
             
@@ -246,6 +246,12 @@ class NewsService:
             'title': {'$regex': '^Mai multe informa', '$options': 'i'}
         })
 
-        total = result1.deleted_count + result2.deleted_count
-        logger.info(f"Cleaned up {result1.deleted_count} from removed sources, {result2.deleted_count} junk articles")
+        # Delete old non-BVB articles from ZF/Profit/Bursa (pre-filter leftovers)
+        result3 = await db.articles.delete_many({
+            'source.name': {'$in': ['Ziarul Financiar', 'Profit.ro', 'Bursa.ro']},
+            'is_bvb_official': {'$ne': True},
+        })
+
+        total = result1.deleted_count + result2.deleted_count + result3.deleted_count
+        logger.info(f"Cleaned up {result1.deleted_count} removed sources, {result2.deleted_count} junk, {result3.deleted_count} pre-filter articles")
         return total
