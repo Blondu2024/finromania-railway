@@ -12,8 +12,8 @@ class Settings:
     DEBUG = os.getenv('DEBUG', 'true').lower() == 'true'
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
     
-    # Database
-    MONGO_URL = os.getenv('MONGO_URL', 'mongodb://localhost:27017/')
+    # Database - accepta MONGO_URL sau MONGODB_URL (Railway foloseste MONGODB_URL)
+    MONGO_URL = os.getenv('MONGO_URL') or os.getenv('MONGODB_URL', 'mongodb://localhost:27017/')
     DB_NAME = os.getenv('DB_NAME', 'stock_news_romania')
     
     # API Keys
