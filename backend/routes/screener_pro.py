@@ -198,6 +198,8 @@ async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional
             # === Debt/Equity din bilanțul EODHD ===
             debt_equity = _extract_debt_equity(data)
 
+            technicals_data = data.get("Technicals", {})
+
             return {
                 "pe_ratio": pe_ratio,
                 "eps": eps,
@@ -208,9 +210,10 @@ async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional
                 "pb_ratio": valuation.get("PriceBookMRQ"),
                 "ps_ratio": valuation.get("PriceSalesTTM"),
                 "ev": valuation.get("EnterpriseValue"),
-                "52_week_high": highlights.get("52WeekHigh"),
-                "52_week_low": highlights.get("52WeekLow"),
-                "beta": highlights.get("Beta"),
+                "52_week_high": technicals_data.get("52WeekHigh"),
+                "52_week_low": technicals_data.get("52WeekLow"),
+                "beta": technicals_data.get("Beta"),
+                "200_day_ma": technicals_data.get("200DayMA"),
                 "book_value": highlights.get("BookValue"),
                 "debt_equity": debt_equity,
             }
@@ -723,8 +726,10 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict, bvb_records: Opt
         "debt_equity": round(debt_equity, 2) if debt_equity is not None else None,
         "market_cap": fundamentals.get("market_cap") if fundamentals else None,
         "pb_ratio": round(fundamentals.get("pb_ratio"), 2) if fundamentals and fundamentals.get("pb_ratio") else None,
-        "52_week_high": fundamentals.get("52_week_high") if fundamentals else None,
-        "52_week_low": fundamentals.get("52_week_low") if fundamentals else None,
+        "52_week_high": round(fundamentals.get("52_week_high"), 2) if fundamentals and fundamentals.get("52_week_high") else None,
+        "52_week_low": round(fundamentals.get("52_week_low"), 2) if fundamentals and fundamentals.get("52_week_low") else None,
+        "beta": round(fundamentals.get("beta"), 3) if fundamentals and fundamentals.get("beta") else None,
+        "200_day_ma": round(fundamentals.get("200_day_ma"), 2) if fundamentals and fundamentals.get("200_day_ma") else None,
         # Signal
         "signal": signal_data["signal"],
         "signal_text": signal_data["signal_text"],
