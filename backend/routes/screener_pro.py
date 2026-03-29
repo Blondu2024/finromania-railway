@@ -147,7 +147,7 @@ async def fetch_fundamentals(client: httpx.AsyncClient, symbol: str) -> Optional
     # Manual overrides pentru valori confirmate BVB.ro (EODHD incorect)
     MANUAL_OVERRIDES = {
         "M": {"eps_override": -0.02, "pe_override": None},
-        "H2O": {"eps_override": 8.99, "pe_override": 16.44},  # Hidroelectrica: profit net ~4 mld RON, 449.69M actiuni
+        "H2O": {"eps_override": 6.73, "pe_override": 21.98},  # Hidroelectrica: EPS=6.73 si P/E=21.98 conform BVB.ro
     }
 
     try:
