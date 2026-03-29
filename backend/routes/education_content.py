@@ -46,9 +46,9 @@ COURSE_LESSONS = [
         "duration": "10 min",
         "tier": "free",  # Available to all
         "quiz": [
-            {"q": "Ce este dobânda compusă?", "options": ["Taxă bancară", "Dobândă la dobândă", "Comision"], "correct": 1},
-            {"q": "Care e principalul dușman al economiilor?", "options": ["Banca", "Inflația", "Statul"], "correct": 1},
-            {"q": "Poți începe să investești cu sume mici?", "options": ["Nu, minim 10.000 RON", "Da, chiar și 50 RON", "Doar peste 1000 RON"], "correct": 1}
+            {"question":"Ce este dobânda compusă?", "options": ["Taxă bancară", "Dobândă la dobândă", "Comision"], "correct": 1},
+            {"question":"Care e principalul dușman al economiilor?", "options": ["Banca", "Inflația", "Statul"], "correct": 1},
+            {"question":"Poți începe să investești cu sume mici?", "options": ["Nu, minim 10.000 RON", "Da, chiar și 50 RON", "Doar peste 1000 RON"], "correct": 1}
         ],
         "content": """## Ce înseamnă să investești?
 
@@ -81,9 +81,9 @@ FALS! Poți începe cu 50-100 RON pe lună. Important este să începi cât mai 
         "duration": "15 min",
         "tier": "starter",
         "quiz": [
-            {"q": "Ce reprezintă o acțiune?", "options": ["Un împrumut", "O parte din companie", "O taxă"], "correct": 1},
-            {"q": "Ce sunt ETF-urile?", "options": ["Acțiuni scumpe", "Coșuri de acțiuni", "Obligațiuni"], "correct": 1},
-            {"q": "Care instrument are risc mai mic?", "options": ["Acțiuni", "Obligațiuni", "Cripto"], "correct": 1}
+            {"question":"Ce reprezintă o acțiune?", "options": ["Un împrumut", "O parte din companie", "O taxă"], "correct": 1},
+            {"question":"Ce sunt ETF-urile?", "options": ["Acțiuni scumpe", "Coșuri de acțiuni", "Obligațiuni"], "correct": 1},
+            {"question":"Care instrument are risc mai mic?", "options": ["Acțiuni", "Obligațiuni", "Cripto"], "correct": 1}
         ],
         "content": """## Instrumentele Financiare Explicate
 
@@ -117,9 +117,9 @@ Similare cu ETF-urile, dar gestionate activ.
         "duration": "12 min",
         "tier": "starter",
         "quiz": [
-            {"q": "Ce determină prețul unei acțiuni?", "options": ["Guvernul", "Cererea și oferta", "Banca"], "correct": 1},
-            {"q": "Ce este un Bull Market?", "options": ["Piață în scădere", "Piață în creștere", "Piață stabilă"], "correct": 1},
-            {"q": "BET este...", "options": ["O bancă", "Un indice BVB", "O monedă"], "correct": 1}
+            {"question":"Ce determină prețul unei acțiuni?", "options": ["Guvernul", "Cererea și oferta", "Banca"], "correct": 1},
+            {"question":"Ce este un Bull Market?", "options": ["Piață în scădere", "Piață în creștere", "Piață stabilă"], "correct": 1},
+            {"question":"BET este...", "options": ["O bancă", "Un indice BVB", "O monedă"], "correct": 1}
         ],
         "content": """## Bursa - Piața de Capital
 
@@ -151,8 +151,8 @@ O piață organizată pentru tranzacționare. În România: **BVB** (Bursa de Va
         "duration": "15 min",
         "tier": "starter",
         "quiz": [
-            {"q": "Ce înseamnă DCA?", "options": ["Investiție unică mare", "Investiție periodică fixă", "Împrumut"], "correct": 1},
-            {"q": "Diversificarea înseamnă...", "options": ["Toate ouăle într-un coș", "Distribuirea riscului", "Vânzare rapidă"], "correct": 1}
+            {"question":"Ce înseamnă DCA?", "options": ["Investiție unică mare", "Investiție periodică fixă", "Împrumut"], "correct": 1},
+            {"question":"Diversificarea înseamnă...", "options": ["Toate ouăle într-un coș", "Distribuirea riscului", "Vânzare rapidă"], "correct": 1}
         ],
         "content": """## Strategii de Investiții
 
@@ -188,8 +188,8 @@ Cumperi și păstrezi pe termen lung (10-20 ani).
         "duration": "18 min",
         "tier": "starter",
         "quiz": [
-            {"q": "P/E ratio compară...", "options": ["Preț vs Profit", "Preț vs Vânzări", "Profit vs Datorii"], "correct": 0},
-            {"q": "ROE măsoară...", "options": ["Prețul acțiunii", "Eficiența companiei", "Datoriile"], "correct": 1}
+            {"question":"P/E ratio compară...", "options": ["Preț vs Profit", "Preț vs Vânzări", "Profit vs Datorii"], "correct": 0},
+            {"question":"ROE măsoară...", "options": ["Prețul acțiunii", "Eficiența companiei", "Datoriile"], "correct": 1}
         ],
         "content": """## Cum Analizezi o Acțiune
 
@@ -226,8 +226,8 @@ Dividend anual / Preț × 100
         "duration": "15 min",
         "tier": "starter",
         "quiz": [
-            {"q": "Ce ar trebui să ai înainte de a investi?", "options": ["Mașină", "Fond de urgență", "Credit"], "correct": 1},
-            {"q": "VWCE este...", "options": ["O bancă", "Un ETF global", "O acțiune"], "correct": 1}
+            {"question":"Ce ar trebui să ai înainte de a investi?", "options": ["Mașină", "Fond de urgență", "Credit"], "correct": 1},
+            {"question":"VWCE este...", "options": ["O bancă", "Un ETF global", "O acțiune"], "correct": 1}
         ],
         "content": """## Primul Tău Portofoliu
 
@@ -266,8 +266,8 @@ Ai parcurs bazele. Acum practică cu portofoliul virtual!"""
         "duration": "20 min",
         "tier": "premium",
         "quiz": [
-            {"q": "FOMO înseamnă...", "options": ["Fear of Missing Out", "First Order Money Out", "Fund of Mutual Options"], "correct": 0},
-            {"q": "Ce să faci când piața scade brusc?", "options": ["Vinzi tot", "Stai calm, analizezi", "Cumperi mai mult imediat"], "correct": 1}
+            {"question":"FOMO înseamnă...", "options": ["Fear of Missing Out", "First Order Money Out", "Fund of Mutual Options"], "correct": 0},
+            {"question":"Ce să faci când piața scade brusc?", "options": ["Vinzi tot", "Stai calm, analizezi", "Cumperi mai mult imediat"], "correct": 1}
         ],
         "content": """## Psihologia Investițiilor
 
@@ -308,8 +308,8 @@ Revizuiește lunar și învață din greșeli."""
         "duration": "25 min",
         "tier": "premium",
         "quiz": [
-            {"q": "Bilanțul arată...", "options": ["Profitul anual", "Active și pasive", "Doar datoriile"], "correct": 1},
-            {"q": "Cash flow negativ înseamnă...", "options": ["Compania e falită", "Cheltuie mai mult decât încasează", "Profit mare"], "correct": 1}
+            {"question":"Bilanțul arată...", "options": ["Profitul anual", "Active și pasive", "Doar datoriile"], "correct": 1},
+            {"question":"Cash flow negativ înseamnă...", "options": ["Compania e falită", "Cheltuie mai mult decât încasează", "Profit mare"], "correct": 1}
         ],
         "content": """## Citirea Raportului Anual
 
@@ -351,8 +351,8 @@ Revizuiește lunar și învață din greșeli."""
         "duration": "20 min",
         "tier": "premium",
         "quiz": [
-            {"q": "Impozitul pe dividende în România este (2026)...", "options": ["5%", "8%", "16%"], "correct": 2},
-            {"q": "Câștigurile din acțiuni internaționale se impozitează cu...", "options": ["5%", "10%", "16%"], "correct": 2}
+            {"question":"Impozitul pe dividende în România este (2026)...", "options": ["5%", "8%", "16%"], "correct": 2},
+            {"question":"Câștigurile din acțiuni internaționale se impozitează cu...", "options": ["5%", "10%", "16%"], "correct": 2}
         ],
         "content": """## Fiscalitatea Investițiilor în România (2026)
 
@@ -392,8 +392,8 @@ Legislația se poate schimba. Consultă un specialist fiscal."""
         "duration": "22 min",
         "tier": "premium",
         "quiz": [
-            {"q": "Bitcoin este...", "options": ["O acțiune", "O criptomonedă", "O obligațiune"], "correct": 1},
-            {"q": "REIT-urile investesc în...", "options": ["Cripto", "Imobiliare", "Aur"], "correct": 1}
+            {"question":"Bitcoin este...", "options": ["O acțiune", "O criptomonedă", "O obligațiune"], "correct": 1},
+            {"question":"REIT-urile investesc în...", "options": ["Cripto", "Imobiliare", "Aur"], "correct": 1}
         ],
         "content": """## Investiții Alternative
 
@@ -438,8 +438,8 @@ Nu investi în ce nu înțelegi!"""
         "duration": "18 min",
         "tier": "premium",
         "quiz": [
-            {"q": "Pilonul II de pensie este...", "options": ["Opțional", "Obligatoriu", "Inexistent"], "correct": 1},
-            {"q": "Pilonul III este...", "options": ["Obligatoriu", "Voluntar", "Doar pentru angajați"], "correct": 1}
+            {"question":"Pilonul II de pensie este...", "options": ["Opțional", "Obligatoriu", "Inexistent"], "correct": 1},
+            {"question":"Pilonul III este...", "options": ["Obligatoriu", "Voluntar", "Doar pentru angajați"], "correct": 1}
         ],
         "content": """## Planificarea Pensiei
 
@@ -489,8 +489,8 @@ Cu 500 RON/lună, randament 7%/an:
         "duration": "25 min",
         "tier": "premium",
         "quiz": [
-            {"q": "Value investing caută acțiuni...", "options": ["În creștere rapidă", "Subevaluate", "Volatile"], "correct": 1},
-            {"q": "Warren Buffett este cunoscut pentru...", "options": ["Day trading", "Value investing", "Cripto"], "correct": 1}
+            {"question":"Value investing caută acțiuni...", "options": ["În creștere rapidă", "Subevaluate", "Volatile"], "correct": 1},
+            {"question":"Warren Buffett este cunoscut pentru...", "options": ["Day trading", "Value investing", "Cripto"], "correct": 1}
         ],
         "content": """## Strategii Avansate
 

@@ -486,18 +486,19 @@ Fond Urgență = Cheltuieli Lunare × 3-6 luni
 
 **Exemplu simplu:**
 - **2020:** Pâine = 3 RON
-- **2024:** Pâine = 5 RON
-- **Inflație:** +67% în 4 ani!
+- **2026:** Pâine = 5.5 RON
+- **Inflație:** +83% în 6 ani!
 
-**Rezultat:** Cu aceiași bani cumperi MAI PUȚIN! 😰
+**Rezultat:** Cu aceiași bani cumperi MAI PUȚIN!
 
 ## 🇷🇴 Inflația în România
 
 **Istoric recent:**
-- **2021:** 5% inflație
 - **2022:** 13% inflație (șoc!)
 - **2023:** 10% inflație
 - **2024:** 7% inflație
+- **2025:** 5% inflație
+- **2026:** ~4% estimat
 
 **Medie:** ~7-8%/an în România (vs 2-3% în UE)
 
@@ -546,7 +547,7 @@ Fond Urgență = Cheltuieli Lunare × 3-6 luni
 
 ## 📊 Exemplu Real
 
-**Ai 50,000 RON economii în 2024:**
+**Ai 50,000 RON economii în 2026:**
 
 **Opțiunea A: Cash acasă (0%)**
 - 2034: Putere cumpărare = **25,000 RON**
@@ -810,7 +811,7 @@ Include:
 - **Risc:** Fondul de pensii e sub-finanțat
 
 **Realitatea:**
-- Pensia medie: ~2000 RON (2024)
+- Pensia medie: ~2.500 RON (2026)
 - Probabil va scădea vs inflație
 
 ### Pilonul II - Pensia Obligatorie Privată

@@ -33,13 +33,14 @@ export default function EducationPage() {
     try {
       const [pkgRes, lessonsRes] = await Promise.all([
         fetch(`${API_URL}/api/education/packages`),
+        fetch(`${API_URL}/api/education/lessons`),
       ]);
-      
+
       if (pkgRes.ok) {
         const data = await pkgRes.json();
         setPackages(data.packages || []);
       }
-      if (lessonsRes.ok) {
+      if (lessonsRes && lessonsRes.ok) {
         const data = await lessonsRes.json();
         setLessons(data.lessons || []);
         setHasStarter(data.has_starter);
