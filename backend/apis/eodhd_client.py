@@ -14,10 +14,10 @@ class EODHDClient:
     
     # BVB Stock symbols with their EODHD codes
     BVB_STOCKS = {
+        # === BET Index (Blue Chips) ===
         "TLV": {"name": "Banca Transilvania", "sector": "Financiar"},
         "H2O": {"name": "Hidroelectrica", "sector": "Energie"},
         "SNP": {"name": "OMV Petrom", "sector": "Energie"},
-        "FP": {"name": "Fondul Proprietatea", "sector": "Financiar"},
         "BRD": {"name": "BRD - Groupe Société Générale", "sector": "Financiar"},
         "SNG": {"name": "Romgaz", "sector": "Energie"},
         "SNN": {"name": "Nuclearelectrica", "sector": "Energie"},
@@ -34,6 +34,47 @@ class EODHDClient:
         "COTE": {"name": "Conpet", "sector": "Energie"},
         "SFG": {"name": "Sphera Franchise Group", "sector": "Consum"},
         "ALR": {"name": "Alro", "sector": "Industrie"},
+        # === BET-XT Extended + Popular ===
+        "EBS": {"name": "Erste Group Bank", "sector": "Financiar"},
+        "PE": {"name": "Premier Energy", "sector": "Energie"},
+        "TTS": {"name": "TTS (Transport Trade Services)", "sector": "Transport"},
+        "EVER": {"name": "Evergent Investments", "sector": "Financiar"},
+        "TRANSI": {"name": "Transilvania Investments Alliance", "sector": "Financiar"},
+        "DN": {"name": "DN Agrar Group", "sector": "Agricultură"},
+        "AROBS": {"name": "AROBS Transilvania Software", "sector": "Tehnologie"},
+        "BNET": {"name": "Bittnet Systems", "sector": "Tehnologie"},
+        "IMP": {"name": "Impact Developer & Contractor", "sector": "Imobiliare"},
+        "NRF": {"name": "Norofert", "sector": "Agricultură"},
+        "SAFE": {"name": "Safetech Innovations", "sector": "Tehnologie"},
+        "HAI": {"name": "Holde Agri Invest", "sector": "Agricultură"},
+        "MET": {"name": "Meta Estate Trust", "sector": "Imobiliare"},
+        # === Pharma & Sănătate ===
+        "ATB": {"name": "Antibiotice Iași", "sector": "Sănătate"},
+        "BIO": {"name": "Biofarm", "sector": "Sănătate"},
+        "RPH": {"name": "Ropharma", "sector": "Sănătate"},
+        "SCD": {"name": "Zentiva", "sector": "Sănătate"},
+        # === Industrie & Apărare ===
+        "ARS": {"name": "Aerostar", "sector": "Apărare"},
+        "IARV": {"name": "IAR Brașov", "sector": "Apărare"},
+        "CMP": {"name": "Compa", "sector": "Industrie"},
+        "ALU": {"name": "Alumil Rom Industry", "sector": "Industrie"},
+        "ELMA": {"name": "Electromagnetica", "sector": "Industrie"},
+        "CRC": {"name": "Chimcomplex", "sector": "Chimie"},
+        "SNO": {"name": "Șantierul Naval Orșova", "sector": "Industrie"},
+        # === Financiar & Altele ===
+        "PBK": {"name": "Patria Bank", "sector": "Financiar"},
+        "BRK": {"name": "SSIF Broker", "sector": "Financiar"},
+        "TBK": {"name": "Transilvania Broker de Asigurare", "sector": "Financiar"},
+        "LION": {"name": "Lion Capital", "sector": "Financiar"},
+        "ROC1": {"name": "Roca Industry", "sector": "Industrie"},
+        "SMTL": {"name": "Simtel Team", "sector": "Tehnologie"},
+        "OIL": {"name": "Oil Terminal", "sector": "Energie"},
+        "CMF": {"name": "Comelf", "sector": "Industrie"},
+        "VNC": {"name": "Vrancart", "sector": "Industrie"},
+        "ROCE": {"name": "Romcarbon", "sector": "Chimie"},
+        "CEON": {"name": "Cemacon", "sector": "Construcții"},
+        "ARTE": {"name": "Artego", "sector": "Industrie"},
+        "FP": {"name": "Fondul Proprietatea", "sector": "Financiar"},
     }
     
     # BVB Index symbols (EODHD format)
