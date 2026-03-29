@@ -11,31 +11,30 @@ import re
 logger = logging.getLogger(__name__)
 
 # Keywords pentru filtrare știri relevante BVB/piața de capital
-BVB_KEYWORDS = [
-    # Piața de capital
+# Regula: keyword trebuie să fie suficient de specific încât să nu matcheze știri generale
+BVB_KEYWORDS_TITLE = [
+    # Piața de capital (doar în titlu - mai strict)
     'bursă', 'bursa', 'bvb', 'piata de capital', 'piață de capital',
-    'acțiun', 'actiuni', 'acțiuni', 'listare', 'listează', 'listeaza',
-    'tranzacți', 'tranzactii', 'tranzacționare',
-    'investitor', 'investiți', 'portofoliu',
+    'acțiuni', 'actiuni', 'listare', 'listează', 'listeaza',
+    'tranzacțion', 'tranzaction',
     # Instrumente financiare
-    'dividende', 'dividend', 'obligațiun', 'obligatiuni', 'bond',
+    'dividende', 'dividend', 'obligațiuni', 'obligatiuni',
     'ipo', 'ofertă publică', 'oferta publica',
     'fond de investiții', 'fond de investitii', 'fond deschis', 'etf',
     'fidelis', 'titluri de stat',
-    # Indici și indicatori
-    'bet index', 'indice bet', 'indicele bet', 'bet-xt', 'bet-fi',
-    'capitalizare', 'randament', 'profit net', 'cifra de afaceri',
-    'p/e', 'eps', 'roe',
+    # Indici
+    'indice bet', 'indicele bet', 'bet-xt', 'bet-fi', 'bet index',
+    'capitalizare bursier',
     # Reglementare
-    'asf', 'cnvm', 'depozitarul central',
-    'piata reglementata', 'piață reglementată', 'aero', 'smb',
+    'depozitarul central', 'piata reglementata', 'piață reglementată',
     # Companii BVB frecvente
-    'fondul proprietatea', 'banca transilvania', 'tlv', 'snp', 'petrom',
-    'omv petrom', 'romgaz', 'sng', 'nuclearelectrica', 'snn',
-    'electrica', 'transelectrica', 'tel', 'transgaz', 'tgn',
-    'brd', 'one united', 'hidroelectrica', 'h2o',
-    'sphera', 'digi', 'teraplast', 'conpet', 'antibiotice',
-    'purcari', 'medlife', 'aquila',
+    'fondul proprietatea', 'banca transilvania',
+    'omv petrom', 'romgaz', 'nuclearelectrica',
+    'electrica', 'transelectrica', 'transgaz',
+    'hidroelectrica', 'teraplast', 'conpet', 'antibiotice',
+    'purcari', 'medlife', 'aquila', 'sphera',
+    'transport trade', 'digi communication',
+    'one united', 'arobs', 'brd groupe',
 ]
 
 
@@ -195,11 +194,12 @@ class RomanianRSSClient:
             return []
 
     def _filter_bvb_relevant(self, articles: List[Dict]) -> List[Dict]:
-        """Filtrează articolele păstrând doar cele relevante BVB/piața de capital"""
+        """Filtrează articolele păstrând doar cele relevante BVB/piața de capital
+        Verifică keywords doar în titlu pentru a evita false positives."""
         relevant = []
         for article in articles:
-            text = f"{article.get('title', '')} {article.get('description', '')}".lower()
-            if any(kw in text for kw in BVB_KEYWORDS):
+            title = article.get('title', '').lower()
+            if any(kw in title for kw in BVB_KEYWORDS_TITLE):
                 relevant.append(article)
         return relevant
 
