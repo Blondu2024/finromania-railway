@@ -102,17 +102,36 @@ class DailySummaryService:
             logger.error(f"Error saving summary: {e}")
             return False
     
+    def _is_market_day(self) -> bool:
+        """Verifică dacă azi e zi de bursă (Luni-Vineri, nu sărbătoare)"""
+        now = datetime.now(BUCHAREST_TZ)
+        # Weekend
+        if now.weekday() >= 5:
+            logger.info(f"⏭️ Weekend ({now.strftime('%A')}) - skip daily summary")
+            return False
+        return True
+
     async def generate_and_save_daily_summary(self) -> Dict:
         """
         Generează rezumatul zilnic și îl salvează în MongoDB.
         Această funcție se apelează O SINGURĂ DATĂ pe zi de către job-ul scheduler.
         """
+        # Verifică dacă e zi de bursă
+        if not self._is_market_day():
+            return None
+
         logger.info("🔄 Generating daily summary...")
-        
+
         # Colectează datele de piață
         market_data = await self.get_market_data()
         if not market_data:
             logger.error("No market data available for summary")
+            return None
+
+        # Verifică dacă bursa a fost efectiv deschisă (volum > 0 pe actiuni)
+        traded = [s for s in market_data.get("top_volume", []) if (s.get("volume") or 0) > 0]
+        if not traded:
+            logger.info("⏭️ No trading volume today (holiday?) - skip daily summary")
             return None
         
         # Generează rezumatul AI
@@ -383,7 +402,7 @@ LUNGIME: 100-130 cuvinte. TON: factual, profesionist, fără emoție."""
                 api_key=os.environ.get("OPENAI_API_KEY") or os.environ.get("EMERGENT_UNIVERSAL_KEY"),
                 session_id=f"daily_summary_{market_data['date']}",
                 system_message=system_prompt
-            ).with_model("openai", "gpt-4o")
+            ).with_model("openai", "gpt-4o-mini")
             
             user_message = UserMessage(text=context)
             response = await chat.send_message(user_message)

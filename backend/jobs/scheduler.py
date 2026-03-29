@@ -240,10 +240,10 @@ def start_scheduler():
             replace_existing=True
         )
         
-        # Job 8: Send daily summary email (daily at 18:05 Bucharest time - right after market close at 18:00)
+        # Job 8: Send daily summary email (Mon-Fri at 18:05 Bucharest time - after BVB close)
         scheduler.add_job(
             send_daily_summary_job,
-            trigger=CronTrigger(hour=18, minute=5, timezone='Europe/Bucharest'),
+            trigger=CronTrigger(hour=18, minute=5, day_of_week='mon-fri', timezone='Europe/Bucharest'),
             id='send_daily_summary',
             name='Send Daily Market Summary',
             replace_existing=True
