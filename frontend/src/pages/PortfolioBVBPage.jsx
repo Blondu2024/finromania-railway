@@ -439,7 +439,7 @@ export default function PortfolioBVBPage() {
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Intrare</th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
                         Preț Curent
-                        <InfoTip>Sursa: EODHD API · Delay ~15 min față de BVB</InfoTip>
+                        <InfoTip>Sursa: BVB · Delay ~15 min</InfoTip>
                       </th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
                         Valoare
@@ -452,7 +452,7 @@ export default function PortfolioBVBPage() {
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Azi</th>
                       <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">
                         RSI
-                        <InfoTip>Relative Strength Index (14 zile) · Calculat matematic din prețurile de închidere · Sursa: EODHD API · {'<'}30 = Supravândut, {'>'}70 = Supracumpărat</InfoTip>
+                        <InfoTip>Relative Strength Index (14 zile) · Calculat matematic din prețurile de închidere BVB · {'<'}30 = Supravândut, {'>'}70 = Supracumpărat</InfoTip>
                       </th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
                         Div Yield
@@ -538,7 +538,7 @@ export default function PortfolioBVBPage() {
             <SourcesSection items={[
               {
                 label: 'Prețuri acțiuni BVB',
-                description: 'Prețurile sunt furnizate de EODHD API cu delay de ~15 minute față de piața BVB. Pentru prețuri în timp real, verifică direct pe BVB.',
+                description: 'Prețurile provin de pe Bursa de Valori București cu delay de ~15 minute. Pentru prețuri în timp real, verifică direct pe BVB.ro.',
                 link: 'https://bvb.ro/FinancialInstruments/Markets/Shares/SharesListForDownload',
               },
               {
