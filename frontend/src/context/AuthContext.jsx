@@ -68,14 +68,7 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, [checkAuth]);
 
-  // OLD Emergent login - kept as fallback
-  const loginEmergent = () => {
-    const redirectUrl = window.location.origin + '/auth/callback';
-    console.log('[Auth] Redirecting to Emergent login with callback:', redirectUrl);
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-  };
-
-  // NEW Firebase Google login
+  // Firebase Google login
   const login = async () => {
     console.log('[Auth] Starting Firebase Google login...');
     setLoading(true);
@@ -160,64 +153,14 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Process Emergent session (kept for backwards compatibility)
-  const processSession = async (sessionId) => {
-    console.log('[Auth] Processing Emergent session:', sessionId.substring(0, 10) + '...');
-    try {
-      const response = await fetch(`${API_URL}/api/auth/session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId })
-      });
-      
-      console.log('[Auth] Session response status:', response.status);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('[Auth] Session data:', {
-          hasToken: !!data.session_token,
-          hasUser: !!(data.user_id || data.email),
-          userName: data.name || data.email
-        });
-        
-        const sessionToken = data.session_token;
-        
-        if (sessionToken) {
-          console.log('[Auth] Saving token to localStorage');
-          localStorage.setItem(TOKEN_KEY, sessionToken);
-          setToken(sessionToken);
-        } else {
-          console.error('[Auth] No session_token in response!');
-        }
-        
-        const { session_token, ...userData } = data;
-        
-        console.log('[Auth] Saving user to state and localStorage');
-        localStorage.setItem(USER_KEY, JSON.stringify(userData));
-        setUser(userData);
-        
-        return userData;
-      } else {
-        const errorText = await response.text();
-        console.error('[Auth] Session error:', errorText);
-      }
-      return null;
-    } catch (error) {
-      console.error('[Auth] Session processing error:', error);
-      return null;
-    }
-  };
-
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      token, 
-      loading, 
-      login,           // Firebase Google login
-      loginEmergent,   // Old Emergent login (backup)
-      logout, 
-      processSession, 
-      checkAuth 
+    <AuthContext.Provider value={{
+      user,
+      token,
+      loading,
+      login,
+      logout,
+      checkAuth
     }}>
       {children}
     </AuthContext.Provider>
