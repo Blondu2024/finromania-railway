@@ -21,10 +21,10 @@ class NewsService:
     async def fetch_and_store_news(self) -> int:
         """Fetch știri BVB din surse românești și salvează în DB"""
         try:
-            # One-time cleanup of articles from removed sources
-            if not getattr(self, '_sources_cleaned', False):
+            # Cleanup junk articles on first run after deploy
+            if not getattr(self, '_cleanup_done', False):
                 await self.cleanup_removed_sources()
-                self._sources_cleaned = True
+                self._cleanup_done = True
 
             logger.info("🔄 Fetching BVB news from RSS sources...")
             
@@ -229,14 +229,23 @@ class NewsService:
         return result.deleted_count
 
     async def cleanup_removed_sources(self) -> int:
-        """Șterge articolele din surse care nu mai sunt active"""
+        """Șterge articolele din surse care nu mai sunt active + junk"""
         removed_sources = [
             'Capital.ro', 'Economica.net', 'Hotnews Economie',
             'Digi24 Economie', 'Mediafax',
         ]
         db = await get_database()
-        result = await db.articles.delete_many({
+
+        # Delete from removed sources
+        result1 = await db.articles.delete_many({
             'source.name': {'$in': removed_sources}
         })
-        logger.info(f"Cleaned up {result.deleted_count} articles from removed sources")
-        return result.deleted_count
+
+        # Delete junk "Mai multe informatii" articles
+        result2 = await db.articles.delete_many({
+            'title': {'$regex': '^Mai multe informa', '$options': 'i'}
+        })
+
+        total = result1.deleted_count + result2.deleted_count
+        logger.info(f"Cleaned up {result1.deleted_count} from removed sources, {result2.deleted_count} junk articles")
+        return total
