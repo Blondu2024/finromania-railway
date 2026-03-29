@@ -1,27 +1,18 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import {
-  ComposedChart,
-  Line,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from 'recharts';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { createChart, ColorType } from 'lightweight-charts';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { TrendingUp, BarChart3 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const COLORS = ['#2196F3', '#FF9800', '#4CAF50', '#E91E63'];
+const COLORS = ['#3b82f6', '#f59e0b', '#10b981', '#ec4899'];
 
 const TIMEFRAMES = [
-  { label: '1L', value: '1mo', days: 30 },
-  { label: '3L', value: '3mo', days: 90 },
-  { label: '6L', value: '6mo', days: 180 },
-  { label: '1A', value: '1y', days: 365 },
+  { label: '1L', value: '1mo' },
+  { label: '3L', value: '3mo' },
+  { label: '6L', value: '6mo' },
+  { label: '1A', value: '1y' },
 ];
 
 const MODES = [
@@ -29,44 +20,22 @@ const MODES = [
   { label: 'Volum', value: 'volume', icon: BarChart3 },
 ];
 
-const CompareTooltip = ({ active, payload, label, mode, symbols }) => {
-  if (!active || !payload || !payload.length) return null;
-
-  return (
-    <div className="bg-white dark:bg-zinc-800 border rounded-lg shadow-lg p-3 text-sm">
-      <p className="font-bold mb-2 text-muted-foreground">{label}</p>
-      {payload.map((entry, idx) => {
-        if (!entry.value && entry.value !== 0) return null;
-        const suffix = mode === 'percent' ? '%' : mode === 'rsi' ? '' : '';
-        return (
-          <p key={idx} style={{ color: entry.color }} className="flex items-center gap-2">
-            <span className="font-semibold">{entry.name}:</span>
-            <span>
-              {mode === 'percent' && entry.value >= 0 ? '+' : ''}
-              {mode === 'volume'
-                ? entry.value.toLocaleString('ro-RO')
-                : entry.value.toFixed(2)}{suffix}
-            </span>
-          </p>
-        );
-      })}
-    </div>
-  );
-};
-
 export default function CompareChart({ symbols = [] }) {
+  const chartContainerRef = useRef(null);
+  const chartRef = useRef(null);
   const [mode, setMode] = useState('percent');
   const [timeframe, setTimeframe] = useState('3mo');
   const [historyData, setHistoryData] = useState({});
   const [loading, setLoading] = useState(false);
   const [hiddenSymbols, setHiddenSymbols] = useState(new Set());
 
+  const isDark = typeof window !== 'undefined' &&
+    document.documentElement.classList.contains('dark');
+
   // Fetch history for all symbols
   useEffect(() => {
     if (symbols.length < 2) return;
-
     setLoading(true);
-
     Promise.all(
       symbols.map(symbol =>
         fetch(`${API_URL}/api/bvb/chart/${symbol}?period=${timeframe}`)
@@ -82,39 +51,98 @@ export default function CompareChart({ symbols = [] }) {
     });
   }, [symbols, timeframe]);
 
-  // Process and align data
-  const chartData = useMemo(() => {
-    if (symbols.length < 2 || Object.keys(historyData).length < 2) return [];
+  // Process data
+  const processedData = useMemo(() => {
+    if (symbols.length < 2 || Object.keys(historyData).length < 2) return {};
 
-    // Collect all dates
-    const dateMap = {};
-
+    const result = {};
     symbols.forEach(symbol => {
       const data = historyData[symbol] || [];
       const sorted = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
       const baseClose = sorted[0]?.close;
 
-      sorted.forEach(point => {
+      result[symbol] = sorted.map(point => {
         const dateKey = point.date?.split('T')[0];
-        if (!dateKey) return;
-        if (!dateMap[dateKey]) dateMap[dateKey] = { date: dateKey };
-
         if (mode === 'percent' && baseClose) {
-          dateMap[dateKey][symbol] = ((point.close - baseClose) / baseClose * 100);
+          return { time: dateKey, value: ((point.close - baseClose) / baseClose * 100) };
         } else if (mode === 'volume') {
-          dateMap[dateKey][symbol] = point.volume || 0;
+          return { time: dateKey, value: point.volume || 0 };
         }
-      });
+        return { time: dateKey, value: point.close };
+      }).filter(d => d.time);
+    });
+    return result;
+  }, [historyData, symbols, mode]);
+
+  // Create chart
+  useEffect(() => {
+    if (!chartContainerRef.current || Object.keys(processedData).length < 2) return;
+
+    if (chartRef.current) { chartRef.current.remove(); chartRef.current = null; }
+
+    const container = chartContainerRef.current;
+    const chart = createChart(container, {
+      width: container.clientWidth,
+      height: 280,
+      layout: {
+        background: { type: ColorType.Solid, color: isDark ? '#18181b' : '#ffffff' },
+        textColor: isDark ? '#a1a1aa' : '#71717a',
+        fontFamily: "'Inter', system-ui, sans-serif",
+      },
+      grid: {
+        vertLines: { color: isDark ? '#27272a' : '#f4f4f5' },
+        horzLines: { color: isDark ? '#27272a' : '#f4f4f5' },
+      },
+      rightPriceScale: {
+        borderColor: isDark ? '#3f3f46' : '#e4e4e7',
+      },
+      timeScale: {
+        borderColor: isDark ? '#3f3f46' : '#e4e4e7',
+      },
+      crosshair: { mode: 0 },
+    });
+    chartRef.current = chart;
+
+    // Add series for each symbol
+    symbols.forEach((symbol, idx) => {
+      if (hiddenSymbols.has(symbol)) return;
+      const data = processedData[symbol];
+      if (!data || data.length === 0) return;
+
+      if (mode === 'volume') {
+        const series = chart.addHistogramSeries({
+          color: COLORS[idx % COLORS.length],
+          priceFormat: { type: 'volume' },
+        });
+        series.setData(data);
+      } else {
+        const series = chart.addLineSeries({
+          color: COLORS[idx % COLORS.length],
+          lineWidth: 2,
+          priceLineVisible: false,
+          lastValueVisible: true,
+        });
+        series.setData(data);
+      }
     });
 
-    return Object.values(dateMap).sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [historyData, symbols, mode]);
+    chart.timeScale().fitContent();
+
+    const handleResize = () => {
+      if (chartRef.current && container) {
+        chartRef.current.applyOptions({ width: container.clientWidth });
+      }
+    };
+    const observer = new ResizeObserver(handleResize);
+    observer.observe(container);
+
+    return () => { observer.disconnect(); chart.remove(); chartRef.current = null; };
+  }, [processedData, hiddenSymbols, isDark, mode]);
 
   const toggleSymbol = (symbol) => {
     setHiddenSymbols(prev => {
       const next = new Set(prev);
       if (next.has(symbol)) next.delete(symbol); else next.add(symbol);
-      // Don't hide all
       if (next.size >= symbols.length) return prev;
       return next;
     });
@@ -122,12 +150,22 @@ export default function CompareChart({ symbols = [] }) {
 
   if (symbols.length < 2) return null;
 
+  // Get last values for performance badges
+  const lastValues = {};
+  if (mode === 'percent') {
+    symbols.forEach(symbol => {
+      const data = processedData[symbol];
+      if (data && data.length > 0) {
+        lastValues[symbol] = data[data.length - 1].value;
+      }
+    });
+  }
+
   return (
     <div className="mb-4">
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        {/* Mode selector */}
-        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+        <div className="flex gap-0.5 p-1 bg-muted rounded-lg">
           {MODES.map(m => (
             <Button
               key={m.value}
@@ -142,8 +180,7 @@ export default function CompareChart({ symbols = [] }) {
           ))}
         </div>
 
-        {/* Timeframe selector */}
-        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+        <div className="flex gap-0.5 p-1 bg-muted rounded-lg">
           {TIMEFRAMES.map(tf => (
             <Button
               key={tf.value}
@@ -157,16 +194,13 @@ export default function CompareChart({ symbols = [] }) {
           ))}
         </div>
 
-        {/* Symbol toggles */}
         <div className="flex items-center gap-1 ml-auto">
           {symbols.map((symbol, idx) => (
             <button
               key={symbol}
               onClick={() => toggleSymbol(symbol)}
               className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-all ${
-                hiddenSymbols.has(symbol)
-                  ? 'opacity-40 line-through'
-                  : 'opacity-100'
+                hiddenSymbols.has(symbol) ? 'opacity-40 line-through' : 'opacity-100'
               }`}
               style={{
                 borderWidth: 2,
@@ -188,93 +222,22 @@ export default function CompareChart({ symbols = [] }) {
       {/* Chart */}
       {loading ? (
         <div className="h-[280px] flex items-center justify-center bg-muted/30 rounded-lg">
-          <div className="text-sm text-muted-foreground animate-pulse">Se încarcă graficele...</div>
+          <div className="animate-spin h-8 w-8 border-2 border-blue-500 rounded-full border-t-transparent" />
         </div>
-      ) : chartData.length > 0 ? (
-        <div className="h-[280px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.5} />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 10 }}
-                tickFormatter={(value) => {
-                  const d = new Date(value);
-                  return `${d.getDate()}/${d.getMonth() + 1}`;
-                }}
-              />
-              <YAxis
-                tick={{ fontSize: 10 }}
-                tickFormatter={(value) => {
-                  if (mode === 'percent') return `${value >= 0 ? '+' : ''}${value.toFixed(0)}%`;
-                  if (mode === 'volume') {
-                    if (value >= 1e6) return `${(value/1e6).toFixed(1)}M`;
-                    if (value >= 1e3) return `${(value/1e3).toFixed(0)}K`;
-                    return value;
-                  }
-                  return value.toFixed(0);
-                }}
-                orientation="right"
-              />
-              <Tooltip content={<CompareTooltip mode={mode} symbols={symbols} />} />
-
-              {/* Reference line at 0% for percent mode */}
-              {mode === 'percent' && (
-                <Line
-                  dataKey={() => 0}
-                  stroke="#999"
-                  strokeDasharray="4 4"
-                  strokeWidth={1}
-                  dot={false}
-                  legendType="none"
-                  isAnimationActive={false}
-                />
-              )}
-
-              {symbols.map((symbol, idx) => {
-                if (hiddenSymbols.has(symbol)) return null;
-
-                if (mode === 'volume') {
-                  return (
-                    <Bar
-                      key={symbol}
-                      dataKey={symbol}
-                      fill={COLORS[idx % COLORS.length]}
-                      opacity={0.7}
-                      name={symbol}
-                    />
-                  );
-                }
-
-                return (
-                  <Line
-                    key={symbol}
-                    type="monotone"
-                    dataKey={symbol}
-                    stroke={COLORS[idx % COLORS.length]}
-                    strokeWidth={2}
-                    dot={false}
-                    name={symbol}
-                    connectNulls
-                  />
-                );
-              })}
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
+      ) : Object.keys(processedData).length >= 2 ? (
+        <div ref={chartContainerRef} className="w-full rounded-lg overflow-hidden" />
       ) : (
         <div className="h-[280px] flex items-center justify-center bg-muted/30 rounded-lg">
           <p className="text-sm text-muted-foreground">Nu sunt date disponibile</p>
         </div>
       )}
 
-      {/* Performance summary */}
-      {mode === 'percent' && chartData.length > 0 && (
-        <div className="flex flex-wrap gap-3 mt-2">
+      {/* Performance badges */}
+      {mode === 'percent' && Object.keys(lastValues).length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
           {symbols.map((symbol, idx) => {
             if (hiddenSymbols.has(symbol)) return null;
-            const lastPoint = chartData[chartData.length - 1];
-            const value = lastPoint?.[symbol];
+            const value = lastValues[symbol];
             if (value === undefined) return null;
             return (
               <Badge
