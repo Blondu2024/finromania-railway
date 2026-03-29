@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Plus, Trash2, Download, RefreshCw, Crown, Edit2, Upload,
   TrendingUp, TrendingDown, Info, BarChart3, Brain, Banknote, Newspaper,
+  ExternalLink, ChevronDown, ChevronUp, HelpCircle, BookOpen,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -24,6 +25,57 @@ import AnalysisSection from '../components/portfolio/AnalysisSection';
 import AIAdvisorSection from '../components/portfolio/AIAdvisorSection';
 import PortfolioNewsSection from '../components/portfolio/PortfolioNewsSection';
 import CSVImportDialog from '../components/portfolio/CSVImportDialog';
+
+// ── Methodology collapsible section ─────────────────────────────────────────
+function SourcesSection({ items }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-4 border rounded-lg bg-muted/20">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full px-4 py-2.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <span className="flex items-center gap-1.5">
+          <BookOpen className="w-3.5 h-3.5" />
+          Surse & Metodologie
+        </span>
+        {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+      </button>
+      {open && (
+        <div className="px-4 pb-3 space-y-2 text-xs text-muted-foreground border-t">
+          {items.map((item, i) => (
+            <div key={i} className="pt-2">
+              <p className="font-medium text-foreground">{item.label}</p>
+              <p>{item.description}</p>
+              {item.formula && (
+                <code className="block mt-1 px-2 py-1 bg-muted rounded text-[11px] font-mono">{item.formula}</code>
+              )}
+              {item.link && (
+                <a href={item.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-1 text-blue-600 hover:underline">
+                  Verifică sursa <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Info tooltip helper ─────────────────────────────────────────────────────
+function InfoTip({ children }) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger className="cursor-help">
+          <HelpCircle className="w-3 h-3 text-muted-foreground inline ml-0.5" />
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs text-xs">{children}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
 
 export default function PortfolioBVBPage() {
   const { user, token } = useAuth();
@@ -385,12 +437,27 @@ export default function PortfolioBVBPage() {
                       <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Simbol</th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Cant.</th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Intrare</th>
-                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Curent</th>
-                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Valoare</th>
-                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">P&L</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
+                        Preț Curent
+                        <InfoTip>Sursa: EODHD API · Delay ~15 min față de BVB</InfoTip>
+                      </th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
+                        Valoare
+                        <InfoTip>Preț Curent × Cantitate</InfoTip>
+                      </th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
+                        P&L
+                        <InfoTip>Profit/Loss = (Preț Curent - Preț Intrare) × Cantitate · Procent = P&L / Investit × 100</InfoTip>
+                      </th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Azi</th>
-                      <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">RSI</th>
-                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Div Yield</th>
+                      <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">
+                        RSI
+                        <InfoTip>Relative Strength Index (14 zile) · Calculat matematic din prețurile de închidere · Sursa: EODHD API · {'<'}30 = Supravândut, {'>'}70 = Supracumpărat</InfoTip>
+                      </th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
+                        Div Yield
+                        <InfoTip>Randament dividend = Dividend trailing 12 luni / Preț curent × 100 · Sursa dividende: BVB.ro oficial</InfoTip>
+                      </th>
                       <th className="px-4 py-2.5"></th>
                     </tr>
                   </thead>
@@ -467,6 +534,31 @@ export default function PortfolioBVBPage() {
                 <p className="text-xs text-muted-foreground">Date live BVB · RSI(14) · Prețuri cu delay 15min · Actualizare la refresh</p>
               </div>
             </Card>
+
+            <SourcesSection items={[
+              {
+                label: 'Prețuri acțiuni BVB',
+                description: 'Prețurile sunt furnizate de EODHD API cu delay de ~15 minute față de piața BVB. Pentru prețuri în timp real, verifică direct pe BVB.',
+                link: 'https://bvb.ro/FinancialInstruments/Markets/Shares/SharesListForDownload',
+              },
+              {
+                label: 'P&L (Profit/Loss)',
+                description: 'Calculat pe baza prețului de intrare introdus de tine și prețului curent de pe BVB.',
+                formula: 'P&L = (Preț Curent - Preț Intrare) × Cantitate',
+              },
+              {
+                label: 'RSI (Relative Strength Index)',
+                description: 'Indicator tehnic standard calculat matematic pe baza prețurilor de închidere din ultimele 14 zile de tranzacționare. Nu este o recomandare de investiții.',
+                formula: 'RSI = 100 - (100 / (1 + RS)), unde RS = Media câștigurilor / Media pierderilor (14 zile)',
+                link: 'https://www.investopedia.com/terms/r/rsi.asp',
+              },
+              {
+                label: 'Dividend Yield',
+                description: 'Calculat pe baza dividendelor plătite în ultimele 12 luni (trailing), conform datelor oficiale BVB.ro.',
+                formula: 'Yield = (Suma dividendelor trailing 12 luni / Preț curent) × 100',
+                link: 'https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar',
+              },
+            ]} />
           </TabsContent>
 
           {/* ── TAB: ANALYSIS ── */}
@@ -582,9 +674,37 @@ export default function PortfolioBVBPage() {
                     </table>
                   </div>
                   <div className="px-4 py-2.5 border-t bg-muted/10">
-                    <p className="text-xs text-muted-foreground">Sursa: BVB.ro · Trailing 12 luni · Dividend per acțiune brut</p>
+                    <p className="text-xs text-muted-foreground">
+                      Sursa: BVB.ro oficial · Trailing 12 luni · Dividend per acțiune brut (înainte de impozit) ·{' '}
+                      <a href="https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-0.5">
+                        Verifică pe BVB.ro <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </p>
                   </div>
                 </Card>
+
+                <SourcesSection items={[
+                  {
+                    label: 'Sursa dividendelor',
+                    description: 'Datele sunt extrase direct de pe BVB.ro (Calendarul Dividendelor). Sunt dividendele brute (înainte de impozitul de 8%).',
+                    link: 'https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar',
+                  },
+                  {
+                    label: 'Dividend Yield (Randament)',
+                    description: 'Calculat ca raport între suma dividendelor plătite în ultimele 12 luni și prețul curent al acțiunii.',
+                    formula: 'Yield = (Dividend trailing 12 luni per acțiune / Preț curent) × 100',
+                  },
+                  {
+                    label: 'Income Anual Estimat',
+                    description: 'Bazat pe dividendele din ultimele 12 luni. Dividendele viitoare pot fi diferite. Verifică rapoartele companiei.',
+                    formula: 'Income = Dividend per acțiune × Număr acțiuni deținute',
+                  },
+                  {
+                    label: 'Impozit dividende România',
+                    description: 'Dividendele afișate sunt BRUTE. Impozitul pe dividende în România este de 8%, reținut la sursă.',
+                    formula: 'Dividend net = Dividend brut × (1 - 0.08)',
+                  },
+                ]} />
               </div>
             ) : (
               <Card>
