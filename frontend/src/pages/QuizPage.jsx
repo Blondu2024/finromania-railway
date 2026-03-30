@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, XCircle, Clock, Trophy, Lock, ArrowRight, RefreshCw, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -35,6 +36,7 @@ const LEVEL_INFO = {
 };
 
 export default function QuizPage() {
+  const { t } = useTranslation();
   const { level } = useParams();
   const navigate = useNavigate();
   const { user, token } = useAuth();

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { TrendingUp, Award, BookOpen, Info, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
@@ -12,6 +13,7 @@ import { Link } from 'react-router-dom';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function LearnTradingPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [indices, setIndices] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);

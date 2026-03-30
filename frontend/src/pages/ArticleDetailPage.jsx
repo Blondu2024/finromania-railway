@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Clock, Building2, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
@@ -14,6 +15,7 @@ const SmartNewsAnalysis = NewsStockAnalysis;
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function ArticleDetailPage() {
+  const { t } = useTranslation();
   const { articleId } = useParams();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);

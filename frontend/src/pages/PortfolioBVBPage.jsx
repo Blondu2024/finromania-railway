@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Plus, Trash2, Download, RefreshCw, Crown, Edit2, Upload,
   TrendingUp, TrendingDown, Info, BarChart3, Brain, Banknote, Newspaper,
@@ -79,6 +80,7 @@ function InfoTip({ children }) {
 }
 
 export default function PortfolioBVBPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
 
   // Subscription check
@@ -318,16 +320,16 @@ export default function PortfolioBVBPage() {
 
   return (
     <>
-      <SEO title="Portofoliu BVB PRO | FinRomania" />
+      <SEO title={`${t('portfolio.title')} | FinRomania`} />
 
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <Crown className="w-6 h-6 text-amber-500" />
-            Portofoliu BVB PRO
+            {t('portfolio.title')}
           </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Date live BVB · Exclusiv PRO</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('portfolio.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={() => fetchPortfolio(true)} disabled={refreshing}>
@@ -350,24 +352,24 @@ export default function PortfolioBVBPage() {
       {/* ── SUMMARY METRICS ── */}
       {!isEmpty && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
-          <MetricCard label="Valoare Totală" value={fmtRON(summary.total_value)} sub={`Investit: ${fmtRON(summary.total_invested)}`} highlight={plPos} />
+          <MetricCard label={t('portfolio.totalValue')} value={fmtRON(summary.total_value)} sub={`${t('portfolio.invested')}: ${fmtRON(summary.total_invested)}`} highlight={plPos} />
           <MetricCard
-            label="P&L Total"
+            label={t('portfolio.pnlTotal')}
             value={<PLCell value={summary.pl_ron} percent={summary.pl_percent} size="lg" />}
-            sub={summary.pl_ron != null ? (plPos ? '▲ Profit' : '▼ Pierdere') : '—'}
+            sub={summary.pl_ron != null ? (plPos ? `▲ ${t('portfolio.profit')}` : `▼ ${t('portfolio.loss')}`) : '—'}
           />
           <MetricCard
-            label="P&L Astăzi"
+            label={t('portfolio.pnlToday')}
             value={<PLCell value={summary.today_pl} size="lg" />}
-            sub="Variație intraday"
+            sub={t('portfolio.intradayChange')}
             icon={todayPos ? TrendingUp : TrendingDown}
           />
-          <MetricCard label="Poziții Active" value={summary.positions_count ?? '—'} sub="acțiuni BVB" />
+          <MetricCard label={t('portfolio.activePositions')} value={summary.positions_count ?? '—'} sub={t('portfolio.bvbStocks')} />
           {dividends?.total_annual_income > 0 && (
             <MetricCard
-              label="Income Dividende/An"
+              label={t('portfolio.dividendIncome')}
               value={<span className="text-emerald-600 dark:text-emerald-400">{fmtRON(dividends.total_annual_income)}</span>}
-              sub="BVB.ro confirmat"
+              sub={t('portfolio.confirmedBVB')}
               icon={TrendingUp}
             />
           )}
@@ -379,16 +381,16 @@ export default function PortfolioBVBPage() {
         <Card className="border-dashed">
           <CardContent className="py-16 text-center">
             <TrendingUp className="w-14 h-14 text-muted-foreground mx-auto mb-4 opacity-40" />
-            <h3 className="text-lg font-semibold mb-2">Portofoliu gol</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('portfolio.emptyTitle')}</h3>
             <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">
-              Adaugă poziții manual sau importă direct din XTB / Tradeville cu un CSV.
+              {t('portfolio.emptyDesc')}
             </p>
             <div className="flex gap-3 justify-center">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setShowAdd(true)}>
-                <Plus className="w-4 h-4 mr-2" /> Adaugă Manual
+                <Plus className="w-4 h-4 mr-2" /> {t('portfolio.addManual')}
               </Button>
               <Button variant="outline" onClick={() => setShowCSVImport(true)}>
-                <Upload className="w-4 h-4 mr-2" /> Import CSV
+                <Upload className="w-4 h-4 mr-2" /> {t('portfolio.importCSV')}
               </Button>
             </div>
           </CardContent>
@@ -399,27 +401,27 @@ export default function PortfolioBVBPage() {
           <TabsList className="w-full justify-start mb-4 h-auto flex-wrap gap-1 bg-muted/50 p-1">
             <TabsTrigger value="positions" className="flex items-center gap-1.5 data-[state=active]:bg-background">
               <TrendingUp className="w-4 h-4" />
-              <span className="hidden sm:inline">Poziții</span>
+              <span className="hidden sm:inline">{t('portfolio.positions')}</span>
               <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{positions.length}</Badge>
             </TabsTrigger>
             <TabsTrigger value="analysis" className="flex items-center gap-1.5 data-[state=active]:bg-background">
               <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">Analiză</span>
+              <span className="hidden sm:inline">{t('portfolio.analysis')}</span>
             </TabsTrigger>
             <TabsTrigger value="ai" className="flex items-center gap-1.5 data-[state=active]:bg-background">
               <Brain className="w-4 h-4" />
-              <span className="hidden sm:inline">AI Advisor</span>
+              <span className="hidden sm:inline">{t('portfolio.aiAdvisor')}</span>
             </TabsTrigger>
             <TabsTrigger value="dividends" className="flex items-center gap-1.5 data-[state=active]:bg-background">
               <Banknote className="w-4 h-4" />
-              <span className="hidden sm:inline">Dividende</span>
+              <span className="hidden sm:inline">{t('portfolio.dividendsTab')}</span>
               {dividends?.total_annual_income > 0 && (
                 <Badge className="bg-emerald-500 text-white text-[10px] px-1.5 py-0">{fmtRON(dividends.total_annual_income)}/an</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="news" className="flex items-center gap-1.5 data-[state=active]:bg-background">
               <Newspaper className="w-4 h-4" />
-              <span className="hidden sm:inline">Știri</span>
+              <span className="hidden sm:inline">{t('portfolio.newsTab')}</span>
             </TabsTrigger>
           </TabsList>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -16,10 +17,10 @@ import { useAuth } from '../context/AuthContext';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Dividend Card Component
-const DividendCard = ({ dividend, index }) => {
+const DividendCard = ({ dividend, index, t }) => {
   const isPaid = dividend.status === 'paid';
   const isEstimated = dividend.status === 'estimated';
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -27,7 +28,7 @@ const DividendCard = ({ dividend, index }) => {
       transition={{ delay: index * 0.05 }}
     >
       <Card className={`overflow-hidden hover:shadow-lg transition-all ${
-        isPaid ? 'border-green-200 bg-green-50/30' : 
+        isPaid ? 'border-green-200 bg-green-50/30' :
         isEstimated ? 'border-blue-200 bg-blue-50/30' : ''
       }`}>
         <CardContent className="p-4">
@@ -45,31 +46,31 @@ const DividendCard = ({ dividend, index }) => {
                 <p className="text-sm text-muted-foreground">{dividend.name}</p>
               </div>
             </div>
-            
+
             <div className="text-right">
               <p className="text-2xl font-bold text-green-600">
                 {dividend.dividend_per_share} RON
               </p>
               <Badge variant={isPaid ? 'default' : 'secondary'}>
-                {isPaid ? 'Plătit' : 'Viitor'}
+                {isPaid ? t('dividends.paid') : t('dividends.future')}
               </Badge>
               {dividend.data_source?.includes('BVB') && (
                 <span className="text-[10px] text-green-600 block mt-0.5">BVB.ro</span>
               )}
             </div>
           </div>
-          
+
           <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t text-sm">
             <div>
-              <p className="text-muted-foreground">Ex-Dividend</p>
+              <p className="text-muted-foreground">{t('dividends.exDividend')}</p>
               <p className="font-semibold">{dividend.ex_date}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Data Plată</p>
+              <p className="text-muted-foreground">{t('dividends.paymentDate')}</p>
               <p className="font-semibold">{dividend.payment_date}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Randament</p>
+              <p className="text-muted-foreground">{t('dividends.yield')}</p>
               <p className="font-semibold text-green-600">{dividend.dividend_yield}%</p>
             </div>
           </div>
@@ -133,12 +134,12 @@ const EventCard = ({ event, index }) => {
 };
 
 // Dividend Kings Section
-const DividendKings = ({ kings }) => (
+const DividendKings = ({ kings, t }) => (
   <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200">
     <CardHeader>
       <CardTitle className="flex items-center gap-2">
         <Crown className="w-5 h-5 text-yellow-600" />
-        👑 Dividend Kings - Top Randamente
+        {t('dividends.topYield')}
       </CardTitle>
     </CardHeader>
     <CardContent>
@@ -176,6 +177,7 @@ const DividendKings = ({ kings }) => (
 );
 
 export default function DividendCalendarPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [dividends, setDividends] = useState([]);
   const [events, setEvents] = useState([]);
@@ -183,7 +185,7 @@ export default function DividendCalendarPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
   const [exporting, setExporting] = useState(false);
-  
+
   const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
 
   useEffect(() => {
@@ -225,7 +227,7 @@ export default function DividendCalendarPage() {
       window.location.href = '/pricing';
       return;
     }
-    
+
     setExporting(true);
     try {
       const endpoint = type === 'all' ? 'all' : type === 'dividends' ? 'dividends' : 'events';
@@ -234,7 +236,7 @@ export default function DividendCalendarPage() {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -281,21 +283,21 @@ export default function DividendCalendarPage() {
           className="text-center py-4"
         >
           <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
-            Calendar Dividende & Evenimente
+            {t('dividends.calendarTitle')}
           </h1>
-          <p className="text-muted-foreground mb-1">Toate datele importante pentru investitorii BVB</p>
+          <p className="text-muted-foreground mb-1">{t('dividends.calendarSubtitle')}</p>
           <p className="text-xs text-green-600 font-medium mb-4">
-            Sursa: BVB.ro (date oficiale) ·{' '}
+            {t('dividends.source')}: BVB.ro ·{' '}
             <a href="https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar" target="_blank" rel="noopener noreferrer" className="underline hover:text-green-800">
               Verifică pe BVB.ro ↗
             </a>
           </p>
-          
+
           {/* Export Button */}
           <div className="flex justify-center gap-2">
             {isPro ? (
-              <Button 
-                onClick={() => handleExport('all')} 
+              <Button
+                onClick={() => handleExport('all')}
                 disabled={exporting}
                 className="bg-gradient-to-r from-amber-500 to-orange-500"
               >
@@ -303,7 +305,7 @@ export default function DividendCalendarPage() {
                 {exporting ? 'Export...' : 'Export Excel (CSV)'}
               </Button>
             ) : (
-              <Button 
+              <Button
                 onClick={() => window.location.href = '/pricing'}
                 variant="outline"
                 className="border-amber-400"
@@ -321,28 +323,28 @@ export default function DividendCalendarPage() {
           <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
             <CardContent className="p-4">
               <Banknote className="w-6 h-6 mb-2 opacity-80" />
-              <p className="text-sm text-green-100">Total Dividende</p>
+              <p className="text-sm text-green-100">{t('dividends.totalDividends')}</p>
               <p className="text-2xl font-bold">{dividends.length}</p>
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
             <CardContent className="p-4">
               <Clock className="w-6 h-6 mb-2 opacity-80" />
-              <p className="text-sm text-blue-100">Viitoare</p>
+              <p className="text-sm text-blue-100">{t('dividends.upcoming')}</p>
               <p className="text-2xl font-bold">{upcomingDividends.length}</p>
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
             <CardContent className="p-4">
               <CalendarDays className="w-6 h-6 mb-2 opacity-80" />
-              <p className="text-sm text-blue-100">Evenimente</p>
+              <p className="text-sm text-blue-100">{t('dividends.events')}</p>
               <p className="text-2xl font-bold">{events.length}</p>
             </CardContent>
           </Card>
           <Card className="bg-gradient-to-br from-amber-500 to-amber-600 text-white">
             <CardContent className="p-4">
               <Crown className="w-6 h-6 mb-2 opacity-80" />
-              <p className="text-sm text-amber-100">Top Randament</p>
+              <p className="text-sm text-amber-100">{t('dividends.topYield')}</p>
               <p className="text-2xl font-bold">{kings[0]?.dividend_yield || 0}%</p>
             </CardContent>
           </Card>
@@ -354,35 +356,35 @@ export default function DividendCalendarPage() {
           <div className="space-y-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="all">📊 Toate</TabsTrigger>
-                <TabsTrigger value="upcoming">📅 Viitoare</TabsTrigger>
-                <TabsTrigger value="events">🗓️ Evenimente</TabsTrigger>
+                <TabsTrigger value="all">{t('dividends.allDividends')}</TabsTrigger>
+                <TabsTrigger value="upcoming">{t('dividends.upcomingTab')}</TabsTrigger>
+                <TabsTrigger value="events">{t('dividends.eventsTab')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="all" className="space-y-4 mt-4">
-                <h3 className="font-bold text-lg">Toate Dividendele</h3>
+                <h3 className="font-bold text-lg">{t('dividends.allDividends')}</h3>
                 {dividends.map((div, idx) => (
-                  <DividendCard key={`${div.symbol}-${div.ex_date}`} dividend={div} index={idx} />
+                  <DividendCard key={`${div.symbol}-${div.ex_date}`} dividend={div} index={idx} t={t} />
                 ))}
               </TabsContent>
 
               <TabsContent value="upcoming" className="space-y-4 mt-4">
-                <h3 className="font-bold text-lg">Dividende Viitoare (Estimate)</h3>
+                <h3 className="font-bold text-lg">{t('dividends.upcomingEstimates')}</h3>
                 {upcomingDividends.length === 0 ? (
                   <Card>
                     <CardContent className="p-8 text-center text-muted-foreground">
-                      Nicio dividend viitoare anunțată
+                      {t('dividends.noUpcoming')}
                     </CardContent>
                   </Card>
                 ) : (
                   upcomingDividends.map((div, idx) => (
-                    <DividendCard key={`${div.symbol}-${div.ex_date}`} dividend={div} index={idx} />
+                    <DividendCard key={`${div.symbol}-${div.ex_date}`} dividend={div} index={idx} t={t} />
                   ))
                 )}
               </TabsContent>
 
               <TabsContent value="events" className="space-y-4 mt-4">
-                <h3 className="font-bold text-lg">Evenimente Corporative</h3>
+                <h3 className="font-bold text-lg">{t('dividends.corporateEvents')}</h3>
                 {events.map((event, idx) => (
                   <EventCard key={`${event.symbol}-${event.date}`} event={event} index={idx} />
                 ))}
@@ -392,17 +394,17 @@ export default function DividendCalendarPage() {
 
           {/* Right Sidebar - Dividend Kings */}
           <div>
-            <DividendKings kings={kings} />
-            
+            <DividendKings kings={kings} t={t} />
+
             {/* Info Card - Glosar */}
             <Card className="mt-6">
               <CardContent className="p-4 text-sm text-muted-foreground">
-                <h4 className="font-semibold text-foreground mb-2">ℹ️ Glosar Dividende</h4>
+                <h4 className="font-semibold text-foreground mb-2">{t('dividends.glossaryTitle')}</h4>
                 <ul className="space-y-2">
-                  <li><strong>Ex-Dividend:</strong> Ultima zi în care poți cumpăra acțiunea și primi dividendul. După această dată, cumpărătorul NU mai primește dividendul.</li>
-                  <li><strong>Record Date:</strong> Data la care depozitarul central verifică cine deține acțiunile.</li>
-                  <li><strong>Payment Date:</strong> Data la care dividendul este virat în contul tău de broker.</li>
-                  <li><strong>Randament (Yield):</strong> Cât primești dividende raportat la prețul acțiunii.</li>
+                  <li><strong>{t('dividends.exDividend')}:</strong> Ultima zi în care poți cumpăra acțiunea și primi dividendul. După această dată, cumpărătorul NU mai primește dividendul.</li>
+                  <li><strong>{t('dividends.recordDate')}:</strong> Data la care depozitarul central verifică cine deține acțiunile.</li>
+                  <li><strong>{t('dividends.paymentDate')}:</strong> Data la care dividendul este virat în contul tău de broker.</li>
+                  <li><strong>{t('dividends.yield')}:</strong> Cât primești dividende raportat la prețul acțiunii.</li>
                 </ul>
                 <div className="mt-3 p-2 bg-muted rounded text-xs font-mono">
                   Yield = (Dividend per acțiune / Preț curent) × 100

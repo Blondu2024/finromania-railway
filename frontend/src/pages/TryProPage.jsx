@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Crown, Check, X, Sparkles, Zap, ArrowRight, Lock, Shield, Clock, TrendingUp, Calculator, Brain, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
@@ -73,6 +74,7 @@ const FAQ_ITEMS = [
 ];
 
 export default function TryProPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [loading, setLoading] = useState(true);

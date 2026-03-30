@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Calculator, TrendingUp, Building2, User, Crown, Lock, ChevronRight, CheckCircle, XCircle, Info, AlertTriangle, Sparkles, Clock, Calendar, MessageCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -39,11 +40,11 @@ const EntityIcon = ({ type, className = "w-8 h-8" }) => {
 };
 
 // Result Card Component
-const ResultCard = ({ scenario, isBest, isWorst }) => {
-  const bgColor = isBest ? 'bg-green-500/10 border-green-500' : 
-                  isWorst ? 'bg-red-500/10 border-red-500' : 
+const ResultCard = ({ scenario, isBest, isWorst, t }) => {
+  const bgColor = isBest ? 'bg-green-500/10 border-green-500' :
+                  isWorst ? 'bg-red-500/10 border-red-500' :
                   'bg-gray-100 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700';
-  
+
   return (
     <Card className={`${bgColor} border-2 transition-all hover:shadow-lg`}>
       <CardHeader className="pb-2">
@@ -54,35 +55,35 @@ const ResultCard = ({ scenario, isBest, isWorst }) => {
             </div>
             <div>
               <CardTitle className="text-lg">{scenario.nume_entitate}</CardTitle>
-              {isBest && <Badge className="bg-green-500 text-white mt-1">✅ Recomandat</Badge>}
-              {isWorst && <Badge variant="destructive" className="mt-1">❌ Nu e recomandat</Badge>}
+              {isBest && <Badge className="bg-green-500 text-white mt-1">{t('fiscal.recommended')}</Badge>}
+              {isWorst && <Badge variant="destructive" className="mt-1">{t('fiscal.notRecommended')}</Badge>}
             </div>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Rată efectivă</p>
+            <p className="text-sm text-muted-foreground">{t('fiscal.effectiveRate')}</p>
             <p className={`text-2xl font-bold ${isBest ? 'text-green-600' : isWorst ? 'text-red-600' : ''}`}>
               {scenario.rata_efectiva_impozitare.toFixed(1)}%
             </p>
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Key Numbers */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white dark:bg-zinc-900 rounded-lg p-3">
-            <p className="text-sm text-muted-foreground">Total Taxe</p>
+            <p className="text-sm text-muted-foreground">{t('fiscal.totalTaxes')}</p>
             <p className="text-lg font-semibold text-red-600">{formatRON(scenario.total_taxe)}</p>
           </div>
           <div className="bg-white dark:bg-zinc-900 rounded-lg p-3">
-            <p className="text-sm text-muted-foreground">Venit Net</p>
+            <p className="text-sm text-muted-foreground">{t('fiscal.netIncome')}</p>
             <p className={`text-lg font-semibold ${isBest ? 'text-green-600' : ''}`}>{formatRON(scenario.venit_net)}</p>
           </div>
         </div>
 
         {/* Details */}
         <div className="space-y-2">
-          <p className="text-sm font-medium">Detalii calcul:</p>
+          <p className="text-sm font-medium">{t('fiscal.calcDetails')}</p>
           {scenario.detalii.map((detaliu, idx) => (
             <p key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
               <ChevronRight className="w-3 h-3 mt-1 flex-shrink-0" />
@@ -95,7 +96,7 @@ const ResultCard = ({ scenario, isBest, isWorst }) => {
         <div className="grid grid-cols-1 gap-4 pt-2 border-t">
           <div>
             <p className="text-sm font-medium text-green-600 mb-2 flex items-center gap-1">
-              <CheckCircle className="w-4 h-4" /> Avantaje
+              <CheckCircle className="w-4 h-4" /> {t('fiscal.advantages')}
             </p>
             <ul className="space-y-1">
               {scenario.avantaje.map((av, idx) => (
@@ -105,7 +106,7 @@ const ResultCard = ({ scenario, isBest, isWorst }) => {
           </div>
           <div>
             <p className="text-sm font-medium text-red-600 mb-2 flex items-center gap-1">
-              <XCircle className="w-4 h-4" /> Dezavantaje
+              <XCircle className="w-4 h-4" /> {t('fiscal.disadvantages')}
             </p>
             <ul className="space-y-1">
               {scenario.dezavantaje.map((dez, idx) => (
@@ -120,6 +121,7 @@ const ResultCard = ({ scenario, isBest, isWorst }) => {
 };
 
 export default function FiscalCalculatorPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
@@ -127,7 +129,7 @@ export default function FiscalCalculatorPage() {
   const [constante, setConstante] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [checkingSubscription, setCheckingSubscription] = useState(true);
-  
+
   // Form state - adaptat pentru investiții
   const [castigCapital, setCastigCapital] = useState(50000);
   const [dividende, setDividende] = useState(10000);
@@ -144,7 +146,7 @@ export default function FiscalCalculatorPage() {
         setCheckingSubscription(false);
         return;
       }
-      
+
       try {
         const response = await fetch(`${API_URL}/api/subscriptions/status`, {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -159,7 +161,7 @@ export default function FiscalCalculatorPage() {
         setCheckingSubscription(false);
       }
     };
-    
+
     checkSubscription();
   }, [user, token]);
 
@@ -237,13 +239,13 @@ export default function FiscalCalculatorPage() {
   };
 
   // Find best and worst scenarios
-  const bestScenario = results?.scenarii?.reduce((best, curr) => 
+  const bestScenario = results?.scenarii?.reduce((best, curr) =>
     curr.venit_net > best.venit_net ? curr : best, results.scenarii[0]);
-  const worstScenario = results?.scenarii?.reduce((worst, curr) => 
+  const worstScenario = results?.scenarii?.reduce((worst, curr) =>
     curr.venit_net < worst.venit_net ? curr : worst, results.scenarii[0]);
 
   const venitTotal = castigCapital + dividende;
-  
+
   // Check if user has PRO access
   const isPro = subscriptionStatus?.subscription?.is_pro;
   const isLoggedIn = !!user;
@@ -272,10 +274,10 @@ export default function FiscalCalculatorPage() {
       "inLanguage": "ro",
       "areaServed": "RO"
     };
-    
+
     return (
       <>
-        <SEO 
+        <SEO
           title="Calculator Fiscal Romania 2026 - PF vs SRL | FinRomania"
           description="Calculator fiscal gratuit pentru România: compară impozite PF, PFA, SRL. Legislatie 2026, calcul CASS, CAS, economii fiscale. Află care formă juridică e optimă pentru tine."
           keywords="calculator fiscal romania 2026, pf vs srl, impozit dividende, microîntreprindere, pfa impozit, calculator impozit venit, legislatie fiscala 2026, CASS 2026"
@@ -301,33 +303,32 @@ export default function FiscalCalculatorPage() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Calculator Fiscal Investiții BVB 2026 - PF vs SRL | FinRomania"
         description="Calculator fiscal pentru investiții la Bursa București (BVB). Compară impozite PF vs PFA vs SRL pentru câștiguri din acțiuni. Legislatie 2026, impozit 3-6% BVB conform Cod Fiscal 2026."
         keywords="calculator fiscal bvb, impozit acțiuni românia, pf vs srl trading, fiscal bursă bucurești, impozit dividende bvb, optimizare fiscală trading"
         structuredData={proStructuredData}
       />
-      
+
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         {/* Hero Section */}
         <div className="text-center space-y-4">
           <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-1">
-            🏆 Actualizat 2026
+            {t('fiscal.updated2026')}
           </Badge>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold">
-            Calculator <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-500">Fiscal BVB</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-500">{t('fiscal.title')}</span>
           </h1>
           <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Știai că pe BVB plătești doar <strong className="text-green-600">3-6% impozit</strong> pe câștiguri?
-            Calculează exact cât datorezi statului.
+            {t('fiscal.subtitle')}
           </p>
         </div>
 
         {/* Main Tabs: Calculator vs Import */}
         <Tabs defaultValue="calculator" className="w-full">
           <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto">
-            <TabsTrigger value="calculator">Calculator Manual</TabsTrigger>
-            <TabsTrigger value="import">Import Portofoliu</TabsTrigger>
+            <TabsTrigger value="calculator">{t('fiscal.manualCalc')}</TabsTrigger>
+            <TabsTrigger value="import">{t('fiscal.importPortfolio')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="import" className="mt-6">
@@ -356,7 +357,7 @@ export default function FiscalCalculatorPage() {
             <CardContent className="p-4 text-center">
               <TrendingUp className="w-6 h-6 text-blue-600 mx-auto mb-2" />
               <p className="text-xl font-bold text-blue-600">16%</p>
-              <p className="text-xs text-muted-foreground">🌍 Internațional</p>
+              <p className="text-xs text-muted-foreground">{t('fiscal.internationalRates')}</p>
             </CardContent>
           </Card>
           <Card className="bg-blue-500/10 border-blue-500/30">
@@ -387,7 +388,7 @@ export default function FiscalCalculatorPage() {
                   </div>
                 </div>
                 <div className="text-center md:text-right">
-                  <p className="text-sm text-white/80">Total taxe ca PF ({tipPiata === 'bvb' ? 'BVB' : 'Internațional'})</p>
+                  <p className="text-sm text-white/80">{t('fiscal.totalTaxes')} ({tipPiata === 'bvb' ? 'BVB' : t('fiscal.internationalRates')})</p>
                   <p className="text-3xl font-bold">
                     {formatRON(tipPiata === 'bvb' ? preview.comparatie?.pf_bvb?.total_taxe || 0 : preview.comparatie?.pf_international?.total_taxe || 0)}
                   </p>
@@ -403,15 +404,15 @@ export default function FiscalCalculatorPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calculator className="w-5 h-5" />
-                Datele Tale
+                {t('fiscal.yourData')}
               </CardTitle>
-              <CardDescription>Introdu câștigurile din investiții</CardDescription>
+              <CardDescription>{t('fiscal.enterGains')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Câștig Capital */}
               <div className="space-y-3">
                 <Label className="flex items-center justify-between">
-                  Câștig din vânzare acțiuni
+                  {t('fiscal.capitalGain')}
                   <span className="font-bold text-blue-600">{formatRON(castigCapital)}</span>
                 </Label>
                 <Slider
@@ -432,7 +433,7 @@ export default function FiscalCalculatorPage() {
               {/* Dividende */}
               <div className="space-y-3">
                 <Label className="flex items-center justify-between">
-                  Dividende primite
+                  {t('fiscal.dividendsReceived')}
                   <span className="font-bold text-blue-600">{formatRON(dividende)}</span>
                 </Label>
                 <Slider
@@ -447,7 +448,7 @@ export default function FiscalCalculatorPage() {
 
               {/* Tip Piață */}
               <div className="space-y-3">
-                <Label>Piața</Label>
+                <Label>{t('fiscal.market')}</Label>
                 <Tabs value={tipPiata} onValueChange={setTipPiata}>
                   <TabsList className="grid grid-cols-2 w-full">
                     <TabsTrigger value="bvb">🇷🇴 BVB</TabsTrigger>
@@ -465,18 +466,18 @@ export default function FiscalCalculatorPage() {
               {/* Perioada Deținere (doar pentru BVB) */}
               {tipPiata === 'bvb' && (
                 <div className="space-y-3">
-                  <Label>Perioada de deținere</Label>
+                  <Label>{t('fiscal.holdingPeriod')}</Label>
                   <Tabs value={perioadaDetinere} onValueChange={setPerioadaDetinere}>
                     <TabsList className="grid grid-cols-3 w-full">
-                      <TabsTrigger value="peste_1_an" className="text-xs">≥1 an (3%)</TabsTrigger>
-                      <TabsTrigger value="sub_1_an" className="text-xs">&lt;1 an (6%)</TabsTrigger>
-                      <TabsTrigger value="mixt" className="text-xs">Mixt</TabsTrigger>
+                      <TabsTrigger value="peste_1_an" className="text-xs">{t('fiscal.longTerm')}</TabsTrigger>
+                      <TabsTrigger value="sub_1_an" className="text-xs">{t('fiscal.shortTerm')}</TabsTrigger>
+                      <TabsTrigger value="mixt" className="text-xs">{t('fiscal.mixed')}</TabsTrigger>
                     </TabsList>
                   </Tabs>
-                  
+
                   {perioadaDetinere === 'mixt' && (
                     <div className="space-y-2 mt-2">
-                      <Label className="text-xs">% pe termen lung (≥1 an): {procentTermenLung}%</Label>
+                      <Label className="text-xs">{t('fiscal.longTermPercent')}: {procentTermenLung}%</Label>
                       <Slider
                         value={[procentTermenLung]}
                         onValueChange={(v) => setProcentTermenLung(v[0])}
@@ -493,7 +494,7 @@ export default function FiscalCalculatorPage() {
               <div className="space-y-4 pt-4 border-t">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="salariu" className="cursor-pointer text-sm">
-                    Am salariu (plătesc CASS de acolo)
+                    {t('fiscal.hasSalary')}
                   </Label>
                   <Switch
                     id="salariu"
@@ -503,13 +504,13 @@ export default function FiscalCalculatorPage() {
                 </div>
                 {!areSalariu && (
                   <p className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-2 rounded">
-                    ⚠️ Fără salariu, vei datora CASS (10%) dacă venitul &gt; 24.300 RON/an
+                    ⚠️ {t('fiscal.cassWarning')}
                   </p>
                 )}
               </div>
 
               {/* Calculate Button */}
-              <Button 
+              <Button
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-500 hover:from-blue-700 hover:to-blue-700"
                 size="lg"
                 onClick={handleCalculate}
@@ -518,12 +519,12 @@ export default function FiscalCalculatorPage() {
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Se calculează...
+                    {t('fiscal.calculating')}
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
                     <Calculator className="w-4 h-4" />
-                    Calculează
+                    {t('fiscal.calculate')}
                   </span>
                 )}
               </Button>
@@ -531,7 +532,7 @@ export default function FiscalCalculatorPage() {
               {!user && (
                 <p className="text-sm text-center text-muted-foreground">
                   <Lock className="w-4 h-4 inline mr-1" />
-                  Conectează-te pentru comparație completă
+                  {t('fiscal.loginForFull')}
                 </p>
               )}
             </CardContent>
@@ -546,11 +547,11 @@ export default function FiscalCalculatorPage() {
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                       <div>
-                        <p className="text-sm text-muted-foreground">Economie vs cea mai scumpă opțiune</p>
+                        <p className="text-sm text-muted-foreground">{t('fiscal.savingsVsWorst')}</p>
                         <p className="text-4xl font-bold text-green-600">{formatRON(results.economie_maxima)}</p>
                       </div>
                       <div className="text-right">
-                        <Badge className="bg-green-500 text-white mb-2">🏆 {results.recomandare}</Badge>
+                        <Badge className="bg-green-500 text-white mb-2">{results.recomandare}</Badge>
                       </div>
                     </div>
                   </CardContent>
@@ -564,6 +565,7 @@ export default function FiscalCalculatorPage() {
                       scenario={scenario}
                       isBest={scenario.tip_entitate === bestScenario?.tip_entitate}
                       isWorst={scenario.tip_entitate === worstScenario?.tip_entitate}
+                      t={t}
                     />
                   ))}
                 </div>
@@ -573,12 +575,12 @@ export default function FiscalCalculatorPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Info className="w-5 h-5" />
-                      Explicație
+                      {t('fiscal.explanation')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="prose dark:prose-invert max-w-none text-sm">
-                      <div dangerouslySetInnerHTML={{ 
+                      <div dangerouslySetInnerHTML={{
                         __html: results.explicatie_detaliata
                           .replace(/###\s*(.*)/g, '<h3 class="text-lg font-bold mt-4 mb-2">$1</h3>')
                           .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -606,10 +608,9 @@ export default function FiscalCalculatorPage() {
                   <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto">
                     <TrendingUp className="w-8 h-8 text-green-600" />
                   </div>
-                  <h3 className="text-xl font-semibold">Investești pe BVB?</h3>
+                  <h3 className="text-xl font-semibold">{t('fiscal.investOnBVB')}</h3>
                   <p className="text-muted-foreground max-w-md">
-                    Vești bune! România are unul dintre cele mai avantajoase regimuri fiscale
-                    pentru investitorii la bursă: doar <strong className="text-green-600">3-6%</strong> impozit pe câștiguri!
+                    {t('fiscal.investOnBVBDesc')}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Completează formularul pentru a calcula exact cât datorezi.
@@ -626,31 +627,31 @@ export default function FiscalCalculatorPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Info className="w-5 h-5" />
-                Legislație Fiscală {constante.an_fiscal}
+                {t('fiscal.legislation')} {constante.an_fiscal}
               </CardTitle>
-              <CardDescription>Ultima actualizare: {constante.ultima_actualizare}</CardDescription>
+              <CardDescription>{t('fiscal.lastUpdate')}: {constante.ultima_actualizare}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-                  <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">🇷🇴 BVB</h4>
+                  <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">🇷🇴 {t('fiscal.bvbRates')}</h4>
                   <p className="text-sm text-muted-foreground">Câștig ≥1 an: <strong>3%</strong></p>
                   <p className="text-sm text-muted-foreground">Câștig &lt;1 an: <strong>6%</strong></p>
                   <p className="text-sm text-muted-foreground">Dividende: <strong>16%</strong></p>
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                  <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🌍 Internațional</h4>
+                  <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🌍 {t('fiscal.internationalRates')}</h4>
                   <p className="text-sm text-muted-foreground">Câștig capital: <strong>16%</strong></p>
                   <p className="text-sm text-muted-foreground">Dividende: <strong>16%</strong></p>
                 </div>
                 <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
-                  <h4 className="font-semibold text-amber-700 dark:text-amber-300 mb-2">🏥 CASS</h4>
+                  <h4 className="font-semibold text-amber-700 dark:text-amber-300 mb-2">🏥 {t('fiscal.cassRates')}</h4>
                   <p className="text-sm text-muted-foreground">Rată: <strong>10%</strong></p>
                   <p className="text-sm text-muted-foreground">Prag: <strong>{constante.cass?.prag_activare}</strong></p>
                   <p className="text-xs text-muted-foreground mt-1">{constante.cass?.nota}</p>
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                  <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🏢 SRL Micro</h4>
+                  <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🏢 {t('fiscal.srlMicro')}</h4>
                   <p className="text-sm text-muted-foreground">Cu angajat: <strong>{constante.micro_srl?.cu_angajat}</strong></p>
                   <p className="text-sm text-muted-foreground">Fără angajat: <strong>{constante.micro_srl?.fara_angajat}</strong></p>
                 </div>
@@ -665,10 +666,10 @@ export default function FiscalCalculatorPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-blue-500" />
-                Întrebări despre Fiscalitate?
+                {t('fiscal.fiscalQuestions')}
               </CardTitle>
               <CardDescription>
-                AI-ul nostru fiscal îți răspunde la întrebări despre impozite, declarații, CASS, W-8BEN și multe altele.
+                {t('fiscal.fiscalQuestionsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -692,7 +693,7 @@ export default function FiscalCalculatorPage() {
               </ul>
             </CardContent>
           </Card>
-          
+
           <FiscalAIChat />
         </div>
 
@@ -700,11 +701,11 @@ export default function FiscalCalculatorPage() {
         <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="font-semibold text-sm">Ai SRL, PFA sau mai multe entități?</p>
-              <p className="text-xs text-muted-foreground">Simulator fiscal cu calcul dividende, CASS, agregare micro</p>
+              <p className="font-semibold text-sm">{t('fiscal.hasSRLOrPFA')}</p>
+              <p className="text-xs text-muted-foreground">{t('fiscal.simulatorDesc')}</p>
             </div>
             <a href="/simulator-fiscal">
-              <Button variant="outline" size="sm">Simulator Antreprenor</Button>
+              <Button variant="outline" size="sm">{t('fiscal.simulatorBtn')}</Button>
             </a>
           </CardContent>
         </Card>
@@ -720,9 +721,7 @@ export default function FiscalCalculatorPage() {
               <div>
                 <h4 className="font-semibold">Disclaimer</h4>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Calculele sunt orientative și bazate pe legislația în vigoare. Legislația fiscală 
-                  se poate modifica. Pentru situația ta specifică, consultă un contabil autorizat CECCAR.
-                  FinRomania nu oferă consiliere fiscală sau juridică.
+                  {t('fiscal.disclaimerText')}
                 </p>
               </div>
             </div>

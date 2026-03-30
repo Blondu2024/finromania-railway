@@ -1,10 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 
 export default function TermsOfServicePage() {
+  const { t } = useTranslation();
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <Link to="/">

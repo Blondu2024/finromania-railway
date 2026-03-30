@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, BookOpen } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -8,6 +9,7 @@ import { Badge } from '../components/ui/badge';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function GlossaryPage() {
+  const { t } = useTranslation();
   const [terms, setTerms] = useState({});
   const [filteredTerms, setFilteredTerms] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
@@ -79,10 +81,10 @@ export default function GlossaryPage() {
       <div>
         <div className="flex items-center gap-3 mb-2">
           <BookOpen className="w-8 h-8 text-blue-600" />
-          <h1 className="text-4xl font-bold">Glosar Financiar</h1>
+          <h1 className="text-4xl font-bold">{t('education.glossaryTitle')}</h1>
         </div>
         <p className="text-muted-foreground">
-          Dicționar complet cu {total} termeni financiari și de investiții
+          {t('education.glossaryDesc')}
         </p>
       </div>
 

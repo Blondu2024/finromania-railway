@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, CheckCircle, XCircle, TrendingUp, Shield,
@@ -71,6 +72,7 @@ function FAQItem({ item }) {
 }
 
 export default function CFDvsActiuniPage() {
+  const { t } = useTranslation();
   return (
     <div className="max-w-4xl mx-auto space-y-10 pb-12">
 

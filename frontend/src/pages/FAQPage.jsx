@@ -3,6 +3,7 @@ import { HelpCircle, ChevronDown, ChevronUp, BookOpen, Shield, DollarSign, Gradu
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 
 const FAQ_DATA = [
@@ -115,6 +116,7 @@ function FAQItem({ question, answer, isOpen, onToggle }) {
 }
 
 export default function FAQPage() {
+  const { t } = useTranslation();
   const [openItems, setOpenItems] = useState({});
 
   const toggleItem = (category, index) => {
@@ -127,15 +129,15 @@ export default function FAQPage() {
 
   return (
     <>
-      <SEO 
-        title="Întrebări Frecvente (FAQ) | FinRomania"
-        description="Răspunsuri despre FinRomania: educație financiară, date BVB, planuri PRO, securitate."
+      <SEO
+        title={`${t('faq.title')} | FinRomania`}
+        description={t('faq.subtitle')}
       />
       
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         <div className="text-center space-y-4">
-          <Badge className="bg-blue-500 text-white">Întrebări Frecvente</Badge>
-          <h1 className="text-2xl font-bold">Ai întrebări? Avem răspunsuri!</h1>
+          <Badge className="bg-blue-500 text-white">{t('faq.title')}</Badge>
+          <h1 className="text-2xl font-bold">{t('faq.subtitle')}</h1>
           <p className="text-xl text-muted-foreground">Tot ce trebuie să știi despre FinRomania</p>
         </div>
 
@@ -164,9 +166,9 @@ export default function FAQPage() {
 
         <Card className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-900/20 dark:to-blue-900/20">
           <CardContent className="p-8 text-center">
-            <h3 className="text-xl font-bold mb-2">Nu ai găsit răspunsul?</h3>
+            <h3 className="text-xl font-bold mb-2">{t('faq.noAnswer')}</h3>
             <p className="text-muted-foreground mb-4">
-              Contactează-ne la <strong>contact@finromania.ro</strong>
+              {t('faq.contactUs')}
             </p>
             <Link to="/contact">
               <button className="text-blue-600 hover:underline">

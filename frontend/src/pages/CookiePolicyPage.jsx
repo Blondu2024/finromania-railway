@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Cookie } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -6,6 +7,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 
 export default function CookiePolicyPage() {
+  const { t } = useTranslation();
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <Link to="/">

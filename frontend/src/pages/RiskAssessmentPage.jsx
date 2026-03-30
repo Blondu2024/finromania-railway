@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { ClipboardCheck, ArrowRight, ArrowLeft, CheckCircle, Shield, TrendingUp, Zap, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
@@ -12,6 +13,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function RiskAssessmentPage() {
   const { user, login } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -116,7 +118,7 @@ export default function RiskAssessmentPage() {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold mb-2">Profilul Tău de Risc</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('risk.yourProfile')}</h1>
           <p className="text-muted-foreground">Evaluat pe {new Date(existingProfile.assessed_at).toLocaleDateString('ro-RO')}</p>
         </div>
 
@@ -129,30 +131,30 @@ export default function RiskAssessmentPage() {
             <p className="text-muted-foreground mt-2 max-w-md mx-auto">{profile.description}</p>
             <p className="mt-4 text-sm">Scor: {existingProfile.score}/{existingProfile.max_score}</p>
           </div>
-          
+
           <CardContent className="p-6">
-            <h3 className="font-semibold mb-3">Alocare Recomandată:</h3>
+            <h3 className="font-semibold mb-3">{t('risk.recommendedAllocation')}:</h3>
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-blue-600">{profile.allocation.stocks}%</p>
-                <p className="text-sm text-muted-foreground">Acțiuni</p>
+                <p className="text-sm text-muted-foreground">{t('risk.equities')}</p>
               </div>
               <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-green-600">{profile.allocation.bonds}%</p>
-                <p className="text-sm text-muted-foreground">Obligațiuni</p>
+                <p className="text-sm text-muted-foreground">{t('risk.bonds')}</p>
               </div>
               <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-yellow-600">{profile.allocation.cash}%</p>
-                <p className="text-sm text-muted-foreground">Cash</p>
+                <p className="text-sm text-muted-foreground">{t('risk.cash')}</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <Button className="w-full" onClick={() => navigate('/portfolio')}>
-                Mergi la Portofoliu
+                {t('risk.goToPortfolio')}
               </Button>
               <Button variant="outline" className="w-full" onClick={() => setExistingProfile(null)}>
-                Refă Evaluarea
+                {t('risk.retake')}
               </Button>
             </div>
           </CardContent>
@@ -168,7 +170,7 @@ export default function RiskAssessmentPage() {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold">Evaluare Completă!</h1>
+          <h1 className="text-3xl font-bold">{t('risk.complete')}</h1>
         </div>
 
         <Card className="overflow-hidden">
@@ -176,29 +178,29 @@ export default function RiskAssessmentPage() {
             <div className="inline-flex p-4 rounded-full mb-4" style={{ backgroundColor: profile.color, color: 'white' }}>
               <ProfileIcon profileKey={profile.key} />
             </div>
-            <h2 className="text-3xl font-bold" style={{ color: profile.color }}>Ești {profile.name}</h2>
+            <h2 className="text-3xl font-bold" style={{ color: profile.color }}>{t('risk.youAre')} {profile.name}</h2>
             <p className="text-muted-foreground mt-2 max-w-md mx-auto">{profile.description}</p>
             <p className="mt-4 text-sm">Scor: {result.score}/{result.max_score}</p>
           </div>
-          
+
           <CardContent className="p-6">
-            <h3 className="font-semibold mb-3">Alocare Recomandată:</h3>
+            <h3 className="font-semibold mb-3">{t('risk.recommendedAllocation')}:</h3>
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-blue-600">{profile.allocation.stocks}%</p>
-                <p className="text-sm text-muted-foreground">Acțiuni</p>
+                <p className="text-sm text-muted-foreground">{t('risk.equities')}</p>
               </div>
               <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-green-600">{profile.allocation.bonds}%</p>
-                <p className="text-sm text-muted-foreground">Obligațiuni</p>
+                <p className="text-sm text-muted-foreground">{t('risk.bonds')}</p>
               </div>
               <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                 <p className="text-2xl font-bold text-yellow-600">{profile.allocation.cash}%</p>
-                <p className="text-sm text-muted-foreground">Cash</p>
+                <p className="text-sm text-muted-foreground">{t('risk.cash')}</p>
               </div>
             </div>
 
-            <h3 className="font-semibold mb-3">Recomandări:</h3>
+            <h3 className="font-semibold mb-3">{t('risk.recommendations')}:</h3>
             <ul className="space-y-2 mb-6">
               {profile.recommendations.map((rec, idx) => (
                 <li key={idx} className="flex items-start gap-2">
@@ -210,10 +212,10 @@ export default function RiskAssessmentPage() {
 
             <div className="space-y-3">
               <Button className="w-full" onClick={() => navigate('/portfolio')}>
-                Creează-ți Portofoliul
+                {t('risk.createPortfolio')}
               </Button>
               <Button variant="outline" className="w-full" onClick={() => navigate('/education')}>
-                Continuă să Înveți
+                {t('risk.continueLearning')}
               </Button>
             </div>
           </CardContent>
@@ -235,9 +237,9 @@ export default function RiskAssessmentPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="text-center">
         <ClipboardCheck className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-        <h1 className="text-3xl font-bold">Evaluează-ți Profilul de Risc</h1>
+        <h1 className="text-3xl font-bold">{t('risk.title')}</h1>
         <p className="text-muted-foreground mt-2">
-          Răspunde la {questions.length} întrebări pentru a descoperi ce tip de investitor ești
+          {t('risk.subtitle', { count: questions.length })}
         </p>
       </div>
 
@@ -245,7 +247,7 @@ export default function RiskAssessmentPage() {
         <CardHeader>
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-muted-foreground">
-              Întrebarea {currentQuestion + 1} din {questions.length}
+              {t('risk.question', { current: currentQuestion + 1, total: questions.length })}
             </span>
             <span className="text-sm font-medium">{Math.round(progress)}%</span>
           </div>
@@ -253,7 +255,7 @@ export default function RiskAssessmentPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <h2 className="text-xl font-semibold">{currentQ.question}</h2>
-          
+
           <RadioGroup
             value={answers[currentQ.id] || ''}
             onValueChange={(value) => handleAnswer(currentQ.id, value)}
@@ -269,27 +271,27 @@ export default function RiskAssessmentPage() {
           </RadioGroup>
 
           <div className="flex justify-between pt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handlePrev}
               disabled={currentQuestion === 0}
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi
             </Button>
-            
+
             {currentQuestion === questions.length - 1 ? (
-              <Button 
+              <Button
                 onClick={handleSubmit}
                 disabled={!canSubmit || submitting}
               >
                 {submitting ? (
-                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Se procesează...</>
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('risk.processing')}</>
                 ) : (
-                  <>Finalizează <CheckCircle className="w-4 h-4 ml-2" /></>
+                  <>{t('risk.finish')} <CheckCircle className="w-4 h-4 ml-2" /></>
                 )}
               </Button>
             ) : (
-              <Button 
+              <Button
                 onClick={handleNext}
                 disabled={!answers[currentQ.id]}
               >

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, CheckCircle, AlertCircle, Lightbulb, Trophy, ChevronRight } from 'lucide-react';
@@ -9,6 +10,7 @@ import ReactMarkdown from 'react-markdown';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function FinLessonPage() {
+  const { t } = useTranslation();
   const { lessonId } = useParams();
   const { user, token } = useAuth();
   const navigate = useNavigate();

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DollarSign, RefreshCw, Search } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -70,6 +71,7 @@ function MainCurrencyCard({ code, data }) {
 }
 
 export default function CurrenciesPage() {
+  const { t } = useTranslation();
   const [currencies, setCurrencies] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

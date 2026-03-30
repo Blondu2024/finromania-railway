@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Filter, TrendingUp, TrendingDown, BarChart3, Zap, Search,
@@ -69,7 +70,7 @@ const ScreenerCard = ({ screener, onClick, isActive }) => {
 // Result Stock Row
 const StockRow = ({ stock, index }) => {
   const isPositive = (stock.change_percent || 0) >= 0;
-  
+
   return (
     <motion.tr
       initial={{ opacity: 0, x: -20 }}
@@ -112,7 +113,7 @@ const StockRow = ({ stock, index }) => {
 };
 
 // Custom Filter Panel
-const CustomFilterPanel = ({ onApply }) => {
+const CustomFilterPanel = ({ onApply, t }) => {
   const [priceRange, setPriceRange] = useState([0, 200]);
   const [changeRange, setChangeRange] = useState([-10, 10]);
   const [minVolume, setMinVolume] = useState('');
@@ -135,14 +136,14 @@ const CustomFilterPanel = ({ onApply }) => {
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Sliders className="w-5 h-5" />
-          Filtre Personalizate
+          {t('screener.customFilters')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Price Range */}
         <div>
           <label className="text-sm font-medium mb-2 block">
-            Preț: {priceRange[0]} - {priceRange[1]} RON
+            {t('screener.priceRange')}: {priceRange[0]} - {priceRange[1]} RON
           </label>
           <Slider
             value={priceRange}
@@ -157,7 +158,7 @@ const CustomFilterPanel = ({ onApply }) => {
         {/* Change Range */}
         <div>
           <label className="text-sm font-medium mb-2 block">
-            Variație: {changeRange[0]}% - {changeRange[1]}%
+            {t('screener.changeRange')}: {changeRange[0]}% - {changeRange[1]}%
           </label>
           <Slider
             value={changeRange}
@@ -171,7 +172,7 @@ const CustomFilterPanel = ({ onApply }) => {
 
         {/* Volume */}
         <div>
-          <label className="text-sm font-medium mb-2 block">Volum Minim</label>
+          <label className="text-sm font-medium mb-2 block">{t('screener.minVolume')}</label>
           <Input
             type="number"
             value={minVolume}
@@ -182,7 +183,7 @@ const CustomFilterPanel = ({ onApply }) => {
 
         <Button onClick={handleApply} className="w-full">
           <Filter className="w-4 h-4 mr-2" />
-          Aplică Filtre
+          {t('screener.applyFilters')}
         </Button>
       </CardContent>
     </Card>
@@ -190,7 +191,7 @@ const CustomFilterPanel = ({ onApply }) => {
 };
 
 // PRO Filter Panel - Fundamental Indicators
-const ProFilterPanel = ({ onApply, isPro, onUpgrade }) => {
+const ProFilterPanel = ({ onApply, isPro, onUpgrade, t }) => {
   const [peRange, setPeRange] = useState([0, 30]);
   const [roeRange, setRoeRange] = useState([0, 30]);
   const [minDividend, setMinDividend] = useState('');
@@ -216,7 +217,7 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade }) => {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Crown className="w-5 h-5 text-amber-500" />
-            Screener PRO
+            {t('screener.proTitle')}
             <Badge className="bg-amber-500">PRO</Badge>
           </CardTitle>
         </CardHeader>
@@ -260,7 +261,7 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade }) => {
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
           <Crown className="w-5 h-5 text-amber-500" />
-          Screener PRO
+          {t('screener.proTitle')}
           <Badge className="bg-amber-500">ACTIV</Badge>
         </CardTitle>
       </CardHeader>
@@ -320,7 +321,7 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade }) => {
 
         <Button onClick={handleApply} className="w-full bg-gradient-to-r from-amber-500 to-orange-500">
           <Filter className="w-4 h-4 mr-2" />
-          Aplică Filtre PRO
+          {t('screener.applyFilters')} PRO
         </Button>
       </CardContent>
     </Card>
@@ -330,7 +331,7 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade }) => {
 // PRO Stock Row with fundamental data
 const ProStockRow = ({ stock, index }) => {
   const isPositive = (stock.change_percent || 0) >= 0;
-  
+
   return (
     <motion.tr
       initial={{ opacity: 0, x: -20 }}
@@ -377,6 +378,7 @@ const ProStockRow = ({ stock, index }) => {
 };
 
 export default function StockScreenerPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [screeners, setScreeners] = useState([]);
   const [activeScreener, setActiveScreener] = useState(null);
@@ -386,7 +388,7 @@ export default function StockScreenerPage() {
   const [resultsLoading, setResultsLoading] = useState(false);
   const [stats, setStats] = useState(null);
   const [showProResults, setShowProResults] = useState(false);
-  
+
   const isPro = user?.subscription_level === 'pro' || user?.subscription_level === 'premium';
 
   // Fetch predefined screeners
@@ -421,7 +423,7 @@ export default function StockScreenerPage() {
     setResultsLoading(true);
     setActiveScreener(screenerId);
     setShowProResults(false);
-    
+
     try {
       const res = await fetch(`${API_URL}/api/screener/run/${screenerId}`);
       if (res.ok) {
@@ -440,7 +442,7 @@ export default function StockScreenerPage() {
     setResultsLoading(true);
     setActiveScreener('custom');
     setShowProResults(false);
-    
+
     try {
       const res = await fetch(`${API_URL}/api/screener/custom`, {
         method: 'POST',
@@ -461,15 +463,15 @@ export default function StockScreenerPage() {
   // Run PRO screener
   const runProScreener = async (filters) => {
     if (!isPro) return;
-    
+
     setResultsLoading(true);
     setActiveScreener('pro');
     setShowProResults(true);
-    
+
     try {
       const res = await fetch(`${API_URL}/api/screener/pro/filter`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -516,9 +518,9 @@ export default function StockScreenerPage() {
           className="text-center py-4"
         >
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent mb-2">
-            🔍 Stock Screener BVB
+            {t('screener.title')}
           </h1>
-          <p className="text-muted-foreground">Găsește oportunitățile de investiție potrivite pentru tine</p>
+          <p className="text-muted-foreground">{t('screener.subtitle')}</p>
         </motion.div>
 
         {/* Market Stats */}
@@ -526,19 +528,19 @@ export default function StockScreenerPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
               <CardContent className="p-4">
-                <p className="text-sm text-blue-100">Total Acțiuni</p>
+                <p className="text-sm text-blue-100">{t('stocks.totalStocks')}</p>
                 <p className="text-2xl font-bold">{stats.total_stocks}</p>
               </CardContent>
             </Card>
             <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
               <CardContent className="p-4">
-                <p className="text-sm text-green-100">Creșteri</p>
+                <p className="text-sm text-green-100">{t('stocks.gainers')}</p>
                 <p className="text-2xl font-bold">{stats.gainers}</p>
               </CardContent>
             </Card>
             <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">
               <CardContent className="p-4">
-                <p className="text-sm text-red-100">Scăderi</p>
+                <p className="text-sm text-red-100">{t('stocks.losers')}</p>
                 <p className="text-2xl font-bold">{stats.losers}</p>
               </CardContent>
             </Card>
@@ -546,9 +548,9 @@ export default function StockScreenerPage() {
               stats.market_sentiment === 'bullish' ? 'from-emerald-500 to-emerald-600' : 'from-orange-500 to-orange-600'
             } text-white`}>
               <CardContent className="p-4">
-                <p className="text-sm opacity-90">Sentiment</p>
+                <p className="text-sm opacity-90">{t('stocks.sentiment')}</p>
                 <p className="text-2xl font-bold capitalize">
-                  {stats.market_sentiment === 'bullish' ? '🐂 Bullish' : '🐻 Bearish'}
+                  {stats.market_sentiment === 'bullish' ? `🐂 ${t('stocks.bullish')}` : `🐻 ${t('stocks.bearish')}`}
                 </p>
               </CardContent>
             </Card>
@@ -563,7 +565,7 @@ export default function StockScreenerPage() {
             <div>
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-yellow-500" />
-                Screener-e Rapide
+                {t('screener.quickScreeners')}
               </h2>
               <div className="grid md:grid-cols-2 gap-3">
                 {screeners.map(screener => (
@@ -592,10 +594,10 @@ export default function StockScreenerPage() {
                           {showProResults ? (
                             <span className="flex items-center gap-2">
                               <Crown className="w-5 h-5 text-amber-500" />
-                              Rezultate PRO ({proResults.length} acțiuni)
+                              {t('screener.results')} PRO ({proResults.length} {t('screener.stocks')})
                             </span>
                           ) : (
-                            `📊 Rezultate (${results.length} acțiuni)`
+                            `📊 ${t('screener.results')} (${results.length} ${t('screener.stocks')})`
                           )}
                         </span>
                         {activeScreener && activeScreener !== 'custom' && activeScreener !== 'pro' && (
@@ -640,7 +642,7 @@ export default function StockScreenerPage() {
                             <thead>
                               <tr className="border-b text-sm text-muted-foreground">
                                 <th className="p-3 text-left">Simbol</th>
-                                <th className="p-3 text-left">Companie</th>
+                                <th className="p-3 text-left">{t('stocks.company')}</th>
                                 <th className="p-3 text-left">Sector</th>
                                 <th className="p-3 text-right">Preț</th>
                                 <th className="p-3 text-right">Variație</th>
@@ -664,8 +666,8 @@ export default function StockScreenerPage() {
 
           {/* Right Sidebar - Custom Filters */}
           <div className="space-y-6">
-            <CustomFilterPanel onApply={runCustomScreener} />
-            <ProFilterPanel onApply={runProScreener} isPro={isPro} onUpgrade={handleUpgrade} />
+            <CustomFilterPanel onApply={runCustomScreener} t={t} />
+            <ProFilterPanel onApply={runProScreener} isPro={isPro} onUpgrade={handleUpgrade} t={t} />
           </div>
         </div>
       </div>

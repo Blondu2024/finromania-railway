@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { BookOpen, CheckCircle, Lock, Play, FileText, Award, Loader2, ShoppingCart, Sparkles, Crown, Star } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
@@ -10,6 +11,7 @@ import { Skeleton } from '../components/ui/skeleton';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function EducationPage() {
+  const { t } = useTranslation();
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -59,7 +61,7 @@ export default function EducationPage() {
       for (let i = 0; i < 5; i++) {
         const res = await fetch(`${API_URL}/api/education/checkout/status/${sessionId}`, {
         });
-        
+
         if (res.ok) {
           const data = await res.json();
           if (data.access_granted) {
@@ -82,18 +84,18 @@ export default function EducationPage() {
       login();
       return;
     }
-    
+
     setPurchasing(packageId);
     try {
       const res = await fetch(`${API_URL}/api/education/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           origin_url: window.location.origin,
-          package_id: packageId 
+          package_id: packageId
         })
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         window.location.href = data.url;
@@ -145,9 +147,9 @@ export default function EducationPage() {
             <BookOpen className="w-10 h-10 text-blue-600" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold mb-4">Academie Investiții</h1>
+        <h1 className="text-4xl font-bold mb-4">{t('education.academyTitle')}</h1>
         <p className="text-lg text-muted-foreground">
-          Învață bazele investițiilor de la zero. Cursuri complete pentru începători.
+          {t('education.academySubtitle')}
         </p>
       </div>
 
@@ -192,8 +194,8 @@ export default function EducationPage() {
                     <span className="text-xl ml-1">RON</span>
                     <p className="text-blue-100 text-sm">Plată unică</p>
                   </div>
-                  <Button 
-                    variant="secondary" 
+                  <Button
+                    variant="secondary"
                     onClick={() => handlePurchase('starter')}
                     disabled={purchasing === 'starter'}
                   >
@@ -237,7 +239,7 @@ export default function EducationPage() {
                     <span className="text-xl ml-1">RON</span>
                     <p className="text-blue-200 text-sm">Acces complet permanent</p>
                   </div>
-                  <Button 
+                  <Button
                     className="bg-yellow-400 text-yellow-900 hover:bg-yellow-300"
                     onClick={() => handlePurchase('premium')}
                     disabled={purchasing === 'premium'}
@@ -260,7 +262,7 @@ export default function EducationPage() {
 
       {!user && (
         <p className="text-center text-sm text-muted-foreground">
-          Trebuie să fii autentificat pentru a cumpăra. <button onClick={login} className="text-blue-600 underline">Conectează-te</button>
+          {t('education.loginToSave')} <button onClick={login} className="text-blue-600 underline">{t('education.freeLogin')}</button>
         </p>
       )}
 
@@ -268,22 +270,22 @@ export default function EducationPage() {
       <div>
         <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
           <Play className="w-6 h-6 text-blue-600" />
-          Conținut Curs ({lessons.length} lecții)
+          {t('education.lessonsComplete', { count: lessons.length })}
         </h2>
-        
+
         <div className="grid gap-4">
           {lessons.map((lesson, idx) => (
-            <Card 
-              key={lesson.id} 
+            <Card
+              key={lesson.id}
               className={`transition-all ${lesson.is_locked ? 'opacity-75' : 'hover:shadow-md cursor-pointer'}`}
               onClick={() => !lesson.is_locked && navigate(`/education/lesson/${lesson.id}`)}
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
-                    lesson.is_locked 
-                      ? 'bg-gray-100 text-gray-400' 
-                      : lesson.tier === 'premium' 
+                    lesson.is_locked
+                      ? 'bg-gray-100 text-gray-400'
+                      : lesson.tier === 'premium'
                         ? 'bg-blue-100 text-blue-600'
                         : 'bg-blue-100 text-blue-600'
                   }`}>
@@ -324,15 +326,15 @@ export default function EducationPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-green-600" />
-            Glosar de Termeni
+            {t('education.glossaryTitle')}
           </CardTitle>
           <CardDescription>
-            100+ termeni financiari explicați simplu
+            {t('education.glossaryDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button variant="outline" onClick={() => navigate('/education/glossary')}>
-            Vezi Glosarul
+            {t('education.seeGlossary')}
           </Button>
         </CardContent>
       </Card>
@@ -342,27 +344,27 @@ export default function EducationPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-yellow-500" />
-            De ce să înveți cu noi?
+            {t('education.whyLearn')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-6">
             <div>
-              <h4 className="font-semibold mb-2">🎯 Conținut Practic</h4>
+              <h4 className="font-semibold mb-2">{t('education.practicalContent')}</h4>
               <p className="text-sm text-muted-foreground">
-                Exemple reale și strategii aplicabile imediat.
+                {t('education.practicalDesc')}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">🇷🇴 Adaptat României</h4>
+              <h4 className="font-semibold mb-2">{t('education.adaptedRo')}</h4>
               <p className="text-sm text-muted-foreground">
-                Conținut specific pentru investitorii români, cu exemple de pe BVB.
+                {t('education.adaptedDesc')}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">🚀 Fără Cunoștințe Prealabile</h4>
+              <h4 className="font-semibold mb-2">{t('education.noPrereqs')}</h4>
               <p className="text-sm text-muted-foreground">
-                Poți începe de la zero. Explicăm totul pas cu pas.
+                {t('education.noPrereqsDesc')}
               </p>
             </div>
           </div>

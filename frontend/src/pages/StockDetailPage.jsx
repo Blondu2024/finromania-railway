@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, TrendingUp, TrendingDown, RefreshCw, Building2, Calendar, DollarSign, BarChart3, Activity } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -16,6 +17,7 @@ import SEO from '../components/SEO';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function StockDetailPage() {
+  const { t } = useTranslation();
   const { type, symbol } = useParams();
   const { user, token } = useAuth();
   const [data, setData] = useState(null);
@@ -25,10 +27,10 @@ export default function StockDetailPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [showReminder, setShowReminder] = useState(false);
   const [companionOpen, setCompanionOpen] = useState(false);
-  
+
   // Check PRO status
   const [isPro, setIsPro] = useState(false);
-  
+
   useEffect(() => {
     if (user && token) {
       fetch(`${API_URL}/api/subscriptions/status`, {
@@ -74,7 +76,7 @@ export default function StockDetailPage() {
   const fetchDetails = useCallback(async (period = '1m', days = null) => {
     try {
       setRefreshing(true);
-      
+
       // Pentru global, convertim perioada în formatul yfinance (1m -> 1mo, etc.)
       let apiPeriod = period;
       if (type === 'global') {
@@ -89,14 +91,14 @@ export default function StockDetailPage() {
         };
         apiPeriod = periodMapping[period] || '1mo';
       }
-      
-      const endpoint = type === 'global' 
+
+      const endpoint = type === 'global'
         ? `${API_URL}/api/stocks/global/${encodeURIComponent(symbol)}/details?period=${apiPeriod}`
         : `${API_URL}/api/stocks/bvb/${symbol}/details?period=${period}${days ? `&days=${days}` : ''}`;
-      
+
       const res = await fetch(endpoint);
       if (!res.ok) throw new Error('Failed to fetch');
-      
+
       const result = await res.json();
       setData(result);
       setCurrentPeriod(period);
@@ -175,17 +177,17 @@ export default function StockDetailPage() {
 
   return (
     <div className="space-y-6">
-      <SEO 
+      <SEO
         title={`${data.name} (${data.symbol}) - Preț Live ${(data.price || lastPrice)?.toFixed(2)} ${data.currency || 'RON'}`}
         description={`Preț live ${data.name} (${data.symbol}) la ${data.exchange || 'BVB'}: ${(data.price || lastPrice)?.toFixed(2)} ${data.currency || 'RON'} (${isPositive ? '+' : ''}${(data.change_percent || percentChange)?.toFixed(2)}%). Grafice profesionale, analiză tehnică, date istorice.`}
         keywords={`${data.symbol} preț, ${data.name} cotație, ${data.symbol} live, ${data.symbol} grafic, acțiune ${data.symbol}, ${data.exchange || 'BVB'} ${data.symbol}`}
         structuredData={structuredData}
       />
-      
+
       {/* Back Button */}
       <Link to="/stocks">
         <Button variant="ghost" size="sm">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la BVB
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t('stocks.backToBVB')}
         </Button>
       </Link>
 
@@ -209,7 +211,7 @@ export default function StockDetailPage() {
             </span>
           </div>
         </div>
-        
+
         <div className="text-left lg:text-right space-y-1">
           <p className="text-2xl sm:text-4xl font-bold">
             {lastPrice.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -219,7 +221,7 @@ export default function StockDetailPage() {
             {isPositive ? <TrendingUp className="w-5 h-5 mr-1" /> : <TrendingDown className="w-5 h-5 mr-1" />}
             {isPositive ? '+' : ''}{priceChange.toFixed(2)} ({isPositive ? '+' : ''}{percentChange.toFixed(2)}%)
             <span className="text-muted-foreground text-sm ml-2">
-              ({currentPeriod === '1d' ? '1 zi' : 
+              ({currentPeriod === '1d' ? '1 zi' :
                 currentPeriod === '1w' ? '1 săptămână' :
                 currentPeriod === '1m' ? '30 zile' :
                 currentPeriod === '3m' ? '3 luni' :
@@ -246,7 +248,7 @@ export default function StockDetailPage() {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <TrendingUp className="w-4 h-4 text-green-600" />
-              <span className="text-sm">Maxim Perioadă</span>
+              <span className="text-sm">{t('stocks.maxPeriod')}</span>
             </div>
             <p className="text-2xl font-bold text-green-600">
               {highPrice.toLocaleString('ro-RO', { minimumFractionDigits: 2 })} {data.currency}
@@ -257,7 +259,7 @@ export default function StockDetailPage() {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <TrendingDown className="w-4 h-4 text-red-600" />
-              <span className="text-sm">Minim Perioadă</span>
+              <span className="text-sm">{t('stocks.minPeriod')}</span>
             </div>
             <p className="text-2xl font-bold text-red-600">
               {lowPrice.toLocaleString('ro-RO', { minimumFractionDigits: 2 })} {data.currency}
@@ -268,7 +270,7 @@ export default function StockDetailPage() {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <BarChart3 className="w-4 h-4 text-blue-600" />
-              <span className="text-sm">Volum Mediu</span>
+              <span className="text-sm">{t('stocks.avgVolume')}</span>
             </div>
             <p className="text-2xl font-bold">
               {avgVolume.toLocaleString('ro-RO')}
@@ -279,7 +281,7 @@ export default function StockDetailPage() {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Activity className="w-4 h-4 text-blue-600" />
-              <span className="text-sm">Volum Total</span>
+              <span className="text-sm">{t('stocks.totalVolume')}</span>
             </div>
             <p className="text-2xl font-bold">
               {totalVolume.toLocaleString('ro-RO')}
@@ -311,25 +313,25 @@ export default function StockDetailPage() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              Informații Preț
+              {t('stocks.priceInfo')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <p className="text-sm text-muted-foreground">Deschidere</p>
+                <p className="text-sm text-muted-foreground">{t('stocks.open')}</p>
                 <p className="text-xl font-bold">{history[history.length - 1]?.open?.toFixed(2)} {data.currency}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Închidere</p>
+                <p className="text-sm text-muted-foreground">{t('stocks.closePrice')}</p>
                 <p className="text-xl font-bold">{history[history.length - 1]?.close?.toFixed(2)} {data.currency}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Max Zi</p>
+                <p className="text-sm text-muted-foreground">{t('stocks.dayHigh')}</p>
                 <p className="text-xl font-bold text-green-600">{history[history.length - 1]?.high?.toFixed(2)} {data.currency}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Min Zi</p>
+                <p className="text-sm text-muted-foreground">{t('stocks.dayLow')}</p>
                 <p className="text-xl font-bold text-red-600">{history[history.length - 1]?.low?.toFixed(2)} {data.currency}</p>
               </div>
             </div>
@@ -341,7 +343,7 @@ export default function StockDetailPage() {
       {data.description && (
         <Card>
           <CardHeader>
-            <CardTitle>Despre {data.name}</CardTitle>
+            <CardTitle>{t('stocks.about')} {data.name}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">{data.description}</p>
@@ -353,13 +355,13 @@ export default function StockDetailPage() {
       {data.related_news && data.related_news.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Știri Legate de {data.symbol}</CardTitle>
+            <CardTitle>{t('stocks.relatedNews')} {data.symbol}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {data.related_news.map((article, idx) => (
-                <Link 
-                  key={article.id || idx} 
+                <Link
+                  key={article.id || idx}
                   to={`/news/${article.id}`}
                   className="block p-3 rounded-lg hover:bg-muted/50 transition-colors border"
                 >
@@ -379,8 +381,8 @@ export default function StockDetailPage() {
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
-              <h3 className="text-lg font-bold mb-1">💰 Vrei Să Înveți Analiza Tehnică?</h3>
-              <p className="text-green-100 text-sm">Află cum să citești graficele și indicatorii în cursul nostru gratuit de trading</p>
+              <h3 className="text-lg font-bold mb-1">{t('stocks.learnTA')}</h3>
+              <p className="text-green-100 text-sm">{t('stocks.learnTADesc')}</p>
             </div>
             <div className="flex gap-3">
               <Link to="/trading-school">
@@ -399,14 +401,14 @@ export default function StockDetailPage() {
       </Card>
 
       {/* Trading Reminder Modal */}
-      <TradingReminder 
+      <TradingReminder
         isOpen={showReminder}
         onClose={handleCloseReminder}
         onOpenCompanion={handleOpenCompanion}
       />
 
       {/* Trading Companion */}
-      <TradingCompanion 
+      <TradingCompanion
         stockSymbol={symbol}
         stockName={data?.name || symbol}
         currentPrice={data?.price}

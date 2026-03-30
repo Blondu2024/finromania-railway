@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -36,6 +37,7 @@ const CAEN_CODES = [
 ];
 
 export default function FiscalSimulatorPage() {
+  const { t } = useTranslation();
   const [entities, setEntities] = useState([
     { tip: 'srl_micro', nume: '', cod_caen: 'none', venit_anual_estimat: 0, procent_detinere: 100, are_angajati: false, platitor_tva: false, norma_venit_anuala: 0, an_infiintare: null, marja_profit: 20 }
   ]);
@@ -85,9 +87,9 @@ export default function FiscalSimulatorPage() {
           alte_asocieri_peste_25: alteAsocieri
         })
       });
-      
+
       if (!response.ok) throw new Error('Eroare la simulare');
-      
+
       const data = await response.json();
       setResult(data);
     } catch (err) {
@@ -117,22 +119,21 @@ export default function FiscalSimulatorPage() {
     <div className="container mx-auto px-4 py-8 max-w-5xl">
       {/* Header */}
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">Simulator Fiscal Antreprenor</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('simulator.title')}</h1>
         <p className="text-muted-foreground">
-          Înțelege cum funcționează impozitarea pentru multiple entități
+          {t('simulator.subtitle')}
         </p>
         <Badge variant="outline" className="mt-2 text-orange-600 border-orange-300">
-          EDUCATIV - Nu reprezintă consiliere fiscală
+          {t('simulator.educational')}
         </Badge>
       </div>
 
       {/* Disclaimer */}
       <Alert className="mb-6 bg-amber-50 border-amber-200">
         <AlertTriangle className="h-4 w-4 text-amber-600" />
-        <AlertTitle className="text-amber-800">Scop Educativ - Reguli 2026</AlertTitle>
+        <AlertTitle className="text-amber-800">{t('simulator.rules2026')}</AlertTitle>
         <AlertDescription className="text-amber-700">
-          Acest simulator folosește regulile fiscale pentru <strong>2026</strong> (OUG 89/2025, OUG 8/2026). 
-          Pentru decizii fiscale reale, consultă obligatoriu un expert contabil autorizat!
+          {t('simulator.rules2026Desc')}
         </AlertDescription>
       </Alert>
 
@@ -141,21 +142,21 @@ export default function FiscalSimulatorPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="w-5 h-5" />
-            Entitățile Tale
+            {t('simulator.yourEntities')}
           </CardTitle>
           <CardDescription>
-            Adaugă toate formele juridice pe care le deții (SRL, PFA, PFI, etc.)
+            {t('simulator.addEntitiesDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {entities.map((entity, index) => (
             <div key={index} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-900 space-y-4">
               <div className="flex justify-between items-center">
-                <span className="font-medium">Entitate #{index + 1}</span>
+                <span className="font-medium">{t('simulator.entity')} #{index + 1}</span>
                 {entities.length > 1 && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => removeEntity(index)}
                     className="text-red-500 hover:text-red-700"
                   >
@@ -166,9 +167,9 @@ export default function FiscalSimulatorPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Tip Entitate</Label>
-                  <Select 
-                    value={entity.tip} 
+                  <Label>{t('simulator.entityType')}</Label>
+                  <Select
+                    value={entity.tip}
                     onValueChange={(v) => updateEntity(index, 'tip', v)}
                   >
                     <SelectTrigger>
@@ -183,8 +184,8 @@ export default function FiscalSimulatorPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Nume (opțional)</Label>
-                  <Input 
+                  <Label>{t('simulator.nameOptional')}</Label>
+                  <Input
                     placeholder="ex: SRL-ul meu IT"
                     value={entity.nume}
                     onChange={(e) => updateEntity(index, 'nume', e.target.value)}
@@ -192,9 +193,9 @@ export default function FiscalSimulatorPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Cod CAEN Principal</Label>
-                  <Select 
-                    value={entity.cod_caen} 
+                  <Label>{t('simulator.caenCode')}</Label>
+                  <Select
+                    value={entity.cod_caen}
                     onValueChange={(v) => updateEntity(index, 'cod_caen', v)}
                   >
                     <SelectTrigger>
@@ -209,8 +210,8 @@ export default function FiscalSimulatorPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Venit Anual Estimat (RON)</Label>
-                  <Input 
+                  <Label>{t('simulator.annualRevenue')}</Label>
+                  <Input
                     type="number"
                     min="0"
                     value={entity.venit_anual_estimat}
@@ -219,8 +220,8 @@ export default function FiscalSimulatorPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>% Deținere</Label>
-                  <Input 
+                  <Label>{t('simulator.ownershipPercent')}</Label>
+                  <Input
                     type="number"
                     min="0"
                     max="100"
@@ -233,7 +234,7 @@ export default function FiscalSimulatorPage() {
                 {entity.tip === 'pfa_norma' && (
                   <div className="space-y-2">
                     <Label>Norma de Venit ANAF (RON/an)</Label>
-                    <Input 
+                    <Input
                       type="number"
                       min="0"
                       placeholder="Norma stabilită de ANAF"
@@ -261,7 +262,7 @@ export default function FiscalSimulatorPage() {
 
                 {entity.tip === 'srl_profit' && (
                   <div className="space-y-2">
-                    <Label>Marjă Profit Estimată (%)</Label>
+                    <Label>{t('simulator.profitMargin')}</Label>
                     <Input
                       type="number"
                       min="1"
@@ -270,25 +271,25 @@ export default function FiscalSimulatorPage() {
                       onChange={(e) => updateEntity(index, 'marja_profit', parseFloat(e.target.value) || 20)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Profit / Venit × 100. Ex: IT/Consulting ~40-50%, Retail ~5-10%, Servicii ~20-30%
+                      {t('simulator.profitMarginHint')}
                     </p>
                   </div>
                 )}
 
                 <div className="flex items-center justify-between pt-6">
                   <div className="flex items-center space-x-2">
-                    <Switch 
+                    <Switch
                       checked={entity.are_angajati}
                       onCheckedChange={(v) => updateEntity(index, 'are_angajati', v)}
                     />
-                    <Label>Are angajați</Label>
+                    <Label>{t('simulator.hasEmployees')}</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Switch 
+                    <Switch
                       checked={entity.platitor_tva}
                       onCheckedChange={(v) => updateEntity(index, 'platitor_tva', v)}
                     />
-                    <Label>Plătitor TVA</Label>
+                    <Label>{t('simulator.vatPayer')}</Label>
                   </div>
                 </div>
               </div>
@@ -297,7 +298,7 @@ export default function FiscalSimulatorPage() {
 
           <Button variant="outline" onClick={addEntity} className="w-full">
             <Plus className="w-4 h-4 mr-2" />
-            Adaugă Entitate
+            {t('simulator.addEntity')}
           </Button>
         </CardContent>
       </Card>
@@ -307,13 +308,13 @@ export default function FiscalSimulatorPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
             <AlertTriangle className="w-5 h-5" />
-            Întrebare Importantă
+            {t('simulator.importantQuestion')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <Label className="text-amber-800 dark:text-amber-300">Ești asociat/administrator în ALTE firme cu peste 25% deținere?</Label>
+              <Label className="text-amber-800 dark:text-amber-300">{t('simulator.otherAssociations')}</Label>
               <p className="text-sm text-amber-700 dark:text-amber-400">
                 (Firme care NU sunt incluse în lista de mai sus)
               </p>
@@ -329,12 +330,12 @@ export default function FiscalSimulatorPage() {
       {/* Additional Options */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Alte Venituri</CardTitle>
+          <CardTitle>{t('simulator.otherRevenue')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <Label>Ai salariu cu CASS plătit?</Label>
+              <Label>{t('simulator.hasSalaryWithCASS')}</Label>
               <p className="text-sm text-muted-foreground">
                 Dacă da, nu mai datorezi CASS din PFA/PFI
               </p>
@@ -345,14 +346,14 @@ export default function FiscalSimulatorPage() {
       </Card>
 
       {/* Simulate Button */}
-      <Button 
-        onClick={simulate} 
+      <Button
+        onClick={simulate}
         disabled={loading || entities.length === 0}
         className="w-full mb-8"
         size="lg"
       >
         <Calculator className="w-5 h-5 mr-2" />
-        {loading ? 'Se calculează...' : 'Simulează Situația Fiscală'}
+        {loading ? t('fiscal.calculating') : t('simulator.simulate')}
       </Button>
 
       {/* Error */}
@@ -370,24 +371,24 @@ export default function FiscalSimulatorPage() {
           {/* Summary */}
           <Card>
             <CardHeader>
-              <CardTitle>Rezultat Simulare</CardTitle>
+              <CardTitle>{t('simulator.result')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg text-center">
-                  <p className="text-sm text-muted-foreground">Total Venituri</p>
+                  <p className="text-sm text-muted-foreground">{t('simulator.totalRevenue')}</p>
                   <p className="text-2xl font-bold text-blue-600">
                     {result.total_venituri.toLocaleString('ro-RO')} RON
                   </p>
                 </div>
                 <div className="p-4 bg-red-50 dark:bg-red-950 rounded-lg text-center">
-                  <p className="text-sm text-muted-foreground">Impozite Estimate</p>
+                  <p className="text-sm text-muted-foreground">{t('simulator.estimatedTaxes')}</p>
                   <p className="text-2xl font-bold text-red-600">
                     {result.total_impozite_estimate.toLocaleString('ro-RO')} RON
                   </p>
                 </div>
                 <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg text-center">
-                  <p className="text-sm text-muted-foreground">Rata Efectivă</p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.effectiveRate')}</p>
                   <p className="text-2xl font-bold text-green-600">
                     {result.rata_efectiva_globala.toFixed(1)}%
                   </p>
@@ -402,7 +403,7 @@ export default function FiscalSimulatorPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-amber-500" />
-                  Avertismente Importante
+                  {t('simulator.warnings')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -425,7 +426,7 @@ export default function FiscalSimulatorPage() {
           {/* Entity Details */}
           <Card>
             <CardHeader>
-              <CardTitle>Detalii pe Entități</CardTitle>
+              <CardTitle>{t('simulator.entityDetails')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {result.entitati.map((e, i) => (
@@ -442,11 +443,11 @@ export default function FiscalSimulatorPage() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <p className="text-sm mb-2">
                     <span className="font-medium">TVA:</span> {e.regim_tva}
                   </p>
-                  
+
                   {e.scutiri_active && e.scutiri_active.length > 0 && (
                     <div className="mb-2">
                       {e.scutiri_active.map((s, j) => (
@@ -457,10 +458,10 @@ export default function FiscalSimulatorPage() {
                     </div>
                   )}
 
-                  {/* Pași de calcul - NOU */}
+                  {/* Pași de calcul */}
                   {e.pasi_calcul && e.pasi_calcul.length > 0 && (
                     <div className="mt-3 p-3 bg-gray-50 dark:bg-zinc-900 rounded-lg">
-                      <p className="text-xs font-medium text-muted-foreground mb-2">Cum s-a calculat:</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-2">{t('simulator.howCalculated')}</p>
                       <div className="space-y-1">
                         {e.pasi_calcul.map((pas, j) => (
                           <div key={j} className="text-xs">
@@ -473,10 +474,10 @@ export default function FiscalSimulatorPage() {
                     </div>
                   )}
 
-                  {/* Comparații - NOU */}
+                  {/* Comparații */}
                   {e.comparatii && e.comparatii.length > 0 && (
                     <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                      <p className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-2">Comparație cu alternative:</p>
+                      <p className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-2">{t('simulator.alternatives')}</p>
                       {e.comparatii.map((c, j) => (
                         <div key={j} className="text-xs flex justify-between items-center py-1 border-b border-blue-100 last:border-0">
                           <span>{c.alternativa}</span>
@@ -487,7 +488,7 @@ export default function FiscalSimulatorPage() {
                       ))}
                     </div>
                   )}
-                  
+
                   {e.observatii && e.observatii.length > 0 && (
                     <ul className="text-sm text-muted-foreground list-disc list-inside mt-3">
                       {e.observatii.map((o, j) => (
@@ -500,29 +501,29 @@ export default function FiscalSimulatorPage() {
             </CardContent>
           </Card>
 
-          {/* Sumar Comparativ Global - NOU */}
+          {/* Sumar Comparativ Global */}
           {result.sumar_comparativ && (
             <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
               <CardHeader>
-                <CardTitle className="text-blue-700 dark:text-blue-400">Sumar Comparativ</CardTitle>
-                <CardDescription>Dacă toate veniturile ar fi pe un singur regim</CardDescription>
+                <CardTitle className="text-blue-700 dark:text-blue-400">{t('simulator.comparativeSummary')}</CardTitle>
+                <CardDescription>{t('simulator.allOnOneRegime')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
                   <div className="p-2 bg-white dark:bg-gray-800 rounded">
-                    <p className="text-xs text-muted-foreground">Ca Micro (1%)</p>
+                    <p className="text-xs text-muted-foreground">{t('simulator.asMicro')}</p>
                     <p className="font-bold">{result.sumar_comparativ.total_ca_micro?.toLocaleString('ro-RO')} RON</p>
                   </div>
                   <div className="p-2 bg-white dark:bg-gray-800 rounded">
-                    <p className="text-xs text-muted-foreground">Ca Profit (16%)</p>
+                    <p className="text-xs text-muted-foreground">{t('simulator.asProfit')}</p>
                     <p className="font-bold">{result.sumar_comparativ.total_ca_profit?.toLocaleString('ro-RO')} RON</p>
                   </div>
                   <div className="p-2 bg-white dark:bg-gray-800 rounded">
-                    <p className="text-xs text-muted-foreground">Ca PFA (10%)</p>
+                    <p className="text-xs text-muted-foreground">{t('simulator.asPFA')}</p>
                     <p className="font-bold">{result.sumar_comparativ.total_ca_pfa?.toLocaleString('ro-RO')} RON</p>
                   </div>
                   <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded">
-                    <p className="text-xs text-green-700 dark:text-green-400">Economie vs Profit</p>
+                    <p className="text-xs text-green-700 dark:text-green-400">{t('simulator.savingsVsProfit')}</p>
                     <p className="font-bold text-green-600">{result.sumar_comparativ.economie_vs_profit?.toLocaleString('ro-RO')} RON</p>
                   </div>
                 </div>

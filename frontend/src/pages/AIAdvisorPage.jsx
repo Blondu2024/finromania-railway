@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Bot, Send, Lightbulb, TrendingUp, MessageCircle, Loader2, Sparkles } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
@@ -11,6 +12,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function AIAdvisorPage() {
   const { user, login } = useAuth();
+  const { t } = useTranslation();
   const [tipOfDay, setTipOfDay] = useState(null);
   const [portfolioAdvice, setPortfolioAdvice] = useState(null);
   const [question, setQuestion] = useState('');
@@ -55,14 +57,14 @@ export default function AIAdvisorPage() {
 
     setLoading(prev => ({ ...prev, ask: true }));
     setAnswer(null);
-    
+
     try {
       const res = await fetch(`${API_URL}/api/advisor/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question })
       });
-      
+
       if (res.ok) {
         setAnswer(await res.json());
       }
@@ -82,9 +84,9 @@ export default function AIAdvisorPage() {
             <Bot className="w-10 h-10 text-blue-600" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold mb-4">Consilier AI</h1>
+        <h1 className="text-4xl font-bold mb-4">{t('ai.title')}</h1>
         <p className="text-lg text-muted-foreground">
-          Primește sfaturi și educație financiară personalizată
+          {t('ai.subtitle')}
         </p>
       </div>
 
@@ -98,7 +100,7 @@ export default function AIAdvisorPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-semibold">Sfatul Zilei</h3>
+                  <h3 className="font-semibold">{t('ai.tipOfDay')}</h3>
                   <Badge variant="outline">{tipOfDay.category}</Badge>
                 </div>
                 <p className="text-muted-foreground">{tipOfDay.tip}</p>
@@ -114,16 +116,16 @@ export default function AIAdvisorPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-green-600" />
-              Sfaturi pentru Portofoliu
+              {t('ai.portfolioAdvice')}
             </CardTitle>
             <CardDescription>
-              Recomandări bazate pe profilul tău de risc
+              {t('ai.portfolioAdviceDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!user ? (
               <div className="text-center py-6">
-                <p className="text-muted-foreground mb-4">Conectează-te pentru sfaturi personalizate</p>
+                <p className="text-muted-foreground mb-4">{t('ai.loginForAdvice')}</p>
                 <Button onClick={login}>Conectare</Button>
               </div>
             ) : loading.advice ? (
@@ -153,7 +155,7 @@ export default function AIAdvisorPage() {
                   <p className="whitespace-pre-wrap">{portfolioAdvice?.advice}</p>
                 </div>
                 <Button variant="outline" className="w-full" onClick={fetchPortfolioAdvice}>
-                  <Sparkles className="w-4 h-4 mr-2" /> Regenerează Sfatul
+                  <Sparkles className="w-4 h-4 mr-2" /> {t('ai.regenerate')}
                 </Button>
               </div>
             )}
@@ -165,10 +167,10 @@ export default function AIAdvisorPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-blue-600" />
-              Întreabă Consilierul
+              {t('ai.askAdvisor')}
             </CardTitle>
             <CardDescription>
-              Pune orice întrebare despre investiții
+              {t('ai.askAnything')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -183,7 +185,7 @@ export default function AIAdvisorPage() {
                 {loading.ask ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </Button>
             </div>
-            
+
             {answer && (
               <div className="p-4 bg-muted/50 rounded-lg">
                 <p className="font-medium mb-2">Întrebare: {answer.question}</p>
@@ -224,7 +226,7 @@ export default function AIAdvisorPage() {
             </CardContent>
           </Card>
         </Link>
-        
+
         <Link to="/trading-school">
           <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
             <CardContent className="p-6 text-center">
@@ -236,7 +238,7 @@ export default function AIAdvisorPage() {
             </CardContent>
           </Card>
         </Link>
-        
+
         <Link to="/portfolio">
           <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
             <CardContent className="p-6 text-center">
@@ -254,8 +256,7 @@ export default function AIAdvisorPage() {
       <Card className="bg-muted/30">
         <CardContent className="p-4">
           <p className="text-sm text-muted-foreground text-center">
-            \u26a0\ufe0f <strong>Disclaimer:</strong> Informațiile oferite sunt doar în scop educațional și nu constituie sfat de investiții. 
-            Consultați un specialist financiar autorizat înainte de a lua decizii de investiții.
+            \u26a0\ufe0f <strong>Disclaimer:</strong> {t('ai.disclaimer')}
           </p>
         </CardContent>
       </Card>

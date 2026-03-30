@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail, MapPin, Clock, Send, MessageSquare } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -8,6 +9,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Alert, AlertDescription } from '../components/ui/alert';
 
 export default function ContactPage() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
@@ -23,17 +25,17 @@ export default function ContactPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <Link to="/">
         <Button variant="ghost" size="sm">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t('common.back')}
         </Button>
       </Link>
 
       <div className="flex items-center gap-3">
         <MessageSquare className="w-8 h-8 text-blue-600" />
-        <h1 className="text-3xl font-bold">Contact</h1>
+        <h1 className="text-3xl font-bold">{t('contact.title')}</h1>
       </div>
-      
+
       <p className="text-muted-foreground">
-        Ai întrebări sau sugestii? Ne poți contacta folosind formularul de mai jos.
+        {t('contact.intro')}
       </p>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -43,22 +45,22 @@ export default function ContactPage() {
             <div className="flex items-start gap-3">
               <Mail className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
-                <p className="font-medium">Email</p>
+                <p className="font-medium">{t('contact.email')}</p>
                 <p className="text-sm text-muted-foreground">contact@finromania.ro</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <MapPin className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
-                <p className="font-medium">Locație</p>
+                <p className="font-medium">{t('contact.location')}</p>
                 <p className="text-sm text-muted-foreground">București, România</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Clock className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
-                <p className="font-medium">Timp de răspuns</p>
-                <p className="text-sm text-muted-foreground">1-2 zile lucrătoare</p>
+                <p className="font-medium">{t('contact.responseTime')}</p>
+                <p className="text-sm text-muted-foreground">{t('contact.responseValue')}</p>
               </div>
             </div>
           </CardContent>
@@ -67,13 +69,13 @@ export default function ContactPage() {
         {/* Contact Form */}
         <Card className="md:col-span-2">
           <CardHeader>
-            <CardTitle>Trimite-ne un mesaj</CardTitle>
+            <CardTitle>{t('contact.sendMessage')}</CardTitle>
           </CardHeader>
           <CardContent>
             {submitted && (
               <Alert className="mb-4 bg-green-100 dark:bg-green-900 border-green-500">
                 <AlertDescription>
-                  ✅ Mesajul a fost trimis cu succes! Îți vom răspunde în curând.
+                  ✅ {t('contact.success')}
                 </AlertDescription>
               </Alert>
             )}
@@ -81,7 +83,7 @@ export default function ContactPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Nume</label>
+                  <label className="text-sm font-medium mb-1 block">{t('contact.yourName')}</label>
                   <Input 
                     placeholder="Numele tău" 
                     value={formData.name}
@@ -90,7 +92,7 @@ export default function ContactPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Email</label>
+                  <label className="text-sm font-medium mb-1 block">{t('contact.email')}</label>
                   <Input 
                     type="email" 
                     placeholder="email@example.com" 
@@ -101,7 +103,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Subiect</label>
+                <label className="text-sm font-medium mb-1 block">{t('contact.subject')}</label>
                 <Input 
                   placeholder="Subiectul mesajului" 
                   value={formData.subject}
@@ -110,7 +112,7 @@ export default function ContactPage() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Mesaj</label>
+                <label className="text-sm font-medium mb-1 block">{t('contact.message')}</label>
                 <Textarea 
                   placeholder="Scrie mesajul tău aici..." 
                   rows={5}
@@ -120,7 +122,7 @@ export default function ContactPage() {
                 />
               </div>
               <Button type="submit" className="w-full md:w-auto">
-                <Send className="w-4 h-4 mr-2" /> Trimite mesajul
+                <Send className="w-4 h-4 mr-2" /> {t('contact.send')}
               </Button>
             </form>
           </CardContent>

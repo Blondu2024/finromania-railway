@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { AlertTriangle, TrendingUp, TrendingDown, DollarSign, Award, RefreshCw, Info, BookOpen, Bot } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
@@ -11,6 +12,7 @@ import TradeModal from '../components/TradeModal';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PortfolioPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [portfolio, setPortfolio] = useState(null);
   const [loading, setLoading] = useState(true);

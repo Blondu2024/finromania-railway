@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { GraduationCap, Trophy, Lock, CheckCircle, Clock, ChevronRight, Star, TrendingUp, Award } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
@@ -10,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function TradingSchoolPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [lessons, setLessons] = useState([]);
@@ -62,7 +64,7 @@ export default function TradingSchoolPage() {
   const canAccessLesson = (lessonOrder) => {
     if (!user) return lessonOrder === 1; // Only first lesson for non-logged
     if (lessonOrder === 1) return true;
-    
+
     // Check if previous lesson is completed
     const prevLesson = lessons.find(l => l.order === lessonOrder - 1);
     return prevLesson ? isLessonCompleted(prevLesson.id) : false;
@@ -82,10 +84,10 @@ export default function TradingSchoolPage() {
               <GraduationCap className="w-16 h-16" />
             </div>
             <h1 className="text-5xl sm:text-6xl font-bold">
-              Trading School
+              {t('education.tradingSchoolTitle')}
             </h1>
             <p className="text-xl sm:text-2xl text-blue-100 max-w-2xl mx-auto">
-              Învață trading de la 0 la PRO - 100% Gratuit, 100% Practic
+              {t('education.tradingSchoolSubtitle')}
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Badge className="bg-white/20 text-white border-white/40 px-4 py-2 text-sm">
@@ -112,16 +114,16 @@ export default function TradingSchoolPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-bold">Progresul Tău</h3>
-                  <p className="text-muted-foreground">Continuă să înveți!</p>
+                  <h3 className="text-xl font-bold">{t('education.yourProgress')}</h3>
+                  <p className="text-muted-foreground">{t('education.keepLearning')}</p>
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-blue-600">{completedCount}/{totalLessons}</div>
-                  <div className="text-sm text-muted-foreground">Lecții complete</div>
+                  <div className="text-sm text-muted-foreground">{t('education.lessonsComplete')}</div>
                 </div>
               </div>
               <Progress value={progressPercent} className="h-3" />
-              <p className="text-sm text-muted-foreground mt-2">{progressPercent.toFixed(0)}% complet</p>
+              <p className="text-sm text-muted-foreground mt-2">{progressPercent.toFixed(0)}% {t('education.complete')}</p>
             </CardContent>
           </Card>
         )}
@@ -165,10 +167,10 @@ export default function TradingSchoolPage() {
                           </div>
                         )}
                       </div>
-                      
+
                       <h3 className="font-bold text-lg mb-2">{lesson.title}</h3>
                       <p className="text-sm text-muted-foreground mb-4">{lesson.subtitle}</p>
-                      
+
                       <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
                         <div className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
@@ -178,13 +180,13 @@ export default function TradingSchoolPage() {
                           {lesson.difficulty}
                         </Badge>
                       </div>
-                      
-                      <Button 
-                        className="w-full" 
+
+                      <Button
+                        className="w-full"
                         variant={completed ? 'outline' : 'default'}
                         disabled={locked}
                       >
-                        {completed ? '✓ Revizuiește' : locked ? '🔒 Locked' : 'Începe Lecția →'}
+                        {completed ? t('education.reviewLesson') : locked ? t('education.locked') : t('education.startLesson')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -230,10 +232,10 @@ export default function TradingSchoolPage() {
                           </div>
                         )}
                       </div>
-                      
+
                       <h3 className="font-bold text-lg mb-2">{lesson.title}</h3>
                       <p className="text-sm text-muted-foreground mb-4">{lesson.subtitle}</p>
-                      
+
                       <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
                         <div className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
@@ -243,13 +245,13 @@ export default function TradingSchoolPage() {
                           {lesson.difficulty}
                         </Badge>
                       </div>
-                      
-                      <Button 
-                        className="w-full" 
+
+                      <Button
+                        className="w-full"
                         variant={completed ? 'outline' : 'default'}
                         disabled={locked}
                       >
-                        {completed ? '✓ Revizuiește' : locked ? '🔒 Locked' : 'Începe Lecția →'}
+                        {completed ? t('education.reviewLesson') : locked ? t('education.locked') : t('education.startLesson')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -264,11 +266,11 @@ export default function TradingSchoolPage() {
           <Card className="mt-12 bg-gradient-to-r from-blue-700 to-blue-500 text-white border-0">
             <CardContent className="p-8 text-center">
               <Trophy className="w-12 h-12 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-2">Gata să Începi?</h3>
-              <p className="text-blue-100 mb-6">Conectează-te pentru a-ți salva progresul și a obține certificat!</p>
+              <h3 className="text-2xl font-bold mb-2">{t('education.readyToStart')}</h3>
+              <p className="text-blue-100 mb-6">{t('education.loginToSave')}</p>
               <Link to="/login">
                 <Button size="lg" variant="secondary">
-                  Conectare Gratuită
+                  {t('education.freeLogin')}
                 </Button>
               </Link>
             </CardContent>

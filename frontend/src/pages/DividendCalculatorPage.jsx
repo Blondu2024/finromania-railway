@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Coins, TrendingUp, Calendar, Calculator, Plus, Trash2, Download,
@@ -115,7 +116,7 @@ const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
   };
 
   const updateShares = (symbol, shares) => {
-    setPortfolio(portfolio.map(h => 
+    setPortfolio(portfolio.map(h =>
       h.symbol === symbol ? { ...h, shares: parseInt(shares) || 0 } : h
     ));
   };
@@ -142,7 +143,7 @@ const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
             {portfolio.map((holding) => {
               const stock = stocksMap[holding.symbol];
               const dividendValue = stock ? holding.shares * stock.dividend_per_share : 0;
-              
+
               return (
                 <motion.div
                   key={holding.symbol}
@@ -191,7 +192,7 @@ const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
 // ============================================
 // RESULTS DISPLAY
 // ============================================
-const ResultsDisplay = ({ results }) => {
+const ResultsDisplay = ({ results, t }) => {
   if (!results) return null;
 
   const { summary, holdings, projections, settings, tax_info } = results;
@@ -207,15 +208,15 @@ const ResultsDisplay = ({ results }) => {
             <div className="text-2xl font-bold text-blue-600">{summary.total_investment.toLocaleString('ro-RO', {minimumFractionDigits: 0})} RON</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200">
           <CardContent className="pt-4">
             <div className="text-sm text-muted-foreground">Dividend Brut/An</div>
             <div className="text-2xl font-bold text-green-600">{summary.total_annual_dividend_gross?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</div>
-            <div className="text-xs text-muted-foreground">Randament: {summary.portfolio_yield?.toFixed(2)}%</div>
+            <div className="text-xs text-muted-foreground">{t('dividends.yield')}: {summary.portfolio_yield?.toFixed(2)}%</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-amber-200">
           <CardContent className="pt-4">
             <div className="text-sm text-muted-foreground">Net după Impozit + CASS</div>
@@ -223,10 +224,10 @@ const ResultsDisplay = ({ results }) => {
             <div className="text-xs text-muted-foreground">~{((summary.total_net_dupa_cass ?? summary.total_annual_dividend_net) / 12).toFixed(0)} RON/lună</div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200">
           <CardContent className="pt-4">
-            <div className="text-sm text-muted-foreground">Randament Portofoliu</div>
+            <div className="text-sm text-muted-foreground">{t('dividends.yield')}</div>
             <div className="text-2xl font-bold text-blue-600">{summary.portfolio_yield?.toFixed(2)}%</div>
             <div className="text-xs text-muted-foreground">brut/an</div>
           </CardContent>
@@ -879,6 +880,7 @@ const DividendHistoryTab = ({ isPro }) => {
 // MAIN COMPONENT
 // ============================================
 export default function DividendCalculatorPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
 
@@ -901,7 +903,7 @@ export default function DividendCalculatorPage() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingStocks, setLoadingStocks] = useState(true);
-  
+
   // Settings
   const [reinvest, setReinvest] = useState(false);
   const [yearsProjection, setYearsProjection] = useState(5);
@@ -969,8 +971,8 @@ export default function DividendCalculatorPage() {
 
   return (
     <>
-      <SEO 
-        title="Calculator Dividende BVB | FinRomania" 
+      <SEO
+        title="Calculator Dividende BVB | FinRomania"
         description="Calculează-ți veniturile din dividende pe BVB. Proiecții pe mai mulți ani cu reinvestire automată."
       />
 
@@ -1014,9 +1016,9 @@ export default function DividendCalculatorPage() {
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Portfolio Builder */}
               <div className="lg:col-span-2">
-                <PortfolioBuilder 
-                  portfolio={portfolio} 
-                  setPortfolio={setPortfolio} 
+                <PortfolioBuilder
+                  portfolio={portfolio}
+                  setPortfolio={setPortfolio}
                   stocks={stocks}
                 />
               </div>
@@ -1058,8 +1060,8 @@ export default function DividendCalculatorPage() {
                       />
                     </div>
 
-                    <Button 
-                      onClick={calculateDividends} 
+                    <Button
+                      onClick={calculateDividends}
                       disabled={loading || portfolio.length === 0}
                       className="w-full bg-gradient-to-r from-amber-500 to-orange-500"
                     >
@@ -1080,7 +1082,7 @@ export default function DividendCalculatorPage() {
                       <div className="text-sm text-amber-800 dark:text-amber-200">
                         <p className="font-medium">Impozit dividende: 16%</p>
                         <p className="text-xs mt-1">
-                          În România, dividendele sunt impozitate cu 16% la sursă. 
+                          În România, dividendele sunt impozitate cu 16% la sursă.
                           Calculatorul include automat această deducere.
                         </p>
                       </div>
@@ -1123,7 +1125,7 @@ export default function DividendCalculatorPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                 >
-                  <ResultsDisplay results={results} />
+                  <ResultsDisplay results={results} t={t} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -1134,7 +1136,7 @@ export default function DividendCalculatorPage() {
               <CardHeader>
                 <CardTitle>Acțiuni BVB cu Dividende</CardTitle>
                 <CardDescription>
-                  Sursa: BVB.ro (oficial) • Sortate după Dividend Yield
+                  {t('dividends.source')}: BVB.ro (oficial) • Sortate după Dividend Yield
                 </CardDescription>
               </CardHeader>
               <CardContent>

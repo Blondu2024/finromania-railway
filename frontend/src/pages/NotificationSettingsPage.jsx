@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -50,6 +51,7 @@ const CategorySection = ({ title, icon: Icon, children, color }) => (
 );
 
 export default function NotificationSettingsPage() {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [preferences, setPreferences] = useState({
     market_open_close: false,

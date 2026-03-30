@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Loader2, Crown, ArrowRight, TrendingUp, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -9,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function PaymentSuccessPage() {
+  const { t } = useTranslation();
   const [status, setStatus] = useState('checking'); // checking, success, error
   const [paymentInfo, setPaymentInfo] = useState(null);
   const navigate = useNavigate();

@@ -3,14 +3,16 @@ import { Heart, Target, Users, Zap, Award, TrendingUp, BookOpen, Globe } from 'l
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 
 export default function AboutPage() {
+  const { t } = useTranslation();
   return (
     <>
-      <SEO 
-        title="Despre Noi - Misiunea FinRomania"
-        description="Descoperă misiunea FinRomania: să democratizăm educația financiară în România prin instrumente gratuite, date reale BVB, și lecții interactive de trading."
+      <SEO
+        title={`${t('about.title')} - FinRomania`}
+        description={t('about.subtitle')}
         url="https://finromania.ro/about"
       />
       
@@ -21,10 +23,10 @@ export default function AboutPage() {
             <Heart className="w-16 h-16 text-white" />
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold">
-            Misiunea Noastră
+            {t('about.title')}
           </h1>
           <p className="text-xl sm:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Să democratizăm educația financiară în România - să facă accesibilă învățarea trading-ului și investițiilor pentru toți românii, 100% gratuit, în limba română.
+            {t('about.subtitle')}
           </p>
         </div>
 
@@ -34,7 +36,7 @@ export default function AboutPage() {
             <div className="prose prose-lg max-w-none">
               <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
                 <Target className="w-8 h-8 text-blue-600" />
-                De Ce Am Creat FinRomania?
+                {t('about.whyTitle')}
               </h2>
               
               <p className="text-lg leading-relaxed text-muted-foreground">
@@ -50,14 +52,14 @@ export default function AboutPage() {
 
         {/* Values */}
         <div>
-          <h2 className="text-3xl font-bold text-center mb-8">Valorile Noastre</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">{t('about.values')}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
                   <Globe className="w-8 h-8 text-blue-600" />
                 </div>
-                <h3 className="font-bold text-lg mb-2">100% Gratuit</h3>
+                <h3 className="font-bold text-lg mb-2">{t('about.freeValue')}</h3>
                 <p className="text-sm text-muted-foreground">
                   Educația nu ar trebui să coste. Totul e gratuit, pentru totdeauna.
                 </p>
@@ -69,7 +71,7 @@ export default function AboutPage() {
                 <div className="inline-block p-4 bg-green-100 rounded-full mb-4">
                   <BookOpen className="w-8 h-8 text-green-600" />
                 </div>
-                <h3 className="font-bold text-lg mb-2">Calitate</h3>
+                <h3 className="font-bold text-lg mb-2">{t('about.qualityValue')}</h3>
                 <p className="text-sm text-muted-foreground">
                   Date reale, lecții profesionale, AI avansat - nu compromitem niciodată.
                 </p>
@@ -81,7 +83,7 @@ export default function AboutPage() {
                 <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
                   <Zap className="w-8 h-8 text-blue-600" />
                 </div>
-                <h3 className="font-bold text-lg mb-2">Inovație</h3>
+                <h3 className="font-bold text-lg mb-2">{t('about.innovationValue')}</h3>
                 <p className="text-sm text-muted-foreground">
                   Primă platformă cu AI Advisor și lecții interactive în română.
                 </p>
@@ -93,7 +95,7 @@ export default function AboutPage() {
                 <div className="inline-block p-4 bg-orange-100 rounded-full mb-4">
                   <Users className="w-8 h-8 text-orange-600" />
                 </div>
-                <h3 className="font-bold text-lg mb-2">Comunitate</h3>
+                <h3 className="font-bold text-lg mb-2">{t('about.communityValue')}</h3>
                 <p className="text-sm text-muted-foreground">
                   Construim o comunitate de investitori educați în România.
                 </p>
@@ -104,7 +106,7 @@ export default function AboutPage() {
 
         {/* Features Highlight */}
         <div className="bg-gradient-to-br from-blue-50 to-blue-50 rounded-2xl p-8 md:p-12">
-          <h2 className="text-3xl font-bold text-center mb-8">Ce Oferim</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">{t('about.whatWeOffer')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="flex gap-4">
               <div className="flex-shrink-0">
@@ -187,9 +189,9 @@ export default function AboutPage() {
         {/* CTA */}
         <Card className="bg-gradient-to-r from-blue-700 to-blue-500 text-white border-0">
           <CardContent className="p-8 md:p-12 text-center">
-            <h2 className="text-3xl font-bold mb-4">Începe Să Înveți Astăzi</h2>
+            <h2 className="text-3xl font-bold mb-4">{t('about.startToday')}</h2>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              Alatură-te miilor de români care învață trading pe FinRomania. Gratuit, în limba română, cu date reale.
+              {t('about.joinThousands')}
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Link to="/trading-school">
@@ -208,9 +210,9 @@ export default function AboutPage() {
 
         {/* Team / Contact */}
         <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold">Ai Întrebări?</h2>
+          <h2 className="text-2xl font-bold">{t('about.questionsTitle')}</h2>
           <p className="text-muted-foreground">
-            Suntem aici să te ajutăm! Contactează-ne sau întreabă AI Advisor-ul.
+            {t('about.questionsDesc')}
           </p>
           <div className="flex gap-3 justify-center">
             <Link to="/faq">

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowRightLeft, RefreshCw, TrendingUp, TrendingDown, Loader2, 
+import {
+  ArrowRightLeft, RefreshCw, TrendingUp, TrendingDown, Loader2,
   Globe, Zap, DollarSign, Euro, Coins, Sparkles, ArrowRight,
   Clock, ChevronDown, Calculator, Wallet
 } from 'lucide-react';
@@ -45,7 +46,7 @@ const FloatingShape = ({ delay, duration, className }) => (
 // Live Ticker Component
 const LiveTicker = ({ rates, isLoading }) => {
   const [offset, setOffset] = useState(0);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       setOffset(prev => prev - 1);
@@ -59,8 +60,8 @@ const LiveTicker = ({ rates, isLoading }) => {
   return (
     <div className="relative overflow-hidden bg-gradient-to-r from-zinc-900 via-blue-900 to-zinc-900 py-3">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9nPjwvc3ZnPg==')] opacity-30" />
-      
-      <motion.div 
+
+      <motion.div
         className="flex gap-8 whitespace-nowrap"
         animate={{ x: offset }}
         transition={{ duration: 0, ease: "linear" }}
@@ -82,7 +83,7 @@ const LiveTicker = ({ rates, isLoading }) => {
 // Animated Currency Card
 const CurrencyCard = ({ code, data, onClick, isSelected, delay = 0 }) => {
   const flag = CURRENCY_FLAGS[code] || '💱';
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -95,12 +96,12 @@ const CurrencyCard = ({ code, data, onClick, isSelected, delay = 0 }) => {
     >
       <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all">
         <div className={`absolute inset-0 bg-gradient-to-br ${
-          isSelected 
-            ? 'from-blue-500/20 to-blue-500/20' 
+          isSelected
+            ? 'from-blue-500/20 to-blue-500/20'
             : 'from-gray-100 to-gray-50 dark:from-zinc-800 dark:to-zinc-900'
         }`} />
         <CardContent className="relative p-4 text-center">
-          <motion.span 
+          <motion.span
             className="text-3xl block mb-2"
             animate={{ rotate: isSelected ? [0, -10, 10, 0] : 0 }}
             transition={{ duration: 0.5 }}
@@ -153,9 +154,9 @@ const PopularPairButton = ({ pair, onClick, delay }) => (
 );
 
 // Main Converter Component
-const MainConverter = ({ 
-  currencies, amount, setAmount, fromCurrency, setFromCurrency, 
-  toCurrency, setToCurrency, result, loading, onSwap 
+const MainConverter = ({
+  currencies, amount, setAmount, fromCurrency, setFromCurrency,
+  toCurrency, setToCurrency, result, loading, onSwap, t
 }) => {
   return (
     <motion.div
@@ -166,7 +167,7 @@ const MainConverter = ({
       <Card className="overflow-hidden border-0 shadow-2xl">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMwLTkuOTQtOC4wNi0xOC0xOC0xOHY2YzYuNjMgMCAxMiA1LjM3IDEyIDEyaC02bDkgOSA5LTloLTZ6IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9Ii4wNSIvPjwvZz48L3N2Zz4=')] opacity-50" />
-        
+
         <CardContent className="relative p-8 text-white">
           <div className="flex items-center justify-center gap-2 mb-6">
             <motion.div
@@ -175,7 +176,7 @@ const MainConverter = ({
             >
               <Coins className="w-6 h-6" />
             </motion.div>
-            <h2 className="text-2xl font-bold">Convertor Instant</h2>
+            <h2 className="text-2xl font-bold">{t('converter.instantConverter')}</h2>
           </div>
 
           <div className="grid md:grid-cols-[1fr,auto,1fr] gap-6 items-center">
@@ -183,7 +184,7 @@ const MainConverter = ({
             <div className="space-y-2">
               <label className="text-sm font-medium text-blue-100 flex items-center gap-2">
                 <Wallet className="w-4 h-4" />
-                De la
+                {t('converter.from')}
               </label>
               <div className="flex gap-2">
                 <Input
@@ -191,7 +192,7 @@ const MainConverter = ({
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-xl font-bold"
-                  placeholder="Sumă"
+                  placeholder={t('converter.amount')}
                 />
                 <Select value={fromCurrency} onValueChange={setFromCurrency}>
                   <SelectTrigger className="w-36 bg-white/10 border-white/20 text-white">
@@ -215,9 +216,9 @@ const MainConverter = ({
               whileHover={{ scale: 1.2, rotate: 180 }}
               whileTap={{ scale: 0.9 }}
             >
-              <Button 
-                variant="outline" 
-                size="icon" 
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={onSwap}
                 className="rounded-full bg-white/20 border-white/30 hover:bg-white/30 text-white h-14 w-14"
               >
@@ -229,14 +230,14 @@ const MainConverter = ({
             <div className="space-y-2">
               <label className="text-sm font-medium text-blue-100 flex items-center gap-2">
                 <Calculator className="w-4 h-4" />
-                La
+                {t('converter.to')}
               </label>
               <div className="flex gap-2">
                 <div className="flex-1 bg-white/10 rounded-md border border-white/20 flex items-center justify-center min-h-[48px] px-4">
                   {loading ? (
                     <Loader2 className="w-6 h-6 animate-spin" />
                   ) : result ? (
-                    <motion.span 
+                    <motion.span
                       key={result.result}
                       initial={{ scale: 0.5, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
@@ -284,7 +285,7 @@ const MainConverter = ({
                 <div className="flex items-center justify-center gap-4 text-sm text-blue-100">
                   <span className="flex items-center gap-1">
                     <Zap className="w-4 h-4" />
-                    Rată: 1 {fromCurrency} = {result.rate.toFixed(6)} {toCurrency}
+                    {t('converter.rate')}: 1 {fromCurrency} = {result.rate.toFixed(6)} {toCurrency}
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
@@ -303,7 +304,7 @@ const MainConverter = ({
 // Vertical Auto-Scroll Rate List
 const AutoScrollRates = ({ rates }) => {
   const [scrollY, setScrollY] = useState(0);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       setScrollY(prev => {
@@ -321,7 +322,7 @@ const AutoScrollRates = ({ rates }) => {
     <div className="h-[400px] overflow-hidden relative">
       <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-background to-transparent z-10" />
       <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background to-transparent z-10" />
-      
+
       <motion.div
         animate={{ y: -scrollY }}
         className="space-y-2"
@@ -352,6 +353,7 @@ const AutoScrollRates = ({ rates }) => {
 
 // Main Page Component
 export default function CurrencyConverterPage() {
+  const { t } = useTranslation();
   const [currencies, setCurrencies] = useState([]);
   const [rates, setRates] = useState({});
   const [popularPairs, setPopularPairs] = useState([]);
@@ -401,7 +403,7 @@ export default function CurrencyConverterPage() {
   // Convert currency
   const convertCurrency = useCallback(async () => {
     if (!amount || isNaN(parseFloat(amount))) return;
-    
+
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/currency/convert`, {
@@ -413,7 +415,7 @@ export default function CurrencyConverterPage() {
           to_currency: toCurrency
         })
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         setResult(data);
@@ -462,7 +464,7 @@ export default function CurrencyConverterPage() {
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Convertor Valutar Live | FinRomania"
         description="Convertor valutar în timp real cu rate BNR. Convertește EUR, USD, GBP și alte 30+ valute. Rate actualizate automat."
         keywords="convertor valutar, curs valutar, EUR RON, USD RON, rate de schimb, BNR"
@@ -481,14 +483,14 @@ export default function CurrencyConverterPage() {
 
           <div className="container mx-auto px-4 relative z-10">
             {/* Header */}
-            <motion.div 
+            <motion.div
               className="text-center mb-10"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="flex items-center justify-center gap-3 mb-4">
                 <motion.div
-                  animate={{ 
+                  animate={{
                     rotate: [0, 360],
                     scale: [1, 1.2, 1]
                   }}
@@ -497,12 +499,12 @@ export default function CurrencyConverterPage() {
                   <Globe className="w-12 h-12 text-blue-600" />
                 </motion.div>
                 <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
-                  Convertor Valutar
+                  {t('converter.title')}
                 </h1>
               </div>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Rate de schimb în timp real pentru 30+ valute mondiale 
-                <motion.span 
+                {t('converter.subtitle')}
+                <motion.span
                   className="inline-block ml-2"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
@@ -513,7 +515,7 @@ export default function CurrencyConverterPage() {
               {lastUpdated && (
                 <Badge variant="outline" className="mt-3">
                   <Clock className="w-3 h-3 mr-1" />
-                  Actualizat: {new Date(lastUpdated).toLocaleString('ro-RO')}
+                  {t('converter.lastUpdated')}: {new Date(lastUpdated).toLocaleString('ro-RO')}
                 </Badge>
               )}
             </motion.div>
@@ -531,6 +533,7 @@ export default function CurrencyConverterPage() {
                 result={result}
                 loading={loading}
                 onSwap={swapCurrencies}
+                t={t}
               />
             </div>
           </div>
@@ -547,9 +550,9 @@ export default function CurrencyConverterPage() {
             >
               <h2 className="text-2xl md:text-3xl font-bold flex items-center justify-center gap-2">
                 <Sparkles className="w-6 h-6 text-yellow-500" />
-                Perechi Populare
+                {t('converter.popularPairs')}
               </h2>
-              <p className="text-muted-foreground mt-2">Click pentru conversie rapidă</p>
+              <p className="text-muted-foreground mt-2">{t('converter.clickForConversion')}</p>
             </motion.div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
@@ -571,17 +574,17 @@ export default function CurrencyConverterPage() {
             <div className="grid lg:grid-cols-[2fr,1fr] gap-8">
               {/* Currency Grid */}
               <div>
-                <motion.h2 
+                <motion.h2
                   className="text-2xl font-bold mb-6 flex items-center gap-2"
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                 >
                   <Coins className="w-6 h-6 text-blue-600" />
-                  Toate Valutele ({Object.keys(rates).length})
+                  {t('converter.allCurrencies')} ({Object.keys(rates).length})
                 </motion.h2>
                 <p className="text-muted-foreground mb-6">Click pe o valută pentru a o selecta ca sursă</p>
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {Object.entries(rates).map(([code, data], idx) => (
                     <CurrencyCard
@@ -602,7 +605,7 @@ export default function CurrencyConverterPage() {
                   <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="w-5 h-5" />
-                      Rate Live
+                      {t('converter.liveRates')}
                       <motion.div
                         animate={{ opacity: [1, 0.5, 1] }}
                         transition={{ duration: 1.5, repeat: Infinity }}
@@ -628,7 +631,7 @@ export default function CurrencyConverterPage() {
                   <DollarSign className="w-3 h-3 mr-1" />
                   BNR
                 </Badge>
-                <span>Ratele sunt furnizate de Banca Națională a României</span>
+                <span>{t('converter.bnrSource')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <motion.div
@@ -637,7 +640,7 @@ export default function CurrencyConverterPage() {
                 >
                   <RefreshCw className="w-4 h-4" />
                 </motion.div>
-                <span>Actualizare automată la fiecare 5 minute</span>
+                <span>{t('converter.autoUpdate')}</span>
               </div>
             </div>
           </div>
