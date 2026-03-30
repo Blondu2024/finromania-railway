@@ -137,7 +137,7 @@ export default function StockDetailPage() {
   if (error || !data) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Nu s-au putut încărca datele pentru {symbol}</p>
+        <p className="text-muted-foreground">{t('stocks.errorLoading')} {symbol}</p>
         <Link to="/stocks">
           <Button className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> Înapoi</Button>
         </Link>
@@ -198,7 +198,7 @@ export default function StockDetailPage() {
             <h1 className="text-3xl font-bold">{data.name}</h1>
             <Badge variant="secondary" className="text-lg">{data.symbol}</Badge>
             {data.is_mock && <Badge variant="outline" className="bg-yellow-100">Demo</Badge>}
-            {!data.is_mock && <Badge className="bg-green-100 text-green-800">Date Reale</Badge>}
+            {!data.is_mock && <Badge className="bg-green-100 text-green-800">{t('stocks.realData')}</Badge>}
           </div>
           <div className="flex items-center gap-4 text-muted-foreground">
             <span className="flex items-center gap-1">
@@ -221,12 +221,12 @@ export default function StockDetailPage() {
             {isPositive ? <TrendingUp className="w-5 h-5 mr-1" /> : <TrendingDown className="w-5 h-5 mr-1" />}
             {isPositive ? '+' : ''}{priceChange.toFixed(2)} ({isPositive ? '+' : ''}{percentChange.toFixed(2)}%)
             <span className="text-muted-foreground text-sm ml-2">
-              ({currentPeriod === '1d' ? '1 zi' :
-                currentPeriod === '1w' ? '1 săptămână' :
-                currentPeriod === '1m' ? '30 zile' :
-                currentPeriod === '3m' ? '3 luni' :
-                currentPeriod === '6m' ? '6 luni' :
-                currentPeriod === '1y' ? '1 an' : '5 ani'})
+              ({currentPeriod === '1d' ? t('stocks.period1d') :
+                currentPeriod === '1w' ? t('stocks.period1w') :
+                currentPeriod === '1m' ? t('stocks.period1m') :
+                currentPeriod === '3m' ? t('stocks.period3m') :
+                currentPeriod === '6m' ? t('stocks.period6m') :
+                currentPeriod === '1y' ? t('stocks.period1y') : t('stocks.period5y')})
             </span>
           </p>
         </div>
@@ -238,7 +238,7 @@ export default function StockDetailPage() {
         <SocialShare title={`${data.name} (${data.symbol})`} />
         <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
           <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-          Actualizează
+          {t('stocks.refresh')}
         </Button>
       </div>
 
@@ -387,12 +387,12 @@ export default function StockDetailPage() {
             <div className="flex gap-3">
               <Link to="/trading-school">
                 <Button className="bg-white text-green-600 hover:bg-green-50">
-                  Școala de Trading →
+                  {t('stocks.tradingSchoolLink')}
                 </Button>
               </Link>
               <Link to="/financial-education">
                 <Button variant="outline" className="border-white text-white hover:bg-white/10">
-                  Educație Financiară
+                  {t('stocks.financialEdLink')}
                 </Button>
               </Link>
             </div>

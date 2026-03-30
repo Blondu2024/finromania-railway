@@ -126,7 +126,7 @@ export default function AIAdvisorPage() {
             {!user ? (
               <div className="text-center py-6">
                 <p className="text-muted-foreground mb-4">{t('ai.loginForAdvice')}</p>
-                <Button onClick={login}>Conectare</Button>
+                <Button onClick={login}>{t('ai.login')}</Button>
               </div>
             ) : loading.advice ? (
               <div className="flex items-center justify-center py-8">
@@ -136,7 +136,7 @@ export default function AIAdvisorPage() {
               <div className="text-center py-6">
                 <p className="text-muted-foreground mb-4">{portfolioAdvice.advice}</p>
                 <Link to="/risk-assessment">
-                  <Button>Completează Chestionarul</Button>
+                  <Button>{t('ai.completeQuestionnaire')}</Button>
                 </Link>
               </div>
             ) : (
@@ -146,10 +146,10 @@ export default function AIAdvisorPage() {
                     portfolioAdvice?.profile === 'conservative' ? 'bg-blue-500 text-white' :
                     portfolioAdvice?.profile === 'moderate' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
                   }>
-                    Profil: {portfolioAdvice?.profile === 'conservative' ? 'Conservator' :
-                             portfolioAdvice?.profile === 'moderate' ? 'Moderat' : 'Agresiv'}
+                    Profil: {portfolioAdvice?.profile === 'conservative' ? t('ai.conservative') :
+                             portfolioAdvice?.profile === 'moderate' ? t('ai.moderate') : t('ai.aggressive')}
                   </Badge>
-                  <Badge variant="outline">{portfolioAdvice?.holdings_count || 0} dețineri</Badge>
+                  <Badge variant="outline">{portfolioAdvice?.holdings_count || 0} {t('ai.holdings')}</Badge>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <p className="whitespace-pre-wrap">{portfolioAdvice?.advice}</p>
@@ -188,16 +188,16 @@ export default function AIAdvisorPage() {
 
             {answer && (
               <div className="p-4 bg-muted/50 rounded-lg">
-                <p className="font-medium mb-2">Întrebare: {answer.question}</p>
+                <p className="font-medium mb-2">{t('ai.question')} {answer.question}</p>
                 <p className="whitespace-pre-wrap text-muted-foreground">{answer.answer}</p>
                 <p className="text-xs text-muted-foreground mt-3 italic">{answer.disclaimer}</p>
               </div>
             )}
 
             <div className="pt-4 border-t">
-              <p className="text-sm text-muted-foreground mb-3">Întrebări populare:</p>
+              <p className="text-sm text-muted-foreground mb-3">{t('ai.popularQuestions')}</p>
               <div className="flex flex-wrap gap-2">
-                {['Ce este un ETF?', 'Cum funcționează bursa?', 'Ce înseamnă diversificare?'].map((q) => (
+                {[t('ai.q1'), t('ai.q2'), t('ai.q3')].map((q) => (
                   <Button
                     key={q}
                     variant="outline"
@@ -221,8 +221,8 @@ export default function AIAdvisorPage() {
               <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full w-fit mx-auto mb-3">
                 <TrendingUp className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="font-semibold">Evaluare Risc</h3>
-              <p className="text-sm text-muted-foreground">Descoperă-ți profilul de investitor</p>
+              <h3 className="font-semibold">{t('ai.riskAssessment')}</h3>
+              <p className="text-sm text-muted-foreground">{t('ai.riskAssessmentDesc')}</p>
             </CardContent>
           </Card>
         </Link>
@@ -234,7 +234,7 @@ export default function AIAdvisorPage() {
                 <Lightbulb className="w-6 h-6 text-green-600" />
               </div>
               <h3 className="font-semibold">Trading School</h3>
-              <p className="text-sm text-muted-foreground">17 lecții gratuite - Învață de la zero</p>
+              <p className="text-sm text-muted-foreground">{t('ai.tradingSchoolDesc')}</p>
             </CardContent>
           </Card>
         </Link>
@@ -245,8 +245,8 @@ export default function AIAdvisorPage() {
               <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full w-fit mx-auto mb-3">
                 <Bot className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="font-semibold">Portofoliu Virtual</h3>
-              <p className="text-sm text-muted-foreground">Practică fără risc</p>
+              <h3 className="font-semibold">{t('ai.virtualPortfolio')}</h3>
+              <p className="text-sm text-muted-foreground">{t('ai.virtualPortfolioDesc')}</p>
             </CardContent>
           </Card>
         </Link>

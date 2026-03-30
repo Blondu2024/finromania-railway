@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Send, Bot, User, HelpCircle, Loader2, Lock, Crown, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -24,6 +25,7 @@ const SUGGESTED_QUESTIONS = [
 ];
 
 const FiscalAIChat = ({ compact = false }) => {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -47,7 +49,7 @@ const FiscalAIChat = ({ compact = false }) => {
     if (!user || !token) {
       setMessages(prev => [...prev, {
         role: 'system',
-        content: 'Trebuie să fii autentificat pentru a folosi AI Fiscal Advisor.',
+        content: t('fiscalChat.authError'),
         isError: true
       }]);
       return;
@@ -87,7 +89,7 @@ const FiscalAIChat = ({ compact = false }) => {
             upgradeMessage: data.upgrade_message
           }]);
         } else {
-          throw new Error(data.message || 'Eroare la procesare');
+          throw new Error(data.message || t('fiscalChat.processError'));
         }
       } else {
         setSessionId(data.session_id);
@@ -103,7 +105,7 @@ const FiscalAIChat = ({ compact = false }) => {
       console.error('Error:', error);
       setMessages(prev => [...prev, {
         role: 'system',
-        content: 'A apărut o eroare. Te rog să încerci din nou.',
+        content: t('fiscalChat.genericError'),
         isError: true
       }]);
     } finally {
@@ -129,8 +131,8 @@ const FiscalAIChat = ({ compact = false }) => {
                 <MessageCircle className="w-6 h-6" />
               </div>
               <div>
-                <p className="font-semibold">Întrebări despre fiscalitate?</p>
-                <p className="text-sm text-white/80">Întreabă AI-ul nostru fiscal</p>
+                <p className="font-semibold">{t('fiscalChat.title')}</p>
+                <p className="text-sm text-white/80">{t('fiscalChat.subtitle')}</p>
               </div>
             </div>
             <ChevronDown className="w-5 h-5" />
@@ -151,13 +153,13 @@ const FiscalAIChat = ({ compact = false }) => {
             </div>
             <div>
               <CardTitle className="text-white text-base">AI Fiscal Advisor</CardTitle>
-              <p className="text-xs text-gray-400">Întrebări despre impozite la bursă</p>
+              <p className="text-xs text-gray-400">{t('fiscalChat.headerSubtitle')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {queriesInfo && !queriesInfo.is_unlimited && (
               <Badge variant="outline" className={`text-xs ${queriesInfo.remaining <= 1 ? 'border-red-500 text-red-400' : 'border-gray-600 text-gray-400'}`}>
-                {queriesInfo.remaining}/5 întrebări
+                {queriesInfo.remaining}/5 {t('fiscalChat.questions')}
               </Badge>
             )}
             {compact && (
@@ -175,7 +177,7 @@ const FiscalAIChat = ({ compact = false }) => {
           <div className="space-y-4">
             {/* Quick Answers */}
             <div>
-              <p className="text-xs text-gray-500 mb-2">Răspunsuri rapide:</p>
+              <p className="text-xs text-gray-500 mb-2">{t('fiscalChat.quickAnswers')}</p>
               <div className="grid grid-cols-2 gap-2">
                 {QUICK_ANSWERS.map((qa, idx) => (
                   <div key={idx} className="bg-zinc-800 rounded-lg p-2">
@@ -188,7 +190,7 @@ const FiscalAIChat = ({ compact = false }) => {
             
             {/* Suggested Questions */}
             <div>
-              <p className="text-xs text-gray-500 mb-2">Întreabă:</p>
+              <p className="text-xs text-gray-500 mb-2">{t('fiscalChat.ask')}</p>
               <div className="flex flex-wrap gap-2">
                 {SUGGESTED_QUESTIONS.slice(0, 3).map((q, idx) => (
                   <Button 
@@ -224,7 +226,7 @@ const FiscalAIChat = ({ compact = false }) => {
                 {msg.role === 'assistant' && (
                   <div className="flex items-center gap-2 mb-2">
                     <Bot className="w-4 h-4 text-blue-400" />
-                    <span className="text-xs text-gray-400">AI Fiscal</span>
+                    <span className="text-xs text-gray-400">{t('fiscalChat.aiFiscal')}</span>
                   </div>
                 )}
                 
@@ -243,7 +245,7 @@ const FiscalAIChat = ({ compact = false }) => {
                     <p className="text-xs text-amber-300">{msg.upgradeMessage}</p>
                     <Button size="sm" className="mt-2 bg-amber-500 hover:bg-amber-600 text-xs">
                       <Crown className="w-3 h-3 mr-1" />
-                      Activează PRO
+                      {t('fiscalChat.activatePro')}
                     </Button>
                   </div>
                 )}
@@ -257,7 +259,7 @@ const FiscalAIChat = ({ compact = false }) => {
             <div className="bg-zinc-800 rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
-                <span className="text-gray-400 text-sm">Analizez întrebarea...</span>
+                <span className="text-gray-400 text-sm">{t('fiscalChat.analyzing')}</span>
               </div>
             </div>
           </div>
@@ -271,7 +273,7 @@ const FiscalAIChat = ({ compact = false }) => {
         {!user ? (
           <div className="text-center">
             <Lock className="w-5 h-5 text-gray-500 mx-auto mb-1" />
-            <p className="text-xs text-gray-500">Conectează-te pentru AI Fiscal</p>
+            <p className="text-xs text-gray-500">{t('fiscalChat.loginRequired')}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex gap-2">
@@ -279,7 +281,7 @@ const FiscalAIChat = ({ compact = false }) => {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Întreabă despre impozite..."
+              placeholder={t('fiscalChat.placeholder')}
               className="flex-1 bg-zinc-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
               disabled={loading}
             />

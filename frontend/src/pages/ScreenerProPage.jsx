@@ -37,13 +37,13 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 // ============================================
 // SIGNAL BADGE COMPONENT
 // ============================================
-const SignalBadge = ({ signal, score }) => {
+const SignalBadge = ({ signal, score, t }) => {
   const configs = {
-    STRONG_BUY: { bg: 'bg-green-600', text: 'Cumpărare Puternică', icon: '🚀' },
-    BUY: { bg: 'bg-green-500', text: 'Cumpărare', icon: '📈' },
-    HOLD: { bg: 'bg-gray-500', text: 'Păstrare', icon: '⏸️' },
-    SELL: { bg: 'bg-orange-500', text: 'Vânzare', icon: '📉' },
-    STRONG_SELL: { bg: 'bg-red-600', text: 'Vânzare Puternică', icon: '🔻' },
+    STRONG_BUY: { bg: 'bg-green-600', text: t('screener.strongBuy'), icon: '🚀' },
+    BUY: { bg: 'bg-green-500', text: t('screener.buy'), icon: '📈' },
+    HOLD: { bg: 'bg-gray-500', text: t('screener.hold'), icon: '⏸️' },
+    SELL: { bg: 'bg-orange-500', text: t('screener.sell'), icon: '📉' },
+    STRONG_SELL: { bg: 'bg-red-600', text: t('screener.strongSell'), icon: '🔻' },
   };
 
   const config = configs[signal] || configs.HOLD;
@@ -57,7 +57,7 @@ const SignalBadge = ({ signal, score }) => {
           </Badge>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Scor: {score}/100</p>
+          <p>{t('screener.score')}: {score}/100</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -149,7 +149,7 @@ const PresetCard = ({ preset, onClick, isActive }) => {
 // ============================================
 // SIGNAL SUMMARY COMPONENT
 // ============================================
-const SignalSummary = ({ summary }) => {
+const SignalSummary = ({ summary, t }) => {
   const signals = ['STRONG_BUY', 'BUY', 'HOLD', 'SELL', 'STRONG_SELL'];
   const colors = {
     STRONG_BUY: 'bg-green-600',
@@ -159,11 +159,11 @@ const SignalSummary = ({ summary }) => {
     STRONG_SELL: 'bg-red-600',
   };
   const labels = {
-    STRONG_BUY: 'Cumpărare Puternică',
-    BUY: 'Cumpărare',
-    HOLD: 'Păstrare',
-    SELL: 'Vânzare',
-    STRONG_SELL: 'Vânzare Puternică',
+    STRONG_BUY: t('screener.strongBuy'),
+    BUY: t('screener.buy'),
+    HOLD: t('screener.hold'),
+    SELL: t('screener.sell'),
+    STRONG_SELL: t('screener.strongSell'),
   };
 
   return (
@@ -243,14 +243,14 @@ export default function ScreenerProPage() {
             setIsRefreshingBackground(false);
             clearInterval(pollingRef.current);
             pollingRef.current = null;
-            toast.success(`${data.count} acțiuni actualizate automat`);
+            toast.success(`${data.count} ${t('screener.stocksUpdated')}`);
           }
         }
       } catch (err) {
         // ignore polling errors
       }
     }, 8000);
-  }, []);
+  }, [t]);
 
   // Cleanup polling la unmount
   useEffect(() => {
@@ -272,7 +272,7 @@ export default function ScreenerProPage() {
   // Full scan
   const runFullScan = useCallback(async () => {
     if (!isPro) {
-      toast.error('Screener PRO necesită abonament PRO');
+      toast.error(t('screener.proRequired'));
       return;
     }
 
@@ -334,7 +334,7 @@ export default function ScreenerProPage() {
   // Apply preset
   const applyPreset = async (preset) => {
     if (!isPro) {
-      toast.error('Screener PRO necesită abonament PRO');
+      toast.error(t('screener.proRequired'));
       return;
     }
 
@@ -424,7 +424,7 @@ export default function ScreenerProPage() {
                 <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
                   <BarChart3 className="w-8 h-8 text-blue-500 mb-2" />
                   <h3 className="font-bold">{t('screener.technicals')}</h3>
-                  <p className="text-sm text-muted-foreground">RSI, MACD, Bollinger, SMA/EMA - actualizați în timp real</p>
+                  <p className="text-sm text-muted-foreground">{t('screener.techDesc')}</p>
                 </div>
                 <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
                   <PieChart className="w-8 h-8 text-green-500 mb-2" />
@@ -434,7 +434,7 @@ export default function ScreenerProPage() {
                 <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
                   <Target className="w-8 h-8 text-blue-500 mb-2" />
                   <h3 className="font-bold">Semnale AI</h3>
-                  <p className="text-sm text-muted-foreground">Strong Buy → Strong Sell bazat pe toți indicatorii</p>
+                  <p className="text-sm text-muted-foreground">{t('screener.signalDesc')}</p>
                 </div>
               </div>
               <Link to="/pricing">
@@ -500,7 +500,7 @@ export default function ScreenerProPage() {
               <CardTitle className="text-lg">{t('screener.signalSummary')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <SignalSummary summary={signalSummary} />
+              <SignalSummary summary={signalSummary} t={t} />
             </CardContent>
           </Card>
         )}
@@ -540,7 +540,7 @@ export default function ScreenerProPage() {
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <CardTitle>
                   {t('screener.results')} ({stocks.length} {t('screener.stocks')})
-                  {scanTime && <span className="text-sm font-normal text-muted-foreground ml-2">în {scanTime}s</span>}
+                  {scanTime && <span className="text-sm font-normal text-muted-foreground ml-2">{t('screener.inSeconds', { time: scanTime })}</span>}
                 </CardTitle>
                 {cacheAge && (
                   <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -555,9 +555,9 @@ export default function ScreenerProPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50">
                     <tr>
-                      <th className="p-3 text-left">Acțiune</th>
+                      <th className="p-3 text-left">{t('screener.stock')}</th>
                       <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('price')}>
-                        Preț <ArrowUpDown className="w-3 h-3 inline" />
+                        {t('screener.price')} <ArrowUpDown className="w-3 h-3 inline" />
                       </th>
                       <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('change_percent')}>
                         Var% <ArrowUpDown className="w-3 h-3 inline" />
@@ -646,7 +646,7 @@ export default function ScreenerProPage() {
                             )}
                           </td>
                           <td className="p-3 text-right">
-                            <SignalBadge signal={stock.signal} score={stock.signal_score} />
+                            <SignalBadge signal={stock.signal} score={stock.signal_score} t={t} />
                           </td>
                           <td className="p-3 text-center">
                             <Button

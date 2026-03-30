@@ -88,7 +88,13 @@
     "seeAll": "See all",
     "realData": "Real Data",
     "demo": "Demo",
-    "and": "and"
+    "and": "and",
+    "login": "Sign In",
+    "cancel": "Cancel",
+    "shares": "shares",
+    "sharesAbbr": "sh.",
+    "calculating": "Calculating...",
+    "disclaimer": "Disclaimer"
   },
   "home": {
     "badge": "Live BVB Data · 55+ Stocks · AI Powered",
@@ -206,7 +212,19 @@
     "proFasterRefresh": "PRO: Faster refresh!",
     "seoTitle": "Bucharest Stock Exchange | Live BVB Data | FinRomania",
     "seoDescription": "Real-time data from the Bucharest Stock Exchange. BVB Heatmap, Market Pulse indicators, top movers and complete Romanian market analysis.",
-    "bvbExchange": "Bucharest Stock Exchange"
+    "bvbExchange": "Bucharest Stock Exchange",
+    "realData": "Real Data",
+    "period1d": "1 day",
+    "period1w": "1 week",
+    "period1m": "30 days",
+    "period3m": "3 months",
+    "period6m": "6 months",
+    "period1y": "1 year",
+    "period5y": "5 years",
+    "refresh": "Refresh",
+    "errorLoading": "Failed to load data for",
+    "tradingSchoolLink": "Trading School →",
+    "financialEdLink": "Financial Education"
   },
   "screener": {
     "title": "BVB Stock Screener",
@@ -236,7 +254,20 @@
     "technicals": "Technical Indicators",
     "fundamentals": "Fundamentals",
     "confirmedBVB": "Confirmed BVB.ro (real dividends)",
-    "disclaimer": "Information is provided for educational purposes only and does NOT constitute investment advice."
+    "disclaimer": "Information is provided for educational purposes only and does NOT constitute investment advice.",
+    "strongBuy": "Strong Buy",
+    "buy": "Buy",
+    "hold": "Hold",
+    "sell": "Sell",
+    "strongSell": "Strong Sell",
+    "score": "Score",
+    "stocksUpdated": "stocks updated automatically",
+    "proRequired": "Screener PRO requires a PRO subscription",
+    "stock": "Stock",
+    "price": "Price",
+    "techDesc": "RSI, MACD, Bollinger, SMA/EMA - updated in real time",
+    "signalDesc": "Strong Buy → Strong Sell based on all indicators",
+    "inSeconds": "in {{time}}s"
   },
   "global": {
     "title": "Global Markets",
@@ -338,7 +369,15 @@
     "simulatorBtn": "Entrepreneur Simulator",
     "disclaimerText": "Calculations are indicative and based on current legislation. Tax law may change. For your specific situation, consult a certified accountant (CECCAR). FinRomania does not provide tax or legal advice.",
     "investOnBVB": "Investing on BVB?",
-    "investOnBVBDesc": "Good news! Romania has one of the most advantageous tax regimes for stock market investors: only 3-6% tax on gains!"
+    "investOnBVBDesc": "Good news! Romania has one of the most advantageous tax regimes for stock market investors: only 3-6% tax on gains!",
+    "gainLong": "Gain ≥1 year",
+    "gainShort": "Gain <1 year",
+    "dividendsLabel": "Dividends",
+    "capitalGainLabel": "Capital gain",
+    "rate": "Rate",
+    "threshold": "Threshold",
+    "withEmployee": "With employee",
+    "withoutEmployee": "Without employee"
   },
   "import": {
     "title": "Import Portfolio",
@@ -450,7 +489,18 @@
     "analysis": "Analysis",
     "aiAdvisor": "AI Advisor",
     "dividendsTab": "Dividends",
-    "newsTab": "News"
+    "newsTab": "News",
+    "sourcesMethodology": "Sources & Methodology",
+    "checkSource": "Check source",
+    "authRequired": "Authentication required",
+    "checkingSubscription": "Checking subscription...",
+    "entryPrice": "Entry Price",
+    "currentPrice": "Current Price",
+    "loadingAnalysis": "Loading portfolio analysis...",
+    "loadingDividends": "Loading dividend data...",
+    "loadingNews": "Loading relevant news...",
+    "deleteConfirm": "Position will be permanently removed from portfolio.",
+    "liveDataNote": "Live BVB data · RSI(14) · Prices with 15min delay · Updated on refresh"
   },
   "pricing": {
     "title": "Choose the Right Plan",
@@ -634,7 +684,23 @@
     "regenerate": "Regenerate Advice",
     "askAdvisor": "Ask the Advisor",
     "askAnything": "Ask any question about investments",
-    "disclaimer": "Information provided is for educational purposes only and does not constitute investment advice. Consult an authorized financial specialist before making investment decisions."
+    "disclaimer": "Information provided is for educational purposes only and does not constitute investment advice. Consult an authorized financial specialist before making investment decisions.",
+    "login": "Sign In",
+    "completeQuestionnaire": "Complete Questionnaire",
+    "conservative": "Conservative",
+    "moderate": "Moderate",
+    "aggressive": "Aggressive",
+    "holdings": "holdings",
+    "question": "Question:",
+    "popularQuestions": "Popular Questions:",
+    "q1": "What is an ETF?",
+    "q2": "How does the stock exchange work?",
+    "q3": "What does diversification mean?",
+    "riskAssessment": "Risk Assessment",
+    "riskAssessmentDesc": "Discover your investor profile",
+    "tradingSchoolDesc": "17 free lessons - Learn from scratch",
+    "virtualPortfolio": "Virtual Portfolio",
+    "virtualPortfolioDesc": "Practice risk-free"
   },
   "about": {
     "title": "Our Mission",
@@ -664,6 +730,22 @@
     "message": "Message",
     "send": "Send message",
     "success": "Message sent successfully! We'll respond soon."
+  },
+  "fiscalChat": {
+    "title": "Questions about taxation?",
+    "subtitle": "Ask our fiscal AI",
+    "headerSubtitle": "Questions about stock market taxes",
+    "questions": "questions",
+    "quickAnswers": "Quick Answers:",
+    "ask": "Ask:",
+    "aiFiscal": "AI Fiscal",
+    "activatePro": "Activate PRO",
+    "analyzing": "Analyzing question...",
+    "loginRequired": "Sign in for AI Fiscal",
+    "placeholder": "Ask about taxes...",
+    "authError": "You must be logged in to use AI Fiscal Advisor.",
+    "processError": "Processing error",
+    "genericError": "An error occurred. Please try again."
   },
   "faq": {
     "title": "Frequently Asked Questions",

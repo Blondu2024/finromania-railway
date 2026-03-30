@@ -30,6 +30,7 @@ import StockLogo from '../components/StockLogo';
 
 // ── Methodology collapsible section ─────────────────────────────────────────
 function SourcesSection({ items }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   return (
     <div className="mt-4 border rounded-lg bg-muted/20">
@@ -39,7 +40,7 @@ function SourcesSection({ items }) {
       >
         <span className="flex items-center gap-1.5">
           <BookOpen className="w-3.5 h-3.5" />
-          Surse & Metodologie
+          {t('portfolio.sourcesMethodology')}
         </span>
         {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
       </button>
@@ -54,7 +55,7 @@ function SourcesSection({ items }) {
               )}
               {item.link && (
                 <a href={item.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-1 text-blue-600 hover:underline">
-                  Verifică sursa <ExternalLink className="w-3 h-3" />
+                  {t('portfolio.checkSource')} <ExternalLink className="w-3 h-3" />
                 </a>
               )}
             </div>
@@ -282,8 +283,8 @@ export default function PortfolioBVBPage() {
       <div className="flex items-center justify-center py-24">
         <div className="text-center">
           <Crown className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Autentificare necesară</h2>
-          <Link to="/login"><Button className="bg-blue-600 hover:bg-blue-700 text-white">Conectare</Button></Link>
+          <h2 className="text-xl font-bold mb-2">{t('portfolio.authRequired')}</h2>
+          <Link to="/login"><Button className="bg-blue-600 hover:bg-blue-700 text-white">{t('common.login')}</Button></Link>
         </div>
       </div>
     );
@@ -292,7 +293,7 @@ export default function PortfolioBVBPage() {
     return (
       <div className="flex items-center justify-center py-24">
         <Crown className="w-10 h-10 text-amber-500 mx-auto mb-3 animate-pulse" />
-        <p className="text-muted-foreground text-sm">Se verifică abonamentul...</p>
+        <p className="text-muted-foreground text-sm">{t('portfolio.checkingSubscription')}</p>
       </div>
     );
   }
@@ -439,7 +440,7 @@ export default function PortfolioBVBPage() {
                     <tr className="border-b bg-muted/40">
                       <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Simbol</th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Cant.</th>
-                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Preț Intrare</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">{t('portfolio.entryPrice')}</th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
                         Preț Curent
                         <InfoTip>Sursa: BVB · Delay ~15 min</InfoTip>
@@ -535,7 +536,7 @@ export default function PortfolioBVBPage() {
                 </table>
               </div>
               <div className="px-4 py-2.5 border-t bg-muted/10">
-                <p className="text-xs text-muted-foreground">Date live BVB · RSI(14) · Prețuri cu delay 15min · Actualizare la refresh</p>
+                <p className="text-xs text-muted-foreground">{t('portfolio.liveDataNote')}</p>
               </div>
             </Card>
 
@@ -572,7 +573,7 @@ export default function PortfolioBVBPage() {
               <Card>
                 <CardContent className="py-12 text-center">
                   <BarChart3 className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-40" />
-                  <p className="text-muted-foreground text-sm">Se încarcă analiza portofoliului...</p>
+                  <p className="text-muted-foreground text-sm">{t('portfolio.loadingAnalysis')}</p>
                   <Button variant="outline" size="sm" className="mt-4" onClick={fetchAnalysis}>
                     <RefreshCw className="w-4 h-4 mr-2" /> Încarcă Analiza
                   </Button>
@@ -717,7 +718,7 @@ export default function PortfolioBVBPage() {
               <Card>
                 <CardContent className="py-12 text-center">
                   <Banknote className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-40" />
-                  <p className="text-muted-foreground text-sm">Se încarcă datele de dividende...</p>
+                  <p className="text-muted-foreground text-sm">{t('portfolio.loadingDividends')}</p>
                 </CardContent>
               </Card>
             )}
@@ -731,9 +732,9 @@ export default function PortfolioBVBPage() {
               <Card>
                 <CardContent className="py-12 text-center">
                   <Newspaper className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-40" />
-                  <p className="text-muted-foreground text-sm">Se încarcă știrile relevante...</p>
+                  <p className="text-muted-foreground text-sm">{t('portfolio.loadingNews')}</p>
                   <Button variant="outline" size="sm" className="mt-4" onClick={fetchNews}>
-                    <RefreshCw className="w-4 h-4 mr-2" /> Încarcă Știrile
+                    <RefreshCw className="w-4 h-4 mr-2" /> {t('portfolio.loadingNews')}
                   </Button>
                 </CardContent>
               </Card>
@@ -751,9 +752,9 @@ export default function PortfolioBVBPage() {
       <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader><DialogTitle>Elimini {deleteConfirm}?</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground">Poziția va fi eliminată definitiv din portofoliu.</p>
+          <p className="text-sm text-muted-foreground">{t('portfolio.deleteConfirm')}</p>
           <DialogFooter className="gap-2 mt-4">
-            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>Anulează</Button>
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>{t('common.cancel')}</Button>
             <Button variant="destructive" onClick={() => handleDelete(deleteConfirm)}>
               <Trash2 className="w-4 h-4 mr-2" /> Elimină
             </Button>

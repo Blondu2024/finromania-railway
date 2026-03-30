@@ -88,7 +88,13 @@
     "seeAll": "Vezi toate",
     "realData": "Date Reale",
     "demo": "Demo",
-    "and": "și"
+    "and": "și",
+    "login": "Conectare",
+    "cancel": "Anulează",
+    "shares": "acțiuni",
+    "sharesAbbr": "acț.",
+    "calculating": "Se calculează...",
+    "disclaimer": "Disclaimer"
   },
   "home": {
     "badge": "Date Live BVB · 55+ Acțiuni · AI Powered",
@@ -206,7 +212,19 @@
     "proFasterRefresh": "PRO: Refresh mai rapid!",
     "seoTitle": "Bursa de Valori București | Date Live BVB | FinRomania",
     "seoDescription": "Date în timp real de pe Bursa de Valori București. Heatmap BVB, indicatori Market Pulse, top movers și analiză completă a pieței românești.",
-    "bvbExchange": "Bursa de Valori București"
+    "bvbExchange": "Bursa de Valori București",
+    "realData": "Date Reale",
+    "period1d": "1 zi",
+    "period1w": "1 săptămână",
+    "period1m": "30 zile",
+    "period3m": "3 luni",
+    "period6m": "6 luni",
+    "period1y": "1 an",
+    "period5y": "5 ani",
+    "refresh": "Actualizează",
+    "errorLoading": "Nu s-au putut încărca datele pentru",
+    "tradingSchoolLink": "Școala de Trading →",
+    "financialEdLink": "Educație Financiară"
   },
   "screener": {
     "title": "Stock Screener BVB",
@@ -236,7 +254,20 @@
     "technicals": "Indicatori Tehnici",
     "fundamentals": "Fundamentale",
     "confirmedBVB": "Confirmat BVB.ro (dividende reale)",
-    "disclaimer": "Informațiile sunt furnizate doar în scop educativ și NU constituie sfaturi de investiții."
+    "disclaimer": "Informațiile sunt furnizate doar în scop educativ și NU constituie sfaturi de investiții.",
+    "strongBuy": "Cumpărare Puternică",
+    "buy": "Cumpărare",
+    "hold": "Păstrare",
+    "sell": "Vânzare",
+    "strongSell": "Vânzare Puternică",
+    "score": "Scor",
+    "stocksUpdated": "acțiuni actualizate automat",
+    "proRequired": "Screener PRO necesită abonament PRO",
+    "stock": "Acțiune",
+    "price": "Preț",
+    "techDesc": "RSI, MACD, Bollinger, SMA/EMA - actualizați în timp real",
+    "signalDesc": "Strong Buy → Strong Sell bazat pe toți indicatorii",
+    "inSeconds": "în {{time}}s"
   },
   "global": {
     "title": "Piețe Globale",
@@ -338,7 +369,15 @@
     "simulatorBtn": "Simulator Antreprenor",
     "disclaimerText": "Calculele sunt orientative și bazate pe legislația în vigoare. Legislația fiscală se poate modifica. Pentru situația ta specifică, consultă un contabil autorizat CECCAR. FinRomania nu oferă consiliere fiscală sau juridică.",
     "investOnBVB": "Investești pe BVB?",
-    "investOnBVBDesc": "Vești bune! România are unul dintre cele mai avantajoase regimuri fiscale pentru investitorii la bursă: doar 3-6% impozit pe câștiguri!"
+    "investOnBVBDesc": "Vești bune! România are unul dintre cele mai avantajoase regimuri fiscale pentru investitorii la bursă: doar 3-6% impozit pe câștiguri!",
+    "gainLong": "Câștig ≥1 an",
+    "gainShort": "Câștig <1 an",
+    "dividendsLabel": "Dividende",
+    "capitalGainLabel": "Câștig capital",
+    "rate": "Rată",
+    "threshold": "Prag",
+    "withEmployee": "Cu angajat",
+    "withoutEmployee": "Fără angajat"
   },
   "import": {
     "title": "Import Portofoliu",
@@ -450,7 +489,18 @@
     "analysis": "Analiză",
     "aiAdvisor": "AI Advisor",
     "dividendsTab": "Dividende",
-    "newsTab": "Știri"
+    "newsTab": "Știri",
+    "sourcesMethodology": "Surse & Metodologie",
+    "checkSource": "Verifică sursa",
+    "authRequired": "Autentificare necesară",
+    "checkingSubscription": "Se verifică abonamentul...",
+    "entryPrice": "Preț Intrare",
+    "currentPrice": "Preț Curent",
+    "loadingAnalysis": "Se încarcă analiza portofoliului...",
+    "loadingDividends": "Se încarcă datele de dividende...",
+    "loadingNews": "Se încarcă știrile relevante...",
+    "deleteConfirm": "Poziția va fi eliminată definitiv din portofoliu.",
+    "liveDataNote": "Date live BVB · RSI(14) · Prețuri cu delay 15min · Actualizare la refresh"
   },
   "pricing": {
     "title": "Alege Planul Potrivit",
@@ -634,7 +684,23 @@
     "regenerate": "Regenerează Sfatul",
     "askAdvisor": "Întreabă Consilierul",
     "askAnything": "Pune orice întrebare despre investiții",
-    "disclaimer": "Informațiile oferite sunt doar în scop educațional și nu constituie sfat de investiții. Consultați un specialist financiar autorizat înainte de a lua decizii de investiții."
+    "disclaimer": "Informațiile oferite sunt doar în scop educațional și nu constituie sfat de investiții. Consultați un specialist financiar autorizat înainte de a lua decizii de investiții.",
+    "login": "Conectare",
+    "completeQuestionnaire": "Completează Chestionarul",
+    "conservative": "Conservator",
+    "moderate": "Moderat",
+    "aggressive": "Agresiv",
+    "holdings": "dețineri",
+    "question": "Întrebare:",
+    "popularQuestions": "Întrebări populare:",
+    "q1": "Ce este un ETF?",
+    "q2": "Cum funcționează bursa?",
+    "q3": "Ce înseamnă diversificare?",
+    "riskAssessment": "Evaluare Risc",
+    "riskAssessmentDesc": "Descoperă-ți profilul de investitor",
+    "tradingSchoolDesc": "17 lecții gratuite - Învață de la zero",
+    "virtualPortfolio": "Portofoliu Virtual",
+    "virtualPortfolioDesc": "Practică fără risc"
   },
   "about": {
     "title": "Misiunea Noastră",
@@ -664,6 +730,22 @@
     "message": "Mesaj",
     "send": "Trimite mesajul",
     "success": "Mesajul a fost trimis cu succes! Îți vom răspunde în curând."
+  },
+  "fiscalChat": {
+    "title": "Întrebări despre fiscalitate?",
+    "subtitle": "Întreabă AI-ul nostru fiscal",
+    "headerSubtitle": "Întrebări despre impozite la bursă",
+    "questions": "întrebări",
+    "quickAnswers": "Răspunsuri rapide:",
+    "ask": "Întreabă:",
+    "aiFiscal": "AI Fiscal",
+    "activatePro": "Activează PRO",
+    "analyzing": "Analizez întrebarea...",
+    "loginRequired": "Conectează-te pentru AI Fiscal",
+    "placeholder": "Întreabă despre impozite...",
+    "authError": "Trebuie să fii autentificat pentru a folosi AI Fiscal Advisor.",
+    "processError": "Eroare la procesare",
+    "genericError": "A apărut o eroare. Te rog să încerci din nou."
   },
   "faq": {
     "title": "Întrebări Frecvente",

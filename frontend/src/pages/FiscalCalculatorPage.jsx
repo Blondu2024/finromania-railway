@@ -364,7 +364,7 @@ export default function FiscalCalculatorPage() {
             <CardContent className="p-4 text-center">
               <TrendingUp className="w-6 h-6 text-blue-600 mx-auto mb-2" />
               <p className="text-xl font-bold text-blue-600">16%</p>
-              <p className="text-xs text-muted-foreground">Dividende RO</p>
+              <p className="text-xs text-muted-foreground">{t('common.dividend')} RO</p>
             </CardContent>
           </Card>
         </div>
@@ -456,10 +456,10 @@ export default function FiscalCalculatorPage() {
                   </TabsList>
                 </Tabs>
                 {tipPiata === 'bvb' && (
-                  <p className="text-xs text-green-600">✅ Impozit avantajos: 3-6%</p>
+                  <p className="text-xs text-green-600">✅ {t('fiscal.bvbRates')}: 3-6%</p>
                 )}
                 {tipPiata === 'international' && (
-                  <p className="text-xs text-yellow-600">⚠️ Impozit: 16%</p>
+                  <p className="text-xs text-yellow-600">⚠️ {t('fiscal.internationalRates')}: 16%</p>
                 )}
               </div>
 
@@ -613,7 +613,7 @@ export default function FiscalCalculatorPage() {
                     {t('fiscal.investOnBVBDesc')}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Completează formularul pentru a calcula exact cât datorezi.
+                    {t('fiscal.enterGains')}
                   </p>
                 </CardContent>
               </Card>
@@ -635,25 +635,25 @@ export default function FiscalCalculatorPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
                   <h4 className="font-semibold text-green-700 dark:text-green-300 mb-2">🇷🇴 {t('fiscal.bvbRates')}</h4>
-                  <p className="text-sm text-muted-foreground">Câștig ≥1 an: <strong>3%</strong></p>
-                  <p className="text-sm text-muted-foreground">Câștig &lt;1 an: <strong>6%</strong></p>
-                  <p className="text-sm text-muted-foreground">Dividende: <strong>16%</strong></p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.gainLong')}: <strong>3%</strong></p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.gainShort')}: <strong>6%</strong></p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.dividendsLabel')}: <strong>16%</strong></p>
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                   <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🌍 {t('fiscal.internationalRates')}</h4>
-                  <p className="text-sm text-muted-foreground">Câștig capital: <strong>16%</strong></p>
-                  <p className="text-sm text-muted-foreground">Dividende: <strong>16%</strong></p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.capitalGainLabel')}: <strong>16%</strong></p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.dividendsLabel')}: <strong>16%</strong></p>
                 </div>
                 <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
                   <h4 className="font-semibold text-amber-700 dark:text-amber-300 mb-2">🏥 {t('fiscal.cassRates')}</h4>
-                  <p className="text-sm text-muted-foreground">Rată: <strong>10%</strong></p>
-                  <p className="text-sm text-muted-foreground">Prag: <strong>{constante.cass?.prag_activare}</strong></p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.rate')}: <strong>10%</strong></p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.threshold')}: <strong>{constante.cass?.prag_activare}</strong></p>
                   <p className="text-xs text-muted-foreground mt-1">{constante.cass?.nota}</p>
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                   <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">🏢 {t('fiscal.srlMicro')}</h4>
-                  <p className="text-sm text-muted-foreground">Cu angajat: <strong>{constante.micro_srl?.cu_angajat}</strong></p>
-                  <p className="text-sm text-muted-foreground">Fără angajat: <strong>{constante.micro_srl?.fara_angajat}</strong></p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.withEmployee')}: <strong>{constante.micro_srl?.cu_angajat}</strong></p>
+                  <p className="text-sm text-muted-foreground">{t('fiscal.withoutEmployee')}: <strong>{constante.micro_srl?.fara_angajat}</strong></p>
                 </div>
               </div>
             </CardContent>
@@ -719,7 +719,7 @@ export default function FiscalCalculatorPage() {
             <div className="flex items-start gap-4">
               <AlertTriangle className="w-6 h-6 text-slate-600 flex-shrink-0 mt-1" />
               <div>
-                <h4 className="font-semibold">Disclaimer</h4>
+                <h4 className="font-semibold">{t('common.disclaimer')}</h4>
                 <p className="text-sm text-muted-foreground mt-1">
                   {t('fiscal.disclaimerText')}
                 </p>
