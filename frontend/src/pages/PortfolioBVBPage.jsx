@@ -320,7 +320,7 @@ export default function PortfolioBVBPage() {
 
   return (
     <>
-      <SEO title={`${t('portfolio.title')} | FinRomania`} />
+      <SEO title="Portofoliu BVB PRO | FinRomania" />
 
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
@@ -341,10 +341,10 @@ export default function PortfolioBVBPage() {
             </Button>
           )}
           <Button variant="outline" size="sm" onClick={() => setShowCSVImport(true)}>
-            <Upload className="w-4 h-4 mr-1.5" /> Import
+            <Upload className="w-4 h-4 mr-1.5" /> {t('portfolio.importCSV')}
           </Button>
           <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setShowAdd(true)}>
-            <Plus className="w-4 h-4 mr-1.5" /> Adaugă
+            <Plus className="w-4 h-4 mr-1.5" /> {t('portfolio.addManual')}
           </Button>
         </div>
       </div>
@@ -430,7 +430,7 @@ export default function PortfolioBVBPage() {
             <Card>
               <CardHeader className="py-3 px-4 border-b">
                 <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                  Poziții Active — {positions.length}
+                  {t('portfolio.activePositions')} — {positions.length}
                 </CardTitle>
               </CardHeader>
               <div className="overflow-x-auto">
@@ -560,7 +560,7 @@ export default function PortfolioBVBPage() {
                 label: 'Dividend Yield',
                 description: 'Calculat pe baza dividendelor plătite în ultimele 12 luni (trailing), conform datelor oficiale BVB.ro.',
                 formula: 'Yield = (Suma dividendelor trailing 12 luni / Preț curent) × 100',
-                link: 'https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar',
+                link: 'https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend',
               },
             ]} />
           </TabsContent>
@@ -683,7 +683,7 @@ export default function PortfolioBVBPage() {
                   <div className="px-4 py-2.5 border-t bg-muted/10">
                     <p className="text-xs text-muted-foreground">
                       Sursa: BVB.ro oficial · Trailing 12 luni · Dividend per acțiune brut (înainte de impozit) ·{' '}
-                      <a href="https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-0.5">
+                      <a href="https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-0.5">
                         Verifică pe BVB.ro <ExternalLink className="w-3 h-3" />
                       </a>
                     </p>
@@ -694,7 +694,7 @@ export default function PortfolioBVBPage() {
                   {
                     label: 'Sursa dividendelor',
                     description: 'Datele sunt extrase direct de pe BVB.ro (Calendarul Dividendelor). Sunt dividendele brute (înainte de impozitul de 16%).',
-                    link: 'https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar',
+                    link: 'https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend',
                   },
                   {
                     label: 'Dividend Yield (Randament)',

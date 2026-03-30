@@ -703,6 +703,9 @@ async def get_dividend_kings():
 
             if div_yield <= 0 and current_price > 0 and div_per_share > 0:
                 div_yield = round(div_per_share / current_price * 100, 2)
+            # Estimate price from yield + DPS when stock is not in main list
+            if current_price <= 0 and div_yield > 0 and div_per_share > 0:
+                current_price = round(div_per_share / (div_yield / 100), 2)
 
             kings.append({
                 "symbol": sym,

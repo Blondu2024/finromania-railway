@@ -76,14 +76,14 @@ const DividendStocksTable = ({ stocks, onAddToPortfolio }) => {
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="text-right font-mono">{stock.price?.toFixed(2)} RON</TableCell>
+              <TableCell className="text-right font-mono">{stock.price > 0 ? `${stock.price.toFixed(2)} RON` : '—'}</TableCell>
               <TableCell className="text-right font-mono text-green-600">{stock.dividend_per_share?.toFixed(3)} RON</TableCell>
               <TableCell className="text-right">
                 <Badge variant={stock.dividend_yield >= 5 ? "default" : "secondary"} className={stock.dividend_yield >= 5 ? "bg-green-600" : ""}>
                   {stock.dividend_yield?.toFixed(2)}%
                 </Badge>
               </TableCell>
-              <TableCell className="text-right text-sm">{stock.payout_ratio}%</TableCell>
+              <TableCell className="text-right text-sm">{stock.payout_ratio != null ? `${stock.payout_ratio}%` : '—'}</TableCell>
               <TableCell className="text-right text-sm text-muted-foreground">{stock.ex_date}</TableCell>
               <TableCell className="text-center">
                 <Button size="sm" variant="outline" onClick={() => onAddToPortfolio(stock)}>
@@ -1165,7 +1165,7 @@ export default function DividendCalculatorPage() {
             <div className="grid md:grid-cols-2 gap-4 text-xs">
               <div className="space-y-2">
                 <p><strong>Sursa dividende:</strong> Date oficiale extrase de pe{' '}
-                  <a href="https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">BVB.ro ↗</a>
+                  <a href="https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">BVB.ro ↗</a>
                   . Dividendele afișate sunt valori BRUTE (înainte de impozit).
                 </p>
                 <p><strong>Prețuri acțiuni:</strong> Prețurile provin de pe Bursa de Valori București cu delay ~15 min.</p>

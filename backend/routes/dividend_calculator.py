@@ -431,6 +431,9 @@ async def get_dividend_stocks():
         div_yield = latest.get("dividend_yield", 0)
         if div_yield <= 0 and current_price > 0:
             div_yield = trailing_annual / current_price * 100
+        # Estimate price from yield + DPS when not in main stocks list
+        if current_price <= 0 and div_yield > 0 and trailing_annual > 0:
+            current_price = trailing_annual / (div_yield / 100)
 
         stocks.append({
             "symbol": symbol,
@@ -476,7 +479,10 @@ async def get_dividend_stocks():
             if current_price > 0:
                 div_yield = div_per_share / current_price * 100
             else:
-                div_yield = 0
+                # Estimate from fallback yield if available
+                div_yield = fallback.get("dividend_yield", 0)
+                if div_yield > 0:
+                    current_price = div_per_share / (div_yield / 100)
             stocks.append({
                 "symbol": symbol,
                 "name": fallback["name"],

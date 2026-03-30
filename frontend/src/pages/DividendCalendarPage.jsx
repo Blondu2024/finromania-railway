@@ -288,7 +288,7 @@ export default function DividendCalendarPage() {
           <p className="text-muted-foreground mb-1">{t('dividends.calendarSubtitle')}</p>
           <p className="text-xs text-green-600 font-medium mb-4">
             {t('dividends.source')}: BVB.ro ·{' '}
-            <a href="https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar" target="_blank" rel="noopener noreferrer" className="underline hover:text-green-800">
+            <a href="https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend" target="_blank" rel="noopener noreferrer" className="underline hover:text-green-800">
               Verifică pe BVB.ro ↗
             </a>
           </p>
@@ -418,7 +418,7 @@ export default function DividendCalendarPage() {
                 <h4 className="font-semibold text-foreground mb-2">📋 Surse & Fiscalitate</h4>
                 <ul className="space-y-2">
                   <li><strong>Sursa date:</strong> Dividendele sunt extrase de pe{' '}
-                    <a href="https://bvb.ro/FinancialInstruments/Markets/Shares/DividendCalendar" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">BVB.ro (oficial) ↗</a>
+                    <a href="https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">BVB.ro (oficial) ↗</a>
                   </li>
                   <li><strong>Impozit dividende:</strong> 16% reținut la sursă (Legea 141/2025, aplicabil din 01.01.2026)</li>
                   <li><strong>CASS:</strong> Se poate aplica contribuție la sănătate de 10% dacă veniturile din investiții depășesc 6 salarii minime brute (28.200 RON în 2026)</li>
