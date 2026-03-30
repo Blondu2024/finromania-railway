@@ -11,73 +11,28 @@ import FreeVsProComparison from '../components/FreeVsProComparison';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const WHY_PRO_CARDS = [
-  {
-    icon: Calculator,
-    title: "Economisește Mii de RON",
-    description: "Calculatorul Fiscal îți arată exact cum să optimizezi impozitarea investițiilor. Un singur calcul corect poate însemna economii de 10.000-50.000 RON anual.",
-    gradient: "from-amber-500 to-orange-500"
-  },
-  {
-    icon: Brain,
-    title: "Învață Fără Limite",
-    description: "AI Advisor nelimitat înseamnă că poți întreba orice, oricând. Înveți în ritmul tău, fără să numeri întrebările.",
-    gradient: "from-blue-500 to-blue-500"
-  },
-  {
-    icon: TrendingUp,
-    title: "Date Mai Rapide",
-    description: "Delay-uri reduse: 15min pentru BVB (vs 30min) și 1 secundă pentru Global Markets (vs 15min). Reacționezi mai rapid la piață.",
-    gradient: "from-green-500 to-emerald-500"
-  },
-  {
-    icon: Target,
-    title: "Monitorizare Completă",
-    description: "Watchlist nelimitat și alerte pentru toate companiile din portofoliu. Nu mai alegi între acțiuni - le urmărești pe toate.",
-    gradient: "from-blue-500 to-cyan-500"
-  }
-];
-
-const FAQ_ITEMS = [
-  {
-    q: "De ce să plătesc pentru o platformă de educație?",
-    a: "Educația (lecțiile și cursurile) rămâne 100% GRATUITĂ! Planul PRO deblochează INSTRUMENTE PROFESIONALE precum Calculatorul Fiscal (poate economisi zeci de mii de RON), AI nelimitat, date mai rapide și funcții avansate de analiză. E diferența dintre a învăța teorie și a avea uneltele pentru a aplica practic."
-  },
-  {
-    q: "Calculatorul Fiscal chiar merită investiția?",
-    a: "Absolut! Un singur calcul corect despre impozitare (PF vs SRL) poate economisi 10.000-50.000 RON pe an pentru investitorii activi. Abonamentul PRO se plătește singur din prima lună dacă investești serios pe BVB sau internațional. Include și AI Fiscal Advisor pentru întrebări complexe."
-  },
-  {
-    q: "Ce înseamnă delay-uri diferite pentru date?",
-    a: "FREE users primesc date cu un delay mai mare (30min BVB, 15min Global), suficient pentru analiză și educație. PRO users primesc date mai rapide (15min BVB, 1s Global), esențiale pentru decizii de trading mai rapide și monitorizare activă."
-  },
-  {
-    q: "De ce limite la watchlist și alerte?",
-    a: "Planul FREE permite 3 acțiuni în watchlist și alerte pentru 2 companii - perfect pentru început. PRO oferă watchlist și alerte nelimitate, necesar când ai un portofoliu diversificat cu 5-15+ acțiuni și vrei să le monitorizezi pe toate."
-  },
-  {
-    q: "Ce înseamnă 'toate nivelurile fără quiz'?",
-    a: "FREE users trebuie să treacă un quiz (minim 7 din 10 răspunsuri corecte) pentru a avansa la nivelele Mediu și Expert. PRO users au acces DIRECT la toate cele 3 nivele din prima zi, cu toate funcțiile avansate (indicatori tehnici, analiză fundamentală)."
-  },
-  {
-    q: "Pot anula oricând?",
-    a: "Da, 100%! Anulezi când vrei, fără costuri ascunse. Vei avea acces la funcțiile PRO până la sfârșitul perioadei plătite. Planul anual (490 RON) oferă economie de 2 luni față de lunar."
-  },
-  {
-    q: "Ce diferență e între planul lunar și anual?",
-    a: "Planul lunar: 49 RON/lună (588 RON/an). Planul anual: 490 RON/an - economisești 98 RON (2 luni gratuite). Ambele oferă aceleași funcții PRO, diferă doar prețul și perioada de facturare."
-  },
-  {
-    q: "Cum funcționează plata și facturarea?",
-    a: "Plata se face securizat prin card bancar. Vei primi factură fiscală pentru fiecare plată. Pentru planul lunar, facturarea e automată în fiecare lună. Poți anula oricând din contul tău."
-  }
-];
+// WHY_PRO_CARDS and FAQ_ITEMS moved inside component for i18n access
 
 export default function TryProPage() {
   const { t } = useTranslation();
   const { user, token } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const WHY_PRO_CARDS = [
+    { icon: Calculator, title: t('pricing.whyPro1Title'), description: t('pricing.whyPro1Desc'), gradient: "from-amber-500 to-orange-500" },
+    { icon: Brain, title: t('pricing.whyPro2Title'), description: t('pricing.whyPro2Desc'), gradient: "from-blue-500 to-blue-500" },
+    { icon: TrendingUp, title: t('pricing.whyPro3Title'), description: t('pricing.whyPro3Desc'), gradient: "from-green-500 to-emerald-500" },
+    { icon: Target, title: t('pricing.whyPro4Title'), description: t('pricing.whyPro4Desc'), gradient: "from-blue-500 to-cyan-500" },
+  ];
+
+  const FAQ_ITEMS = [
+    { q: t('pricing.faqWhyPayQ'), a: t('pricing.faqWhyPayA') },
+    { q: t('pricing.faqCalcQ'), a: t('pricing.faqCalcA') },
+    { q: t('pricing.faqDelayQ'), a: t('pricing.faqDelayA') },
+    { q: t('pricing.faqWatchlistQ'), a: t('pricing.faqWatchlistA') },
+    { q: t('pricing.faqQuizQ'), a: t('pricing.faqQuizA') },
+  ];
 
   useEffect(() => {
     if (user && token) {

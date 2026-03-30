@@ -52,13 +52,13 @@ const DividendStocksTable = ({ stocks, onAddToPortfolio }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Acțiune</TableHead>
-            <TableHead className="text-right">Preț</TableHead>
-            <TableHead className="text-right">Dividend/Acț</TableHead>
-            <TableHead className="text-right">Yield</TableHead>
-            <TableHead className="text-right">Payout</TableHead>
+            <TableHead>{t('dividends.tableStock')}</TableHead>
+            <TableHead className="text-right">{t('dividends.tablePrice')}</TableHead>
+            <TableHead className="text-right">{t('dividends.tableDPS')}</TableHead>
+            <TableHead className="text-right">{t('dividends.yield')}</TableHead>
+            <TableHead className="text-right">{t('dividends.tablePayout')}</TableHead>
             <TableHead className="text-right">Ex-Date</TableHead>
-            <TableHead className="text-center">Acțiune</TableHead>
+            <TableHead className="text-center">{t('dividends.tableAction')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -128,15 +128,15 @@ const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <PiggyBank className="w-5 h-5 text-amber-500" />
-          Portofoliul Tău
+          {t('dividends.yourPortfolio')}
         </CardTitle>
-        <CardDescription>Adaugă acțiuni și specifică numărul de unități</CardDescription>
+        <CardDescription>{t('dividends.addStocksDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         {portfolio.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Coins className="w-12 h-12 mx-auto mb-2 opacity-30" />
-            <p>Adaugă acțiuni din tabelul de mai jos</p>
+            <p>{t('dividends.addStocksBelow')}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -204,14 +204,14 @@ const ResultsDisplay = ({ results, t }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200">
           <CardContent className="pt-4">
-            <div className="text-sm text-muted-foreground">Investiție Totală</div>
+            <div className="text-sm text-muted-foreground">{t('dividends.totalInvestment')}</div>
             <div className="text-2xl font-bold text-blue-600">{summary.total_investment.toLocaleString('ro-RO', {minimumFractionDigits: 0})} RON</div>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200">
           <CardContent className="pt-4">
-            <div className="text-sm text-muted-foreground">Dividend Brut/An</div>
+            <div className="text-sm text-muted-foreground">{t('dividends.grossAnnual')}</div>
             <div className="text-2xl font-bold text-green-600">{summary.total_annual_dividend_gross?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</div>
             <div className="text-xs text-muted-foreground">{t('dividends.yield')}: {summary.portfolio_yield?.toFixed(2)}%</div>
           </CardContent>
@@ -219,9 +219,9 @@ const ResultsDisplay = ({ results, t }) => {
 
         <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-amber-200">
           <CardContent className="pt-4">
-            <div className="text-sm text-muted-foreground">Net după Impozit + CASS</div>
+            <div className="text-sm text-muted-foreground">{t('dividends.netAfterTax')}</div>
             <div className="text-2xl font-bold text-amber-600">{(summary.total_net_dupa_cass ?? summary.total_annual_dividend_net)?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</div>
-            <div className="text-xs text-muted-foreground">~{((summary.total_net_dupa_cass ?? summary.total_annual_dividend_net) / 12).toFixed(0)} RON/lună</div>
+            <div className="text-xs text-muted-foreground">~{((summary.total_net_dupa_cass ?? summary.total_annual_dividend_net) / 12).toFixed(0)} RON{t('dividends.perMonth')}</div>
           </CardContent>
         </Card>
 
@@ -229,7 +229,7 @@ const ResultsDisplay = ({ results, t }) => {
           <CardContent className="pt-4">
             <div className="text-sm text-muted-foreground">{t('dividends.yield')}</div>
             <div className="text-2xl font-bold text-blue-600">{summary.portfolio_yield?.toFixed(2)}%</div>
-            <div className="text-xs text-muted-foreground">brut/an</div>
+            <div className="text-xs text-muted-foreground">{t('dividends.grossYear')}</div>
           </CardContent>
         </Card>
       </div>
@@ -239,26 +239,26 @@ const ResultsDisplay = ({ results, t }) => {
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
             <Calculator className="w-4 h-4 text-orange-500" />
-            Calcul Fiscal 2026
+            {t('dividends.fiscalCalc2026')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="space-y-1.5">
-              <div className="flex justify-between"><span>Dividend brut total:</span><span className="font-mono font-semibold">{summary.total_annual_dividend_gross?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span></div>
-              <div className="flex justify-between text-red-500"><span>Impozit 16% (reținut la sursă):</span><span className="font-mono">-{summary.impozit_dividende_16pct?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span></div>
-              <div className="flex justify-between font-semibold border-t pt-1"><span>Net după impozit:</span><span className="font-mono">{summary.total_annual_dividend_net?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span></div>
+              <div className="flex justify-between"><span>{t('dividends.grossDivTotal')}</span><span className="font-mono font-semibold">{summary.total_annual_dividend_gross?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span></div>
+              <div className="flex justify-between text-red-500"><span>{t('dividends.tax16')}</span><span className="font-mono">-{summary.impozit_dividende_16pct?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span></div>
+              <div className="flex justify-between font-semibold border-t pt-1"><span>{t('dividends.netAfterTaxLabel')}</span><span className="font-mono">{summary.total_annual_dividend_net?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span></div>
             </div>
             <div className="space-y-1.5">
               <div className="flex justify-between">
                 <span>CASS ({cass.plafon || 'sub 6 SMB'}):</span>
                 <span className={`font-mono ${cass.datorat ? 'text-red-500' : 'text-green-500'}`}>
-                  {cass.datorat ? `-${cass.suma?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON` : '0 RON (sub prag)'}
+                  {cass.datorat ? `-${cass.suma?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON` : t('dividends.zeroSubThreshold')}
                 </span>
               </div>
               {cass.detaliu && <div className="text-xs text-muted-foreground">{cass.detaliu}</div>}
               <div className="flex justify-between font-bold text-green-600 border-t pt-1">
-                <span>NET FINAL (după impozit + CASS):</span>
+                <span>{t('dividends.netFinal')}</span>
                 <span className="font-mono">{(summary.total_net_dupa_cass ?? summary.total_annual_dividend_net)?.toLocaleString('ro-RO', {minimumFractionDigits: 2})} RON</span>
               </div>
             </div>
@@ -278,7 +278,7 @@ const ResultsDisplay = ({ results, t }) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
-            Detalii pe Acțiuni
+            {t('dividends.detailsPerStock')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -286,13 +286,13 @@ const ResultsDisplay = ({ results, t }) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Acțiune</TableHead>
-                  <TableHead className="text-right">Acțiuni</TableHead>
-                  <TableHead className="text-right">Investiție</TableHead>
-                  <TableHead className="text-right">Div/Acț</TableHead>
-                  <TableHead className="text-right">Dividend Brut</TableHead>
-                  <TableHead className="text-right">Impozit 16%</TableHead>
-                  <TableHead className="text-right">Dividend NET</TableHead>
+                  <TableHead>{t('dividends.tableStock')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.tableShares')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.tableInvestment')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.tableDPS')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.tableGrossDividend')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.tableTax16')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.tableNetDividend')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1027,7 +1027,7 @@ export default function DividendCalculatorPage() {
               <div className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Setări Calcul</CardTitle>
+                    <CardTitle className="text-lg">{t('dividends.calcSettings')}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -1039,7 +1039,7 @@ export default function DividendCalculatorPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Ani proiecție: {yearsProjection}</Label>
+                      <Label>{t('dividends.projectionYears')} {yearsProjection}</Label>
                       <Slider
                         value={[yearsProjection]}
                         onValueChange={([v]) => setYearsProjection(v)}
@@ -1050,7 +1050,7 @@ export default function DividendCalculatorPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label>Creștere dividende/an: {growthRate}%</Label>
+                      <Label>{t('dividends.dividendGrowth')} {growthRate}%</Label>
                       <Slider
                         value={[growthRate]}
                         onValueChange={([v]) => setGrowthRate(v)}
@@ -1095,7 +1095,7 @@ export default function DividendCalculatorPage() {
             {/* Quick Add Buttons */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Adaugă Rapid</CardTitle>
+                <CardTitle className="text-sm">{t('dividends.addQuick')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -1134,7 +1134,7 @@ export default function DividendCalculatorPage() {
           <TabsContent value="stocks">
             <Card>
               <CardHeader>
-                <CardTitle>Acțiuni BVB cu Dividende</CardTitle>
+                <CardTitle>{t('dividends.bvbDividendStocks')}</CardTitle>
                 <CardDescription>
                   {t('dividends.source')}: BVB.ro (oficial) • Sortate după Dividend Yield
                 </CardDescription>
