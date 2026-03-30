@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -116,6 +117,8 @@ export default function FiscalSimulatorPage() {
   };
 
   return (
+    <>
+    <SEO title={`${t('simulator.title')} | FinRomania`} description={t('simulator.subtitle')} />
     <div className="container mx-auto px-4 py-8 max-w-5xl">
       {/* Header */}
       <div className="mb-8 text-center">
@@ -542,5 +545,6 @@ export default function FiscalSimulatorPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

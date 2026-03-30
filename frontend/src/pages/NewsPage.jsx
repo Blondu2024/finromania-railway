@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { Newspaper, RefreshCw, Clock, Building2, Globe, Flag } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -137,6 +138,8 @@ export default function NewsPage() {
   }
 
   return (
+    <>
+    <SEO title={`${t('news.title')} | FinRomania`} description={t('news.subtitle')} />
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -267,5 +270,6 @@ export default function NewsPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

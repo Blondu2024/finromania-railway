@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { GraduationCap, Trophy, Lock, CheckCircle, Clock, ChevronRight, Star, TrendingUp, Award, DollarSign } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
@@ -72,6 +73,8 @@ export default function FinancialEducationPage() {
   const progressPercent = totalLessons > 0 ? (completedCount / totalLessons) * 100 : 0;
 
   return (
+    <>
+    <SEO title={`${t('education.financialTitle')} | FinRomania`} description={t('education.financialSubtitle')} />
     <div className="min-h-0">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-16">
@@ -340,5 +343,6 @@ export default function FinancialEducationPage() {
         )}
       </div>
     </div>
+    </>
   );
 }

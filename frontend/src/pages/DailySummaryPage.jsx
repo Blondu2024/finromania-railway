@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -72,6 +73,8 @@ export default function DailySummaryPage() {
   const betValue = indices.BET?.value;
 
   return (
+    <>
+    <SEO title="Daily Market Summary | FinRomania" description="AI-generated daily BVB market summary with top movers, volume analysis, and market sentiment." />
     <div className="max-w-3xl mx-auto space-y-6" data-testid="daily-summary-page">
       {/* Notă dacă rezumatul e vechi */}
       {showOldSummaryNote && (
@@ -212,5 +215,6 @@ export default function DailySummaryPage() {
         Informații educative, NU sfaturi de investiții. Datele pot conține erori.
       </p>
     </div>
+    </>
   );
 }

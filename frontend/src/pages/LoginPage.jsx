@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
@@ -38,6 +39,8 @@ export default function LoginPage() {
   }
 
   return (
+    <>
+    <SEO title={`${t('login.welcome')} | FinRomania`} description={t('login.subtitle')} />
     <div className="min-h-[70vh] flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
@@ -81,5 +84,6 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

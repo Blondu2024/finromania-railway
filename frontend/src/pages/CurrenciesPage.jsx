@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { DollarSign, RefreshCw, Search } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -125,6 +126,8 @@ export default function CurrenciesPage() {
   }
 
   return (
+    <>
+    <SEO title={`${t('converter.title')} | FinRomania`} description={t('converter.subtitle')} />
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -213,5 +216,6 @@ export default function CurrenciesPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

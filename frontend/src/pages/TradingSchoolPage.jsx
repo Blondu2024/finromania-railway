@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { GraduationCap, Trophy, Lock, CheckCircle, Clock, ChevronRight, Star, TrendingUp, Award } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
@@ -75,6 +76,8 @@ export default function TradingSchoolPage() {
   const progressPercent = totalLessons > 0 ? (completedCount / totalLessons) * 100 : 0;
 
   return (
+    <>
+    <SEO title={`${t('education.tradingSchoolTitle')} | FinRomania`} description={t('education.tradingSchoolSubtitle')} />
     <div className="min-h-0">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-16">
@@ -278,5 +281,6 @@ export default function TradingSchoolPage() {
         )}
       </div>
     </div>
+    </>
   );
 }

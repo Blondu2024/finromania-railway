@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, CheckCircle, XCircle, TrendingUp, Shield,
@@ -74,6 +75,8 @@ function FAQItem({ item }) {
 export default function CFDvsActiuniPage() {
   const { t } = useTranslation();
   return (
+    <>
+    <SEO title="CFD vs Stocks | FinRomania" description="Learn the differences between CFD trading and stock investing. Pros, cons, and which is right for you." />
     <div className="max-w-4xl mx-auto space-y-10 pb-12">
 
       {/* HERO */}
@@ -394,5 +397,6 @@ export default function CFDvsActiuniPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

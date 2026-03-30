@@ -4,11 +4,13 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
+import SEO from '../components/SEO';
 
 export default function PrivacyPolicyPage() {
   const { t } = useTranslation();
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <SEO title="Privacy Policy | FinRomania" description="FinRomania privacy policy - how we protect and handle your personal data." />
       <Link to="/">
         <Button variant="ghost" size="sm">
           <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi

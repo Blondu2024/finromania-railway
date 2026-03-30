@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { ClipboardCheck, ArrowRight, ArrowLeft, CheckCircle, Shield, TrendingUp, Zap, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
@@ -234,6 +235,8 @@ export default function RiskAssessmentPage() {
   const canSubmit = Object.keys(answers).length === questions.length;
 
   return (
+    <>
+    <SEO title={`${t('risk.title')} | FinRomania`} description="Discover your investor risk profile with our questionnaire" />
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="text-center">
         <ClipboardCheck className="w-12 h-12 text-blue-600 mx-auto mb-4" />
@@ -308,5 +311,6 @@ export default function RiskAssessmentPage() {
         </p>
       )}
     </div>
+    </>
   );
 }

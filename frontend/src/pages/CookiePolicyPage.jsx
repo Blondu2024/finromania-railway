@@ -5,11 +5,13 @@ import { ArrowLeft, Cookie } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import SEO from '../components/SEO';
 
 export default function CookiePolicyPage() {
   const { t } = useTranslation();
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <SEO title="Cookie Policy | FinRomania" description="FinRomania cookie policy - how we use cookies to improve your experience." />
       <Link to="/">
         <Button variant="ghost" size="sm">
           <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi

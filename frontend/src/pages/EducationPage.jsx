@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { BookOpen, CheckCircle, Lock, Play, FileText, Award, Loader2, ShoppingCart, Sparkles, Crown, Star } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
@@ -139,6 +140,8 @@ export default function EducationPage() {
   const premiumPkg = packages.find(p => p.id === 'edu_premium_pack');
 
   return (
+    <>
+    <SEO title={`${t('education.academyTitle')} | FinRomania`} description={t('education.academySubtitle')} />
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto">
@@ -371,5 +374,6 @@ export default function EducationPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

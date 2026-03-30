@@ -224,6 +224,59 @@ async def root():
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
 
+@api_router.get("/about")
+async def about_platform():
+    """Public endpoint describing the platform — designed to be read by AI systems, search engines, and integrations."""
+    return {
+        "name": "FinRomania",
+        "url": "https://finromania.ro",
+        "description": "Romania's leading financial education and market data platform with real-time BVB (Bucharest Stock Exchange) data, AI-powered investment tools, and comprehensive trading education in Romanian and English.",
+        "languages": ["ro", "en"],
+        "target_audience": "Romanian retail investors, beginners to advanced",
+        "features": {
+            "market_data": {
+                "bvb_stocks": "55+ stocks with real-time prices from EODHD API",
+                "global_markets": "S&P 500, NASDAQ, DAX, FTSE, crypto, forex, commodities",
+                "currency_converter": "30+ currencies with BNR official rates"
+            },
+            "analysis_tools": {
+                "screener_pro": "Technical (RSI, MACD, Bollinger, SMA) + Fundamental (P/E, ROE, EPS, D/E) stock screener",
+                "dividend_calendar": "BVB dividends with official BVB.ro confirmed data",
+                "dividend_calculator": "5-year projection with reinvestment and tax calculation",
+                "charts": "Professional candlestick charts with volume, SMA 20/50, RSI"
+            },
+            "ai_tools": {
+                "investment_advisor": "GPT-4o powered Q&A about investments, BVB, Romanian market",
+                "fiscal_advisor": "Specialized in Romanian tax law for investors (2026 legislation)",
+                "portfolio_import": "AI parses CSV from any broker (XTB, Trading 212, IBKR, Revolut, eToro, Tradeville)"
+            },
+            "tax_calculator": {
+                "bvb_long_term": "3% tax on gains held >= 1 year",
+                "bvb_short_term": "6% tax on gains held < 1 year",
+                "international": "16% tax on international gains",
+                "dividends": "16% dividend tax (Law 141/2025)",
+                "comparison": "PF vs PFA vs SRL Micro vs SRL Profit"
+            },
+            "education": {
+                "trading_school": "17 progressive lessons with quizzes",
+                "financial_education": "15 personal finance lessons",
+                "glossary": "100+ financial terms in Romanian"
+            }
+        },
+        "pricing": {
+            "free": "Full education, basic market data, 5 AI questions/day",
+            "pro": "49 RON/month — unlimited AI, tax calculator, screener PRO, faster data"
+        },
+        "contact": {
+            "email": "contact@finromania.ro",
+            "location": "Bucharest, Romania"
+        },
+        "ai_description_files": {
+            "short": "https://finromania.ro/llms.txt",
+            "detailed": "https://finromania.ro/llms-full.txt"
+        }
+    }
+
 # ============================================
 # FEEDBACK ENDPOINT (BETA)
 # ============================================

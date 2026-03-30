@@ -8,6 +8,7 @@ import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Link } from 'react-router-dom';
 import TradeModal from '../components/TradeModal';
+import SEO from '../components/SEO';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -262,6 +263,7 @@ export default function PortfolioPage() {
 
   return (
     <div className="space-y-6">
+      <SEO title="Portfolio Simulator | FinRomania" description="Practice portfolio management with a virtual trading simulator. Risk-free learning environment." />
       {/* Demo Banner */}
       <Alert className="bg-green-50 border-green-200">
         <Info className="w-4 h-4 text-green-600" />

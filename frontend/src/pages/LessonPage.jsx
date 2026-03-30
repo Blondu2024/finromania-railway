@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import ReactMarkdown from 'react-markdown';
+import SEO from '../components/SEO';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -260,6 +261,7 @@ export default function LessonPage() {
   // Lesson Content Screen
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
+      <SEO title={lesson ? `${lesson.title} | Trading School | FinRomania` : 'Trading School | FinRomania'} description={lesson?.subtitle || 'Free trading lessons for Romanian investors'} />
       <Link to="/trading-school">
         <Button variant="ghost" className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Școală

@@ -9,6 +9,7 @@ import { Badge } from '../components/ui/badge';
 import IndexCard from '../components/IndexCard';
 import AIAssistant from '../components/AIAssistant';
 import { Link } from 'react-router-dom';
+import SEO from '../components/SEO';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -114,6 +115,7 @@ export default function LearnTradingPage() {
 
   return (
     <div className="space-y-6 pb-20">
+      <SEO title="Learn Trading | FinRomania" description="Start your trading journey with free lessons, quizzes, and practical examples from the Romanian stock market." />
       {/* Header */}
       <div className="text-center space-y-3">
         <div className="flex items-center justify-center gap-2">

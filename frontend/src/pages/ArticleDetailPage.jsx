@@ -8,6 +8,7 @@ import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
 import SocialShare from '../components/SocialShare';
 import NewsStockAnalysis from '../components/NewsStockAnalysis';
+import SEO from '../components/SEO';
 
 // Rename import to use smart analysis
 const SmartNewsAnalysis = NewsStockAnalysis;
@@ -113,6 +114,7 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      <SEO title={article ? `${article.title} | FinRomania` : 'Financial News | FinRomania'} description={article?.description || article?.summary || 'Latest financial news from Romania and international markets'} />
       {/* Back Button */}
       <Link to="/news">
         <Button variant="ghost" size="sm">

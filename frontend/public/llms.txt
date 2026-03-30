@@ -1,0 +1,85 @@
+# FinRomania
+
+> FinRomania (https://finromania.ro) is Romania's leading financial education and market data platform. It provides real-time Bucharest Stock Exchange (BVB) data, AI-powered investment tools, and comprehensive trading education — all in Romanian and English.
+
+## What is FinRomania?
+
+FinRomania is a web platform built for Romanian retail investors and anyone interested in the Romanian financial market. It combines live market data from the Bucharest Stock Exchange (BVB) with educational content, AI advisors, and professional analysis tools.
+
+- Website: https://finromania.ro
+- Languages: Romanian (primary), English
+- Target audience: Romanian retail investors, beginners to advanced
+- Free tier: Full education access, basic market data, 5 AI questions/day
+- PRO tier (49 RON/month): Advanced tools, unlimited AI, faster data refresh
+
+## Core Features
+
+### Live Market Data
+- 55+ BVB stocks with real-time prices from EODHD API
+- Global Markets: S&P 500, NASDAQ, DAX, FTSE, crypto, forex, commodities
+- BVB Heatmap, Market Pulse sentiment indicator, sector performance
+- Currency converter with BNR (National Bank of Romania) rates
+
+### Stock Analysis Tools
+- Stock Screener PRO: RSI, MACD, Bollinger Bands, SMA/EMA technical indicators
+- Fundamental analysis: P/E, ROE, EPS, Debt/Equity from EODHD
+- Dividend Calendar with official BVB.ro data
+- Dividend Calculator with 5-year projections and tax calculations
+- Stock comparison (up to 4 stocks overlay)
+- Professional candlestick charts (TradingView lightweight-charts)
+
+### AI-Powered Tools
+- AI Investment Advisor (GPT-4o powered) — answers questions about investments, BVB, taxation
+- AI Fiscal Advisor — specialized in Romanian tax law for investors
+- AI Technical Analysis — automated chart pattern and indicator analysis
+- Portfolio Import with AI — GPT-4o parses CSV from any broker (XTB, Trading 212, IBKR, Revolut, eToro, Tradeville)
+
+### Tax Calculator (2026 Romanian Tax Law)
+- Compare: PF (individual) vs PFA vs SRL taxation
+- BVB gains: 3% (held ≥1 year) or 6% (held <1 year) — among lowest in Europe
+- International gains: 16%
+- Dividends: 16% (Law 141/2025)
+- CASS health contribution calculator (threshold: 24,300 RON)
+- Entrepreneur Simulator for multiple entities (SRL, PFA, PFI)
+
+### Education
+- Trading School: 17 structured lessons from basics to advanced strategies, with quizzes
+- Financial Education: 15 lessons on budgeting, savings, pensions, investments
+- Financial Glossary: 100+ terms explained in Romanian
+- CFD vs Stocks educational comparison
+
+### Portfolio Management
+- BVB Portfolio PRO with live P&L tracking
+- Dividend income tracking (BVB.ro confirmed data)
+- AI-powered portfolio advice
+- CSV import from major brokers
+
+## Technology Stack
+- Frontend: React.js with Tailwind CSS, deployed on Railway
+- Backend: Python (FastAPI) with MongoDB, deployed on Railway
+- Data: EODHD API (market data), BVB.ro scraper (dividends), BNR (currency rates)
+- AI: OpenAI GPT-4o for advisors, GPT-4o-mini for daily summaries
+- Charts: TradingView lightweight-charts library
+- Auth: Firebase (Google Sign-In)
+- Payments: Stripe
+
+## Romanian Market Context
+- BVB (Bursa de Valori București) is Romania's stock exchange
+- Romania offers advantageous tax rates for stock market investors (3-6% on BVB gains)
+- The platform addresses the gap in Romanian-language financial education
+- All tax calculations follow 2026 Romanian fiscal legislation (OUG 89/2025, OUG 8/2026)
+
+## Contact
+- Email: contact@finromania.ro
+- Location: Bucharest, Romania
+
+## Links
+- [Homepage](https://finromania.ro)
+- [BVB Stocks](https://finromania.ro/stocks)
+- [Trading School](https://finromania.ro/trading-school)
+- [Financial Education](https://finromania.ro/financial-education)
+- [Tax Calculator](https://finromania.ro/calculator-fiscal)
+- [AI Advisor](https://finromania.ro/advisor)
+- [Pricing](https://finromania.ro/pricing)
+- [About](https://finromania.ro/about)
+- [FAQ](https://finromania.ro/faq)

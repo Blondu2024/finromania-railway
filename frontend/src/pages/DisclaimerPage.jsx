@@ -5,11 +5,13 @@ import { ArrowLeft, AlertTriangle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
+import SEO from '../components/SEO';
 
 export default function DisclaimerPage() {
   const { t } = useTranslation();
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <SEO title="Disclaimer | FinRomania" description="Legal disclaimer - FinRomania provides educational content, not investment advice." />
       <Link to="/">
         <Button variant="ghost" size="sm">
           <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi

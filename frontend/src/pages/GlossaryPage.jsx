@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { Search, BookOpen } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -76,6 +77,8 @@ export default function GlossaryPage() {
   }
 
   return (
+    <>
+    <SEO title={`${t('education.glossaryTitle')} | FinRomania`} description={t('education.glossaryDesc')} />
     <div className="space-y-6">
       {/* Header */}
       <div>
@@ -169,5 +172,6 @@ export default function GlossaryPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

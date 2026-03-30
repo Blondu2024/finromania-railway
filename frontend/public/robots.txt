@@ -1,12 +1,17 @@
 # FinRomania.ro - Robots.txt
-# Platform financiar pentru România
-# Actualizat: 2026-03-06
+# Romanian financial education & market data platform
+# Updated: 2026-03-30
 
 User-agent: *
 Allow: /
 
 # Sitemap
 Sitemap: https://finromania.ro/sitemap.xml
+
+# AI Crawlers - platform description for LLMs
+# llms.txt standard: https://llmstxt.org
+Allow: /llms.txt
+Allow: /llms-full.txt
 
 # Pagini cu date live - permite crawling frecvent
 Allow: /stocks

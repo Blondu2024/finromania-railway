@@ -4,11 +4,13 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, FileText } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
+import SEO from '../components/SEO';
 
 export default function TermsOfServicePage() {
   const { t } = useTranslation();
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <SEO title="Terms of Service | FinRomania" description="FinRomania terms and conditions for using our financial education platform." />
       <Link to="/">
         <Button variant="ghost" size="sm">
           <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi

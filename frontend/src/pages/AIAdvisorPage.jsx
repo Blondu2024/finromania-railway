@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { Bot, Send, Lightbulb, TrendingUp, MessageCircle, Loader2, Sparkles } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../components/ui/card';
@@ -76,6 +77,8 @@ export default function AIAdvisorPage() {
   };
 
   return (
+    <>
+    <SEO title={`${t('ai.title')} | FinRomania`} description={t('ai.subtitle')} />
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto">
@@ -261,5 +264,6 @@ export default function AIAdvisorPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

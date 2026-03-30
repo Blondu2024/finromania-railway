@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle, AlertCircle, Lightbulb, Trophy, ChevronRight } 
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import ReactMarkdown from 'react-markdown';
+import SEO from '../components/SEO';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -301,6 +302,7 @@ export default function FinLessonPage() {
   // Lesson Content Screen
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
+      <SEO title={lesson ? `${lesson.title} | Financial Education | FinRomania` : 'Financial Education | FinRomania'} description={lesson?.subtitle || 'Free financial education lessons'} />
       <Link to="/financial-education">
         <Button variant="ghost" className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Educație Financiară

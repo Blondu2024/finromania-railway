@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail, MapPin, Clock, Send, MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import { Button } from '../components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -22,6 +23,8 @@ export default function ContactPage() {
   };
 
   return (
+    <>
+    <SEO title={`${t('contact.title')} | FinRomania`} description={t('contact.intro')} />
     <div className="max-w-4xl mx-auto space-y-6">
       <Link to="/">
         <Button variant="ghost" size="sm">
@@ -159,5 +162,6 @@ export default function ContactPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }

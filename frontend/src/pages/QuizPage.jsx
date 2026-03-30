@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { useAuth } from '../context/AuthContext';
+import SEO from '../components/SEO';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -290,6 +291,7 @@ export default function QuizPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <SEO title="Quiz | Trading School | FinRomania" description="Test your trading knowledge with interactive quizzes after each lesson." />
       {/* Header */}
       <Card className="bg-gradient-to-r from-blue-700 to-blue-500 text-white">
         <CardContent className="p-6">
