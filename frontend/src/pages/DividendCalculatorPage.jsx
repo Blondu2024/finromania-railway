@@ -47,6 +47,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 // DIVIDEND STOCKS TABLE
 // ============================================
 const DividendStocksTable = ({ stocks, onAddToPortfolio }) => {
+  const { t } = useTranslation();
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -102,6 +103,7 @@ const DividendStocksTable = ({ stocks, onAddToPortfolio }) => {
 // PORTFOLIO BUILDER
 // ============================================
 const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
+  const { t } = useTranslation();
   const addHolding = (symbol) => {
     if (portfolio.find(h => h.symbol === symbol)) {
       toast.error(t('dividends.alreadyInPortfolio'));
@@ -159,7 +161,7 @@ const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
                       <span className="text-sm text-muted-foreground">{stock?.name}</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Investiție: {(holding.shares * (stock?.price || 0)).toFixed(0)} RON
+                      {t('dividends.investmentLabel')}: {(holding.shares * (stock?.price || 0)).toFixed(0)} RON
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -174,7 +176,7 @@ const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
                   </div>
                   <div className="text-right min-w-[80px]">
                     <div className="text-green-600 font-bold">{dividendValue.toFixed(2)} RON</div>
-                    <div className="text-xs text-muted-foreground">/an brut</div>
+                    <div className="text-xs text-muted-foreground">{t('dividends.perYearGross')}</div>
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => removeHolding(holding.symbol)}>
                     <Trash2 className="w-4 h-4 text-red-500" />
@@ -322,13 +324,13 @@ const ResultsDisplay = ({ results, t }) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
-            Proiecții pe {settings.years_projected} ani
+            {t('dividends.projectionsYearsTitle', { years: settings.years_projected })}
             {settings.reinvest_dividends && (
-              <Badge variant="secondary" className="ml-2">Cu reinvestire</Badge>
+              <Badge variant="secondary" className="ml-2">{t('dividends.withReinvestment')}</Badge>
             )}
           </CardTitle>
           <CardDescription>
-            Rata de creștere dividende: {settings.dividend_growth_rate}%/an • Impozit 16% + CASS incluse
+            {t('dividends.growthRateDesc', { rate: settings.dividend_growth_rate })}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -336,13 +338,13 @@ const ResultsDisplay = ({ results, t }) => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>An</TableHead>
-                  <TableHead className="text-right">Dividend Brut</TableHead>
-                  <TableHead className="text-right">Impozit 16%</TableHead>
-                  <TableHead className="text-right">CASS</TableHead>
-                  <TableHead className="text-right">NET Final</TableHead>
-                  <TableHead className="text-right">Cumulat NET</TableHead>
-                  <TableHead className="text-right">Yield/Cost</TableHead>
+                  <TableHead>{t('dividends.yearCol')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.grossDividendCol')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.tax16Col')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.cassCol')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.netFinalCol')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.cumulativeNetCol')}</TableHead>
+                  <TableHead className="text-right">{t('dividends.yieldOnCostCol')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -371,13 +373,21 @@ const ResultsDisplay = ({ results, t }) => {
 // ============================================
 // SCORE BADGE COMPONENT
 // ============================================
-const ScoreBadge = ({ score, rating, size = 'md' }) => {
+const ScoreBadge = ({ score, rating, size = 'md', t }) => {
   const colors = {
     'Excelent': 'from-emerald-500 to-green-600 text-white',
     'Foarte Bun': 'from-blue-600 to-blue-500 text-white',
     'Bun': 'from-amber-400 to-yellow-500 text-black',
     'Mediu': 'from-orange-400 to-orange-500 text-white',
     'Slab': 'from-red-400 to-red-500 text-white',
+  };
+
+  const ratingTranslations = {
+    'Excelent': t ? t('dividends.ratingExcellent') : rating,
+    'Foarte Bun': t ? t('dividends.ratingVeryGood') : rating,
+    'Bun': t ? t('dividends.ratingGood') : rating,
+    'Mediu': t ? t('dividends.ratingAverage') : rating,
+    'Slab': t ? t('dividends.ratingWeak') : rating,
   };
 
   const sizeClasses = size === 'lg'
@@ -389,7 +399,7 @@ const ScoreBadge = ({ score, rating, size = 'md' }) => {
       <div className={`${sizeClasses} rounded-full bg-gradient-to-br ${colors[rating] || colors['Mediu']} flex items-center justify-center font-bold shadow-lg`}>
         {score}
       </div>
-      <span className="text-[10px] font-medium text-muted-foreground">{rating}</span>
+      <span className="text-[10px] font-medium text-muted-foreground">{ratingTranslations[rating] || rating}</span>
     </div>
   );
 };
@@ -398,6 +408,7 @@ const ScoreBadge = ({ score, rating, size = 'md' }) => {
 // DIVIDEND HISTORY TAB (PRO)
 // ============================================
 const DividendHistoryTab = ({ isPro }) => {
+  const { t } = useTranslation();
   const [rankings, setRankings] = useState([]);
   const [loadingRankings, setLoadingRankings] = useState(false);
   const [selectedSymbol, setSelectedSymbol] = useState(null);
@@ -481,13 +492,13 @@ const DividendHistoryTab = ({ isPro }) => {
       <Card className="border-amber-200">
         <CardContent className="py-16 text-center">
           <Lock className="w-12 h-12 mx-auto mb-4 text-amber-500 opacity-60" />
-          <h3 className="text-xl font-bold mb-2">Istoric Dividende PRO</h3>
+          <h3 className="text-xl font-bold mb-2">{t('dividends.proHistoryTitle')}</h3>
           <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-            Acces la analiza avansată: Dividend Score, CAGR, stabilitate, grafice pe ani și clasamentul complet BVB.
+            {t('dividends.proHistoryAccess')}
           </p>
           <Button onClick={() => window.location.href = '/pricing'} className="bg-gradient-to-r from-amber-500 to-orange-500">
             <Award className="w-4 h-4 mr-2" />
-            Upgrade la PRO
+            {t('dividends.upgradeToPro')}
           </Button>
         </CardContent>
       </Card>
@@ -523,7 +534,7 @@ const DividendHistoryTab = ({ isPro }) => {
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                   <div className="bg-white rounded-lg p-3 shadow-sm border">
-                    <div className="text-xs text-muted-foreground">Yield Actual</div>
+                    <div className="text-xs text-muted-foreground">{t('dividends.currentYield')}</div>
                     <div className="text-lg font-bold text-green-600">{analysis.current_yield}%</div>
                   </div>
                   <div className="bg-white rounded-lg p-3 shadow-sm border">
@@ -533,17 +544,17 @@ const DividendHistoryTab = ({ isPro }) => {
                     </div>
                   </div>
                   <div className="bg-white rounded-lg p-3 shadow-sm border">
-                    <div className="text-xs text-muted-foreground">Ani Consecutivi</div>
+                    <div className="text-xs text-muted-foreground">{t('dividends.consecutiveYears')}</div>
                     <div className="text-lg font-bold">{analysis.metrics.consecutive_years}</div>
                   </div>
                   <div className="bg-white rounded-lg p-3 shadow-sm border">
-                    <div className="text-xs text-muted-foreground">Total Ani cu Div.</div>
+                    <div className="text-xs text-muted-foreground">{t('dividends.totalPayingYears')}</div>
                     <div className="text-lg font-bold">{analysis.metrics.total_paying_years}</div>
                   </div>
                   <div className="bg-white rounded-lg p-3 shadow-sm border">
-                    <div className="text-xs text-muted-foreground">Consistență</div>
+                    <div className="text-xs text-muted-foreground">{t('dividends.consistencyLabel')}</div>
                     <div className={`text-lg font-bold ${analysis.metrics.consistency_cv < 50 ? 'text-green-600' : analysis.metrics.consistency_cv < 80 ? 'text-amber-500' : 'text-red-500'}`}>
-                      {analysis.metrics.consistency_cv < 30 ? 'Stabil' : analysis.metrics.consistency_cv < 60 ? 'Moderat' : 'Variabil'}
+                      {analysis.metrics.consistency_cv < 30 ? t('dividends.stableLabel') : analysis.metrics.consistency_cv < 60 ? t('dividends.moderateLabel') : t('dividends.variableLabel')}
                     </div>
                   </div>
                 </div>
@@ -552,13 +563,13 @@ const DividendHistoryTab = ({ isPro }) => {
                 <div className="bg-white rounded-lg p-4 shadow-sm border">
                   <h4 className="text-sm font-semibold mb-3 flex items-center gap-1.5">
                     <Shield className="w-4 h-4 text-blue-500" />
-                    Dividend Score — Detalii
+                    {t('dividends.scoreDetails')}
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
-                      { label: 'Stabilitate', value: analysis.dividend_score.breakdown.stability, max: 40, color: 'bg-emerald-500' },
-                      { label: 'Creștere', value: analysis.dividend_score.breakdown.growth, max: 30, color: 'bg-blue-500' },
-                      { label: 'Randament', value: analysis.dividend_score.breakdown.yield_score, max: 30, color: 'bg-amber-500' },
+                      { label: t('dividends.stabilityLabel'), value: analysis.dividend_score.breakdown.stability, max: 40, color: 'bg-emerald-500' },
+                      { label: t('dividends.growthLabel'), value: analysis.dividend_score.breakdown.growth, max: 30, color: 'bg-blue-500' },
+                      { label: t('dividends.yieldScoreLabel'), value: analysis.dividend_score.breakdown.yield_score, max: 30, color: 'bg-amber-500' },
                     ].map((item) => (
                       <div key={item.label}>
                         <div className="flex justify-between text-xs mb-1">
@@ -579,7 +590,7 @@ const DividendHistoryTab = ({ isPro }) => {
                 {/* Yearly Dividend Chart */}
                 {analysis.yearly_dividends.length > 0 && (
                   <div className="bg-white rounded-lg p-4 shadow-sm border">
-                    <h4 className="text-sm font-semibold mb-3">Dividend per An (RON/acțiune)</h4>
+                    <h4 className="text-sm font-semibold mb-3">{t('dividends.dividendPerYearChart')}</h4>
                     <ResponsiveContainer width="100%" height={220}>
                       <BarChart data={analysis.yearly_dividends} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -602,15 +613,15 @@ const DividendHistoryTab = ({ isPro }) => {
                 {/* Payment History Table */}
                 <details className="bg-white rounded-lg shadow-sm border">
                   <summary className="px-4 py-3 cursor-pointer text-sm font-semibold hover:bg-gray-50">
-                    Toate plățile ({analysis.payments.length})
+                    {t('dividends.allPaymentsCount', { count: analysis.payments.length })}
                   </summary>
                   <div className="px-4 pb-3 overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Data</TableHead>
-                          <TableHead className="text-right">Dividend</TableHead>
-                          <TableHead className="text-right">Sursă</TableHead>
+                          <TableHead>{t('dividends.dateCol')}</TableHead>
+                          <TableHead className="text-right">{t('dividends.dividendCol')}</TableHead>
+                          <TableHead className="text-right">{t('dividends.sourceColLabel')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -649,11 +660,11 @@ const DividendHistoryTab = ({ isPro }) => {
                   <div>
                     <CardTitle className="text-xl flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-blue-600" />
-                      Comparație Dividende — {compareData.symbols.join(' vs ')}
+                      {t('dividends.comparisonTitle', { symbols: compareData.symbols.join(' vs ') })}
                     </CardTitle>
-                    <CardDescription>Dividend per an (RON/acțiune) • Sursa: BVB.ro + date istorice</CardDescription>
+                    <CardDescription>{t('dividends.comparisonSubtitle')}</CardDescription>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => setCompareData(null)}>Închide</Button>
+                  <Button variant="ghost" size="sm" onClick={() => setCompareData(null)}>{t('dividends.closeLabel')}</Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-5">
@@ -674,7 +685,7 @@ const DividendHistoryTab = ({ isPro }) => {
                           <div><span className="text-muted-foreground">Yield:</span> <span className="font-bold text-green-600">{s.current_yield}%</span></div>
                           <div><span className="text-muted-foreground">CAGR:</span> <span className={`font-bold ${s.cagr >= 0 ? 'text-green-600' : 'text-red-500'}`}>{s.cagr != null ? `${s.cagr}%` : '—'}</span></div>
                           <div><span className="text-muted-foreground">Consec.:</span> <span className="font-bold">{s.consecutive_years} ani</span></div>
-                          <div><span className="text-muted-foreground">Preț:</span> <span className="font-bold">{s.price} RON</span></div>
+                          <div><span className="text-muted-foreground">{t('common.price')}:</span> <span className="font-bold">{s.price} RON</span></div>
                         </div>
                       </div>
                     );
@@ -683,7 +694,7 @@ const DividendHistoryTab = ({ isPro }) => {
 
                 {/* Grouped Bar Chart */}
                 <div className="bg-white rounded-lg p-4 shadow-sm border" data-testid="compare-chart">
-                  <h4 className="text-sm font-semibold mb-3">Dividend per An (RON/acțiune)</h4>
+                  <h4 className="text-sm font-semibold mb-3">{t('dividends.dividendPerYearChart')}</h4>
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={compareData.chart_data} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -704,13 +715,13 @@ const DividendHistoryTab = ({ isPro }) => {
                 {/* Year-by-Year Table */}
                 <details className="bg-white rounded-lg shadow-sm border">
                   <summary className="px-4 py-3 cursor-pointer text-sm font-semibold hover:bg-gray-50">
-                    Tabel comparativ pe ani ({compareData.years.length} ani)
+                    {t('dividends.compareTableTitle', { count: compareData.years.length })}
                   </summary>
                   <div className="px-4 pb-3 overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>An</TableHead>
+                          <TableHead>{t('dividends.yearColTable')}</TableHead>
                           {compareData.symbols.map(sym => (
                             <TableHead key={sym} className="text-right">{sym}</TableHead>
                           ))}
@@ -747,7 +758,7 @@ const DividendHistoryTab = ({ isPro }) => {
           <Card className="bg-blue-50 border-blue-200 shadow-lg">
             <CardContent className="py-3 flex items-center justify-between">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-medium text-blue-700">Compară:</span>
+                <span className="text-sm font-medium text-blue-700">{t('dividends.compareBarLabel')}</span>
                 {compareSymbols.map(sym => (
                   <Badge key={sym} variant="secondary" className="bg-blue-100 text-blue-700 cursor-pointer" onClick={() => toggleCompare(sym)}>
                     {sym} ✕
@@ -765,7 +776,7 @@ const DividendHistoryTab = ({ isPro }) => {
                   data-testid="compare-btn"
                 >
                   {loadingCompare ? <RefreshCw className="w-4 h-4 animate-spin mr-1" /> : <BarChart3 className="w-4 h-4 mr-1" />}
-                  Compară ({compareSymbols.length})
+                  {t('dividends.compareButtonLabel', { count: compareSymbols.length })}
                 </Button>
               </div>
             </CardContent>
@@ -778,10 +789,10 @@ const DividendHistoryTab = ({ isPro }) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2" data-testid="dividend-history-title">
             <Award className="w-5 h-5 text-amber-500" />
-            Clasament Dividend Score BVB
+            {t('dividends.rankingTitle')}
           </CardTitle>
           <CardDescription>
-            Scor calculat din: Stabilitate (40%) + Creștere (30%) + Randament (30%) • Sursa: BVB.ro + date istorice
+            {t('dividends.rankingDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -800,16 +811,16 @@ const DividendHistoryTab = ({ isPro }) => {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger><BarChart3 className="w-4 h-4 text-blue-500" /></TooltipTrigger>
-                          <TooltipContent>Selectează 2-4 acțiuni pentru comparație</TooltipContent>
+                          <TooltipContent>{t('dividends.selectCompareTooltip')}</TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </TableHead>
-                    <TableHead>Acțiune</TableHead>
-                    <TableHead className="text-center">Score</TableHead>
-                    <TableHead className="text-right">Yield</TableHead>
-                    <TableHead className="text-right">CAGR</TableHead>
-                    <TableHead className="text-right">Ani Consec.</TableHead>
-                    <TableHead className="text-center">Detalii</TableHead>
+                    <TableHead>{t('dividends.stockCol')}</TableHead>
+                    <TableHead className="text-center">{t('dividends.scoreCol')}</TableHead>
+                    <TableHead className="text-right">{t('dividends.yieldCol')}</TableHead>
+                    <TableHead className="text-right">{t('dividends.cagrCol')}</TableHead>
+                    <TableHead className="text-right">{t('dividends.consecutiveCol')}</TableHead>
+                    <TableHead className="text-center">{t('dividends.detailsCol')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -934,12 +945,12 @@ export default function DividendCalculatorPage() {
       return;
     }
     setPortfolio([...portfolio, { symbol: stock.symbol, shares: 100 }]);
-    toast.success(`${stock.symbol} adăugat în portofoliu`);
+    toast.success(`${stock.symbol} ${t('dividends.addedToPortfolioToast')}`);
   };
 
   const calculateDividends = async () => {
     if (portfolio.length === 0) {
-      toast.error('Adaugă cel puțin o acțiune în portofoliu');
+      toast.error(t('dividends.addAtLeastOne'));
       return;
     }
 
@@ -959,11 +970,11 @@ export default function DividendCalculatorPage() {
       if (res.ok) {
         const data = await res.json();
         setResults(data);
-        toast.success('Calcul finalizat!');
+        toast.success(t('dividends.calcComplete'));
       }
     } catch (err) {
       console.error('Error calculating:', err);
-      toast.error('Eroare la calcul');
+      toast.error(t('dividends.calcError'));
     } finally {
       setLoading(false);
     }
@@ -972,8 +983,8 @@ export default function DividendCalculatorPage() {
   return (
     <>
       <SEO
-        title="Calculator Dividende BVB | FinRomania"
-        description="Calculează-ți veniturile din dividende pe BVB. Proiecții pe mai mulți ani cu reinvestire automată."
+        title={t('dividends.seoTitle')}
+        description={t('dividends.seoDesc')}
       />
 
       <div className="space-y-6">
@@ -982,10 +993,10 @@ export default function DividendCalculatorPage() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <Coins className="w-8 h-8 text-amber-500" />
-              Calculator Dividende BVB
+              {t('dividends.calcTitle')}
             </h1>
             <p className="text-muted-foreground">
-              Calculează-ți veniturile pasive din dividende • Date oficiale BVB.ro
+              {t('dividends.calcSubtitle')}
             </p>
           </div>
         </div>
@@ -996,17 +1007,15 @@ export default function DividendCalculatorPage() {
             <TabsList className="flex-shrink-0 w-full sm:w-auto">
               <TabsTrigger value="calculator">
                 <Calculator className="w-4 h-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Calculator</span>
-                <span className="sm:hidden">Calc.</span>
+                {t('dividends.calculatorTab')}
               </TabsTrigger>
               <TabsTrigger value="stocks">
                 <BarChart3 className="w-4 h-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Acțiuni cu Dividende</span>
-                <span className="sm:hidden">Acțiuni</span>
+                {t('dividends.dividendStocksTab')}
               </TabsTrigger>
               <TabsTrigger value="history" data-testid="tab-istoric-dividende">
                 <History className="w-4 h-4 mr-1 sm:mr-2" />
-                Istoric
+                {t('dividends.historyTab')}
                 {!isPro && <Lock className="w-3 h-3 ml-1 opacity-50" />}
               </TabsTrigger>
             </TabsList>
@@ -1070,7 +1079,7 @@ export default function DividendCalculatorPage() {
                       ) : (
                         <Calculator className="w-4 h-4 mr-2" />
                       )}
-                      Calculează Dividendele
+                      {t('dividends.calculateBtn')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -1080,10 +1089,9 @@ export default function DividendCalculatorPage() {
                     <div className="flex gap-2">
                       <Info className="w-5 h-5 text-amber-600 flex-shrink-0" />
                       <div className="text-sm text-amber-800 dark:text-amber-200">
-                        <p className="font-medium">Impozit dividende: 16%</p>
+                        <p className="font-medium">{t('dividends.taxInfoTitle')}</p>
                         <p className="text-xs mt-1">
-                          În România, dividendele sunt impozitate cu 16% la sursă.
-                          Calculatorul include automat această deducere.
+                          {t('dividends.taxInfoDesc')}
                         </p>
                       </div>
                     </div>
@@ -1136,7 +1144,7 @@ export default function DividendCalculatorPage() {
               <CardHeader>
                 <CardTitle>{t('dividends.bvbDividendStocks')}</CardTitle>
                 <CardDescription>
-                  {t('dividends.source')}: BVB.ro (oficial) • Sortate după Dividend Yield
+                  {t('dividends.source')} • {t('dividends.sortedByYield')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1160,35 +1168,33 @@ export default function DividendCalculatorPage() {
         <Card className="bg-muted/30 border-dashed">
           <CardContent className="p-5 text-sm text-muted-foreground space-y-3">
             <h4 className="font-semibold text-foreground flex items-center gap-2">
-              📋 Surse, Metodologie & Bază Legală
+              📋 {t('dividends.sourcesTitle')}
             </h4>
             <div className="grid md:grid-cols-2 gap-4 text-xs">
               <div className="space-y-2">
-                <p><strong>Sursa dividende:</strong> Date oficiale extrase de pe{' '}
+                <p><strong>{t('dividends.sourceDivLabel')}</strong> {t('dividends.sourceDivText')}{' '}
                   <a href="https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">BVB.ro ↗</a>
-                  . Dividendele afișate sunt valori BRUTE (înainte de impozit).
                 </p>
-                <p><strong>Prețuri acțiuni:</strong> Prețurile provin de pe Bursa de Valori București cu delay ~15 min.</p>
+                <p><strong>{t('dividends.sourcePriceLabel')}</strong> {t('dividends.sourcePriceText')}</p>
                 <p><strong>Dividend Yield:</strong>{' '}
-                  <code className="px-1.5 py-0.5 bg-muted rounded font-mono">Yield = (Dividend/acțiune / Preț curent) × 100</code>
+                  <code className="px-1.5 py-0.5 bg-muted rounded font-mono">{t('dividends.divYieldFormulaCalc')}</code>
                 </p>
-                <p><strong>Proiecție 5 ani:</strong> Folosește o rată de creștere implicită de 3%/an. Dividendele viitoare nu sunt garantate și depind de performanța companiei și deciziile AGA.</p>
+                <p><strong>{t('dividends.projection5y')}</strong> {t('dividends.projection5yText')}</p>
               </div>
               <div className="space-y-2">
-                <p><strong>Impozit dividende:</strong> 16% reținut la sursă — Legea 141/2025 (aplicabil din 01.01.2026)</p>
-                <p><strong>CASS (Contribuție Sănătate):</strong> 10% se aplică dacă veniturile din investiții depășesc 6 salarii minime brute. Salariu minim brut 2026: 4.700 RON.</p>
+                <p><strong>{t('dividends.taxDiv16')}</strong></p>
+                <p><strong>{t('dividends.cassHealthDesc')}</strong></p>
                 <div className="p-2 bg-muted rounded font-mono text-[11px] space-y-0.5">
-                  <p>Venit {'<'} 28.200 RON → CASS = 0</p>
-                  <p>28.200 - 56.400 RON → CASS = 2.820 RON</p>
-                  <p>56.400 - 112.800 RON → CASS = 5.640 RON</p>
-                  <p>{'>'} 112.800 RON → CASS = 11.280 RON (maxim)</p>
+                  <p>{t('dividends.cassThreshold1')}</p>
+                  <p>{t('dividends.cassThreshold2')}</p>
+                  <p>{t('dividends.cassThreshold3')}</p>
+                  <p>{t('dividends.cassThreshold4')}</p>
                 </div>
-                <p className="italic">Bază legală: Codul Fiscal 2026 — art. 97 (impozit) + art. 156 (CASS)</p>
+                <p className="italic">{t('dividends.legalBasis')}</p>
               </div>
             </div>
             <p className="text-xs border-t pt-2 mt-2">
-              Calculele sunt educative și orientative. Dividendele viitoare pot varia. Aceasta nu constituie sfat de investiții sau consiliere fiscală.
-              Pentru situația ta specifică, consultă un consilier fiscal autorizat.
+              {t('dividends.disclaimerCalc')}
             </p>
           </CardContent>
         </Card>

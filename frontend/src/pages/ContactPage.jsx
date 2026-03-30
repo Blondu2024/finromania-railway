@@ -56,7 +56,7 @@ export default function ContactPage() {
               <MapPin className="w-5 h-5 text-blue-600 mt-0.5" />
               <div>
                 <p className="font-medium">{t('contact.location')}</p>
-                <p className="text-sm text-muted-foreground">București, România</p>
+                <p className="text-sm text-muted-foreground">{t('contact.locationValue')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -88,7 +88,7 @@ export default function ContactPage() {
                 <div>
                   <label className="text-sm font-medium mb-1 block">{t('contact.yourName')}</label>
                   <Input 
-                    placeholder="Numele tău" 
+                    placeholder={t('contact.namePlaceholder')}
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     required
@@ -108,7 +108,7 @@ export default function ContactPage() {
               <div>
                 <label className="text-sm font-medium mb-1 block">{t('contact.subject')}</label>
                 <Input 
-                  placeholder="Subiectul mesajului" 
+                  placeholder={t('contact.subjectPlaceholder')}
                   value={formData.subject}
                   onChange={(e) => setFormData({...formData, subject: e.target.value})}
                   required
@@ -117,7 +117,7 @@ export default function ContactPage() {
               <div>
                 <label className="text-sm font-medium mb-1 block">{t('contact.message')}</label>
                 <Textarea 
-                  placeholder="Scrie mesajul tău aici..." 
+                  placeholder={t('contact.messagePlaceholder')}
                   rows={5}
                   value={formData.message}
                   onChange={(e) => setFormData({...formData, message: e.target.value})}
@@ -135,28 +135,25 @@ export default function ContactPage() {
       {/* FAQ Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Întrebări frecvente</CardTitle>
+          <CardTitle>{t('contact.faqTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <p className="font-medium">De unde provin datele despre acțiuni?</p>
+            <p className="font-medium">{t('contact.faqDataSourceQ')}</p>
             <p className="text-sm text-muted-foreground">
-              Datele despre indicii globali provin de la Yahoo Finance. Datele BVB sunt momentan 
-              simulate în scopuri demonstrative.
+              {t('contact.faqDataSourceA')}
             </p>
           </div>
           <div>
-            <p className="font-medium">De unde provin știrile?</p>
+            <p className="font-medium">{t('contact.faqNewsSourceQ')}</p>
             <p className="text-sm text-muted-foreground">
-              Știrile sunt agregate din surse românești de încredere: Ziarul Financiar, Profit.ro, 
-              Bursa, Wall-Street.ro și alte publicații financiare.
+              {t('contact.faqNewsSourceA')}
             </p>
           </div>
           <div>
-            <p className="font-medium">Cât de des se actualizează datele?</p>
+            <p className="font-medium">{t('contact.faqUpdateFreqQ')}</p>
             <p className="text-sm text-muted-foreground">
-              Cursurile valutare BNR se actualizează zilnic. Indicii globali și știrile se 
-              actualizează la fiecare 15 minute.
+              {t('contact.faqUpdateFreqA')}
             </p>
           </div>
         </CardContent>

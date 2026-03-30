@@ -70,9 +70,9 @@ export default function TryProPage() {
 
   return (
     <>
-      <SEO 
-        title="Încearcă PRO - Toate Funcțiile Avansate | FinRomania"
-        description="Descoperă diferențele între planul Gratuit și PRO: Calculator Fiscal, AI nelimitat, date mai rapide, watchlist nelimitat și mai mult."
+      <SEO
+        title={t('pro.seoTitle')}
+        description={t('pro.seoDescription')}
       />
       
       <div className="max-w-7xl mx-auto px-4 py-12 space-y-16">
@@ -80,16 +80,12 @@ export default function TryProPage() {
         <div className="text-center space-y-6">
           <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2 text-lg">
             <Crown className="w-5 h-5 mr-2" />
-            Încearcă PRO
+            {t('pro.tryProBadge')}
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold">
-            Deblochează <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">Totul</span>
+            {t('pro.unlockEverything')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">{t('pro.unlockEverythingHighlight')}</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            De la 5 întrebări AI pe zi la <strong>NELIMITATE</strong>. 
-            De la 3 acțiuni în watchlist la <strong>TOATE</strong>. 
-            De la delay 30min la <strong>15min</strong> (BVB) și <strong>1 secundă</strong> (Global).
-          </p>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed" dangerouslySetInnerHTML={{ __html: `${t('pro.heroDesc1')} ${t('pro.heroDesc2')} ${t('pro.heroDesc3')}` }} />
         </div>
 
         {/* Current Status */}
@@ -100,16 +96,16 @@ export default function TryProPage() {
                 <div className="flex items-center justify-center gap-3">
                   <Crown className="w-8 h-8 text-amber-500" />
                   <div>
-                    <p className="text-2xl font-bold">Ai deja PRO Activ! 🎉</p>
-                    <p className="text-muted-foreground">Bucură-te de toate funcțiile premium</p>
+                    <p className="text-2xl font-bold">{t('pro.proAlreadyActive')} 🎉</p>
+                    <p className="text-muted-foreground">{t('pro.enjoyPremium')}</p>
                   </div>
                 </div>
               ) : (
                 <div className="flex items-center justify-center gap-3">
                   <Lock className="w-8 h-8 text-gray-500" />
                   <div>
-                    <p className="text-xl font-semibold">Plan curent: GRATUIT</p>
-                    <p className="text-muted-foreground">Upgrade pentru a debloca toate funcțiile</p>
+                    <p className="text-xl font-semibold">{t('pro.currentPlanFree')}</p>
+                    <p className="text-muted-foreground">{t('pro.upgradeToUnlock')}</p>
                   </div>
                 </div>
               )}
@@ -119,7 +115,7 @@ export default function TryProPage() {
 
         {/* Why PRO Cards */}
         <div>
-          <h2 className="text-3xl font-bold text-center mb-8">De Ce PRO?</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">{t('pro.whyProTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {WHY_PRO_CARDS.map((card, idx) => (
               <Card key={idx} className="bg-gradient-to-br from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-800 hover:shadow-xl transition-all">
@@ -139,62 +135,62 @@ export default function TryProPage() {
 
         {/* Main Comparison Table */}
         <div>
-          <h2 className="text-3xl font-bold text-center mb-8">Comparație Completă FREE vs PRO</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">{t('pro.comparisonTitle')}</h2>
           <FreeVsProComparison />
         </div>
 
         {/* Pricing */}
         <div>
-          <h2 className="text-3xl font-bold text-center mb-8">Alege Planul Tău</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">{t('pro.choosePlanTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <Card className="border-2">
               <CardHeader>
-                <CardTitle className="text-2xl">PRO Lunar</CardTitle>
-                <CardDescription>Flexibil, anulare oricând</CardDescription>
+                <CardTitle className="text-2xl">{t('pro.proMonthly')}</CardTitle>
+                <CardDescription>{t('pro.monthlyFlexible')}</CardDescription>
                 <div className="pt-4">
                   <span className="text-5xl font-bold">49</span>
                   <span className="text-2xl text-muted-foreground"> RON</span>
-                  <span className="text-muted-foreground">/lună</span>
+                  <span className="text-muted-foreground">{t('common.perMonth')}</span>
                 </div>
               </CardHeader>
               <CardContent>
                 <Link to="/pricing">
                   <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 h-12">
                     <Crown className="w-4 h-4 mr-2" />
-                    Activează Lunar
+                    {t('pro.activateMonthly')}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
                 <p className="text-xs text-center text-muted-foreground mt-3">
-                  Anulare oricând • Fără costuri ascunse
+                  {t('pro.cancelNoHidden')}
                 </p>
               </CardContent>
             </Card>
 
             <Card className="border-2 border-green-500 relative shadow-xl">
               <div className="absolute -top-3 right-4">
-                <Badge className="bg-green-500 text-white px-3 py-1">📈 Economisești 2 luni!</Badge>
+                <Badge className="bg-green-500 text-white px-3 py-1">{`📈 ${t('pro.save2Months')}`}</Badge>
               </div>
               <CardHeader>
-                <CardTitle className="text-2xl">PRO Anual</CardTitle>
-                <CardDescription>Cel mai bun preț</CardDescription>
+                <CardTitle className="text-2xl">{t('pro.proAnnual')}</CardTitle>
+                <CardDescription>{t('pro.bestPrice')}</CardDescription>
                 <div className="pt-4">
                   <span className="text-5xl font-bold">490</span>
                   <span className="text-2xl text-muted-foreground"> RON</span>
-                  <span className="text-muted-foreground">/an</span>
+                  <span className="text-muted-foreground">{t('common.perYear')}</span>
                 </div>
-                <p className="text-sm text-green-600 font-semibold">vs 588 RON lunar • Economie: 98 RON</p>
+                <p className="text-sm text-green-600 font-semibold">{t('pro.annualSavings')}</p>
               </CardHeader>
               <CardContent>
                 <Link to="/pricing">
                   <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 h-12">
                     <Crown className="w-4 h-4 mr-2" />
-                    Activează Anual
+                    {t('pro.activateAnnual')}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
                 <p className="text-xs text-center text-muted-foreground mt-3">
-                  Cea mai bună ofertă • 41 RON/lună (anual)
+                  {t('pro.bestOffer')}
                 </p>
               </CardContent>
             </Card>
@@ -203,7 +199,7 @@ export default function TryProPage() {
 
         {/* FAQ */}
         <div>
-          <h2 className="text-3xl font-bold text-center mb-8">Întrebări Frecvente</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">{t('pro.faqTitle')}</h2>
           <div className="max-w-4xl mx-auto space-y-4">
             {FAQ_ITEMS.map((item, idx) => (
               <Card key={idx} className="bg-gradient-to-br from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-800">
@@ -230,22 +226,21 @@ export default function TryProPage() {
               <div className="flex items-center gap-4">
                 <Shield className="w-12 h-12 text-blue-600" />
                 <div>
-                  <h3 className="text-xl font-bold mb-1">Date Securizate & Conforme</h3>
+                  <h3 className="text-xl font-bold mb-1">{t('pro.secureCompliant')}</h3>
                   <p className="text-muted-foreground">
-                    Platforma respectă legislația GDPR și standardele de securitate. 
-                    Datele tale sunt protejate cu criptare SSL.
+                    {t('pro.secureCompliantDesc')}
                   </p>
                 </div>
               </div>
               <div className="flex gap-4">
                 <Link to="/privacy">
                   <Button variant="outline" size="sm">
-                    Confidențialitate
+                    {t('pro.privacy')}
                   </Button>
                 </Link>
                 <Link to="/terms">
                   <Button variant="outline" size="sm">
-                    Termeni
+                    {t('pro.terms')}
                   </Button>
                 </Link>
               </div>
@@ -255,19 +250,19 @@ export default function TryProPage() {
 
         {/* Final CTA */}
         <div className="text-center bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 rounded-3xl p-12 border-2 border-amber-500/20">
-          <h2 className="text-4xl font-bold mb-4">Gata să Deblochezi Totul?</h2>
+          <h2 className="text-4xl font-bold mb-4">{t('pro.readyToUnlock')}</h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Alătură-te investitorilor care folosesc instrumente PRO pentru decizii mai bune și economii reale.
+            {t('pro.readyToUnlockDesc')}
           </p>
           <Link to="/pricing">
             <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-12 h-16 text-xl">
               <Crown className="w-6 h-6 mr-3" />
-              Activează PRO Acum
+              {t('pro.activateProNow')}
               <ArrowRight className="w-6 h-6 ml-3" />
             </Button>
           </Link>
           <p className="text-sm text-muted-foreground mt-4">
-            💳 Plată securizată • 🔄 Anulare oricând • ⚡ Activare instant
+            {`💳 ${t('pro.trustSecure')} • 🔄 ${t('pro.trustCancel')} • ⚡ ${t('pro.trustInstant')}`}
           </p>
         </div>
       </div>

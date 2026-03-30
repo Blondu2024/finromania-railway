@@ -224,9 +224,9 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade, t }) => {
         <CardContent className="space-y-4">
           <div className="text-center py-4">
             <Lock className="w-12 h-12 mx-auto text-amber-400 mb-3" />
-            <p className="font-semibold mb-2">Indicatori Fundamentali</p>
+            <p className="font-semibold mb-2">{t('screener.fundamentalIndicators')}</p>
             <p className="text-sm text-muted-foreground mb-4">
-              Accesează P/E, ROE, EPS, Marjă Profit, Grad Îndatorare și multe altele
+              {t('screener.fundamentalAccess')}
             </p>
             <ul className="text-sm text-left space-y-2 mb-4">
               <li className="flex items-center gap-2">
@@ -239,16 +239,16 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade, t }) => {
               </li>
               <li className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-blue-500" />
-                Randament Dividend
+                {t('screener.dividendYieldLabel')}
               </li>
               <li className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-blue-500" />
-                Marjă Profit, Grad Îndatorare
+                {t('screener.profitMarginDebt')}
               </li>
             </ul>
             <Button onClick={onUpgrade} className="w-full bg-gradient-to-r from-amber-500 to-orange-500">
               <Crown className="w-4 h-4 mr-2" />
-              Upgrade la PRO - 49 lei/lună
+              {t('screener.upgradeProPrice')}
             </Button>
           </div>
         </CardContent>
@@ -262,7 +262,7 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade, t }) => {
         <CardTitle className="text-lg flex items-center gap-2">
           <Crown className="w-5 h-5 text-amber-500" />
           {t('screener.proTitle')}
-          <Badge className="bg-amber-500">ACTIV</Badge>
+          <Badge className="bg-amber-500">{t('screener.active')}</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
@@ -298,7 +298,7 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade, t }) => {
 
         {/* Dividend Yield */}
         <div>
-          <label className="text-sm font-medium mb-2 block">Randament Dividend Min (%)</label>
+          <label className="text-sm font-medium mb-2 block">{t('screener.minDividendYield')}</label>
           <Input
             type="number"
             value={minDividend}
@@ -309,7 +309,7 @@ const ProFilterPanel = ({ onApply, isPro, onUpgrade, t }) => {
 
         {/* Debt/Equity */}
         <div>
-          <label className="text-sm font-medium mb-2 block">Îndatorare Max (Debt/Equity)</label>
+          <label className="text-sm font-medium mb-2 block">{t('screener.maxDebtEquity')}</label>
           <Input
             type="number"
             value={maxDebt}
@@ -507,7 +507,7 @@ export default function StockScreenerPage() {
     <>
       <SEO
         title="Stock Screener BVB | FinRomania"
-        description="Filtrează și găsește cele mai bune acțiuni de pe Bursa București. Screener-e predefinite și filtre personalizate."
+        description={t('screener.seoDesc')}
       />
 
       <div className="space-y-6">
@@ -618,9 +618,9 @@ export default function StockScreenerPage() {
                           <table className="w-full">
                             <thead>
                               <tr className="border-b text-sm text-muted-foreground">
-                                <th className="p-3 text-left">Simbol</th>
-                                <th className="p-3 text-right">Preț</th>
-                                <th className="p-3 text-right">Var %</th>
+                                <th className="p-3 text-left">{t('screener.symbolCol')}</th>
+                                <th className="p-3 text-right">{t('screener.priceCol')}</th>
+                                <th className="p-3 text-right">{t('screener.changeCol')}</th>
                                 <th className="p-3 text-right">P/E</th>
                                 <th className="p-3 text-right">P/B</th>
                                 <th className="p-3 text-right">ROE</th>
@@ -641,12 +641,12 @@ export default function StockScreenerPage() {
                           <table className="w-full">
                             <thead>
                               <tr className="border-b text-sm text-muted-foreground">
-                                <th className="p-3 text-left">Simbol</th>
+                                <th className="p-3 text-left">{t('screener.symbolCol')}</th>
                                 <th className="p-3 text-left">{t('stocks.company')}</th>
-                                <th className="p-3 text-left">Sector</th>
-                                <th className="p-3 text-right">Preț</th>
-                                <th className="p-3 text-right">Variație</th>
-                                <th className="p-3 text-right">Volum</th>
+                                <th className="p-3 text-left">{t('screener.sectorCol')}</th>
+                                <th className="p-3 text-right">{t('screener.priceCol')}</th>
+                                <th className="p-3 text-right">{t('screener.variationCol')}</th>
+                                <th className="p-3 text-right">{t('screener.volumeCol')}</th>
                               </tr>
                             </thead>
                             <tbody>

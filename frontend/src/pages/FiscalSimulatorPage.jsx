@@ -13,32 +13,38 @@ import { Plus, Trash2, Calculator, AlertTriangle, Info, AlertCircle, Building2, 
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
-const ENTITY_TYPES = [
-  { value: 'pf', label: 'Persoană Fizică (PF)', icon: User },
-  { value: 'pfa_norma', label: 'PFA - Normă de Venit', icon: Briefcase },
-  { value: 'pfa_real', label: 'PFA - Sistem Real', icon: Briefcase },
-  { value: 'pfi', label: 'PFI - Profesie Liberală', icon: Briefcase },
-  { value: 'srl_micro', label: 'SRL Micro-întreprindere', icon: Building2 },
-  { value: 'srl_profit', label: 'SRL - Impozit Profit', icon: Building2 },
-];
+function getEntityTypes(t) {
+  return [
+    { value: 'pf', label: t('simulator.entityPF'), icon: User },
+    { value: 'pfa_norma', label: t('simulator.entityPFANorma'), icon: Briefcase },
+    { value: 'pfa_real', label: t('simulator.entityPFAReal'), icon: Briefcase },
+    { value: 'pfi', label: t('simulator.entityPFI'), icon: Briefcase },
+    { value: 'srl_micro', label: t('simulator.entitySRLMicro'), icon: Building2 },
+    { value: 'srl_profit', label: t('simulator.entitySRLProfit'), icon: Building2 },
+  ];
+}
 
-const CAEN_CODES = [
-  { value: 'none', label: 'Selectează (opțional)' },
-  { value: '6201', label: '6201 - Software la comandă (IT)' },
-  { value: '6202', label: '6202 - Consultanță IT' },
-  { value: '6209', label: '6209 - Alte servicii IT' },
-  { value: '6311', label: '6311 - Prelucrare date, web hosting' },
-  { value: '6312', label: '6312 - Portaluri web' },
-  { value: '8621', label: '8621 - Asistență medicală generală' },
-  { value: '8622', label: '8622 - Asistență medicală specializată' },
-  { value: '8559', label: '8559 - Alte forme de învățământ' },
-  { value: '4711', label: '4711 - Comerț cu amănuntul' },
-  { value: '4719', label: '4719 - Comerț cu amănuntul nespecializat' },
-  { value: '7022', label: '7022 - Consultanță pentru afaceri' },
-];
+function getCaenCodes(t) {
+  return [
+    { value: 'none', label: t('simulator.caenNone') },
+    { value: '6201', label: t('simulator.caen6201') },
+    { value: '6202', label: t('simulator.caen6202') },
+    { value: '6209', label: t('simulator.caen6209') },
+    { value: '6311', label: t('simulator.caen6311') },
+    { value: '6312', label: t('simulator.caen6312') },
+    { value: '8621', label: t('simulator.caen8621') },
+    { value: '8622', label: t('simulator.caen8622') },
+    { value: '8559', label: t('simulator.caen8559') },
+    { value: '4711', label: t('simulator.caen4711') },
+    { value: '4719', label: t('simulator.caen4719') },
+    { value: '7022', label: t('simulator.caen7022') },
+  ];
+}
 
 export default function FiscalSimulatorPage() {
   const { t } = useTranslation();
+  const ENTITY_TYPES = getEntityTypes(t);
+  const CAEN_CODES = getCaenCodes(t);
   const [entities, setEntities] = useState([
     { tip: 'srl_micro', nume: '', cod_caen: 'none', venit_anual_estimat: 0, procent_detinere: 100, are_angajati: false, platitor_tva: false, norma_venit_anuala: 0, an_infiintare: null, marja_profit: 20 }
   ]);
@@ -89,7 +95,7 @@ export default function FiscalSimulatorPage() {
         })
       });
 
-      if (!response.ok) throw new Error('Eroare la simulare');
+      if (!response.ok) throw new Error(t('simulator.errorSimulation'));
 
       const data = await response.json();
       setResult(data);
@@ -179,8 +185,8 @@ export default function FiscalSimulatorPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {ENTITY_TYPES.map(t => (
-                        <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                      {ENTITY_TYPES.map(et => (
+                        <SelectItem key={et.value} value={et.value}>{et.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -189,7 +195,7 @@ export default function FiscalSimulatorPage() {
                 <div className="space-y-2">
                   <Label>{t('simulator.nameOptional')}</Label>
                   <Input
-                    placeholder="ex: SRL-ul meu IT"
+                    placeholder={t('simulator.namePlaceholder')}
                     value={entity.nume}
                     onChange={(e) => updateEntity(index, 'nume', e.target.value)}
                   />
@@ -202,7 +208,7 @@ export default function FiscalSimulatorPage() {
                     onValueChange={(v) => updateEntity(index, 'cod_caen', v)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selectează..." />
+                      <SelectValue placeholder={t('simulator.selectPlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
                       {CAEN_CODES.map(c => (
@@ -236,30 +242,30 @@ export default function FiscalSimulatorPage() {
                 {/* Câmpuri condiționale */}
                 {entity.tip === 'pfa_norma' && (
                   <div className="space-y-2">
-                    <Label>Norma de Venit ANAF (RON/an)</Label>
+                    <Label>{t('simulator.normANAF')}</Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="Norma stabilită de ANAF"
+                      placeholder={t('simulator.normPlaceholder')}
                       value={entity.norma_venit_anuala || ''}
                       onChange={(e) => updateEntity(index, 'norma_venit_anuala', parseFloat(e.target.value) || 0)}
                     />
-                    <p className="text-xs text-muted-foreground">Lasă 0 dacă nu știi - se va folosi venitul estimat</p>
+                    <p className="text-xs text-muted-foreground">{t('simulator.normHint')}</p>
                   </div>
                 )}
 
                 {(entity.tip === 'srl_micro' || entity.tip === 'srl_profit') && (
                   <div className="space-y-2">
-                    <Label>An Înființare</Label>
+                    <Label>{t('simulator.foundingYear')}</Label>
                     <Input
                       type="number"
                       min="2000"
                       max="2026"
-                      placeholder="ex: 2024"
+                      placeholder={t('simulator.foundingYearPlaceholder')}
                       value={entity.an_infiintare || ''}
                       onChange={(e) => updateEntity(index, 'an_infiintare', parseInt(e.target.value) || null)}
                     />
-                    <p className="text-xs text-muted-foreground">Important pentru regimul fiscal în primul an</p>
+                    <p className="text-xs text-muted-foreground">{t('simulator.foundingYearHint')}</p>
                   </div>
                 )}
 
@@ -319,10 +325,10 @@ export default function FiscalSimulatorPage() {
             <div>
               <Label className="text-amber-800 dark:text-amber-300">{t('simulator.otherAssociations')}</Label>
               <p className="text-sm text-amber-700 dark:text-amber-400">
-                (Firme care NU sunt incluse în lista de mai sus)
+                {t('simulator.otherAssociationsHint')}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Acest lucru afectează calculul agregat pentru pragul micro de 100.000 EUR!
+                {t('simulator.otherAssociationsImpact')}
               </p>
             </div>
             <Switch checked={alteAsocieri} onCheckedChange={setAlteAsocieri} />
@@ -340,7 +346,7 @@ export default function FiscalSimulatorPage() {
             <div>
               <Label>{t('simulator.hasSalaryWithCASS')}</Label>
               <p className="text-sm text-muted-foreground">
-                Dacă da, nu mai datorezi CASS din PFA/PFI
+                {t('simulator.cassFromSalaryHint')}
               </p>
             </div>
             <Switch checked={areSalariu} onCheckedChange={setAreSalariu} />
@@ -363,7 +369,7 @@ export default function FiscalSimulatorPage() {
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Eroare</AlertTitle>
+          <AlertTitle>{t('simulator.errorLabel')}</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}

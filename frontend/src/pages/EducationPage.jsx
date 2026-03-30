@@ -102,11 +102,11 @@ export default function EducationPage() {
         window.location.href = data.url;
       } else {
         const error = await res.json();
-        alert(error.detail || 'Eroare la procesarea plății');
+        alert(error.detail || t('education.paymentProcessError'));
       }
     } catch (error) {
       console.error('Purchase error:', error);
-      alert('Eroare la conectarea cu serviciul de plăți');
+      alert(t('education.paymentConnectionError'));
     } finally {
       setPurchasing(null);
     }
@@ -129,8 +129,8 @@ export default function EducationPage() {
       <div className="min-h-[50vh] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-600" />
-          <h2 className="text-xl font-semibold">Se verifică plata...</h2>
-          <p className="text-muted-foreground">Te rugăm să aștepți</p>
+          <h2 className="text-xl font-semibold">{t('education.verifyingPayment')}</h2>
+          <p className="text-muted-foreground">{t('education.pleaseWait')}</p>
         </div>
       </div>
     );
@@ -163,10 +163,10 @@ export default function EducationPage() {
             <CheckCircle className="w-6 h-6 text-green-600" />
             <div>
               <p className="font-semibold text-green-800 dark:text-green-200">
-                {hasPremium ? 'Ai acces Premium complet!' : 'Ai acces la pachetul Starter!'}
+                {hasPremium ? t('education.premiumAccessFull') : t('education.starterAccessFull')}
               </p>
               <p className="text-sm text-green-700 dark:text-green-300">
-                {hasPremium ? 'Toate cele 12 lecții sunt deblocate.' : '6 lecții de bază sunt deblocate.'}
+                {hasPremium ? t('education.premiumAllUnlocked') : t('education.starterUnlocked')}
               </p>
             </div>
           </CardContent>
@@ -181,7 +181,7 @@ export default function EducationPage() {
             <Card className="bg-gradient-to-br from-blue-500 to-blue-700 text-white overflow-hidden relative">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
               <CardContent className="p-6 relative">
-                <Badge className="bg-white/20 text-white mb-3">Pachet Starter</Badge>
+                <Badge className="bg-white/20 text-white mb-3">{t('education.starterBadge')}</Badge>
                 <h2 className="text-2xl font-bold mb-4">{starterPkg.name}</h2>
                 <ul className="space-y-2 mb-6">
                   {starterPkg.features?.map((f, i) => (
@@ -195,7 +195,7 @@ export default function EducationPage() {
                   <div>
                     <span className="text-4xl font-bold">{starterPkg.price}</span>
                     <span className="text-xl ml-1">RON</span>
-                    <p className="text-blue-100 text-sm">Plată unică</p>
+                    <p className="text-blue-100 text-sm">{t('education.oneTimePayment')}</p>
                   </div>
                   <Button
                     variant="secondary"
@@ -207,7 +207,7 @@ export default function EducationPage() {
                     ) : (
                       <>
                         <ShoppingCart className="w-4 h-4 mr-2" />
-                        Cumpără
+                        {t('education.buyBtn')}
                       </>
                     )}
                   </Button>
@@ -225,7 +225,7 @@ export default function EducationPage() {
               </div>
               <CardContent className="p-6 relative">
                 <Badge className="bg-yellow-400 text-yellow-900 mb-3">
-                  <Star className="w-3 h-3 mr-1" /> Recomandat
+                  <Star className="w-3 h-3 mr-1" /> {t('education.recommendedBadge')}
                 </Badge>
                 <h2 className="text-2xl font-bold mb-4">{premiumPkg.name}</h2>
                 <ul className="space-y-2 mb-6">
@@ -240,7 +240,7 @@ export default function EducationPage() {
                   <div>
                     <span className="text-4xl font-bold">{premiumPkg.price}</span>
                     <span className="text-xl ml-1">RON</span>
-                    <p className="text-blue-200 text-sm">Acces complet permanent</p>
+                    <p className="text-blue-200 text-sm">{t('education.fullPermanentAccess')}</p>
                   </div>
                   <Button
                     className="bg-yellow-400 text-yellow-900 hover:bg-yellow-300"
@@ -252,7 +252,7 @@ export default function EducationPage() {
                     ) : (
                       <>
                         <Crown className="w-4 h-4 mr-2" />
-                        Cumpără Premium
+                        {t('education.buyPremiumBtn')}
                       </>
                     )}
                   </Button>
@@ -298,7 +298,7 @@ export default function EducationPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold">{lesson.title}</h3>
                       {lesson.is_free && (
-                        <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">GRATUIT</Badge>
+                        <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">{t('education.freeBadge')}</Badge>
                       )}
                       {lesson.tier === 'premium' && !lesson.is_free && (
                         <Badge className="text-xs bg-blue-100 text-blue-700">

@@ -139,7 +139,7 @@ export default function StockDetailPage() {
       <div className="text-center py-12">
         <p className="text-muted-foreground">{t('stocks.errorLoading')} {symbol}</p>
         <Link to="/stocks">
-          <Button className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> Înapoi</Button>
+          <Button className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> {t('stocks.backBtn')}</Button>
         </Link>
       </div>
     );
@@ -163,7 +163,7 @@ export default function StockDetailPage() {
     "@context": "https://schema.org",
     "@type": "FinancialProduct",
     "name": `${data.name} (${data.symbol})`,
-    "description": `Preț live ${data.name} - ${data.symbol} la ${data.exchange || 'BVB'}. Urmărește cotația în timp real, grafice istorice, volum de tranzacționare.`,
+    "description": t('stocks.seoStructuredDesc', { name: data.name, symbol: data.symbol, exchange: data.exchange || 'BVB' }),
     "provider": {
       "@type": "Organization",
       "name": "FinRomania"
@@ -178,9 +178,9 @@ export default function StockDetailPage() {
   return (
     <div className="space-y-6">
       <SEO
-        title={`${data.name} (${data.symbol}) - Preț Live ${(data.price || lastPrice)?.toFixed(2)} ${data.currency || 'RON'}`}
-        description={`Preț live ${data.name} (${data.symbol}) la ${data.exchange || 'BVB'}: ${(data.price || lastPrice)?.toFixed(2)} ${data.currency || 'RON'} (${isPositive ? '+' : ''}${(data.change_percent || percentChange)?.toFixed(2)}%). Grafice profesionale, analiză tehnică, date istorice.`}
-        keywords={`${data.symbol} preț, ${data.name} cotație, ${data.symbol} live, ${data.symbol} grafic, acțiune ${data.symbol}, ${data.exchange || 'BVB'} ${data.symbol}`}
+        title={t('stocks.seoTitleDetail', { name: data.name, symbol: data.symbol, price: (data.price || lastPrice)?.toFixed(2), currency: data.currency || 'RON' })}
+        description={t('stocks.seoDescDetail', { name: data.name, symbol: data.symbol, exchange: data.exchange || 'BVB', price: (data.price || lastPrice)?.toFixed(2), currency: data.currency || 'RON', change: `${isPositive ? '+' : ''}${(data.change_percent || percentChange)?.toFixed(2)}` })}
+        keywords={t('stocks.seoKeywordsDetail', { symbol: data.symbol, name: data.name, exchange: data.exchange || 'BVB' })}
         structuredData={structuredData}
       />
 

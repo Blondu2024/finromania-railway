@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Facebook, Twitter, Linkedin, Link2, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { useState } from 'react';
 
 export default function SocialShare({ title, url }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   
   const shareUrl = url || window.location.href;
@@ -42,7 +44,7 @@ export default function SocialShare({ title, url }) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground">Distribuie:</span>
+      <span className="text-sm text-muted-foreground">{t('share.share')}:</span>
       {shareLinks.map((link) => (
         <Button
           key={link.name}
@@ -50,7 +52,7 @@ export default function SocialShare({ title, url }) {
           size="icon"
           className={`h-8 w-8 ${link.color}`}
           onClick={() => window.open(link.url, '_blank', 'width=600,height=400')}
-          title={`Distribuie pe ${link.name}`}
+          title={`${t('share.shareOn')} ${link.name}`}
         >
           <link.icon className="h-4 w-4" />
         </Button>
@@ -60,7 +62,7 @@ export default function SocialShare({ title, url }) {
         size="icon"
         className="h-8 w-8 hover:bg-gray-200"
         onClick={copyToClipboard}
-        title="Copiază link-ul"
+        title={t('share.copyLink')}
       >
         {copied ? <Check className="h-4 w-4 text-green-600" /> : <Link2 className="h-4 w-4" />}
       </Button>

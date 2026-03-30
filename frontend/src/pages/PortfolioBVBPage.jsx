@@ -175,8 +175,8 @@ export default function PortfolioBVBPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (r.ok) setAiAdvice(await r.json());
-      else toast.error((await r.json()).detail || 'Eroare AI Advisor');
-    } catch { toast.error('Eroare de conexiune'); }
+      else toast.error((await r.json()).detail || t('portfolio.errorAIAdvisor'));
+    } catch { toast.error(t('portfolio.errorConnection')); }
     finally { setLoadingAI(false); }
   }, [token]);
 
@@ -198,7 +198,7 @@ export default function PortfolioBVBPage() {
       } else if (r.status === 403) {
         setPortfolio(null);
       }
-    } catch { toast.error('Eroare la încărcare date'); }
+    } catch { toast.error(t('portfolio.errorLoading')); }
     finally { setLoading(false); setRefreshing(false); }
   }, [token, fetchDividends]);
 
@@ -227,9 +227,9 @@ export default function PortfolioBVBPage() {
         body: JSON.stringify(data),
       });
       const res = await r.json();
-      if (r.ok) { toast.success(res.message || `${data.symbol} adăugat`); setShowAdd(false); fetchPortfolio(true); }
-      else toast.error(res.detail || 'Eroare la adăugare');
-    } catch { toast.error('Eroare de conexiune'); }
+      if (r.ok) { toast.success(res.message || `${data.symbol} ${t('portfolio.added')}`); setShowAdd(false); fetchPortfolio(true); }
+      else toast.error(res.detail || t('portfolio.errorAdding'));
+    } catch { toast.error(t('portfolio.errorConnection')); }
     finally { setSaving(false); }
   };
 
@@ -243,9 +243,9 @@ export default function PortfolioBVBPage() {
         body: JSON.stringify(data),
       });
       const res = await r.json();
-      if (r.ok) { toast.success(res.message || `${editPos.symbol} actualizat`); setEditPos(null); fetchPortfolio(true); }
-      else toast.error(res.detail || 'Eroare la actualizare');
-    } catch { toast.error('Eroare de conexiune'); }
+      if (r.ok) { toast.success(res.message || `${editPos.symbol} ${t('portfolio.updated')}`); setEditPos(null); fetchPortfolio(true); }
+      else toast.error(res.detail || t('portfolio.errorUpdating'));
+    } catch { toast.error(t('portfolio.errorConnection')); }
     finally { setSaving(false); }
   };
 
@@ -256,9 +256,9 @@ export default function PortfolioBVBPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const res = await r.json();
-      if (r.ok) { toast.success(res.message || `${symbol} eliminat`); fetchPortfolio(true); }
-      else toast.error(res.detail || 'Eroare');
-    } catch { toast.error('Eroare de conexiune'); }
+      if (r.ok) { toast.success(res.message || `${symbol} ${t('portfolio.removed')}`); fetchPortfolio(true); }
+      else toast.error(res.detail || t('portfolio.errorGeneric'));
+    } catch { toast.error(t('portfolio.errorConnection')); }
     finally { setDeleteConfirm(null); }
   };
 
@@ -274,7 +274,7 @@ export default function PortfolioBVBPage() {
         a.click();
         URL.revokeObjectURL(url);
       }
-    } catch { toast.error('Eroare export'); }
+    } catch { toast.error(t('portfolio.errorExport')); }
   };
 
   // ── Guards ───────────────────────────────────────────────────────────────
@@ -321,7 +321,7 @@ export default function PortfolioBVBPage() {
 
   return (
     <>
-      <SEO title="Portofoliu BVB PRO | FinRomania" />
+      <SEO title={`${t('portfolio.title')} | FinRomania`} />
 
       {/* ── HEADER ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
@@ -417,7 +417,7 @@ export default function PortfolioBVBPage() {
               <Banknote className="w-4 h-4" />
               <span className="hidden sm:inline">{t('portfolio.dividendsTab')}</span>
               {dividends?.total_annual_income > 0 && (
-                <Badge className="bg-emerald-500 text-white text-[10px] px-1.5 py-0">{fmtRON(dividends.total_annual_income)}/an</Badge>
+                <Badge className="bg-emerald-500 text-white text-[10px] px-1.5 py-0">{fmtRON(dividends.total_annual_income)}{t('common.perYear')}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="news" className="flex items-center gap-1.5 data-[state=active]:bg-background">
@@ -438,29 +438,29 @@ export default function PortfolioBVBPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-muted/40">
-                      <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Simbol</th>
-                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Cant.</th>
+                      <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">{t('portfolio.symbolHeader')}</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">{t('portfolio.qtyHeader')}</th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">{t('portfolio.entryPrice')}</th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
-                        Preț Curent
-                        <InfoTip>Sursa: BVB · Delay ~15 min</InfoTip>
+                        {t('portfolio.currentPriceHeader')}
+                        <InfoTip>{t('portfolio.currentPriceTooltip')}</InfoTip>
                       </th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
-                        Valoare
-                        <InfoTip>Preț Curent × Cantitate</InfoTip>
+                        {t('portfolio.valueHeader')}
+                        <InfoTip>{t('portfolio.valueTooltip')}</InfoTip>
                       </th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
                         P&L
-                        <InfoTip>Profit/Loss = (Preț Curent - Preț Intrare) × Cantitate · Procent = P&L / Investit × 100</InfoTip>
+                        <InfoTip>{t('portfolio.plTooltip')}</InfoTip>
                       </th>
-                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Azi</th>
+                      <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">{t('portfolio.todayHeader')}</th>
                       <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">
                         RSI
-                        <InfoTip>Relative Strength Index (14 zile) · Calculat matematic din prețurile de închidere BVB · {'<'}30 = Supravândut, {'>'}70 = Supracumpărat</InfoTip>
+                        <InfoTip>{t('portfolio.rsiTooltip')}</InfoTip>
                       </th>
                       <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
                         Div Yield
-                        <InfoTip>Randament dividend = Dividend trailing 12 luni / Preț curent × 100 · Sursa dividende: BVB.ro oficial</InfoTip>
+                        <InfoTip>{t('portfolio.divYieldTooltip')}</InfoTip>
                       </th>
                       <th className="px-4 py-2.5"></th>
                     </tr>
@@ -526,7 +526,7 @@ export default function PortfolioBVBPage() {
                       <td className="px-4 py-3 text-right">
                         {dividends?.total_annual_income > 0 && (
                           <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                            {fmtRON(dividends.total_annual_income)}/an
+                            {fmtRON(dividends.total_annual_income)}{t('common.perYear')}
                           </span>
                         )}
                       </td>
@@ -542,25 +542,25 @@ export default function PortfolioBVBPage() {
 
             <SourcesSection items={[
               {
-                label: 'Prețuri acțiuni BVB',
-                description: 'Prețurile provin de pe Bursa de Valori București cu delay de ~15 minute. Pentru prețuri în timp real, verifică direct pe BVB.ro.',
+                label: t('portfolio.bvbPricesSource'),
+                description: t('portfolio.bvbPricesDesc'),
                 link: 'https://bvb.ro/FinancialInstruments/Markets/Shares/SharesListForDownload',
               },
               {
                 label: 'P&L (Profit/Loss)',
-                description: 'Calculat pe baza prețului de intrare introdus de tine și prețului curent de pe BVB.',
-                formula: 'P&L = (Preț Curent - Preț Intrare) × Cantitate',
+                description: t('portfolio.plDescription'),
+                formula: t('portfolio.plFormula'),
               },
               {
                 label: 'RSI (Relative Strength Index)',
-                description: 'Indicator tehnic standard calculat matematic pe baza prețurilor de închidere din ultimele 14 zile de tranzacționare. Nu este o recomandare de investiții.',
-                formula: 'RSI = 100 - (100 / (1 + RS)), unde RS = Media câștigurilor / Media pierderilor (14 zile)',
+                description: t('portfolio.rsiDescription'),
+                formula: t('portfolio.rsiFormula'),
                 link: 'https://www.investopedia.com/terms/r/rsi.asp',
               },
               {
                 label: 'Dividend Yield',
-                description: 'Calculat pe baza dividendelor plătite în ultimele 12 luni (trailing), conform datelor oficiale BVB.ro.',
-                formula: 'Yield = (Suma dividendelor trailing 12 luni / Preț curent) × 100',
+                description: t('portfolio.divYieldDescription'),
+                formula: t('portfolio.divYieldFormula'),
                 link: 'https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend',
               },
             ]} />
@@ -575,7 +575,7 @@ export default function PortfolioBVBPage() {
                   <BarChart3 className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-40" />
                   <p className="text-muted-foreground text-sm">{t('portfolio.loadingAnalysis')}</p>
                   <Button variant="outline" size="sm" className="mt-4" onClick={fetchAnalysis}>
-                    <RefreshCw className="w-4 h-4 mr-2" /> Încarcă Analiza
+                    <RefreshCw className="w-4 h-4 mr-2" /> {t('portfolio.loadAnalysis')}
                   </Button>
                 </CardContent>
               </Card>
@@ -595,32 +595,32 @@ export default function PortfolioBVBPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <Card>
                     <CardContent className="p-5 text-center">
-                      <p className="text-sm text-muted-foreground mb-1">Income Anual Estimat</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t('portfolio.annualEstimatedIncome')}</p>
                       <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                         {fmtRON(dividends.total_annual_income || 0)}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">din dividende BVB</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('portfolio.fromBVBDividends')}</p>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-5 text-center">
-                      <p className="text-sm text-muted-foreground mb-1">Yield Mediu Portofoliu</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t('portfolio.avgPortfolioYield')}</p>
                       <p className="text-2xl font-bold">
                         {dividends.dividends?.length > 0
                           ? fmt(dividends.dividends.filter(d => d.dividend_yield_pct).reduce((s, d) => s + d.dividend_yield_pct, 0) / dividends.dividends.filter(d => d.dividend_yield_pct).length)
                           : '0'}%
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">trailing 12 luni</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('portfolio.trailing12m')}</p>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-5 text-center">
-                      <p className="text-sm text-muted-foreground mb-1">Acțiuni cu Dividende</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t('portfolio.stocksWithDividends')}</p>
                       <p className="text-2xl font-bold">
                         {dividends.dividends?.filter(d => d.trailing_annual_dividend > 0).length || 0}
                         <span className="text-base text-muted-foreground"> / {positions.length}</span>
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">plătesc dividende</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('portfolio.payDividends')}</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -629,18 +629,18 @@ export default function PortfolioBVBPage() {
                 <Card>
                   <CardHeader className="py-3 px-4 border-b">
                     <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                      Dividende per Poziție
+                      {t('portfolio.dividendsPerPosition')}
                     </CardTitle>
                   </CardHeader>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b bg-muted/40">
-                          <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Simbol</th>
-                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Acțiuni</th>
-                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Dividend/Acțiune</th>
+                          <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">{t('portfolio.symbolHeader')}</th>
+                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">{t('portfolio.sharesHeader')}</th>
+                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">{t('portfolio.dividendPerShare')}</th>
                           <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Yield</th>
-                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Income Anual</th>
+                          <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">{t('portfolio.annualIncome')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
@@ -673,7 +673,7 @@ export default function PortfolioBVBPage() {
                       </tbody>
                       <tfoot>
                         <tr className="border-t-2 bg-muted/20">
-                          <td className="px-4 py-3 font-bold" colSpan={4}>TOTAL INCOME ANUAL</td>
+                          <td className="px-4 py-3 font-bold" colSpan={4}>{t('portfolio.totalAnnualIncome')}</td>
                           <td className="px-4 py-3 text-right font-bold font-mono text-emerald-600 dark:text-emerald-400">
                             {fmtRON(dividends.total_annual_income || 0)}
                           </td>
@@ -683,9 +683,9 @@ export default function PortfolioBVBPage() {
                   </div>
                   <div className="px-4 py-2.5 border-t bg-muted/10">
                     <p className="text-xs text-muted-foreground">
-                      Sursa: BVB.ro oficial · Trailing 12 luni · Dividend per acțiune brut (înainte de impozit) ·{' '}
+                      {t('portfolio.dividendSourceNote')} ·{' '}
                       <a href="https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-0.5">
-                        Verifică pe BVB.ro <ExternalLink className="w-3 h-3" />
+                        {t('portfolio.checkOnBVB')} <ExternalLink className="w-3 h-3" />
                       </a>
                     </p>
                   </div>
@@ -693,24 +693,24 @@ export default function PortfolioBVBPage() {
 
                 <SourcesSection items={[
                   {
-                    label: 'Sursa dividendelor',
-                    description: 'Datele sunt extrase direct de pe BVB.ro (Calendarul Dividendelor). Sunt dividendele brute (înainte de impozitul de 16%).',
+                    label: t('portfolio.divSourceLabel'),
+                    description: t('portfolio.divSourceDesc'),
                     link: 'https://bvb.ro/FinancialInstruments/CorporateActions/InfoDividend',
                   },
                   {
-                    label: 'Dividend Yield (Randament)',
-                    description: 'Calculat ca raport între suma dividendelor plătite în ultimele 12 luni și prețul curent al acțiunii.',
-                    formula: 'Yield = (Dividend trailing 12 luni per acțiune / Preț curent) × 100',
+                    label: t('portfolio.divYieldLabel'),
+                    description: t('portfolio.divYieldCalcDesc'),
+                    formula: t('portfolio.divYieldFormula'),
                   },
                   {
-                    label: 'Income Anual Estimat',
-                    description: 'Bazat pe dividendele din ultimele 12 luni. Dividendele viitoare pot fi diferite. Verifică rapoartele companiei.',
-                    formula: 'Income = Dividend per acțiune × Număr acțiuni deținute',
+                    label: t('portfolio.annualEstimatedIncome'),
+                    description: t('portfolio.annualIncomeDesc'),
+                    formula: t('portfolio.annualIncomeFormula'),
                   },
                   {
-                    label: 'Impozit dividende România',
-                    description: 'Dividendele afișate sunt BRUTE. Impozitul pe dividende în România este de 16%, reținut la sursă (2026, Legea 141/2025).',
-                    formula: 'Dividend net = Dividend brut × (1 - 0.16)',
+                    label: t('portfolio.divTaxLabel'),
+                    description: t('portfolio.divTaxDesc'),
+                    formula: t('portfolio.divTaxFormula'),
                   },
                 ]} />
               </div>
@@ -751,12 +751,12 @@ export default function PortfolioBVBPage() {
       {/* Delete confirm */}
       <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
         <DialogContent className="sm:max-w-sm">
-          <DialogHeader><DialogTitle>Elimini {deleteConfirm}?</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{t('portfolio.deleteTitle')} {deleteConfirm}?</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">{t('portfolio.deleteConfirm')}</p>
           <DialogFooter className="gap-2 mt-4">
             <Button variant="outline" onClick={() => setDeleteConfirm(null)}>{t('common.cancel')}</Button>
             <Button variant="destructive" onClick={() => handleDelete(deleteConfirm)}>
-              <Trash2 className="w-4 h-4 mr-2" /> Elimină
+              <Trash2 className="w-4 h-4 mr-2" /> {t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

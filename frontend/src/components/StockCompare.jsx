@@ -124,7 +124,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
-            Comparație Acțiuni BVB
+            {t('compare.title')}
           </CardTitle>
           {onClose && (
             <Button variant="ghost" size="sm" onClick={onClose} className="text-white hover:bg-white/20">
@@ -139,7 +139,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Caută și adaugă acțiuni (max 4)..."
+              placeholder={t('compare.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -180,7 +180,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
             ))}
             {symbols.length < 2 && (
               <span className="text-sm text-muted-foreground">
-                Adaugă minim 2 acțiuni pentru comparație
+                {t('compare.minStocks')}
               </span>
             )}
           </div>
@@ -203,7 +203,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-2 font-semibold">Metric</th>
+                  <th className="text-left p-2 font-semibold">{t('compare.metric')}</th>
                   {comparisonData.map(stock => (
                     <th key={stock.symbol} className="text-center p-2">
                       <Link to={`/stocks/bvb/${stock.symbol}`} className="hover:text-blue-600">
@@ -252,7 +252,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
                 
                 {/* Sector Row */}
                 <tr className="border-b bg-gray-50 dark:bg-zinc-800/50">
-                  <td className="p-2 font-medium text-sm">Sector</td>
+                  <td className="p-2 font-medium text-sm">{t('compare.sector')}</td>
                   {comparisonData.map(stock => (
                     <td key={`${stock.symbol}-sector`} className="text-center p-2">
                       <Badge variant="outline">{stock.sector || 'N/A'}</Badge>
@@ -265,15 +265,15 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
                   <td className="p-2">
                     <div className="flex items-center gap-2">
                       <Activity className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium text-sm">Peste SMA 50</span>
+                      <span className="font-medium text-sm">{t('compare.aboveSMA50')}</span>
                     </div>
                   </td>
                   {comparisonData.map(stock => (
                     <td key={`${stock.symbol}-sma`} className="text-center p-2">
                       {stock.above_sma_50 === true ? (
-                        <Badge className="bg-green-100 text-green-700">DA</Badge>
+                        <Badge className="bg-green-100 text-green-700">{t('common.yes')}</Badge>
                       ) : stock.above_sma_50 === false ? (
-                        <Badge className="bg-red-100 text-red-700">NU</Badge>
+                        <Badge className="bg-red-100 text-red-700">{t('common.no')}</Badge>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
@@ -289,13 +289,13 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
         {comparisonData.length >= 2 && (
           <div className="mt-4 text-xs text-muted-foreground flex items-center gap-4">
             <span className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-green-100 rounded" /> Cea mai bună valoare
+              <div className="w-3 h-3 bg-green-100 rounded" /> {t('compare.bestValue')}
             </span>
             <span className="flex items-center gap-1">
-              <span className="text-green-600 font-bold">+</span> Creștere
+              <span className="text-green-600 font-bold">+</span> {t('compare.growth')}
             </span>
             <span className="flex items-center gap-1">
-              <span className="text-red-600 font-bold">-</span> Scădere
+              <span className="text-red-600 font-bold">-</span> {t('compare.decline')}
             </span>
           </div>
         )}

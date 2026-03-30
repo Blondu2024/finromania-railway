@@ -218,7 +218,7 @@ export default function PortfolioImport() {
                 {t('import.fiscalDetails')} - {report.year}
               </CardTitle>
               <CardDescription>
-                Broker: {report.broker} | Piață: {report.market === 'bvb' ? 'BVB' : 'Internațională'} | {report.total_transactions} vânzări, {report.total_dividends} dividende
+                Broker: {report.broker} | {t('import.market')}: {report.market === 'bvb' ? 'BVB' : t('import.international')} | {report.total_transactions} {t('import.sales')}, {report.total_dividends} {t('import.dividendsLabel')}
               </CardDescription>
             </CardHeader>
             <CardContent>

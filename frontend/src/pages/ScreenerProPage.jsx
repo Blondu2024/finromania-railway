@@ -299,23 +299,23 @@ export default function ScreenerProPage() {
           // Cache gol — pornim polling automat, userul nu trebuie să facă nimic
           setIsRefreshingBackground(true);
           startPolling(token);
-          toast.info('Se pregătesc datele... Vei vedea rezultatele automat în câteva secunde.');
+          toast.info(t('screener.preparingData'));
         } else if (data.cache_refreshing) {
           // Date vechi disponibile, refresh în background
           setIsRefreshingBackground(true);
           startPolling(token);
-          toast.success(`${data.count} acțiuni (actualizare automată în curs)`);
+          toast.success(t('screener.stocksAutoUpdate', { count: data.count }));
         } else if (data.from_cache) {
           const timeStr = data.scanned_at
             ? new Date(data.scanned_at).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })
             : '';
-          toast.success(`${data.count} acțiuni din cache (${timeStr})`);
+          toast.success(t('screener.stocksFromCache', { count: data.count, time: timeStr }));
         } else {
-          toast.success(`Scanare completă: ${data.count} acțiuni`);
+          toast.success(t('screener.scanComplete', { count: data.count }));
         }
       } else {
         const err = await scanRes.json();
-        toast.error(err.detail || 'Eroare la scanare');
+        toast.error(err.detail || t('screener.scanError'));
       }
 
       if (summaryRes.ok) {
@@ -324,7 +324,7 @@ export default function ScreenerProPage() {
       }
     } catch (err) {
       console.error(err);
-      toast.error('Eroare de conexiune');
+      toast.error(t('screener.connectionError'));
     } finally {
       setLoading(false);
       setActivePreset(null);
@@ -354,11 +354,11 @@ export default function ScreenerProPage() {
       if (res.ok) {
         const data = await res.json();
         setStocks(data.stocks || []);
-        toast.success(`${preset.name}: ${data.count} acțiuni găsite`);
+        toast.success(t('screener.presetFound', { name: preset.name, count: data.count }));
       }
     } catch (err) {
       console.error(err);
-      toast.error('Eroare la filtrare');
+      toast.error(t('screener.filterError'));
     } finally {
       setLoading(false);
     }
@@ -381,7 +381,7 @@ export default function ScreenerProPage() {
 
   // Export to CSV
   const exportCSV = () => {
-    const headers = ['Simbol', 'Nume', 'Preț (RON)', 'Variație %', 'RSI', 'MACD', 'P/E', 'ROE %', 'Div Yield % (BVB.ro)', 'D/E', 'Semnal', 'Scor'];
+    const headers = [t('common.symbol'), t('common.name'), `${t('common.price')} (RON)`, `${t('common.change')} %`, 'RSI', 'MACD', 'P/E', 'ROE %', 'Div Yield % (BVB.ro)', 'D/E', t('screener.signal'), t('screener.score')];
     const rows = sortedStocks.map(s => [
       s.symbol,
       `"${(s.name || '').replace(/"/g, '""')}"`,
@@ -433,14 +433,14 @@ export default function ScreenerProPage() {
                 </div>
                 <div className="p-4 bg-white dark:bg-gray-800 rounded-lg">
                   <Target className="w-8 h-8 text-blue-500 mb-2" />
-                  <h3 className="font-bold">Semnale AI</h3>
+                  <h3 className="font-bold">{t('screener.aiSignals')}</h3>
                   <p className="text-sm text-muted-foreground">{t('screener.signalDesc')}</p>
                 </div>
               </div>
               <Link to="/pricing">
                 <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
                   <Crown className="w-5 h-5 mr-2" />
-                  Upgrade la PRO - 49 lei/lună
+                  {t('screener.upgradeProPrice')}
                 </Button>
               </Link>
             </CardContent>
@@ -545,7 +545,7 @@ export default function ScreenerProPage() {
                 {cacheAge && (
                   <span className="text-xs text-muted-foreground flex items-center gap-1">
                     {isRefreshingBackground && <RefreshCw className="w-3 h-3 animate-spin" />}
-                    Actualizat la {new Date(cacheAge).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
+                    {t('screener.updatedAt', { time: new Date(cacheAge).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' }) })}
                   </span>
                 )}
               </div>
@@ -560,7 +560,7 @@ export default function ScreenerProPage() {
                         {t('screener.price')} <ArrowUpDown className="w-3 h-3 inline" />
                       </th>
                       <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('change_percent')}>
-                        Var% <ArrowUpDown className="w-3 h-3 inline" />
+                        {t('screener.varPercent')} <ArrowUpDown className="w-3 h-3 inline" />
                       </th>
                       <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('rsi')}>
                         RSI <ArrowUpDown className="w-3 h-3 inline" />
@@ -581,7 +581,7 @@ export default function ScreenerProPage() {
                       <th className="p-3 text-right cursor-pointer hover:bg-muted" onClick={() => handleSort('signal_score')}>
                         {t('screener.signal')} <ArrowUpDown className="w-3 h-3 inline" />
                       </th>
-                      <th className="p-3 text-center">Detalii</th>
+                      <th className="p-3 text-center">{t('screener.detailsLabel')}</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -96,7 +96,7 @@ export default function GlossaryPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Caută termeni... (ex: acțiune, dividend, ETF)"
+          placeholder={t('education.searchTerms')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
@@ -107,11 +107,11 @@ export default function GlossaryPage() {
       {searchQuery && (
         <div className="flex items-center gap-2">
           <Badge variant="secondary">
-            {Object.keys(filteredTerms).length} rezultate
+            {t('education.resultsCount', { count: Object.keys(filteredTerms).length })}
           </Badge>
           {Object.keys(filteredTerms).length === 0 && (
             <p className="text-sm text-muted-foreground">
-              Nu am găsit termeni care să corespundă căutării tale.
+              {t('education.noSearchResults')}
             </p>
           )}
         </div>
@@ -148,7 +148,7 @@ export default function GlossaryPage() {
           <Card>
             <CardContent className="text-center py-12">
               <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Nu s-au găsit termeni.</p>
+              <p className="text-muted-foreground">{t('education.noTermsFound')}</p>
             </CardContent>
           </Card>
         )
@@ -161,11 +161,10 @@ export default function GlossaryPage() {
             <BookOpen className="w-6 h-6 text-blue-600 mt-1" />
             <div>
               <h3 className="font-semibold text-blue-900 mb-2">
-                💡 Ghid de utilizare
+                {'💡 '}{t('dividends.usageGuide')}
               </h3>
               <p className="text-sm text-blue-800">
-                Acest glosar conține termeni esențiali din lumea investițiilor și finanțelor.
-                Folosește bara de căutare pentru a găsi rapid definiții sau navighează alfabetic.
+                {t('dividends.usageGuideText')}
               </p>
             </div>
           </div>

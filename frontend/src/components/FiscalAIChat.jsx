@@ -8,24 +8,23 @@ import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Quick answers pentru afișare inițială
-const QUICK_ANSWERS = [
-  { q: "Cât e impozitul pe BVB?", a: "3% pentru deținere ≥1 an, 6% pentru <1 an (2026)" },
-  { q: "Trebuie Declarația Unică?", a: "DA pentru international, NU pentru BVB" },
-  { q: "Ce e W-8BEN?", a: "Formular SUA - reduce impozitul de la 30% la 15%" },
-  { q: "Când datorez CASS?", a: "Venit investiții > 24.300 RON/an (inclusiv cu salariu)" },
-];
-
-const SUGGESTED_QUESTIONS = [
-  "Cum completez Declarația Unică?",
-  "Ce documente am nevoie de la broker?",
-  "Pot compensa pierderile cu câștigurile?",
-  "Care e diferența între BVB și Trading 212 fiscal?",
-  "Trebuie să declar ETF-urile?",
-];
-
 const FiscalAIChat = ({ compact = false }) => {
   const { t } = useTranslation();
+
+  const QUICK_ANSWERS = [
+    { q: t('fiscalChat.qa1q'), a: t('fiscalChat.qa1a') },
+    { q: t('fiscalChat.qa2q'), a: t('fiscalChat.qa2a') },
+    { q: t('fiscalChat.qa3q'), a: t('fiscalChat.qa3a') },
+    { q: t('fiscalChat.qa4q'), a: t('fiscalChat.qa4a') },
+  ];
+
+  const SUGGESTED_QUESTIONS = [
+    t('fiscalChat.sq1'),
+    t('fiscalChat.sq2'),
+    t('fiscalChat.sq3'),
+    t('fiscalChat.sq4'),
+    t('fiscalChat.sq5'),
+  ];
   const { user, token } = useAuth();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');

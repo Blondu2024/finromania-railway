@@ -40,12 +40,11 @@ export default function AboutPage() {
               </h2>
               
               <p className="text-lg leading-relaxed text-muted-foreground">
-                În România, educația financiară este aproape inexistentă. Milioane de români vor să învețe despre investiții, bursa de valori, și trading - dar resurse de calitate în limba română sunt rare sau foarte scumpe.
+                {t('about.whyParagraph1')}
               </p>
-              
-              <p className="text-lg leading-relaxed text-muted-foreground">
-                <strong>FinRomania</strong> a fost creat pentru a schimba asta. Credem că fiecare român merită acces la educație financiară de calitate, indiferent de venit sau background. De aceea am construit prima platformă educațională de trading complet <strong>gratuită</strong> din România.
-              </p>
+
+              <p className="text-lg leading-relaxed text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('about.whyParagraph2') }} />
+
             </div>
           </CardContent>
         </Card>
@@ -61,7 +60,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="font-bold text-lg mb-2">{t('about.freeValue')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Educația nu ar trebui să coste. Totul e gratuit, pentru totdeauna.
+                  {t('about.freeValueDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -73,7 +72,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="font-bold text-lg mb-2">{t('about.qualityValue')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Date reale, lecții profesionale, AI avansat - nu compromitem niciodată.
+                  {t('about.qualityValueDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -85,7 +84,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="font-bold text-lg mb-2">{t('about.innovationValue')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Primă platformă cu AI Advisor și lecții interactive în română.
+                  {t('about.innovationValueDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -97,7 +96,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="font-bold text-lg mb-2">{t('about.communityValue')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Construim o comunitate de investitori educați în România.
+                  {t('about.communityValueDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -115,9 +114,9 @@ export default function AboutPage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-bold mb-2">Date Reale BVB</h3>
+                <h3 className="font-bold mb-2">{t('about.featureRealBVB')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Prețuri live de pe Bursa de Valori București, actualizate la fiecare 5 minute. Nu folosim date simulate - vezi piața reală!
+                  {t('about.featureRealBVBDesc')}
                 </p>
               </div>
             </div>
@@ -129,9 +128,9 @@ export default function AboutPage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-bold mb-2">Trading School Interactive</h3>
+                <h3 className="font-bold mb-2">{t('about.featureTradingSchool')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  17 lecții complete cu quizzes și scenarii practice. De la începător la avansat, înveți prin practică ghidată.
+                  {t('about.featureTradingSchoolDesc')}
                 </p>
               </div>
             </div>
@@ -143,9 +142,9 @@ export default function AboutPage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-bold mb-2">AI Advisor Personal</h3>
+                <h3 className="font-bold mb-2">{t('about.featureAIAdvisor')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Asistent AI care răspunde la întrebările tale despre trading, investiții, și analiză financiară - disponibil 24/7.
+                  {t('about.featureAIAdvisorDesc')}
                 </p>
               </div>
             </div>
@@ -157,9 +156,9 @@ export default function AboutPage() {
                 </div>
               </div>
               <div>
-                <h3 className="font-bold mb-2">Instrumente Profesionale</h3>
+                <h3 className="font-bold mb-2">{t('about.featureProTools')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Glosar 99 termeni, convertor valutar live, știri automate, evaluare risc - tot ce ai nevoie pentru a începe.
+                  {t('about.featureProToolsDesc')}
                 </p>
               </div>
             </div>
@@ -170,19 +169,19 @@ export default function AboutPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
             <div className="text-4xl font-bold text-blue-600 mb-2">17</div>
-            <div className="text-sm text-muted-foreground">Lecții Interactive</div>
+            <div className="text-sm text-muted-foreground">{t('about.statLessons')}</div>
           </div>
           <div>
             <div className="text-4xl font-bold text-green-600 mb-2">99</div>
-            <div className="text-sm text-muted-foreground">Termeni în Glosar</div>
+            <div className="text-sm text-muted-foreground">{t('about.statGlossary')}</div>
           </div>
           <div>
             <div className="text-4xl font-bold text-blue-600 mb-2">20+</div>
-            <div className="text-sm text-muted-foreground">Acțiuni BVB Live</div>
+            <div className="text-sm text-muted-foreground">{t('about.statStocks')}</div>
           </div>
           <div>
             <div className="text-4xl font-bold text-orange-600 mb-2">100%</div>
-            <div className="text-sm text-muted-foreground">Gratuit</div>
+            <div className="text-sm text-muted-foreground">{t('about.statFree')}</div>
           </div>
         </div>
 
@@ -196,12 +195,12 @@ export default function AboutPage() {
             <div className="flex gap-4 justify-center flex-wrap">
               <Link to="/trading-school">
                 <button className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors">
-                  🎓 Începe Trading School
+                  🎓 {t('about.ctaTradingSchool')}
                 </button>
               </Link>
               <Link to="/stocks">
                 <button className="bg-white/20 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/30 transition-colors border-2 border-white/40">
-                  📈 Explorează BVB
+                  📈 {t('about.ctaExploreBVB')}
                 </button>
               </Link>
             </div>
@@ -222,7 +221,7 @@ export default function AboutPage() {
             </Link>
             <Link to="/advisor">
               <button className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                🤖 Întreabă AI
+                🤖 {t('about.askAI')}
               </button>
             </Link>
           </div>

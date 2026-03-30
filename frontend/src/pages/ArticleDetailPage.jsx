@@ -55,7 +55,7 @@ export default function ArticleDetailPage() {
         </div>
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="w-4 h-4 animate-spin" />
-          <span className="text-sm">Se încarcă articolul complet...</span>
+          <span className="text-sm">{t('news.loadingArticle')}</span>
         </div>
       </div>
     );
@@ -64,9 +64,9 @@ export default function ArticleDetailPage() {
   if (error || !article) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Articolul nu a fost găsit</p>
+        <p className="text-muted-foreground">{t('news.articleNotFound')}</p>
         <Link to="/news">
-          <Button className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Știri</Button>
+          <Button className="mt-4"><ArrowLeft className="w-4 h-4 mr-2" /> {t('news.backToNews')}</Button>
         </Link>
       </div>
     );
@@ -118,7 +118,7 @@ export default function ArticleDetailPage() {
       {/* Back Button */}
       <Link to="/news">
         <Button variant="ghost" size="sm">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Știri
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t('news.backToNews')}
         </Button>
       </Link>
 
@@ -142,12 +142,12 @@ export default function ArticleDetailPage() {
             </Badge>
             {article.is_romanian_source && (
               <Badge variant="default" className="bg-blue-600">
-                🇷🇴 Sursă Română
+                🇷🇴 {t('news.romanianSource')}
               </Badge>
             )}
             {hasFullContent && (
               <Badge variant="default" className="bg-green-600">
-                ✓ Articol Complet
+                ✓ {t('news.fullArticle')}
               </Badge>
             )}
           </div>
@@ -185,15 +185,14 @@ export default function ArticleDetailPage() {
               <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200">
                 <CardContent className="p-4">
                   <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                    ℹ️ Conținutul complet nu a putut fi extras automat. 
-                    Pentru a citi articolul integral, vizitează sursa originală.
+                    ℹ️ {t('news.contentNotExtracted')}
                   </p>
                 </CardContent>
               </Card>
             </div>
           ) : (
             <p className="text-muted-foreground italic">
-              Conținutul nu este disponibil. Vizitează sursa originală.
+              {t('news.contentNotAvailable')}
             </p>
           )}
         </div>
@@ -203,7 +202,7 @@ export default function ArticleDetailPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">Sursă originală</p>
+                <p className="text-xs text-muted-foreground">{t('news.originalSource')}</p>
                 <p className="text-sm font-medium">{article.source?.name}</p>
               </div>
               <a 
@@ -213,7 +212,7 @@ export default function ArticleDetailPage() {
               >
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                   <ExternalLink className="w-3 h-3 mr-1" />
-                  <span className="text-xs">Vizitează sursa</span>
+                  <span className="text-xs">{t('news.visitSource')}</span>
                 </Button>
               </a>
             </div>
@@ -223,7 +222,7 @@ export default function ArticleDetailPage() {
         {/* Author */}
         {article.author && article.author !== article.source?.name && (
           <p className="text-sm text-muted-foreground">
-            Autor: {article.author}
+            {t('news.author')}: {article.author}
           </p>
         )}
 
@@ -240,12 +239,12 @@ export default function ArticleDetailPage() {
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-center md:text-left">
-                <h3 className="text-lg font-bold mb-1">💰 Vrei Să Înțelegi Mai Bine Știrile Financiare?</h3>
-                <p className="text-green-100 text-sm">Învață bazele finanțelor personale și investițiilor în 15 lecții gratuite</p>
+                <h3 className="text-lg font-bold mb-1">💰 {t('news.understandNewsTitle')}</h3>
+                <p className="text-green-100 text-sm">{t('news.understandNewsDesc')}</p>
               </div>
               <Link to="/financial-education">
                 <Button className="bg-white text-green-600 hover:bg-green-50 whitespace-nowrap">
-                  Începe Educația Financiară →
+                  {t('news.startFinancialEd')} →
                 </Button>
               </Link>
             </div>

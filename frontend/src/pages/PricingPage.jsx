@@ -89,12 +89,12 @@ export default function PricingPage() {
         window.location.href = data.url;
       } else {
         const error = await response.json();
-        alert(`Eroare: ${error.detail}`);
+        alert(t('pricing.errorGeneric', { detail: error.detail }));
         setLoadingCheckout(false);
       }
     } catch (error) {
       console.error('Error creating checkout:', error);
-      alert('Eroare la inițializarea plății');
+      alert(t('pricing.paymentInitError'));
       setLoadingCheckout(false);
     }
   };
@@ -103,9 +103,9 @@ export default function PricingPage() {
 
   return (
     <>
-      <SEO 
-        title="Prețuri & Abonamente | FinRomania"
-        description="Alege planul potrivit pentru tine. PRO: 49 RON/lună sau 490 RON/an. Acces complet la toate funcțiile avansate."
+      <SEO
+        title={t('pricing.seoTitle')}
+        description={t('pricing.seoDesc')}
       />
       
       <div className="max-w-7xl mx-auto px-4 py-12 space-y-12">
@@ -157,7 +157,7 @@ export default function PricingPage() {
               <CardDescription>{t('pricing.freeDescription')}</CardDescription>
               <div className="pt-4">
                 <span className="text-4xl font-bold">0 RON</span>
-                <span className="text-muted-foreground">/lună</span>
+                <span className="text-muted-foreground">{t('pricing.perMonth')}</span>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -197,7 +197,7 @@ export default function PricingPage() {
               <div className="pt-4 space-y-2">
                 <div>
                   <span className="text-4xl font-bold">{t('pricing.monthlyPrice')}</span>
-                  <span className="text-muted-foreground">/lună</span>
+                  <span className="text-muted-foreground">{t('pricing.perMonth')}</span>
                 </div>
                 <div className="text-sm text-muted-foreground">
                   sau <strong className="text-green-600">{t('pricing.annualPrice')}</strong> ({t('pricing.annualSavings')}!)

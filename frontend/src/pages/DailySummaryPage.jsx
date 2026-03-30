@@ -22,7 +22,7 @@ export default function DailySummaryPage() {
     const fetchSummary = async () => {
       try {
         const res = await fetch(`${API_URL}/api/daily-summary/preview`);
-        if (!res.ok) throw new Error('Nu s-au putut încărca datele');
+        if (!res.ok) throw new Error('Failed to load data');
         const json = await res.json();
         setData(json);
       } catch (err) {
@@ -48,12 +48,12 @@ export default function DailySummaryPage() {
     return (
       <div className="max-w-3xl mx-auto text-center py-16" data-testid="daily-summary-error">
         <BarChart3 className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-        <h2 className="text-xl font-semibold mb-2">Rezumatul zilei nu este încă disponibil</h2>
+        <h2 className="text-xl font-semibold mb-2">{t('dailySummary.notAvailable')}</h2>
         <p className="text-muted-foreground mb-4">
-          Rezumatul se generează automat la 18:10, după închiderea Bursei de Valori București.
+          {t('dailySummary.generatedAt')}
         </p>
         <p className="text-sm text-muted-foreground">
-          Revino după ora 18:10 pentru a vedea analiza completă a zilei.
+          {t('dailySummary.comeBack')}
         </p>
       </div>
     );
@@ -88,7 +88,7 @@ export default function DailySummaryPage() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <BarChart3 className="w-6 h-6 text-blue-600" />
-            Rezumatul Zilei BVB
+            {t('dailySummary.title')}
           </h1>
           <p className="text-muted-foreground text-sm flex items-center gap-1 mt-1">
             <Clock className="w-3.5 h-3.5" />
@@ -109,7 +109,7 @@ export default function DailySummaryPage() {
       <Card data-testid="indices-card">
         <CardContent className="p-4">
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-1">
-            <Activity className="w-4 h-4" /> Indicii BVB
+            <Activity className="w-4 h-4" /> {t('dailySummary.bvbIndices')}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {Object.entries(indices).map(([name, idx]) => (
@@ -131,19 +131,19 @@ export default function DailySummaryPage() {
       <div className="grid grid-cols-3 gap-3">
         <Card data-testid="stat-positive">
           <CardContent className="p-4 text-center">
-            <p className="text-xs text-muted-foreground">Creșteri</p>
+            <p className="text-xs text-muted-foreground">{t('dailySummary.gains')}</p>
             <p className="text-2xl font-bold text-green-600">{sentiment.positive || 0}</p>
           </CardContent>
         </Card>
         <Card data-testid="stat-negative">
           <CardContent className="p-4 text-center">
-            <p className="text-xs text-muted-foreground">Scăderi</p>
+            <p className="text-xs text-muted-foreground">{t('dailySummary.losses')}</p>
             <p className="text-2xl font-bold text-red-600">{sentiment.negative || 0}</p>
           </CardContent>
         </Card>
         <Card data-testid="stat-neutral">
           <CardContent className="p-4 text-center">
-            <p className="text-xs text-muted-foreground">Neutre</p>
+            <p className="text-xs text-muted-foreground">{t('dailySummary.neutrals')}</p>
             <p className="text-2xl font-bold text-gray-500">{sentiment.neutral || 0}</p>
           </CardContent>
         </Card>
@@ -152,7 +152,7 @@ export default function DailySummaryPage() {
       {/* AI Analysis */}
       <Card data-testid="ai-summary-card">
         <CardContent className="p-5">
-          <h2 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Analiza Zilei</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">{t('dailySummary.dayAnalysis')}</h2>
           <p className="text-foreground leading-relaxed">{data.ai_summary}</p>
         </CardContent>
       </Card>
@@ -162,7 +162,7 @@ export default function DailySummaryPage() {
         <Card data-testid="top-gainers">
           <CardContent className="p-4">
             <h3 className="text-sm font-semibold text-green-600 mb-3 flex items-center gap-1">
-              <TrendingUp className="w-4 h-4" /> Top Creșteri
+              <TrendingUp className="w-4 h-4" /> {t('dailySummary.topGains')}
             </h3>
             <div className="space-y-2">
               {gainers.map((s, i) => (
@@ -180,7 +180,7 @@ export default function DailySummaryPage() {
         <Card data-testid="top-losers">
           <CardContent className="p-4">
             <h3 className="text-sm font-semibold text-red-600 mb-3 flex items-center gap-1">
-              <TrendingDown className="w-4 h-4" /> Top Scăderi
+              <TrendingDown className="w-4 h-4" /> {t('dailySummary.topLosses')}
             </h3>
             <div className="space-y-2">
               {losers.map((s, i) => (
@@ -202,9 +202,9 @@ export default function DailySummaryPage() {
         <Card className="border-blue-200 dark:border-blue-800" data-testid="subscribe-cta">
           <CardContent className="p-5 text-center">
             <Lock className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground mb-3">Primește rezumatul zilnic pe email la 18:10</p>
+            <p className="text-sm text-muted-foreground mb-3">{t('dailySummary.receiveDailySummary')}</p>
             <Link to="/login">
-              <Button size="sm">Conectează-te pentru abonare</Button>
+              <Button size="sm">{t('dailySummary.loginToSubscribe')}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -212,7 +212,7 @@ export default function DailySummaryPage() {
 
       {/* Disclaimer */}
       <p className="text-xs text-muted-foreground text-center">
-        Informații educative, NU sfaturi de investiții. Datele pot conține erori.
+        {t('dailySummary.disclaimer')}
       </p>
     </div>
     </>

@@ -208,7 +208,7 @@ export default function NotificationSettingsPage() {
   return (
     <>
       <SEO
-        title="{t('notifications.title')} | FinRomania"
+        title={`${t('notifications.title')} | FinRomania`}
         description={t('notifications.chooseNotifications')}
       />
 
@@ -334,15 +334,15 @@ export default function NotificationSettingsPage() {
             icon={Globe}
           />
           <ToggleItem
-            label="Variații Mari pe Piață"
-            description="Alertă când indicele BET variază cu peste 2%"
+            label={t('notifications.bigMovesMarket')}
+            description={t('notifications.bigMovesMarketDesc')}
             checked={preferences.market_big_moves}
             onChange={(v) => updatePreference('market_big_moves', v)}
             icon={TrendingUp}
           />
           <ToggleItem
-            label="Bună Seara, Investitorule"
-            description="Mesajul tău personal de seară cu noutățile pieței"
+            label={t('notifications.eveningSummary')}
+            description={t('notifications.eveningSummaryDesc')}
             checked={preferences.daily_summary}
             onChange={(v) => updatePreference('daily_summary', v)}
             icon={Mail}
@@ -351,27 +351,27 @@ export default function NotificationSettingsPage() {
 
         {/* Watchlist Notifications */}
         <CategorySection
-          title="⭐ Watchlist"
+          title={`⭐ ${t('notifications.watchlistCategory')}`}
           icon={Bell}
           color="from-yellow-500 to-amber-500"
         >
           <ToggleItem
-            label="Alerte de Preț"
-            description="Notificare când prețul atinge valorile setate"
+            label={t('notifications.priceAlerts')}
+            description={t('notifications.priceAlertsDesc')}
             checked={preferences.watchlist_price_alerts}
             onChange={(v) => updatePreference('watchlist_price_alerts', v)}
             icon={Bell}
           />
           <ToggleItem
-            label="Variații Mari (>5%)"
-            description="Alertă când acțiunile din watchlist variază mult"
+            label={t('notifications.bigMovesWatchlist')}
+            description={t('notifications.bigMovesWatchlistDesc')}
             checked={preferences.watchlist_big_moves}
             onChange={(v) => updatePreference('watchlist_big_moves', v)}
             icon={TrendingUp}
           />
           <ToggleItem
-            label="Anunțuri Dividende"
-            description="Notificare când companiile anunță dividende"
+            label={t('notifications.dividendAnnouncements')}
+            description={t('notifications.dividendAnnouncementsDesc')}
             checked={preferences.dividend_announcements}
             onChange={(v) => updatePreference('dividend_announcements', v)}
             icon={Calendar}
@@ -380,20 +380,20 @@ export default function NotificationSettingsPage() {
 
         {/* News Notifications */}
         <CategorySection
-          title="📰 Știri"
+          title={`📰 ${t('notifications.newsCategory')}`}
           icon={Newspaper}
           color="from-blue-500 to-blue-600"
         >
           <ToggleItem
-            label="Știri Importante"
-            description="Breaking news despre piața financiară"
+            label={t('notifications.importantNews')}
+            description={t('notifications.importantNewsDesc')}
             checked={preferences.important_news}
             onChange={(v) => updatePreference('important_news', v)}
             icon={Newspaper}
           />
           <ToggleItem
-            label="Știri Watchlist"
-            description="Știri despre companiile din watchlist-ul tău"
+            label={t('notifications.watchlistNews')}
+            description={t('notifications.watchlistNewsDesc')}
             checked={preferences.watchlist_news}
             onChange={(v) => updatePreference('watchlist_news', v)}
             icon={Bell}
@@ -402,13 +402,13 @@ export default function NotificationSettingsPage() {
 
         {/* Education Notifications */}
         <CategorySection
-          title="🎓 Educație"
+          title={`🎓 ${t('notifications.educationCategory')}`}
           icon={GraduationCap}
           color="from-green-500 to-green-600"
         >
           <ToggleItem
-            label="Reminder Lecții"
-            description="Reamintire să continui cursurile începute"
+            label={t('notifications.lessonReminder')}
+            description={t('notifications.lessonReminderDesc')}
             checked={preferences.lesson_reminders}
             onChange={(v) => updatePreference('lesson_reminders', v)}
             icon={GraduationCap}
@@ -424,14 +424,14 @@ export default function NotificationSettingsPage() {
           {saved && (
             <Badge variant="outline" className="text-green-600 border-green-300 py-2 px-4">
               <Check className="w-4 h-4 mr-1" />
-              Salvat!
+              {t('notifications.saved')}
             </Badge>
           )}
           <Button onClick={savePreferences} disabled={saving} size="lg">
             {saving ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Se salvează...</>
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('notifications.saving')}</>
             ) : (
-              <><Save className="w-4 h-4 mr-2" /> Salvează Preferințele</>
+              <><Save className="w-4 h-4 mr-2" /> {t('notifications.savePreferences')}</>
             )}
           </Button>
         </motion.div>
@@ -439,7 +439,7 @@ export default function NotificationSettingsPage() {
         {/* Info */}
         <Card className="bg-slate-50">
           <CardContent className="p-4 text-sm text-muted-foreground">
-            <p><strong>ℹ️ Notă:</strong> Notificările browser funcționează doar când ai site-ul deschis sau în background. Pentru notificări mobile, vom adăuga în curând o aplicație dedicată!</p>
+            <p dangerouslySetInnerHTML={{ __html: `ℹ️ ${t('notifications.infoNote')}` }} />
           </CardContent>
         </Card>
       </div>

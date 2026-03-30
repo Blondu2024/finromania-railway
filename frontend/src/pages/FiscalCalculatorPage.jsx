@@ -265,12 +265,12 @@ export default function FiscalCalculatorPage() {
     const calcStructuredData = {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Calculator Fiscal Romania - PF vs SRL 2026",
-      "description": "Calculator fiscal profesional pentru alegerea între PF, PFA și SRL în România. Legislatie 2026, calcul impozite, CASS, economii fiscale.",
+      "name": t('fiscal.structuredName'),
+      "description": t('fiscal.structuredDesc'),
       "url": "https://finromania.ro/calculator-fiscal",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Any",
-      "featureList": ["Calcul impozit BVB 3-6%", "Calcul SRL Micro 1%+16%", "Comparație economii", "Legislatie 2026"],
+      "featureList": t('fiscal.structuredFeatures').split(', '),
       "inLanguage": "ro",
       "areaServed": "RO"
     };
@@ -278,12 +278,12 @@ export default function FiscalCalculatorPage() {
     return (
       <>
         <SEO
-          title="Calculator Fiscal Romania 2026 - PF vs SRL | FinRomania"
-          description="Calculator fiscal gratuit pentru România: compară impozite PF, PFA, SRL. Legislatie 2026, calcul CASS, CAS, economii fiscale. Află care formă juridică e optimă pentru tine."
-          keywords="calculator fiscal romania 2026, pf vs srl, impozit dividende, microîntreprindere, pfa impozit, calculator impozit venit, legislatie fiscala 2026, CASS 2026"
+          title={t('fiscal.seoTitle')}
+          description={t('fiscal.seoDesc')}
+          keywords={t('fiscal.seoKeywords')}
           structuredData={calcStructuredData}
         />
-        <ProPaywall feature="Calculatorul Fiscal cu AI" />
+        <ProPaywall feature={t('fiscal.proPaywallFeature')} />
       </>
     );
   }
@@ -292,11 +292,11 @@ export default function FiscalCalculatorPage() {
   const proStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Calculator Fiscal PRO - Investiții BVB",
-    "description": "Calculator fiscal avansat pentru investiții la Bursa București. Compară PF vs SRL pentru acțiuni BVB. Impozit 3-6% optimizat.",
+    "name": t('fiscal.structuredProName'),
+    "description": t('fiscal.structuredProDesc'),
     "url": "https://finromania.ro/calculator-fiscal",
     "applicationCategory": "FinanceApplication",
-    "featureList": ["Calcul impozit BVB 3-6%", "PF vs SRL comparație", "Optimizare fiscală", "AI Advisor fiscal"],
+    "featureList": t('fiscal.structuredProFeatures').split(', '),
     "inLanguage": "ro",
     "areaServed": "RO"
   };
@@ -304,9 +304,9 @@ export default function FiscalCalculatorPage() {
   return (
     <>
       <SEO
-        title="Calculator Fiscal Investiții BVB 2026 - PF vs SRL | FinRomania"
-        description="Calculator fiscal pentru investiții la Bursa București (BVB). Compară impozite PF vs PFA vs SRL pentru câștiguri din acțiuni. Legislatie 2026, impozit 3-6% BVB conform Cod Fiscal 2026."
-        keywords="calculator fiscal bvb, impozit acțiuni românia, pf vs srl trading, fiscal bursă bucurești, impozit dividende bvb, optimizare fiscală trading"
+        title={t('fiscal.seoProTitle')}
+        description={t('fiscal.seoProDesc')}
+        keywords={t('fiscal.seoKeywords')}
         structuredData={proStructuredData}
       />
 
@@ -377,7 +377,7 @@ export default function FiscalCalculatorPage() {
                 <div className="flex items-center gap-4">
                   <Sparkles className="w-12 h-12" />
                   <div>
-                    <p className="text-white/80">Pentru {formatRON(venitTotal)} venit din investiții</p>
+                    <p className="text-white/80">{t('fiscal.forInvestmentIncome', { amount: formatRON(venitTotal) })}</p>
                     <p className="text-2xl font-bold">{preview.mesaj_principal}</p>
                     {preview.bonus_bvb && tipPiata === 'bvb' && (
                       <p className="text-sm text-white/90 mt-1">💡 {preview.bonus_bvb}</p>
@@ -676,19 +676,19 @@ export default function FiscalCalculatorPage() {
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Cum completez Declarația Unică?
+                  {t('fiscal.questionDeclaratia')}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Ce e W-8BEN și când am nevoie?
+                  {t('fiscal.questionW8BEN')}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Cum calculez CASS pentru investiții?
+                  {t('fiscal.questionCASS')}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  Pot compensa pierderile cu câștigurile?
+                  {t('fiscal.questionLosses')}
                 </li>
               </ul>
             </CardContent>

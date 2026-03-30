@@ -80,14 +80,14 @@ export default function LearnTradingPage() {
     setStep('confirm');
     
     // AI message
-    setAiMessages([`Super alegere! ${index.name} ${index.learning_tip}`]);
+    setAiMessages([`${t('education.greatChoice')} ${index.name} ${index.learning_tip}`]);
   };
 
   const handleStartTrading = () => {
     setStep('trade');
     setAiMessages([
-      `Hai să începem cu ${selectedIndex.name}!`,
-      "Pas 1: Vom cumpăra o cantitate mică pentru început. Dacă pierzi, nu-i grav - e învățare!"
+      `${t('education.letsStartWith')} ${selectedIndex.name}!`,
+      t('education.step1BuySmall')
     ]);
   };
 
@@ -95,10 +95,10 @@ export default function LearnTradingPage() {
     return (
       <div className="text-center py-12">
         <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-        <h2 className="text-xl font-semibold">Învață Trading Gratuit</h2>
-        <p className="text-muted-foreground mb-4">Conectează-te pentru a începe.</p>
+        <h2 className="text-xl font-semibold">{t('education.learnTradingFree')}</h2>
+        <p className="text-muted-foreground mb-4">{t('education.loginToStart')}</p>
         <Link to="/login">
-          <Button size="lg">Conectare</Button>
+          <Button size="lg">{t('common.login')}</Button>
         </Link>
       </div>
     );
@@ -108,7 +108,7 @@ export default function LearnTradingPage() {
     return (
       <div className="text-center py-12">
         <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
-        <p>Se încarcă...</p>
+        <p>{t('common.loading')}</p>
       </div>
     );
   }
@@ -120,10 +120,10 @@ export default function LearnTradingPage() {
       <div className="text-center space-y-3">
         <div className="flex items-center justify-center gap-2">
           <span className="text-4xl">🎓</span>
-          <h1 className="text-4xl font-bold">Învață Trading</h1>
+          <h1 className="text-4xl font-bold">{t('education.learnTradingTitle')}</h1>
         </div>
         <p className="text-xl text-muted-foreground">
-          Platformă educațională - 100% GRATIS, 100% SIGUR
+          {t('education.learnTradingSubtitle')}
         </p>
       </div>
 
@@ -131,8 +131,8 @@ export default function LearnTradingPage() {
       <Alert className="bg-green-50 border-green-200">
         <Info className="w-4 h-4 text-green-600" />
         <AlertDescription className="text-green-800">
-          <strong>🟢 DEMO MODE</strong> - Bani virtuali: {portfolio?.cash?.toLocaleString('ro-RO') || '50,000'} RON 
-          · Nivel: <Badge variant="outline" className="ml-1">{portfolio?.experience_level || 'beginner'}</Badge>
+          <strong>🟢 {t('education.demoMode')}</strong> - {t('education.virtualMoney')}: {portfolio?.cash?.toLocaleString('ro-RO') || '50,000'} RON
+          · {t('education.level')}: <Badge variant="outline" className="ml-1">{portfolio?.experience_level || 'beginner'}</Badge>
         </AlertDescription>
       </Alert>
 
@@ -146,7 +146,7 @@ export default function LearnTradingPage() {
               }`}>
                 1
               </div>
-              <span className="text-sm font-medium">Alege Activ</span>
+              <span className="text-sm font-medium">{t('education.chooseAsset')}</span>
             </div>
             <div className="flex-1 h-0.5 bg-gray-200 mx-2" />
             <div className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export default function LearnTradingPage() {
               }`}>
                 2
               </div>
-              <span className="text-sm font-medium">Confirmă</span>
+              <span className="text-sm font-medium">{t('education.confirm')}</span>
             </div>
             <div className="flex-1 h-0.5 bg-gray-200 mx-2" />
             <div className="flex items-center gap-2">
@@ -164,7 +164,7 @@ export default function LearnTradingPage() {
               }`}>
                 3
               </div>
-              <span className="text-sm font-medium">Tranzacționează</span>
+              <span className="text-sm font-medium">{t('education.trade')}</span>
             </div>
           </div>
         </CardContent>
@@ -177,12 +177,12 @@ export default function LearnTradingPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5" />
-                Pas 1: Alege un Activ Cunoscut
+                {t('education.step1ChooseAsset')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Începem cu activele pe care le-ai auzit înainte. Sunt cele mai bune pentru învățare! 🎯
+                {t('education.step1Desc')} 🎯
               </p>
             </CardContent>
           </Card>
@@ -214,24 +214,24 @@ export default function LearnTradingPage() {
               <Alert className="bg-blue-50 border-blue-200">
                 <Info className="w-4 h-4 text-blue-600" />
                 <AlertDescription className="text-blue-800">
-                  <strong>Sfat:</strong> {selectedIndex.learning_tip}
+                  <strong>{t('education.tipLabel')}:</strong> {selectedIndex.learning_tip}
                 </AlertDescription>
               </Alert>
 
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Categorie:</span>
+                  <span className="text-muted-foreground">{t('education.category')}:</span>
                   <span className="font-medium">{selectedIndex.category_ro}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Volatilitate:</span>
+                  <span className="text-muted-foreground">{t('education.volatility')}:</span>
                   <span className="font-medium">{selectedIndex.volatility_ro}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Risc:</span>
+                  <span className="text-muted-foreground">{t('education.riskLabel')}:</span>
                   <span className="font-medium">
-                    {selectedIndex.risk_level === 'low' ? 'Scăzut' : 
-                     selectedIndex.risk_level === 'medium' ? 'Mediu' : 'Ridicat'}
+                    {selectedIndex.risk_level === 'low' ? t('education.riskLow') :
+                     selectedIndex.risk_level === 'medium' ? t('education.riskMedium') : t('education.riskHigh')}
                   </span>
                 </div>
               </div>
@@ -246,14 +246,14 @@ export default function LearnTradingPage() {
                     setAiMessages([]);
                   }}
                 >
-                  ← Înapoi
+                  {t('education.backBtn')}
                 </Button>
                 <Button
                   className="flex-1"
                   size="lg"
                   onClick={handleStartTrading}
                 >
-                  Continuă →
+                  {t('education.continue')} →
                 </Button>
               </div>
             </CardContent>
@@ -265,15 +265,15 @@ export default function LearnTradingPage() {
         <div className="max-w-2xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle>Prima Tranzacție cu {selectedIndex.name}</CardTitle>
+              <CardTitle>{t('education.firstTrade')} {selectedIndex.name}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center py-12">
                 <p className="text-muted-foreground mb-4">
-                  Funcționalitatea completă de tranzacționare ghidată pas-cu-pas va fi implementată în curând.
+                  {t('education.tradingComingSoon')}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Pentru acum, poți accesa <Link to="/portfolio" className="text-blue-600 underline">Portofoliul Complet</Link>.
+                  {t('education.fullPortfolioLink')} <Link to="/portfolio" className="text-blue-600 underline">{t('education.fullPortfolio')}</Link>.
                 </p>
               </div>
             </CardContent>

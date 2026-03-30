@@ -67,12 +67,12 @@ export default function FinLessonPage() {
 
   const handleQuizSubmit = async () => {
     if (!user) {
-      alert('Conectează-te pentru a salva progresul!');
+      alert(t('education.loginToSaveProgress'));
       return;
     }
 
     if (quizAnswers.includes(null)) {
-      alert('Te rog răspunde la toate întrebările!');
+      alert(t('education.answerAllQuestions'));
       return;
     }
 
@@ -94,11 +94,11 @@ export default function FinLessonPage() {
         setQuizResult(result);
       } else {
         const error = await res.json();
-        alert(error.detail || 'Eroare la trimiterea quiz-ului');
+        alert(error.detail || t('education.quizSubmitError'));
       }
     } catch (error) {
       console.error('Error submitting quiz:', error);
-      alert('Eroare de conexiune. Încearcă din nou.');
+      alert(t('education.connectionError'));
     }
   };
 
@@ -112,7 +112,7 @@ export default function FinLessonPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Se încarcă lecția...</p>
+          <p className="text-muted-foreground">{t('education.loadingLesson')}</p>
         </div>
       </div>
     );
@@ -122,9 +122,9 @@ export default function FinLessonPage() {
     return (
       <div className="text-center py-12">
         <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold">Lecție negăsită</h2>
+        <h2 className="text-xl font-semibold">{t('education.lessonNotFound')}</h2>
         <Link to="/financial-education">
-          <Button className="mt-4">← Înapoi la Educație Financiară</Button>
+          <Button className="mt-4">{t('education.backToFinEd')}</Button>
         </Link>
       </div>
     );
@@ -152,10 +152,10 @@ export default function FinLessonPage() {
             </div>
             
             <h2 className="text-3xl font-bold mb-2">
-              {passed ? '🎉 Felicitări!' : '💪 Aproape!'}
+              {passed ? `🎉 ${t('education.congratulations')}` : `💪 ${t('education.almostThere')}`}
             </h2>
             <p className="text-xl mb-6">
-              Scor: <span className="font-bold">{quizResult.score.toFixed(0)}%</span> ({quizResult.correct}/{quizResult.total} corecte)
+              {t('education.scoreLabel')}: <span className="font-bold">{quizResult.score.toFixed(0)}%</span> ({quizResult.correct}/{quizResult.total} {t('education.correctLabel')})
             </p>
             
             {/* Results Detail */}
@@ -171,7 +171,7 @@ export default function FinLessonPage() {
                       )}
                       <div className="flex-1">
                         <p className="font-medium">{result.question}</p>
-                        <p className="text-sm text-muted-foreground mt-1">Răspuns: {result.your_answer}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{t('education.answerLabel')}: {result.your_answer}</p>
                       </div>
                     </div>
                     <div className="bg-blue-50 p-3 rounded mt-2">
@@ -188,7 +188,7 @@ export default function FinLessonPage() {
             <div className="flex gap-3 justify-center flex-wrap">
               {!passed && (
                 <Button onClick={handleRetry} size="lg">
-                  🔄 Încearcă Din Nou
+                  🔄 {t('education.tryAgainBtn')}
                 </Button>
               )}
               {passed && nextLesson ? (
@@ -197,19 +197,19 @@ export default function FinLessonPage() {
                     size="lg" 
                     className="bg-green-600 hover:bg-green-700"
                   >
-                    Următoarea Lecție: {nextLesson.title.length > 25 ? nextLesson.title.substring(0, 25) + '...' : nextLesson.title} <ChevronRight className="w-4 h-4 ml-2" />
+                    {t('education.nextLessonLabel')}: {nextLesson.title.length > 25 ? nextLesson.title.substring(0, 25) + '...' : nextLesson.title} <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
               ) : passed ? (
                 <Link to="/financial-education">
                   <Button size="lg" className="bg-green-600 hover:bg-green-700">
-                    🎉 Ai Terminat Cursul! Înapoi la Pagină
+                    🎉 {t('education.finishedCourse')}
                   </Button>
                 </Link>
               ) : (
                 <Link to="/financial-education">
                   <Button variant="outline" size="lg">
-                    ← Înapoi la Lecții
+                    {t('education.backToLessons')}
                   </Button>
                 </Link>
               )}
@@ -217,7 +217,7 @@ export default function FinLessonPage() {
               {/* Always show back button */}
               <Link to="/financial-education">
                 <Button variant="outline" size="lg">
-                  Vezi Toate Lecțiile
+                  {t('education.seeAllLessons')}
                 </Button>
               </Link>
             </div>
@@ -233,7 +233,7 @@ export default function FinLessonPage() {
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Link to="/financial-education">
           <Button variant="ghost" className="mb-6">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi
+            <ArrowLeft className="w-4 h-4 mr-2" /> {t('education.backBtn')}
           </Button>
         </Link>
 
@@ -245,7 +245,7 @@ export default function FinLessonPage() {
             {lesson.quiz.map((q, qIdx) => (
               <Card key={qIdx}>
                 <CardContent className="p-4">
-                  <p className="font-semibold mb-4">Întrebarea {qIdx + 1}: {q.question}</p>
+                  <p className="font-semibold mb-4">{t('education.questionLabel')} {qIdx + 1}: {q.question}</p>
                   <div className="space-y-2">
                     {q.options.map((option, oIdx) => (
                       <div
@@ -282,15 +282,15 @@ export default function FinLessonPage() {
 
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setShowQuiz(false)} className="flex-1">
-                ← Revizuiește Lecția
+                {t('education.reviewLessonBtn')}
               </Button>
-              <Button 
+              <Button
                 onClick={handleQuizSubmit}
                 disabled={quizAnswers.includes(null)}
                 className="flex-1 bg-green-600 hover:bg-green-700"
                 size="lg"
               >
-                Trimite Răspunsurile →
+                {t('education.submitAnswers')} →
               </Button>
             </div>
           </CardContent>
@@ -305,7 +305,7 @@ export default function FinLessonPage() {
       <SEO title={lesson ? `${lesson.title} | Financial Education | FinRomania` : 'Financial Education | FinRomania'} description={lesson?.subtitle || 'Free financial education lessons'} />
       <Link to="/financial-education">
         <Button variant="ghost" className="mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi la Educație Financiară
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t('education.backToFinEd')}
         </Button>
       </Link>
 
@@ -334,11 +334,11 @@ export default function FinLessonPage() {
                   <CheckCircle className="w-6 h-6" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-lg">Gata să testezi cunoștințele?</h4>
-                  <p className="text-muted-foreground">Răspunde la {lesson.quiz?.length || 0} întrebări pentru a finaliza lecția!</p>
+                  <h4 className="font-bold text-lg">{t('education.readyToTest')}</h4>
+                  <p className="text-muted-foreground">{t('education.answerQuestions', { count: lesson.quiz?.length || 0 })}</p>
                 </div>
                 <Button size="lg" className="bg-green-600 hover:bg-green-700" onClick={() => setShowQuiz(true)}>
-                  Începe Quiz →
+                  {t('education.startQuiz')} →
                 </Button>
               </div>
             </CardContent>

@@ -27,6 +27,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 // ASSET DETAIL MODAL WITH CHART
 // ============================================
 const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
+  const { t } = useTranslation();
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('1d');
@@ -39,17 +40,17 @@ const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
     { value: '5m', label: '5 min', requiresPeriod: '1d' },
     { value: '15m', label: '15 min', requiresPeriod: '1d' },
     { value: '30m', label: '30 min', requiresPeriod: '5d' },
-    { value: '1h', label: '1 oră', requiresPeriod: '5d' },
-    { value: '1d', label: '1 zi', requiresPeriod: '1mo' },
+    { value: '1h', label: t('global.interval1h'), requiresPeriod: '5d' },
+    { value: '1d', label: t('global.interval1d'), requiresPeriod: '1mo' },
   ];
 
   const periods = [
-    { value: '1d', label: '1 Zi' },
-    { value: '5d', label: '5 Zile' },
-    { value: '1mo', label: '1 Lună' },
-    { value: '3mo', label: '3 Luni' },
-    { value: '6mo', label: '6 Luni' },
-    { value: '1y', label: '1 An' },
+    { value: '1d', label: t('global.period1Day') },
+    { value: '5d', label: t('global.period5Days') },
+    { value: '1mo', label: t('global.period1Month') },
+    { value: '3mo', label: t('global.period3Months') },
+    { value: '6mo', label: t('global.period6Months') },
+    { value: '1y', label: t('global.period1Year') },
   ];
 
   useEffect(() => {
@@ -143,6 +144,7 @@ const AssetDetailModal = ({ asset, onClose, isPro, token }) => {
 // GLOBAL SENTIMENT GAUGE
 // ============================================
 const GlobalSentimentGauge = ({ sentiment }) => {
+  const { t } = useTranslation();
   const score = useMemo(() => {
     if (!sentiment) return 50;
     const ratio = sentiment.gainers / (sentiment.gainers + sentiment.losers || 1);
@@ -151,9 +153,9 @@ const GlobalSentimentGauge = ({ sentiment }) => {
 
   const getLabel = (s) => {
     if (s >= 70) return { text: 'BULLISH 🐂', color: 'text-green-500' };
-    if (s >= 55) return { text: 'UȘOR BULLISH', color: 'text-green-400' };
-    if (s >= 45) return { text: 'NEUTRU', color: 'text-yellow-500' };
-    if (s >= 30) return { text: 'UȘOR BEARISH', color: 'text-orange-500' };
+    if (s >= 55) return { text: t('global.slightlyBullish'), color: 'text-green-400' };
+    if (s >= 45) return { text: t('global.neutral'), color: 'text-yellow-500' };
+    if (s >= 30) return { text: t('global.slightlyBearish'), color: 'text-orange-500' };
     return { text: 'BEARISH 🐻', color: 'text-red-500' };
   };
 
@@ -164,20 +166,20 @@ const GlobalSentimentGauge = ({ sentiment }) => {
       <CardContent className="p-6">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Activity className="w-5 h-5 text-blue-400" />
-          Sentiment Global
+          {t('global.sentimentGlobal')}
         </h3>
-        
+
         <div className="flex items-center justify-between">
           <div>
             <p className={`text-3xl font-bold ${label.color}`}>{score}%</p>
             <p className={`font-semibold ${label.color}`}>{label.text}</p>
           </div>
-          
+
           <div className="text-right text-sm">
-            <p className="text-green-400">📈 {sentiment?.gainers || 0} în creștere</p>
-            <p className="text-red-400">📉 {sentiment?.losers || 0} în scădere</p>
+            <p className="text-green-400">📈 {sentiment?.gainers || 0} {t('global.gaining')}</p>
+            <p className="text-red-400">📉 {sentiment?.losers || 0} {t('global.losing')}</p>
             <p className="text-blue-300 mt-2">
-              Media: {sentiment?.avg_change >= 0 ? '+' : ''}{sentiment?.avg_change?.toFixed(2)}%
+              {t('global.average')}: {sentiment?.avg_change >= 0 ? '+' : ''}{sentiment?.avg_change?.toFixed(2)}%
             </p>
           </div>
         </div>
@@ -237,9 +239,9 @@ const EXCHANGES = [
   },
   {
     key: 'bvb',
-    name: 'București (BVB)',
+    nameKey: 'global.bvbExchangeName',
     flag: '🇷🇴',
-    exchange: 'Bursa de Valori București',
+    exchangeKey: 'global.bvbExchangeFull',
     // BVB 10:00-18:00 Bucharest. Dynamic UTC offset handled below.
     indices: ['BET', 'BET-FI'],
     isBVB: true,
@@ -326,13 +328,13 @@ const ExchangeCard = ({ ex, nowUTC }) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
             <span className="text-base">{ex.flag}</span>
-            <span className="font-semibold text-sm truncate">{ex.name}</span>
+            <span className="font-semibold text-sm truncate">{ex.nameKey ? t(ex.nameKey) : ex.name}</span>
             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
               ex.alwaysOpen ? 'bg-blue-400 animate-pulse' :
               isOpen ? 'bg-green-400 animate-pulse' : 'bg-slate-400'
             }`} />
           </div>
-          <p className="text-xs text-muted-foreground truncate">{ex.exchange}</p>
+          <p className="text-xs text-muted-foreground truncate">{ex.exchangeKey ? t(ex.exchangeKey) : ex.exchange}</p>
           <div className="flex flex-wrap gap-1 mt-1">
             {ex.indices.map(idx => (
               <span key={idx} className="text-xs bg-background/60 rounded px-1 py-0.5 text-muted-foreground">{idx}</span>
@@ -351,7 +353,7 @@ const ExchangeCard = ({ ex, nowUTC }) => {
         </span>
         {!ex.alwaysOpen && nextEventMin !== null && (
           <span className="text-xs text-muted-foreground">
-            {nextEventType === 'opens' ? 'Deschide' : 'Închide'} în{' '}
+            {nextEventType === 'opens' ? t('global.opensInLabel') : t('global.closesInLabel')}{' '}
             <span className="font-semibold text-foreground">{fmtCountdown(nextEventMin)}</span>
           </span>
         )}
@@ -360,7 +362,7 @@ const ExchangeCard = ({ ex, nowUTC }) => {
       {/* Data note when closed */}
       {!ex.alwaysOpen && !isOpen && (
         <p className="text-xs text-muted-foreground mt-1 italic">
-          Se afișează ultimul close
+          {t('global.showingLastClose')}
         </p>
       )}
     </motion.div>
@@ -368,6 +370,7 @@ const ExchangeCard = ({ ex, nowUTC }) => {
 };
 
 const MarketStatusBar = ({ marketStatus }) => {
+  const { t } = useTranslation();
   const [nowUTC, setNowUTC] = useState(new Date());
 
   useEffect(() => {
@@ -379,7 +382,7 @@ const MarketStatusBar = ({ marketStatus }) => {
     <div className="space-y-2">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Clock className="w-4 h-4" />
-        <span>Orar Burse Mondiale — UTC acum: <strong className="text-foreground">{nowUTC.toUTCString().slice(17, 22)}</strong></span>
+        <span>{t('global.exchangeScheduleLabel')}: <strong className="text-foreground">{nowUTC.toUTCString().slice(17, 22)}</strong></span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
         {EXCHANGES.map(ex => (
@@ -394,6 +397,7 @@ const MarketStatusBar = ({ marketStatus }) => {
 // ASSET CARD COMPONENT
 // ============================================
 const AssetCard = ({ asset, index, onClick }) => {
+  const { t } = useTranslation();
   const isPositive = asset.change_percent >= 0;
   
   return (
@@ -454,7 +458,7 @@ const AssetCard = ({ asset, index, onClick }) => {
           
           {/* Click hint */}
           <p className="text-xs text-center text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            Click pentru grafic detaliat
+            {t('global.clickForDetailedChart')}
           </p>
         </CardContent>
       </Card>
@@ -629,8 +633,8 @@ export default function GlobalMarketsPage() {
   // Delay info cu update frequency REAL pentru PRO
   // Data update info - fără a menționa delay
   const delayInfo = isPro
-    ? { text: 'PRO', color: 'bg-green-500', description: 'Date profesionale live', frequency: '30s' }
-    : { text: 'Live', color: 'bg-blue-500', description: 'Date actualizate automat', frequency: '60s' };
+    ? { text: 'PRO', color: 'bg-green-500', description: t('global.proDataDesc'), frequency: '30s' }
+    : { text: 'Live', color: 'bg-blue-500', description: t('global.liveDataDesc'), frequency: '60s' };
 
   const fetchData = useCallback(async () => {
     try {
@@ -732,8 +736,8 @@ export default function GlobalMarketsPage() {
   return (
     <>
       <SEO
-        title="Piețe Globale Live | FinRomania"
-        description="Date în timp real de pe piețele globale. Indici S&P 500, NASDAQ, DAX, comodități, crypto și forex."
+        title={`${t('global.title')} Live | FinRomania`}
+        description={t('global.seoDescription')}
         keywords="indici globali, S&P 500, NASDAQ, DAX, bitcoin, petrol, aur, forex"
       />
 
@@ -772,15 +776,15 @@ export default function GlobalMarketsPage() {
             {refreshing && (
               <Badge className="bg-blue-500 text-white">
                 <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
-                Actualizare...
+                {t('global.updating')}
               </Badge>
             )}
           </div>
           <p className="text-muted-foreground">
-            {delayInfo.description} • Auto-refresh la {delayInfo.frequency}
+            {delayInfo.description} • {t('global.autoRefresh')} {delayInfo.frequency}
             {!isPro && (
               <Link to="/pricing" className="text-amber-600 hover:underline ml-2">
-                → PRO: Refresh mai rapid!
+                → {t('global.fasterRefresh')}
               </Link>
             )}
           </p>
@@ -882,12 +886,12 @@ export default function GlobalMarketsPage() {
               <div>
                 <h3 className="text-xl font-bold mb-1">{t('global.whyGlobalMatters')}</h3>
                 <p className="text-blue-100">
-                  BVB este influențată de piețele internaționale. Când S&P 500 scade, de obicei și BET scade.
+                  {t('global.whyGlobalDesc')}
                 </p>
               </div>
               <Link to="/stocks">
                 <Button className="bg-white text-blue-600 hover:bg-blue-50">
-                  Vezi Bursa București →
+                  {t('global.seeBVB')} →
                 </Button>
               </Link>
             </div>
@@ -897,12 +901,12 @@ export default function GlobalMarketsPage() {
         {/* Educational Note */}
         <Card className="bg-gray-50 dark:bg-zinc-800">
           <CardContent className="p-4 text-sm text-muted-foreground">
-            <h4 className="font-semibold text-foreground mb-2">ℹ️ Informații</h4>
+            <h4 className="font-semibold text-foreground mb-2">ℹ️ {t('global.infoTitle')}</h4>
             <ul className="space-y-1">
-              <li>• <strong>Indici:</strong> Reprezintă performanța unui grup de acțiuni (ex: S&P 500 = top 500 companii SUA)</li>
-              <li>• <strong>Comodități:</strong> Materii prime tranzacționate (petrol, aur, gaze)</li>
-              <li>• <strong>Crypto:</strong> Monede digitale descentralizate</li>
-              <li>• <strong>Forex:</strong> Piața valutară - schimb între valute</li>
+              <li>• <strong>{t('global.indices')}:</strong> {t('global.indicesDesc')}</li>
+              <li>• <strong>{t('global.commodities')}:</strong> {t('global.commoditiesDesc')}</li>
+              <li>• <strong>{t('global.crypto')}:</strong> {t('global.cryptoDesc')}</li>
+              <li>• <strong>{t('global.forex')}:</strong> {t('global.forexDesc')}</li>
             </ul>
           </CardContent>
         </Card>
@@ -912,7 +916,7 @@ export default function GlobalMarketsPage() {
       {!selectedAsset && (
         <TradingCompanion 
           stockSymbol={selectedAsset?.symbol || "Global"}
-          stockName={selectedAsset?.name || "Piețe Globale"}
+          stockName={selectedAsset?.name || t('global.title')}
           currentPrice={selectedAsset?.price}
           changePercent={selectedAsset?.change_percent || data?.sentiment?.avg_change}
           stockType="global"

@@ -11,44 +11,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const CURRENCY_INFO = {
-  EUR: { name: 'Euro', flag: '🇪🇺' },
-  USD: { name: 'Dolar American', flag: '🇺🇸' },
-  GBP: { name: 'Liră Sterlină', flag: '🇬🇧' },
-  CHF: { name: 'Franc Elvețian', flag: '🇨🇭' },
-  JPY: { name: 'Yen Japonez', flag: '🇯🇵' },
-  CAD: { name: 'Dolar Canadian', flag: '🇨🇦' },
-  AUD: { name: 'Dolar Australian', flag: '🇦🇺' },
-  PLN: { name: 'Zlot Polonez', flag: '🇵🇱' },
-  HUF: { name: 'Forint Maghiar', flag: '🇭🇺' },
-  CZK: { name: 'Coroană Cehă', flag: '🇨🇿' },
-  SEK: { name: 'Coroană Suedeză', flag: '🇸🇪' },
-  NOK: { name: 'Coroană Norvegiană', flag: '🇳🇴' },
-  DKK: { name: 'Coroană Daneză', flag: '🇩🇰' },
-  BGN: { name: 'Leva Bulgărească', flag: '🇧🇬' },
-  RSD: { name: 'Dinar Sârbesc', flag: '🇷🇸' },
-  MDL: { name: 'Leu Moldovenesc', flag: '🇲🇩' },
-  UAH: { name: 'Hryvna Ucraineană', flag: '🇺🇦' },
-  TRY: { name: 'Liră Turcească', flag: '🇹🇷' },
-  CNY: { name: 'Yuan Chinezesc', flag: '🇨🇳' },
-  INR: { name: 'Rupie Indiană', flag: '🇮🇳' },
-  BRL: { name: 'Real Brazilian', flag: '🇧🇷' },
-  MXN: { name: 'Peso Mexican', flag: '🇲🇽' },
-  ZAR: { name: 'Rand Sud-African', flag: '🇿🇦' },
-  SGD: { name: 'Dolar Singaporean', flag: '🇸🇬' },
-  HKD: { name: 'Dolar Hong Kong', flag: '🇭🇰' },
-  NZD: { name: 'Dolar Neo-Zeelandez', flag: '🇳🇿' },
-  KRW: { name: 'Won Sud-Coreean', flag: '🇰🇷' },
-  THB: { name: 'Baht Thailandez', flag: '🇹🇭' },
-  MYR: { name: 'Ringgit Malaysian', flag: '🇲🇾' },
-  PHP: { name: 'Peso Filipinez', flag: '🇵🇭' },
-  IDR: { name: 'Rupie Indoneziană', flag: '🇮🇩' },
-  XAU: { name: 'Aur (1 gram)', flag: '🥇' },
-  XDR: { name: 'DST (FMI)', flag: '🌐' },
+const CURRENCY_FLAGS = {
+  EUR: '🇪🇺', USD: '🇺🇸', GBP: '🇬🇧', CHF: '🇨🇭', JPY: '🇯🇵',
+  CAD: '🇨🇦', AUD: '🇦🇺', PLN: '🇵🇱', HUF: '🇭🇺', CZK: '🇨🇿',
+  SEK: '🇸🇪', NOK: '🇳🇴', DKK: '🇩🇰', BGN: '🇧🇬', RSD: '🇷🇸',
+  MDL: '🇲🇩', UAH: '🇺🇦', TRY: '🇹🇷', CNY: '🇨🇳', INR: '🇮🇳',
+  BRL: '🇧🇷', MXN: '🇲🇽', ZAR: '🇿🇦', SGD: '🇸🇬', HKD: '🇭🇰',
+  NZD: '🇳🇿', KRW: '🇰🇷', THB: '🇹🇭', MYR: '🇲🇾', PHP: '🇵🇭',
+  IDR: '🇮🇩', XAU: '🥇', XDR: '🌐',
 };
 
-function MainCurrencyCard({ code, data }) {
-  const info = CURRENCY_INFO[code] || { name: code, flag: '💱' };
+const getCurrencyInfo = (code, t) => ({
+  name: t(`converter.curr${code}`, code),
+  flag: CURRENCY_FLAGS[code] || '💱',
+});
+
+function MainCurrencyCard({ code, data, t }) {
+  const info = getCurrencyInfo(code, t);
   
   return (
     <Card className="hover:shadow-lg transition-shadow">
@@ -106,9 +85,9 @@ export default function CurrenciesPage() {
   const mainCurrencies = ['EUR', 'USD', 'GBP', 'CHF'];
   
   const allCurrencies = currencies?.rates ? Object.entries(currencies.rates)
-    .filter(([code]) => 
+    .filter(([code]) =>
       code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (CURRENCY_INFO[code]?.name || '').toLowerCase().includes(searchTerm.toLowerCase())
+      getCurrencyInfo(code, t).name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => a[0].localeCompare(b[0]))
     : [];
@@ -134,23 +113,23 @@ export default function CurrenciesPage() {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <DollarSign className="w-8 h-8 text-blue-600" />
-            Curs Valutar BNR
+            {t('converter.bnrTitle')}
           </h1>
           <p className="text-muted-foreground">
-            Cursuri oficiale de la Banca Națională a României
+            {t('converter.bnrSubtitle')}
             {currencies?.date && ` - ${currencies.date}`}
           </p>
         </div>
         <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
           <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-          Actualizează
+          {t('converter.update')}
         </Button>
       </div>
 
       {/* Main Currencies */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {mainCurrencies.map(code => currencies?.rates?.[code] && (
-          <MainCurrencyCard key={code} code={code} data={currencies.rates[code]} />
+          <MainCurrencyCard key={code} code={code} data={currencies.rates[code]} t={t} />
         ))}
       </div>
 
@@ -158,11 +137,11 @@ export default function CurrenciesPage() {
       <Card>
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <CardTitle>Toate Valutele ({allCurrencies.length})</CardTitle>
+            <CardTitle>{t('converter.allCurrenciesCount', { count: allCurrencies.length })}</CardTitle>
             <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Caută valută..."
+                placeholder={t('converter.searchCurrency')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -174,15 +153,15 @@ export default function CurrenciesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Valută</TableHead>
-                <TableHead>Denumire</TableHead>
-                <TableHead className="text-right">Curs (RON)</TableHead>
-                <TableHead className="text-right">Multiplicator</TableHead>
+                <TableHead>{t('converter.currency')}</TableHead>
+                <TableHead>{t('converter.denomination')}</TableHead>
+                <TableHead className="text-right">{t('converter.rateRON')}</TableHead>
+                <TableHead className="text-right">{t('converter.multiplierLabel')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {allCurrencies.map(([code, data]) => {
-                const info = CURRENCY_INFO[code] || { name: code, flag: '💱' };
+                const info = getCurrencyInfo(code, t);
                 return (
                   <TableRow key={code} className="hover:bg-muted/50">
                     <TableCell className="font-bold">
@@ -196,7 +175,7 @@ export default function CurrenciesPage() {
                       {data.rate.toFixed(4)}
                     </TableCell>
                     <TableCell className="text-right text-muted-foreground">
-                      {data.multiplier > 1 ? `pentru ${data.multiplier} unități` : '-'}
+                      {data.multiplier > 1 ? t('converter.forUnitsLabel', { count: data.multiplier }) : '-'}
                     </TableCell>
                   </TableRow>
                 );
@@ -211,7 +190,7 @@ export default function CurrenciesPage() {
         <CardContent className="p-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Badge variant="outline">Info</Badge>
-            <span>Cursurile valutare sunt furnizate de Banca Națională a României și se actualizează zilnic în jurul orei 13:00.</span>
+            <span>{t('converter.bnrInfo')}</span>
           </div>
         </CardContent>
       </Card>

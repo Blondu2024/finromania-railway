@@ -120,7 +120,7 @@ export default function RiskAssessmentPage() {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-2">{t('risk.yourProfile')}</h1>
-          <p className="text-muted-foreground">Evaluat pe {new Date(existingProfile.assessed_at).toLocaleDateString('ro-RO')}</p>
+          <p className="text-muted-foreground">{t('risk.assessedOn')} {new Date(existingProfile.assessed_at).toLocaleDateString()}</p>
         </div>
 
         <Card className="overflow-hidden">
@@ -130,7 +130,7 @@ export default function RiskAssessmentPage() {
             </div>
             <h2 className="text-3xl font-bold" style={{ color: profile.color }}>{profile.name}</h2>
             <p className="text-muted-foreground mt-2 max-w-md mx-auto">{profile.description}</p>
-            <p className="mt-4 text-sm">Scor: {existingProfile.score}/{existingProfile.max_score}</p>
+            <p className="mt-4 text-sm">{t('risk.score')}: {existingProfile.score}/{existingProfile.max_score}</p>
           </div>
 
           <CardContent className="p-6">
@@ -181,7 +181,7 @@ export default function RiskAssessmentPage() {
             </div>
             <h2 className="text-3xl font-bold" style={{ color: profile.color }}>{t('risk.youAre')} {profile.name}</h2>
             <p className="text-muted-foreground mt-2 max-w-md mx-auto">{profile.description}</p>
-            <p className="mt-4 text-sm">Scor: {result.score}/{result.max_score}</p>
+            <p className="mt-4 text-sm">{t('risk.score')}: {result.score}/{result.max_score}</p>
           </div>
 
           <CardContent className="p-6">
@@ -279,7 +279,7 @@ export default function RiskAssessmentPage() {
               onClick={handlePrev}
               disabled={currentQuestion === 0}
             >
-              <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi
+              <ArrowLeft className="w-4 h-4 mr-2" /> {t('common.back')}
             </Button>
 
             {currentQuestion === questions.length - 1 ? (
@@ -298,7 +298,7 @@ export default function RiskAssessmentPage() {
                 onClick={handleNext}
                 disabled={!answers[currentQ.id]}
               >
-                Următoarea <ArrowRight className="w-4 h-4 ml-2" />
+                {t('common.next')} <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             )}
           </div>
@@ -307,7 +307,7 @@ export default function RiskAssessmentPage() {
 
       {!user && (
         <p className="text-center text-sm text-muted-foreground">
-          Vei fi rugat să te autentifici pentru a salva rezultatul.
+          {t('risk.loginToSave')}
         </p>
       )}
     </div>
