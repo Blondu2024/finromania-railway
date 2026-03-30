@@ -791,6 +791,27 @@
     "send": "Send message",
     "success": "Message sent successfully! We'll respond soon."
   },
+  "notifications": {
+    "title": "Notification Settings",
+    "loginPrompt": "Sign in to customize your notifications.",
+    "register": "Register",
+    "enableBrowser": "Enable Browser Notifications",
+    "activated": "Notifications are now enabled!",
+    "browserActive": "Browser notifications are enabled!",
+    "test": "Test",
+    "exchangeSchedule": "Exchange Open/Close",
+    "exchangeTime": "At 10:00 and 18:00",
+    "bigChanges": "Big Changes (>2%)",
+    "bigChangesDesc": "When the BET index changes significantly",
+    "subscribed": "You're subscribed! You'll receive the daily summary at",
+    "afterTrading": "after trading hours on trading days.",
+    "disabled": "Disabled — you won't receive the daily email",
+    "receiveDaily": "Receive daily BVB summary at 18:10",
+    "loginToSubscribe": "Sign in to subscribe",
+    "blockedNotifications": "You've blocked notifications. Enable them in your browser settings.",
+    "notificationSent": "Notification sent! Check on",
+    "devices": "device(s)"
+  },
   "fiscalChat": {
     "title": "Questions about taxation?",
     "subtitle": "Ask our fiscal AI",

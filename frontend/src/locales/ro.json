@@ -791,6 +791,27 @@
     "send": "Trimite mesajul",
     "success": "Mesajul a fost trimis cu succes! Îți vom răspunde în curând."
   },
+  "notifications": {
+    "title": "Setări Notificări",
+    "loginPrompt": "Conectează-te pentru a-ți personaliza notificările.",
+    "register": "Înregistrare",
+    "enableBrowser": "Activează Notificările Browser",
+    "activated": "Notificările sunt acum activate!",
+    "browserActive": "Notificările browser sunt activate!",
+    "test": "Testează",
+    "exchangeSchedule": "Deschidere/Închidere Bursă",
+    "exchangeTime": "La 10:00 și 18:00",
+    "bigChanges": "Variații Mari (>2%)",
+    "bigChangesDesc": "Când indicele BET variază mult",
+    "subscribed": "Ești abonat! Vei primi rezumatul zilnic la",
+    "afterTrading": "după ora 18:05 în zilele de tranzacționare.",
+    "disabled": "Dezactivat — nu primești emailul zilnic",
+    "receiveDaily": "Primește rezumatul zilnic pe email la 18:10",
+    "loginToSubscribe": "Conectează-te pentru abonare",
+    "blockedNotifications": "Ai blocat notificările. Activează-le din setările browser-ului.",
+    "notificationSent": "Notificare trimisă! Verifică pe",
+    "devices": "dispozitiv(e)"
+  },
   "fiscalChat": {
     "title": "Întrebări despre fiscalitate?",
     "subtitle": "Întreabă AI-ul nostru fiscal",

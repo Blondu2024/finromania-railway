@@ -187,16 +187,16 @@ export default function NotificationSettingsPage() {
         <Card className="max-w-md">
           <CardContent className="p-8 text-center">
             <Bell className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Setări Notificări</h2>
+            <h2 className="text-2xl font-bold mb-2">{t('notifications.title')}</h2>
             <p className="text-muted-foreground mb-6">
-              Conectează-te pentru a-ți personaliza notificările.
+              {t('notifications.loginPrompt')}
             </p>
             <div className="flex gap-3 justify-center">
               <Link to="/login">
-                <Button>Conectare</Button>
+                <Button>{t('common.login')}</Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline">Înregistrare</Button>
+                <Button variant="outline">{t('notifications.register')}</Button>
               </Link>
             </div>
           </CardContent>
@@ -208,7 +208,7 @@ export default function NotificationSettingsPage() {
   return (
     <>
       <SEO
-        title="Setări Notificări | FinRomania"
+        title="{t('notifications.title')} | FinRomania"
         description="Personalizează notificările pentru alerte de preț, știri și evenimente BVB."
       />
 
@@ -220,7 +220,7 @@ export default function NotificationSettingsPage() {
         >
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Bell className="w-8 h-8 text-blue-500" />
-            Setări Notificări
+            {t('notifications.title')}
           </h1>
           <p className="text-muted-foreground mt-1">
             Alege ce notificări vrei să primești
@@ -239,7 +239,7 @@ export default function NotificationSettingsPage() {
                   <div className="flex items-center gap-3">
                     <AlertTriangle className="w-6 h-6 text-yellow-600" />
                     <div>
-                      <p className="font-semibold">Activează Notificările Browser</p>
+                      <p className="font-semibold">{t('notifications.enableBrowser')}</p>
                       <p className="text-sm text-muted-foreground">
                         Pentru a primi notificări, trebuie să le activezi în browser.
                       </p>
@@ -260,7 +260,7 @@ export default function NotificationSettingsPage() {
             <CardContent className="p-4">
               <div className="flex items-center gap-3 text-green-700">
                 <Check className="w-6 h-6" />
-                <span className="font-medium">Notificările browser sunt activate!</span>
+                <span className="font-medium">{t('notifications.browserActive')}</span>
               </div>
             </CardContent>
           </Card>
@@ -327,7 +327,7 @@ export default function NotificationSettingsPage() {
           color="from-blue-500 to-blue-600"
         >
           <ToggleItem
-            label="Deschidere/Închidere Bursă"
+            label="{t('notifications.exchangeSchedule')}"
             description="Notificare când BVB se deschide (10:00) și se închide (18:00)"
             checked={preferences.market_open_close}
             onChange={(v) => updatePreference('market_open_close', v)}
