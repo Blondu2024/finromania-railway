@@ -11,46 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 
-const FAQ_ITEMS = [
-  {
-    q: 'Pot pierde mai mult decât am investit pe CFD-uri?',
-    a: 'Da, absolut! CFD-urile cu efect de levier îți pot aduce pierderi ce depășesc suma investită inițial. De exemplu, cu un levier 1:10 și 1.000 EUR investiți, controlezi 10.000 EUR. O mișcare adversă de 10% înseamnă pierderea totală a celor 1.000 EUR, plus posibil mai mult (margin call). Pe acțiunile reale, nu poți pierde mai mult decât ai investit.'
-  },
-  {
-    q: 'De ce Plus500 / eToro / XTB arată date diferite față de FinRomania?',
-    a: 'Platforma FinRomania afișează datele REALE de la bursele oficiale (BVB, NYSE, etc.) care se opresc după orele de tranzacționare și sunt închise în weekenduri și sărbători. Platformele CFD ca Plus500 sunt deschise 24/7 deoarece nu tranzacționezi pe bursă — tranzacționezi cu brokerul, care poate seta orice preț dorește în afara orelor de bursă (preț "sintetic").'
-  },
-  {
-    q: 'CFD-urile sunt legale în România?',
-    a: 'Da, CFD-urile sunt produse financiare reglementate de ASF (Autoritatea de Supraveghere Financiară) în România și de ESMA la nivel european. Totuși, ESMA impune restricții stricte: levier maxim 1:30 pentru retail, avertismente obligatorii că 74-89% din conturile de retail pierd bani pe CFD-uri.'
-  },
-  {
-    q: 'Dacă am dividende pe acțiunile CFD, le primesc?',
-    a: 'Nu primești dividende reale. Brokerul poate credita un "ajustament de dividend" în contul tău, dar nu este același lucru cu un dividend oficial de la companie. Nu vei figura în registrul acționarilor companiei și nu ai drept de vot în Adunările Generale.'
-  },
-  {
-    q: 'Cum cumpăr acțiuni BVB reale?',
-    a: 'Prin brokeri autorizați BVB: Tradeville, BT Capital Partners, XTB (secțiunea "Acțiuni", nu CFD), Interactive Brokers. Deschizi cont, depui fonduri și cumperi acțiunile direct. Acțiunile apar în Depozitarul Central (Ro) și ești proprietar real.'
-  },
-  {
-    q: 'Ce este margin call?',
-    a: 'Când pierderile tale pe CFD-uri depășesc suma de garanție (marja), brokerul îți cere să depui bani suplimentari. Dacă nu depui, îți închide pozițiile automat, adesea în cel mai prost moment. Acest lucru nu există la acțiunile reale — acțiunile tale rămân ale tale chiar dacă prețul scade.'
-  }
-];
-
-const COMPARISON_ROWS = [
-  { aspect: 'Proprietate reală', real: true, cfd: false },
-  { aspect: 'Dividende oficiale', real: true, cfd: false },
-  { aspect: 'Drept de vot', real: true, cfd: false },
-  { aspect: 'Risc limitat (max. suma investită)', real: true, cfd: false },
-  { aspect: 'Tranzacționare 24/7', real: false, cfd: true },
-  { aspect: 'Efect de levier inclus', real: false, cfd: true },
-  { aspect: 'Supus impozitului pe dividende 16%', real: true, cfd: false },
-  { aspect: 'Broker contraparte (conflict de interese)', real: false, cfd: true },
-  { aspect: 'Reglementat BVB / Bursă oficială', real: true, cfd: false },
-  { aspect: 'Poate genera margin call', real: false, cfd: true },
-];
-
 function FAQItem({ item }) {
   const [open, setOpen] = useState(false);
   return (
@@ -74,21 +34,86 @@ function FAQItem({ item }) {
 
 export default function CFDvsActiuniPage() {
   const { t } = useTranslation();
+
+  const FAQ_ITEMS = [
+    { q: t('cfd.faq_q1'), a: t('cfd.faq_a1') },
+    { q: t('cfd.faq_q2'), a: t('cfd.faq_a2') },
+    { q: t('cfd.faq_q3'), a: t('cfd.faq_a3') },
+    { q: t('cfd.faq_q4'), a: t('cfd.faq_a4') },
+    { q: t('cfd.faq_q5'), a: t('cfd.faq_a5') },
+    { q: t('cfd.faq_q6'), a: t('cfd.faq_a6') },
+  ];
+
+  const COMPARISON_ROWS = [
+    { aspect: t('cfd.row_ownership'), real: true, cfd: false },
+    { aspect: t('cfd.row_dividends'), real: true, cfd: false },
+    { aspect: t('cfd.row_voting'), real: true, cfd: false },
+    { aspect: t('cfd.row_limitedRisk'), real: true, cfd: false },
+    { aspect: t('cfd.row_247'), real: false, cfd: true },
+    { aspect: t('cfd.row_leverage'), real: false, cfd: true },
+    { aspect: t('cfd.row_dividendTax'), real: true, cfd: false },
+    { aspect: t('cfd.row_conflict'), real: false, cfd: true },
+    { aspect: t('cfd.row_regulated'), real: true, cfd: false },
+    { aspect: t('cfd.row_marginCall'), real: false, cfd: true },
+  ];
+
+  const alternatives = [
+    {
+      icon: Building2,
+      title: t('cfd.altBvbTitle'),
+      desc: t('cfd.altBvbDesc'),
+      color: 'blue',
+      link: '/stocks',
+      linkText: t('cfd.altBvbLink')
+    },
+    {
+      icon: DollarSign,
+      title: t('cfd.altDivTitle'),
+      desc: t('cfd.altDivDesc'),
+      color: 'green',
+      link: '/calculator-dividende',
+      linkText: t('cfd.altDivLink')
+    },
+    {
+      icon: TrendingUp,
+      title: t('cfd.altScreenerTitle'),
+      desc: t('cfd.altScreenerDesc'),
+      color: 'amber',
+      link: '/screener-pro',
+      linkText: t('cfd.altScreenerLink')
+    },
+    {
+      icon: BookOpen,
+      title: t('cfd.altAcademyTitle'),
+      desc: t('cfd.altAcademyDesc'),
+      color: 'orange',
+      link: '/trading-school',
+      linkText: t('cfd.altAcademyLink')
+    }
+  ];
+
+  const brokers = [
+    { name: 'Tradeville', desc: t('cfd.brokerTradeville'), url: 'https://www.tradeville.ro' },
+    { name: 'BT Capital Partners', desc: t('cfd.brokerBT'), url: 'https://www.btcapital.ro' },
+    { name: 'XTB', desc: t('cfd.brokerXTB'), url: 'https://www.xtb.com/ro' },
+    { name: 'Interactive Brokers', desc: t('cfd.brokerIBKR'), url: 'https://www.interactivebrokers.com' },
+  ];
+
   return (
     <>
-    <SEO title="CFD vs Stocks | FinRomania" description="Learn the differences between CFD trading and stock investing. Pros, cons, and which is right for you." />
+    <SEO title={t('cfd.seoTitle')} description={t('cfd.seoDesc')} />
     <div className="max-w-4xl mx-auto space-y-10 pb-12">
 
       {/* HERO */}
       <div className="text-center space-y-4 py-8">
         <Badge variant="destructive" className="text-sm px-3 py-1" data-testid="cfd-alert-badge">
-          <AlertTriangle className="w-4 h-4 mr-1" /> Avertisment important pentru investitori
+          <AlertTriangle className="w-4 h-4 mr-1" /> {t('cfd.alertBadge')}
         </Badge>
         <h1 className="text-4xl sm:text-5xl font-bold leading-tight" data-testid="cfd-page-title">
-          CFD-uri vs. Acțiuni Reale
+          {t('cfd.pageTitle')}
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          De ce platformele ca Plus500 NU sunt burse reale și cum să îți protejezi banii investind corect
+          {t('cfd.heroDesc')}
         </p>
       </div>
 
@@ -99,12 +124,10 @@ export default function CFDvsActiuniPage() {
             <AlertTriangle className="w-8 h-8 text-red-600 flex-shrink-0 mt-1" />
             <div>
               <h2 className="text-xl font-bold text-red-800 dark:text-red-300 mb-2">
-                Știai că 74-89% din conturile retail pierd bani pe CFD-uri?
+                {t('cfd.warningTitle')}
               </h2>
               <p className="text-red-700 dark:text-red-400 text-sm leading-relaxed">
-                Aceasta este avertizarea obligatorie pe care orice broker CFD reglementat trebuie să o afișeze
-                conform regulamentelor ESMA. Nu este o statistică inventată — este realitatea milioanelor de
-                investitori care au confundat platformele CFD cu burse reale.
+                {t('cfd.warningText')}
               </p>
             </div>
           </div>
@@ -115,32 +138,24 @@ export default function CFDvsActiuniPage() {
       <section>
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <Info className="w-6 h-6 text-blue-600" />
-          Ce este un CFD (Contract for Difference)?
+          {t('cfd.whatIsCfdTitle')}
         </h2>
         <div className="space-y-4 text-muted-foreground leading-relaxed">
-          <p>
-            Un <strong className="text-foreground">CFD (Contract for Difference)</strong> este un contract financiar
-            derivat în care tu și brokerul sunteți de acord să schimbați diferența de preț a unui activ
-            (acțiune, index, materie primă) de la momentul deschiderii până la închiderea contractului.
-          </p>
+          <p dangerouslySetInnerHTML={{ __html: t('cfd.whatIsCfdText') }} />
           <Card className="bg-muted/40">
             <CardContent className="p-5">
               <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-blue-600" /> Exemplu concret:
+                <BookOpen className="w-5 h-5 text-blue-600" /> {t('cfd.exampleTitle')}
               </h3>
               <div className="space-y-2 text-sm">
                 <p>
-                  <span className="font-medium text-foreground">Scenariul 1 — Acțiune reală TLV:</span><br />
-                  Cumperi 100 acțiuni TLV la 18 RON = 1.800 RON. Dacă prețul crește la 20 RON, vinzi și câștigi 200 RON.
-                  Dacă TLV plătește dividende de 2 RON/acțiune, primești 200 RON dividende în contul tău bancar.
-                  Ești <strong>proprietarul</strong> acelor acțiuni, înregistrat la Depozitarul Central.
+                  <span className="font-medium text-foreground" dangerouslySetInnerHTML={{ __html: t('cfd.exampleRealLabel') }} /><br />
+                  <span dangerouslySetInnerHTML={{ __html: t('cfd.exampleRealText') }} />
                 </p>
                 <hr className="border-border" />
                 <p>
-                  <span className="font-medium text-foreground">Scenariul 2 — CFD TLV pe Plus500:</span><br />
-                  Deschizi un CFD pe TLV cu 1.800 RON. Dacă prețul crește la 20 RON, primești diferența de 200 RON.
-                  Brokerul poate credita un "ajustament de dividend", dar nu ești proprietar — nu figurezi nicăieri ca acționar.
-                  Dacă pierderea ta depășește 1.800 RON (din cauza levierului), poți ajunge pe minus.
+                  <span className="font-medium text-foreground" dangerouslySetInnerHTML={{ __html: t('cfd.exampleCfdLabel') }} /><br />
+                  <span dangerouslySetInnerHTML={{ __html: t('cfd.exampleCfdText') }} />
                 </p>
               </div>
             </CardContent>
@@ -152,18 +167,18 @@ export default function CFDvsActiuniPage() {
       <section>
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <BarChart2 className="w-6 h-6 text-blue-600" />
-          Comparație directă: Acțiuni Reale vs. CFD-uri
+          {t('cfd.comparisonTitle')}
         </h2>
         <div className="overflow-x-auto rounded-lg border" data-testid="comparison-table">
           <table className="w-full">
             <thead>
               <tr className="bg-muted/60">
-                <th className="text-left px-4 py-3 font-semibold text-sm">Aspect</th>
+                <th className="text-left px-4 py-3 font-semibold text-sm">{t('cfd.colAspect')}</th>
                 <th className="text-center px-4 py-3 font-semibold text-sm text-green-700 dark:text-green-400">
-                  Acțiuni Reale (BVB, NYSE)
+                  {t('cfd.colRealStocks')}
                 </th>
                 <th className="text-center px-4 py-3 font-semibold text-sm text-red-700 dark:text-red-400">
-                  CFD-uri (Plus500, eToro, etc.)
+                  {t('cfd.colCfd')}
                 </th>
               </tr>
             </thead>
@@ -192,29 +207,17 @@ export default function CFDvsActiuniPage() {
       <section>
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <Globe className="w-6 h-6 text-orange-500" />
-          De ce Plus500 arată date 24/7, iar FinRomania arată "ÎNCHIS" vineri seara?
+          {t('cfd.marketHoursTitle')}
         </h2>
         <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950/20" data-testid="market-hours-card">
           <CardContent className="p-6 space-y-4">
-            <p className="text-sm leading-relaxed">
-              <strong>Bursa reală</strong> (NYSE, BVB, etc.) funcționează conform unui program oficial.
-              NYSE este deschisă luni-vineri, 15:30 - 22:00 (ora României). Este <strong>ÎNCHISĂ</strong> în
-              weekenduri, sărbători legale (Good Friday, Thanksgiving, Crăciun, etc.).
-              FinRomania afișează date reale de la aceste burse, deci când bursa este închisă, afișăm ultimul preț oficial.
-            </p>
+            <p className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: t('cfd.marketHoursReal') }} />
             <hr className="border-orange-200" />
-            <p className="text-sm leading-relaxed">
-              <strong>Plus500 / CFD brokeri</strong> nu trimite ordinele tale la bursă.
-              Tu tranzacționezi <em>cu brokerul</em>, care este contrapartea ta. El poate afișa prețuri
-              "sintetice" 24/7, bazate pe futures sau calcule interne. Dacă piezi, brokerul câștigă direct.
-              Acesta este modelul de business: <strong>conflict de interese fundamental</strong>.
-            </p>
+            <p className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: t('cfd.marketHoursCfd') }} />
             <div className="flex items-start gap-3 bg-orange-100 dark:bg-orange-900/30 p-4 rounded-lg">
               <AlertTriangle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-orange-800 dark:text-orange-300">
-                Prețurile afișate sâmbătă sau duminică pe Plus500 pentru S&P 500 nu sunt prețuri reale
-                de bursă — sunt prețuri generate de broker, care pot include spread-uri mai mari și
-                nu reflectă realitatea pieței.
+                {t('cfd.marketHoursWarning')}
               </p>
             </div>
           </CardContent>
@@ -225,81 +228,48 @@ export default function CFDvsActiuniPage() {
       <section>
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <TrendingUp className="w-6 h-6 text-red-600" />
-          Pericolul levierului — cum poți pierde mai mult decât ai investit
+          {t('cfd.leverageTitle')}
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
           <Card className="border-green-200">
             <CardHeader className="pb-2">
               <CardTitle className="text-base text-green-700 dark:text-green-400 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" /> Acțiuni Reale (fără levier)
+                <CheckCircle className="w-5 h-5" /> {t('cfd.leverageRealTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
-              <p>Investești <strong>1.000 RON</strong> în TLV la 18 RON/acțiune → 55 acțiuni</p>
-              <p>TLV scade cu 50% → prețul devine 9 RON</p>
-              <p>Portofoliul tău valorează acum <strong>495 RON</strong></p>
-              <p className="text-green-700 font-medium">Pierdere maximă: 1.000 RON (suma investită)</p>
-              <p className="text-muted-foreground">Acțiunile rămân ale tale. Prețul poate reveni.</p>
+              <p dangerouslySetInnerHTML={{ __html: t('cfd.leverageRealLine1') }} />
+              <p>{t('cfd.leverageRealLine2')}</p>
+              <p dangerouslySetInnerHTML={{ __html: t('cfd.leverageRealLine3') }} />
+              <p className="text-green-700 font-medium">{t('cfd.leverageRealLine4')}</p>
+              <p className="text-muted-foreground">{t('cfd.leverageRealLine5')}</p>
             </CardContent>
           </Card>
           <Card className="border-red-200">
             <CardHeader className="pb-2">
               <CardTitle className="text-base text-red-700 dark:text-red-400 flex items-center gap-2">
-                <XCircle className="w-5 h-5" /> CFD cu levier 1:10
+                <XCircle className="w-5 h-5" /> {t('cfd.leverageCfdTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
-              <p>Depui <strong>1.000 RON</strong> marjă și controlezi poziție de <strong>10.000 RON</strong></p>
-              <p>Activul scade cu 10% → pierdere de 1.000 RON</p>
-              <p className="text-red-700 font-medium">Ai pierdut 100% din suma depusă!</p>
-              <p>Dacă piața scade mai mult → <strong>margin call</strong> sau sold negativ</p>
-              <p className="text-muted-foreground">Poți ajunge să datorezi bani brokerului.</p>
+              <p dangerouslySetInnerHTML={{ __html: t('cfd.leverageCfdLine1') }} />
+              <p>{t('cfd.leverageCfdLine2')}</p>
+              <p className="text-red-700 font-medium">{t('cfd.leverageCfdLine3')}</p>
+              <p dangerouslySetInnerHTML={{ __html: t('cfd.leverageCfdLine4') }} />
+              <p className="text-muted-foreground">{t('cfd.leverageCfdLine5')}</p>
             </CardContent>
           </Card>
         </div>
       </section>
 
-      {/* CE SĂ FACI ÎN SCHIMB */}
+      {/* CE SA FACI IN SCHIMB */}
       <section>
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <Shield className="w-6 h-6 text-blue-600" />
-          Cum investești corect — alternativele sănătoase
+          {t('cfd.alternativesTitle')}
         </h2>
         <div className="grid sm:grid-cols-2 gap-4" data-testid="alternatives-section">
-          {[
-            {
-              icon: Building2,
-              title: 'BVB — Bursa de Valori București',
-              desc: 'Cumperi acțiuni reale la companii românești (TLV, SNP, BRD, H2O, SNN). Primești dividende, ești proprietar real.',
-              color: 'blue',
-              link: '/stocks',
-              linkText: 'Explorează acțiunile BVB'
-            },
-            {
-              icon: DollarSign,
-              title: 'Calculator Dividende PRO',
-              desc: 'Planifică-ți veniturile pasive din dividende BVB cu calculatorul nostru fiscal 2026. Calculează impozit 16% și CASS exact.',
-              color: 'green',
-              link: '/calculator-dividende',
-              linkText: 'Calculează dividendele tale'
-            },
-            {
-              icon: TrendingUp,
-              title: 'Screener PRO',
-              desc: 'Identifică cele mai bune oportunități pe BVB cu indicatori tehnici (RSI, MACD) și fundamentali (P/E, ROE).',
-              color: 'amber',
-              link: '/screener-pro',
-              linkText: 'Deschide Screener PRO'
-            },
-            {
-              icon: BookOpen,
-              title: 'Academia FinRomania',
-              desc: 'Învață de la zero cum să investești corect pe bursă, ce sunt indicatorii tehnici și cum să citești situațiile financiare.',
-              color: 'orange',
-              link: '/trading-school',
-              linkText: 'Începe să înveți'
-            }
-          ].map((item, i) => (
+          {alternatives.map((item, i) => (
             <Card key={i} className="hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className={`w-10 h-10 rounded-lg bg-${item.color}-100 dark:bg-${item.color}-900/30 flex items-center justify-center mb-3`}>
@@ -322,20 +292,15 @@ export default function CFDvsActiuniPage() {
       <section>
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <CheckCircle className="w-6 h-6 text-green-600" />
-          Brokeri autorizați pentru acțiuni BVB reale
+          {t('cfd.brokersTitle')}
         </h2>
         <Card>
           <CardContent className="p-5">
             <p className="text-sm text-muted-foreground mb-4">
-              Aceștia sunt brokeri reglementați ASF/BVB prin care poți cumpăra acțiuni reale, nu CFD-uri:
+              {t('cfd.brokersIntro')}
             </p>
             <div className="grid sm:grid-cols-2 gap-3">
-              {[
-                { name: 'Tradeville', desc: 'Broker românesc, cel mai utilizat pe BVB', url: 'https://www.tradeville.ro' },
-                { name: 'BT Capital Partners', desc: 'Subsidiara Banca Transilvania, broker autorizat BVB', url: 'https://www.btcapital.ro' },
-                { name: 'XTB (secțiunea Acțiuni)', desc: 'Atenție: alege "Acțiuni" nu "CFD". XTB oferă ambele.', url: 'https://www.xtb.com/ro' },
-                { name: 'Interactive Brokers', desc: 'International, comisioane mici, acces global', url: 'https://www.interactivebrokers.com' },
-              ].map((broker, i) => (
+              {brokers.map((broker, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 border rounded-lg">
                   <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                   <div>
@@ -346,7 +311,7 @@ export default function CFDvsActiuniPage() {
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-4">
-              * FinRomania nu este afiliat cu niciun broker și nu primește comisioane pentru recomandări. Lista are scop pur educațional.
+              {t('cfd.brokersDisclaimer')}
             </p>
           </CardContent>
         </Card>
@@ -356,7 +321,7 @@ export default function CFDvsActiuniPage() {
       <section>
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
           <BookOpen className="w-6 h-6 text-blue-600" />
-          Întrebări frecvente
+          {t('cfd.faqTitle')}
         </h2>
         <div className="space-y-2" data-testid="faq-section">
           {FAQ_ITEMS.map((item, i) => (
@@ -368,30 +333,25 @@ export default function CFDvsActiuniPage() {
       {/* DISCLAIMER */}
       <Card className="bg-muted/30 border-dashed">
         <CardContent className="p-5">
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            <strong>Disclaimer:</strong> Conținutul acestei pagini are scop exclusiv educațional și nu constituie
-            consultanță financiară. FinRomania nu este autorizat ca consultant de investiții.
-            Investițiile implică riscuri. Înainte de a investi, consultați un specialist financiar autorizat ASF.
-            Datele despre brokeri sunt furnizate cu titlu informativ și pot fi actualizate independent.
-          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: t('cfd.disclaimerText') }} />
         </CardContent>
       </Card>
 
       {/* CTA FINAL */}
       <div className="text-center space-y-4 py-6 border-t" data-testid="cfd-page-cta">
-        <h2 className="text-2xl font-bold">Investește inteligent, nu specula orbește</h2>
+        <h2 className="text-2xl font-bold">{t('cfd.ctaTitle')}</h2>
         <p className="text-muted-foreground">
-          Folosește FinRomania pentru date reale de la bursele oficiale și ia decizii informate.
+          {t('cfd.ctaDesc')}
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
           <Link to="/stocks">
             <Button data-testid="cta-stocks-btn">
-              <TrendingUp className="w-4 h-4 mr-2" /> Acțiuni BVB
+              <TrendingUp className="w-4 h-4 mr-2" /> {t('cfd.ctaBvb')}
             </Button>
           </Link>
           <Link to="/calculator-dividende">
             <Button variant="outline" data-testid="cta-calculator-btn">
-              <DollarSign className="w-4 h-4 mr-2" /> Calculator Dividende
+              <DollarSign className="w-4 h-4 mr-2" /> {t('cfd.ctaCalc')}
             </Button>
           </Link>
         </div>

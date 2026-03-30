@@ -108,9 +108,9 @@ const NotificationSettingsDialog = ({ token, t }) => {
         setPushEnabled(true);
         setPermissionStatus('granted');
       } else {
-        alert(result.error === 'Permission denied' 
-          ? 'Ai blocat notificările. Activează-le din setările browser-ului.'
-          : 'Eroare la activarea notificărilor: ' + result.error
+        alert(result.error === 'Permission denied'
+          ? t('watchlist.pushPermissionDenied')
+          : t('watchlist.pushEnableError') + result.error
         );
       }
     } else {
@@ -124,12 +124,12 @@ const NotificationSettingsDialog = ({ token, t }) => {
     try {
       const result = await sendTestNotification(token);
       if (result.success) {
-        alert(`✅ Notificare trimisă! Verifică pe ${result.sent} dispozitiv(e).`);
+        alert(`✅ ${t('watchlist.testNotifSuccess', { count: result.sent })}`);
       } else {
-        alert('❌ Eroare: ' + (result.error || 'Nu s-a putut trimite'));
+        alert('❌ ' + t('watchlist.testNotifError') + (result.error || t('watchlist.testNotifFallback')));
       }
     } catch (err) {
-      alert('❌ Eroare la trimitere');
+      alert('❌ ' + t('watchlist.testNotifSendError'));
     } finally {
       setTestingSending(false);
     }
@@ -166,10 +166,10 @@ const NotificationSettingsDialog = ({ token, t }) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-blue-500" />
-            Ce notificări vrei să primești?
+            {t('watchlist.notifDialogTitle')}
           </DialogTitle>
           <DialogDescription>
-            Alege ce alerte și actualizări vrei să primești
+            {t('watchlist.notifDialogDesc')}
           </DialogDescription>
         </DialogHeader>
 
@@ -177,24 +177,24 @@ const NotificationSettingsDialog = ({ token, t }) => {
           {/* Push Notifications Section - NEW */}
           <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
             <h4 className="font-semibold text-sm text-blue-600 dark:text-blue-400 mb-3 flex items-center gap-2">
-              <Smartphone className="w-4 h-4" /> Notificări Push (Timp Real)
+              <Smartphone className="w-4 h-4" /> {t('watchlist.pushNotifRealtime')}
             </h4>
             
             {!pushSupported ? (
               <p className="text-sm text-muted-foreground">
-                ⚠️ Browser-ul tău nu suportă notificări push. Încearcă Chrome, Firefox sau Edge.
+                ⚠️ {t('watchlist.pushNotSupported')}
               </p>
             ) : permissionStatus === 'denied' ? (
               <p className="text-sm text-red-500">
-                🚫 Ai blocat notificările. Pentru a le activa, mergi în setările browser-ului.
+                🚫 {t('watchlist.pushBlocked')}
               </p>
             ) : (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-sm">Activează Notificări Push</p>
+                    <p className="font-medium text-sm">{t('watchlist.enablePushNotif')}</p>
                     <p className="text-xs text-muted-foreground">
-                      Primește alerte chiar dacă nu ești pe site
+                      {t('watchlist.pushAlertsDesc')}
                     </p>
                   </div>
                   <Switch 
@@ -206,7 +206,7 @@ const NotificationSettingsDialog = ({ token, t }) => {
                 {pushEnabled && (
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
-                    <span className="text-sm text-green-600">Notificările sunt active</span>
+                    <span className="text-sm text-green-600">{t('watchlist.notifActive')}</span>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -217,7 +217,7 @@ const NotificationSettingsDialog = ({ token, t }) => {
                       {testingSending ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        'Testează'
+                        t('watchlist.testNotif')
                       )}
                     </Button>
                   </div>
@@ -229,24 +229,24 @@ const NotificationSettingsDialog = ({ token, t }) => {
           {/* Piață */}
           <div>
             <h4 className="font-semibold text-sm text-blue-600 mb-2 flex items-center gap-2">
-              <Globe className="w-4 h-4" /> Piață
+              <Globe className="w-4 h-4" /> {t('watchlist.sectionMarket')}
             </h4>
             <div className="bg-muted/30 rounded-lg px-3">
               <Toggle
-                label="Deschidere/Închidere Bursă"
-                description="La 10:00 și 18:00"
+                label={t('watchlist.marketOpenClose')}
+                description={t('watchlist.marketOpenCloseTime')}
                 checked={preferences.market_open_close}
                 onChange={(v) => setPreferences(p => ({ ...p, market_open_close: v }))}
               />
               <Toggle
-                label="Variații Mari (>2%)"
-                description="Când indicele BET variază mult"
+                label={t('watchlist.bigMoves')}
+                description={t('watchlist.bigMovesDesc')}
                 checked={preferences.market_big_moves}
                 onChange={(v) => setPreferences(p => ({ ...p, market_big_moves: v }))}
               />
               <Toggle
-                label="Bună Seara, Investitorule"
-                description="Mesajul tău personal de seară cu noutățile pieței"
+                label={t('watchlist.dailySummary')}
+                description={t('watchlist.dailySummaryDesc')}
                 checked={preferences.daily_summary}
                 onChange={(v) => setPreferences(p => ({ ...p, daily_summary: v }))}
               />
@@ -260,20 +260,20 @@ const NotificationSettingsDialog = ({ token, t }) => {
             </h4>
             <div className="bg-muted/30 rounded-lg px-3">
               <Toggle
-                label="Alerte de Preț"
-                description="Când prețul atinge valorile setate"
+                label={t('watchlist.priceAlerts')}
+                description={t('watchlist.priceAlertsDesc')}
                 checked={preferences.watchlist_price_alerts}
                 onChange={(v) => setPreferences(p => ({ ...p, watchlist_price_alerts: v }))}
               />
               <Toggle
-                label="Variații Mari (>5%)"
-                description="Acțiunile tale variază mult"
+                label={t('watchlist.watchlistBigMoves')}
+                description={t('watchlist.watchlistBigMovesDesc')}
                 checked={preferences.watchlist_big_moves}
                 onChange={(v) => setPreferences(p => ({ ...p, watchlist_big_moves: v }))}
               />
               <Toggle
-                label="Anunțuri Dividende"
-                description="Companiile anunță dividende"
+                label={t('watchlist.dividendAnnouncements')}
+                description={t('watchlist.dividendAnnouncementsDesc')}
                 checked={preferences.dividend_announcements}
                 onChange={(v) => setPreferences(p => ({ ...p, dividend_announcements: v }))}
               />
@@ -283,18 +283,18 @@ const NotificationSettingsDialog = ({ token, t }) => {
           {/* Știri */}
           <div>
             <h4 className="font-semibold text-sm text-blue-600 mb-2 flex items-center gap-2">
-              <Newspaper className="w-4 h-4" /> Știri
+              <Newspaper className="w-4 h-4" /> {t('watchlist.sectionNews')}
             </h4>
             <div className="bg-muted/30 rounded-lg px-3">
               <Toggle
-                label="Știri Importante"
-                description="Breaking news financiar"
+                label={t('watchlist.importantNews')}
+                description={t('watchlist.importantNewsDesc')}
                 checked={preferences.important_news}
                 onChange={(v) => setPreferences(p => ({ ...p, important_news: v }))}
               />
               <Toggle
-                label="Știri Watchlist"
-                description="Despre companiile tale"
+                label={t('watchlist.watchlistNews')}
+                description={t('watchlist.watchlistNewsDesc')}
                 checked={preferences.watchlist_news}
                 onChange={(v) => setPreferences(p => ({ ...p, watchlist_news: v }))}
               />
@@ -304,12 +304,12 @@ const NotificationSettingsDialog = ({ token, t }) => {
           {/* Educație */}
           <div>
             <h4 className="font-semibold text-sm text-green-600 mb-2 flex items-center gap-2">
-              <GraduationCap className="w-4 h-4" /> Educație
+              <GraduationCap className="w-4 h-4" /> {t('watchlist.sectionEducation')}
             </h4>
             <div className="bg-muted/30 rounded-lg px-3">
               <Toggle
-                label="Reminder Lecții"
-                description="Continuă cursurile începute"
+                label={t('watchlist.lessonReminders')}
+                description={t('watchlist.lessonRemindersDesc')}
                 checked={preferences.lesson_reminders}
                 onChange={(v) => setPreferences(p => ({ ...p, lesson_reminders: v }))}
               />
@@ -320,9 +320,9 @@ const NotificationSettingsDialog = ({ token, t }) => {
         <div className="flex justify-end">
           <Button onClick={savePreferences} disabled={saving}>
             {saving ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Se salvează...</>
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('watchlist.saving')}</>
             ) : (
-              <><Save className="w-4 h-4 mr-2" /> Salvează</>
+              <><Save className="w-4 h-4 mr-2" /> {t('common.save')}</>
             )}
           </Button>
         </div>
@@ -370,7 +370,7 @@ const AddStockDialog = ({ onAdd, existingSymbols, t }) => {
         <DialogHeader>
           <DialogTitle>{t('watchlist.addToWatchlist')}</DialogTitle>
           <DialogDescription>
-            Adaugă o acțiune BVB și setează alerte de preț opționale
+            {t('watchlist.addDesc')}
           </DialogDescription>
         </DialogHeader>
         
@@ -413,7 +413,7 @@ const AddStockDialog = ({ onAdd, existingSymbols, t }) => {
             <Input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Ex: Cumpărat la 27.50"
+              placeholder={t('watchlist.notesPlaceholder')}
               className="mt-1"
             />
           </div>
@@ -434,6 +434,7 @@ const AddStockDialog = ({ onAdd, existingSymbols, t }) => {
 
 // Watchlist Item Component
 const WatchlistItem = ({ item, onRemove, onUpdate }) => {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [alertAbove, setAlertAbove] = useState(item.alert_above || '');
   const [alertBelow, setAlertBelow] = useState(item.alert_below || '');
@@ -493,14 +494,14 @@ const WatchlistItem = ({ item, onRemove, onUpdate }) => {
                     type="number"
                     value={alertAbove}
                     onChange={(e) => setAlertAbove(e.target.value)}
-                    placeholder="Peste"
+                    placeholder={t('watchlist.above')}
                     className="w-20 h-8 text-sm"
                   />
                   <Input
                     type="number"
                     value={alertBelow}
                     onChange={(e) => setAlertBelow(e.target.value)}
-                    placeholder="Sub"
+                    placeholder={t('watchlist.below')}
                     className="w-20 h-8 text-sm"
                   />
                   <Button size="sm" onClick={handleSave}>
@@ -579,7 +580,7 @@ export default function WatchlistPage() {
       }
     } catch (err) {
       console.error('Error fetching watchlist:', err);
-      setError('Nu am putut încărca watchlist-ul');
+      setError(t('watchlist.loadError'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -607,7 +608,7 @@ export default function WatchlistPage() {
         await fetchWatchlist();
       } else {
         const data = await res.json();
-        alert(data.detail || 'Eroare la adăugare');
+        alert(data.detail || t('watchlist.addError'));
       }
     } catch (err) {
       console.error('Error adding to watchlist:', err);
@@ -615,7 +616,7 @@ export default function WatchlistPage() {
   };
 
   const handleRemove = async (symbol) => {
-    if (!window.confirm(`Ștergi ${symbol} din watchlist?`)) return;
+    if (!window.confirm(t('watchlist.deleteConfirm', { symbol }))) return;
     
     try {
       const res = await fetch(`${API_URL}/api/watchlist/remove/${symbol}`, {
@@ -664,14 +665,14 @@ export default function WatchlistPage() {
             <Star className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">{t('watchlist.title')}</h2>
             <p className="text-muted-foreground mb-6">
-              Creează-ți un cont gratuit pentru a urmări acțiunile preferate și a seta alerte de preț.
+              {t('watchlist.loginPrompt')}
             </p>
             <div className="flex gap-3 justify-center">
               <Link to="/login">
-                <Button>Conectare</Button>
+                <Button>{t('common.login')}</Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline">Înregistrare</Button>
+                <Button variant="outline">{t('watchlist.register')}</Button>
               </Link>
             </div>
           </CardContent>
@@ -683,8 +684,8 @@ export default function WatchlistPage() {
   return (
     <>
       <SEO 
-        title="Watchlist Personal | FinRomania"
-        description="Urmărește acțiunile BVB preferate și setează alerte de preț personalizate."
+        title={`${t('watchlist.title')} | FinRomania`}
+        description={t('watchlist.seoDescription')}
       />
 
       <div className="space-y-6">
@@ -696,7 +697,7 @@ export default function WatchlistPage() {
               {t('watchlist.title')}
             </h1>
             <p className="text-muted-foreground">
-              {watchlist.length} acțiuni urmărite • Actualizare la 30 secunde
+              {t('watchlist.subtitleCount', { count: watchlist.length })}
             </p>
           </div>
           
@@ -787,12 +788,12 @@ export default function WatchlistPage() {
               <ul className="mt-2 space-y-1 text-sm">
                 {watchlist.filter(w => w.alert_triggered_above).map(w => (
                   <li key={`${w.symbol}-above`}>
-                    🔔 {w.symbol} a depășit {w.alert_above} RON (acum: {w.price?.toFixed(2)} RON)
+                    🔔 {t('watchlist.alertAboveTriggered', { symbol: w.symbol, price: w.alert_above, current: w.price?.toFixed(2) })}
                   </li>
                 ))}
                 {watchlist.filter(w => w.alert_triggered_below).map(w => (
                   <li key={`${w.symbol}-below`}>
-                    🔔 {w.symbol} a scăzut sub {w.alert_below} RON (acum: {w.price?.toFixed(2)} RON)
+                    🔔 {t('watchlist.alertBelowTriggered', { symbol: w.symbol, price: w.alert_below, current: w.price?.toFixed(2) })}
                   </li>
                 ))}
               </ul>

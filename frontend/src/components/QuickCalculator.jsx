@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Calculator, ArrowRight, Lock, Crown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -8,6 +9,7 @@ import { Badge } from './ui/badge';
 import { Link } from 'react-router-dom';
 
 export default function QuickCalculator({ user }) {
+  const { t } = useTranslation();
   const [venit, setVenit] = useState(100000);
   const [tipPiata, setTipPiata] = useState('bvb');
   
@@ -46,19 +48,19 @@ export default function QuickCalculator({ user }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calculator className="w-6 h-6 text-amber-600" />
-          Calculator Rapid Economie Fiscală
+          {t('fiscal.quickCalcTitle')}
         </CardTitle>
         {!isPro && (
           <Badge className="bg-amber-500 text-white w-fit">
             <Lock className="w-3 h-3 mr-1" />
-            Versiune FREE (limitată)
+            {t('fiscal.freeVersionLimited')}
           </Badge>
         )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label>Câștig Anual (RON)</Label>
+            <Label>{t('fiscal.annualGain')}</Label>
             <Input 
               type="number"
               value={venit}
@@ -67,7 +69,7 @@ export default function QuickCalculator({ user }) {
             />
           </div>
           <div>
-            <Label>Piață</Label>
+            <Label>{t('fiscal.market')}</Label>
             <div className="flex gap-2">
               <Button 
                 variant={tipPiata === 'bvb' ? 'default' : 'outline'}
@@ -90,15 +92,15 @@ export default function QuickCalculator({ user }) {
         {/* Quick Results */}
         <div className="bg-white dark:bg-zinc-900 rounded-lg p-4 space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Impozit ca PF:</span>
+            <span className="text-sm text-muted-foreground">{t('fiscal.taxAsPF')}</span>
             <span className="font-bold">{preview.impozitPF.toLocaleString()} RON</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Impozit ca SRL:</span>
+            <span className="text-sm text-muted-foreground">{t('fiscal.taxAsSRL')}</span>
             <span className="font-bold">{preview.impozitSRL.toLocaleString()} RON</span>
           </div>
           <div className="border-t pt-3 flex justify-between items-center">
-            <span className="font-semibold text-green-600">Economie ca PF:</span>
+            <span className="font-semibold text-green-600">{t('fiscal.savingsAsPF')}</span>
             <span className="text-2xl font-bold text-green-600">+{preview.economie.toLocaleString()} RON</span>
           </div>
         </div>
@@ -109,14 +111,14 @@ export default function QuickCalculator({ user }) {
             <div className="flex items-start gap-3 mb-3">
               <Lock className="w-5 h-5 text-amber-600 mt-0.5" />
               <div>
-                <p className="font-semibold text-amber-900 dark:text-amber-200">Deblochează Calculul Complet</p>
-                <p className="text-sm text-amber-700 dark:text-amber-300">Cu PRO primești:</p>
+                <p className="font-semibold text-amber-900 dark:text-amber-200">{t('fiscal.unlockFullCalc')}</p>
+                <p className="text-sm text-amber-700 dark:text-amber-300">{t('fiscal.withProYouGet')}</p>
                 <ul className="text-xs text-amber-700 dark:text-amber-300 mt-2 space-y-1">
-                  <li>✓ Calcul detaliat pentru PF, PFA, SRL Micro</li>
-                  <li>✓ Analiză CASS precisă</li>
-                  <li>✓ Scenariu BVB vs Internațional</li>
-                  <li>✓ AI Fiscal Advisor pentru întrebări complexe</li>
-                  <li>✓ Avantaje/Dezavantaje detaliate</li>
+                  <li>{`✓ ${t('fiscal.detailedCalcPFPFASRL')}`}</li>
+                  <li>{`✓ ${t('fiscal.preciseCASS')}`}</li>
+                  <li>{`✓ ${t('fiscal.scenarioBVBvsIntl')}`}</li>
+                  <li>{`✓ ${t('fiscal.aiFiscalAdvisor')}`}</li>
+                  <li>{`✓ ${t('fiscal.detailedAdvDisadv')}`}</li>
                 </ul>
               </div>
             </div>

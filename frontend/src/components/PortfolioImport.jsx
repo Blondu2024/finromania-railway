@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Upload, FileText, Calculator, AlertTriangle, CheckCircle, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Button } from './ui/button';
@@ -19,6 +20,7 @@ const BROKER_EXAMPLES = [
 ];
 
 export default function PortfolioImport() {
+  const { t } = useTranslation();
   const { token } = useAuth();
   const [csvText, setCsvText] = useState('');
   const [year, setYear] = useState(2025);
@@ -37,7 +39,7 @@ export default function PortfolioImport() {
 
   const analyze = async () => {
     if (!csvText.trim() || csvText.trim().length < 20) {
-      setError('Lipește sau uploadează un raport de tranzacții');
+      setError(t('import.errorUpload'));
       return;
     }
     setLoading(true);
@@ -58,7 +60,7 @@ export default function PortfolioImport() {
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.detail || 'Eroare la analiză');
+        throw new Error(err.detail || t('techAnalysis.errorAnalysis'));
       }
       const data = await res.json();
       setReport(data.report);
@@ -80,16 +82,16 @@ export default function PortfolioImport() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Upload className="w-5 h-5" />
-                Import Portofoliu
+                {t('import.title')}
               </CardTitle>
               <CardDescription>
-                Uploadează sau lipește raportul CSV de la broker. AI-ul parsează automat orice format.
+                {t('import.subtitle')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* File upload */}
               <div>
-                <Label>Upload fișier CSV/TXT</Label>
+                <Label>{t('import.uploadFile')}</Label>
                 <input
                   type="file"
                   accept=".csv,.txt,.xlsx"
@@ -103,7 +105,7 @@ export default function PortfolioImport() {
 
               {/* Or paste */}
               <div>
-                <Label>Sau lipește textul aici</Label>
+                <Label>{t('import.pasteText')}</Label>
                 <textarea
                   value={csvText}
                   onChange={(e) => setCsvText(e.target.value)}
@@ -116,7 +118,7 @@ export default function PortfolioImport() {
               {/* Options */}
               <div className="flex flex-wrap items-center gap-6">
                 <div>
-                  <Label>An fiscal</Label>
+                  <Label>{t('import.fiscalYear')}</Label>
                   <select
                     value={year}
                     onChange={(e) => setYear(parseInt(e.target.value))}
@@ -129,13 +131,13 @@ export default function PortfolioImport() {
                 </div>
                 <div className="flex items-center gap-2 pt-5">
                   <Switch checked={hasSalary} onCheckedChange={setHasSalary} />
-                  <Label>Am salariu (CASS plătit)</Label>
+                  <Label>{t('import.hasSalary')}</Label>
                 </div>
               </div>
 
               {/* Broker hints */}
               <div className="p-3 bg-muted/30 rounded-lg">
-                <p className="text-xs font-medium text-muted-foreground mb-2">Cum exportezi de la broker:</p>
+                <p className="text-xs font-medium text-muted-foreground mb-2">{t('import.brokerHints')}</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                   {BROKER_EXAMPLES.map(b => (
                     <div key={b.name} className="text-xs">
@@ -154,12 +156,12 @@ export default function PortfolioImport() {
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    AI analizează tranzacțiile...
+                    {t('import.analyzing')}
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
                     <Calculator className="w-4 h-4" />
-                    Analizează și Calculează Taxe
+                    {t('import.analyzeBtn')}
                   </span>
                 )}
               </Button>
@@ -182,7 +184,7 @@ export default function PortfolioImport() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="bg-blue-50 dark:bg-blue-950/30">
               <CardContent className="p-4 text-center">
-                <p className="text-xs text-muted-foreground">Câștiguri Nete</p>
+                <p className="text-xs text-muted-foreground">{t('import.netGains')}</p>
                 <p className={`text-xl font-bold ${report.net_gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {formatRON(report.net_gain)}
                 </p>
@@ -190,19 +192,19 @@ export default function PortfolioImport() {
             </Card>
             <Card className="bg-purple-50 dark:bg-purple-950/30">
               <CardContent className="p-4 text-center">
-                <p className="text-xs text-muted-foreground">Dividende</p>
+                <p className="text-xs text-muted-foreground">{t('import.dividends')}</p>
                 <p className="text-xl font-bold text-purple-600">{formatRON(report.total_dividend_income)}</p>
               </CardContent>
             </Card>
             <Card className="bg-red-50 dark:bg-red-950/30">
               <CardContent className="p-4 text-center">
-                <p className="text-xs text-muted-foreground">Total Taxe</p>
+                <p className="text-xs text-muted-foreground">{t('import.totalTax')}</p>
                 <p className="text-xl font-bold text-red-600">{formatRON(report.total_tax)}</p>
               </CardContent>
             </Card>
             <Card className="bg-green-50 dark:bg-green-950/30">
               <CardContent className="p-4 text-center">
-                <p className="text-xs text-muted-foreground">Rată Efectivă</p>
+                <p className="text-xs text-muted-foreground">{t('import.effectiveRate')}</p>
                 <p className="text-xl font-bold text-green-600">{report.effective_rate}%</p>
               </CardContent>
             </Card>
@@ -213,7 +215,7 @@ export default function PortfolioImport() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calculator className="w-5 h-5" />
-                Detalii Fiscale - {report.year}
+                {t('import.fiscalDetails')} - {report.year}
               </CardTitle>
               <CardDescription>
                 Broker: {report.broker} | Piață: {report.market === 'bvb' ? 'BVB' : 'Internațională'} | {report.total_transactions} vânzări, {report.total_dividends} dividende
@@ -222,27 +224,27 @@ export default function PortfolioImport() {
             <CardContent>
               <div className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                  <span className="text-sm">Câștiguri brute</span>
+                  <span className="text-sm">{t('import.grossGains')}</span>
                   <span className="font-semibold text-green-600">+{formatRON(report.total_gains)}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                  <span className="text-sm">Pierderi</span>
+                  <span className="text-sm">{t('import.losses')}</span>
                   <span className="font-semibold text-red-600">-{formatRON(report.total_losses)}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 border-t pt-3">
-                  <span className="text-sm font-medium">Impozit câștiguri capital</span>
+                  <span className="text-sm font-medium">{t('import.capitalGainsTax')}</span>
                   <span className="font-semibold">{formatRON(report.capital_gains_tax)}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                  <span className="text-sm font-medium">Impozit dividende</span>
+                  <span className="text-sm font-medium">{t('import.dividendTax')}</span>
                   <span className="font-semibold">{formatRON(report.dividend_tax)}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                  <span className="text-sm font-medium">CASS (contribuție sănătate)</span>
+                  <span className="text-sm font-medium">{t('import.cassHealth')}</span>
                   <span className="font-semibold">{formatRON(report.cass_amount)}</span>
                 </div>
                 <div className="flex justify-between items-center p-4 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200">
-                  <span className="font-bold">TOTAL DE PLATĂ</span>
+                  <span className="font-bold">{t('import.totalToPay')}</span>
                   <span className="text-2xl font-bold text-red-600">{formatRON(report.total_tax)}</span>
                 </div>
               </div>
@@ -255,7 +257,7 @@ export default function PortfolioImport() {
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  Explicație AI
+                  {t('import.aiExplanation')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -270,7 +272,7 @@ export default function PortfolioImport() {
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-600" />
-                  Recomandări
+                  {t('import.recommendations')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -290,16 +292,16 @@ export default function PortfolioImport() {
           {report.tax_breakdown?.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">Tranzacții Detaliate ({report.tax_breakdown.length})</CardTitle>
+                <CardTitle className="text-sm">{t('import.detailedTransactions')} ({report.tax_breakdown.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b text-left">
-                        <th className="p-2">Data</th>
-                        <th className="p-2">Simbol</th>
-                        <th className="p-2">Tip</th>
+                        <th className="p-2">{t('common.date')}</th>
+                        <th className="p-2">{t('common.symbol')}</th>
+                        <th className="p-2">{t('common.type')}</th>
                         <th className="p-2 text-right">P/L</th>
                       </tr>
                     </thead>
@@ -310,7 +312,7 @@ export default function PortfolioImport() {
                           <td className="p-2 font-medium">{tx.symbol}</td>
                           <td className="p-2">
                             <Badge variant="outline" className="text-xs">
-                              {tx.type === 'sell' ? 'Vânzare' : tx.type === 'dividend' ? 'Dividend' : tx.type}
+                              {tx.type === 'sell' ? t('common.sell') : tx.type === 'dividend' ? t('common.dividend') : tx.type}
                             </Badge>
                           </td>
                           <td className={`p-2 text-right font-medium ${
@@ -337,7 +339,7 @@ export default function PortfolioImport() {
 
           {/* New Analysis */}
           <Button variant="outline" onClick={() => { setReport(null); setCsvText(''); }} className="w-full">
-            Analiză Nouă
+            {t('import.newAnalysis')}
           </Button>
         </>
       )}

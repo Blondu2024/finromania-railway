@@ -69,14 +69,14 @@ export default function PaymentSuccessPage() {
   if (status === 'checking') {
     return (
       <>
-        <SEO title="Verificare Plată | FinRomania" />
+        <SEO title={t('payment.checkingTitle')} />
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="max-w-md w-full">
             <CardContent className="p-8 text-center">
               <Loader2 className="w-16 h-16 mx-auto text-blue-600 animate-spin mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Verificăm plata...</h2>
+              <h2 className="text-2xl font-bold mb-2">{t('payment.checking')}</h2>
               <p className="text-muted-foreground">
-                Așteptăm confirmarea de la Stripe. Nu închide această pagină.
+                {t('payment.checkingDesc')}
               </p>
             </CardContent>
           </Card>
@@ -88,23 +88,23 @@ export default function PaymentSuccessPage() {
   if (status === 'error') {
     return (
       <>
-        <SEO title="Eroare Plată | FinRomania" />
+        <SEO title={t('payment.errorTitle')} />
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="max-w-md w-full border-red-200">
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
                 <span className="text-3xl">❌</span>
               </div>
-              <h2 className="text-2xl font-bold mb-2">Plata nu a fost procesată</h2>
+              <h2 className="text-2xl font-bold mb-2">{t('payment.notProcessed')}</h2>
               <p className="text-muted-foreground mb-6">
-                Nu am putut confirma plata. Verifică email-ul sau contactează suportul.
+                {t('payment.errorDesc')}
               </p>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => navigate('/pricing')} className="flex-1">
-                  Înapoi la Pricing
+                  {t('payment.backToPricing')}
                 </Button>
                 <Button onClick={() => navigate('/')} className="flex-1">
-                  Acasă
+                  {t('payment.home')}
                 </Button>
               </div>
             </CardContent>
@@ -117,15 +117,15 @@ export default function PaymentSuccessPage() {
   // Success
   return (
     <>
-      <SEO title="Plată Reușită! | FinRomania" />
+      <SEO title={t('payment.successTitle')} />
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="max-w-2xl w-full border-green-200">
           <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white">
             <div className="flex items-center gap-3">
               <CheckCircle className="w-12 h-12" />
               <div>
-                <CardTitle className="text-3xl">Bine ai venit la PRO! 🎉</CardTitle>
-                <p className="text-green-100 mt-1">Plata a fost procesată cu succes</p>
+                <CardTitle className="text-3xl">{t('payment.welcomePro')} 🎉</CardTitle>
+                <p className="text-green-100 mt-1">{t('payment.successProcessed')}</p>
               </div>
             </div>
           </CardHeader>
@@ -133,11 +133,11 @@ export default function PaymentSuccessPage() {
           <CardContent className="p-8">
             {/* Payment Info */}
             <div className="bg-muted/50 rounded-lg p-4 mb-6">
-              <h3 className="font-bold mb-2">Detalii Plată:</h3>
+              <h3 className="font-bold mb-2">{t('payment.details')}</h3>
               <div className="space-y-1 text-sm">
-                <p>Pachet: <span className="font-semibold">{paymentInfo?.package || 'PRO'}</span></p>
-                <p>Sumă: <span className="font-semibold">{paymentInfo?.amount} {paymentInfo?.currency}</span></p>
-                <p>Status: <span className="text-green-600 font-semibold">✅ Plătit</span></p>
+                <p>{t('payment.package')}: <span className="font-semibold">{paymentInfo?.package || 'PRO'}</span></p>
+                <p>{t('payment.amount')}: <span className="font-semibold">{paymentInfo?.amount} {paymentInfo?.currency}</span></p>
+                <p>{t('payment.status')}: <span className="text-green-600 font-semibold">✅ {t('payment.paid')}</span></p>
               </div>
             </div>
 
@@ -145,18 +145,18 @@ export default function PaymentSuccessPage() {
             <div className="mb-6">
               <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
                 <Crown className="w-5 h-5 text-amber-500" />
-                Features Deblocate:
+                {t('payment.featuresUnlocked')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {[
-                  '✅ Întrebări AI nelimitate',
-                  '✅ Grafice intraday (1min, 5min, 15min)',
-                  '✅ Indicatori tehnici PRO (RSI, Volume)',
-                  '✅ Candlestick charts profesionale',
-                  '✅ Calculator Fiscal complet',
-                  '✅ Date LIVE (update 3s)',
-                  '✅ Watchlist nelimitat',
-                  '✅ Alerte nelimitate'
+                  `✅ ${t('payment.unlimitedAI')}`,
+                  `✅ ${t('payment.intradayCharts')}`,
+                  `✅ ${t('payment.proIndicators')}`,
+                  `✅ ${t('payment.candlestickCharts')}`,
+                  `✅ ${t('payment.taxCalcFull')}`,
+                  `✅ ${t('payment.liveData')}`,
+                  `✅ ${t('payment.unlimitedWatchlist')}`,
+                  `✅ ${t('payment.unlimitedAlerts')}`
                 ].map((feature, i) => (
                   <p key={i} className="text-sm flex items-center gap-2">
                     {feature}
@@ -172,7 +172,7 @@ export default function PaymentSuccessPage() {
                 onClick={() => navigate('/global')}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
-                Explorează Grafice PRO
+                {t('payment.exploreProCharts')}
               </Button>
               <Button 
                 variant="outline"
@@ -180,12 +180,12 @@ export default function PaymentSuccessPage() {
                 onClick={() => navigate('/stocks')}
               >
                 <Sparkles className="w-4 h-4 mr-2" />
-                Vezi Bursa BVB
+                {t('payment.seeBVB')}
               </Button>
             </div>
 
             <p className="text-center text-sm text-muted-foreground mt-6">
-              Vei primi și un email de confirmare la {user?.email || 'adresa ta'}
+              {t('payment.emailConfirmation', { email: user?.email || 'N/A' })}
             </p>
           </CardContent>
         </Card>

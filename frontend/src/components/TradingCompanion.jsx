@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  MessageCircle, X, Send, Shield, AlertTriangle, 
+import {
+  MessageCircle, X, Send, Shield, AlertTriangle,
   Loader2, ChevronDown, Lightbulb, HelpCircle
 } from 'lucide-react';
 import { Button } from './ui/button';
@@ -12,6 +13,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Reminder Modal - appears when viewing stock details
 export const TradingReminder = ({ isOpen, onClose, onOpenCompanion }) => {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   return (
@@ -37,8 +39,8 @@ export const TradingReminder = ({ isOpen, onClose, onOpenCompanion }) => {
                 <AlertTriangle className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-xl font-bold">⚠️ Înainte să decizi...</h2>
-                <p className="text-amber-100 text-sm">Un moment de reflecție</p>
+                <h2 className="text-xl font-bold">{`⚠️ ${t('trading.beforeDecide')}`}</h2>
+                <p className="text-amber-100 text-sm">{t('trading.reflection')}</p>
               </div>
             </div>
           </div>
@@ -46,33 +48,33 @@ export const TradingReminder = ({ isOpen, onClose, onOpenCompanion }) => {
           {/* Content */}
           <div className="p-6 space-y-4">
             <p className="text-muted-foreground">
-              Nu lua decizii bazate pe emoții. Mulți investitori au pierdut bani pentru că au acționat pripit.
+              {t('trading.dontDecideEmotions')}
             </p>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 space-y-2">
-              <p className="font-medium text-blue-700 dark:text-blue-300">Întreabă-te:</p>
+              <p className="font-medium text-blue-700 dark:text-blue-300">{t('trading.askYourself')}</p>
               <ul className="text-sm text-blue-600 dark:text-blue-400 space-y-1">
-                <li>• Știu de ce vreau să fac această mișcare?</li>
-                <li>• Am un plan dacă merge prost?</li>
-                <li>• Sunt influențat de emoții acum?</li>
+                <li>• {t('trading.knowWhyMove')}</li>
+                <li>• {t('trading.planIfBad')}</li>
+                <li>• {t('trading.influencedByEmotions')}</li>
               </ul>
             </div>
 
             <p className="text-sm text-muted-foreground">
-              💡 Poți discuta cu <strong>&quot;Verifică Înainte&quot;</strong> - asistentul AI care te ajută să gândești clar.
+              {`💡 ${t('trading.canDiscuss')} `}<strong>&quot;{t('trading.checkBefore')}&quot;</strong>{` - ${t('trading.assistantHelps')}`}
             </p>
           </div>
 
           {/* Actions */}
           <div className="p-4 border-t bg-muted/30 flex gap-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex-1"
               onClick={onClose}
             >
-              Am înțeles
+              {t('trading.understood')}
             </Button>
-            <Button 
+            <Button
               className="flex-1 bg-gradient-to-r from-blue-700 to-blue-500"
               onClick={() => {
                 onClose();
@@ -80,7 +82,7 @@ export const TradingReminder = ({ isOpen, onClose, onOpenCompanion }) => {
               }}
             >
               <Shield className="w-4 h-4 mr-2" />
-              Consultă AI-ul
+              {t('trading.consultAI')}
             </Button>
           </div>
         </motion.div>
@@ -126,6 +128,7 @@ const TradingCompanion = ({
   const [subscriptionLevel, setSubscriptionLevel] = useState('free');
   const messagesEndRef = useRef(null);
   const { user, token } = useAuth();
+  const { t } = useTranslation();
 
   // Fetch AI limits when component opens
   useEffect(() => {
@@ -232,25 +235,25 @@ const TradingCompanion = ({
       } else if (res.status === 429) {
         // AI limit reached
         const errorData = await res.json();
-        setConversation(prev => [...prev, { 
-          role: 'assistant', 
-          content: `🔒 ${errorData.detail?.message || 'Ai atins limita de întrebări AI.'}\n\n💎 **Upgrade la PRO:**\n- Întrebări AI nelimitate\n- Grafice intraday profesionale\n- Date live actualizate la 3s\n\n[Vezi /pricing pentru detalii]`,
+        setConversation(prev => [...prev, {
+          role: 'assistant',
+          content: `🔒 ${errorData.detail?.message || t('trading.aiLimitReached')}\n\n💎 ${t('trading.upgradeProPrompt')}\n\n${t('trading.seePricingDetails')}`,
           isError: true,
           isLimitReached: true
         }]);
       } else {
         const errorText = await res.text();
-        setConversation(prev => [...prev, { 
-          role: 'assistant', 
-          content: 'Nu am putut procesa cererea. Încearcă din nou.',
+        setConversation(prev => [...prev, {
+          role: 'assistant',
+          content: t('trading.couldNotProcess'),
           isError: true
         }]);
       }
     } catch (err) {
       console.error('Error:', err);
-      setConversation(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Eroare de conexiune. Verifică internetul și încearcă din nou.',
+      setConversation(prev => [...prev, {
+        role: 'assistant',
+        content: t('trading.connectionError'),
         isError: true
       }]);
     } finally {
@@ -267,10 +270,10 @@ const TradingCompanion = ({
 
   // Suggested questions based on context
   const suggestedQuestions = [
-    `${stockSymbol} a ${(changePercent || 0) < 0 ? 'scăzut' : 'crescut'} - e moment bun să intru?`,
-    `Ce riscuri ar trebui să știu despre ${stockSymbol}?`,
-    `Sunt începător - cum ar trebui să abordez ${stockSymbol}?`,
-    `Am deja ${stockSymbol} - să mai cumpăr sau să aștept?`
+    t('trading.goodTimeEnter', { symbol: stockSymbol, direction: (changePercent || 0) < 0 ? t('trading.droppedRose') : t('trading.rose') }),
+    t('trading.whatRisks', { symbol: stockSymbol }),
+    t('trading.beginnerApproach', { symbol: stockSymbol }),
+    t('trading.alreadyHave', { symbol: stockSymbol })
   ];
 
   return (
@@ -285,7 +288,7 @@ const TradingCompanion = ({
         className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-blue-700 to-blue-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow flex items-center gap-2"
       >
         <Shield className="w-5 h-5" />
-        <span className="hidden sm:inline font-medium">Verifică Înainte</span>
+        <span className="hidden sm:inline font-medium">{t('trading.floatingBtn')}</span>
         <HelpCircle className="w-4 h-4 sm:hidden" />
       </motion.button>
 
@@ -306,19 +309,19 @@ const TradingCompanion = ({
                     <Shield className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold">🤔 Verifică Înainte</h3>
+                    <h3 className="font-bold">{`🤔 ${t('trading.headerTitle')}`}</h3>
                     <p className="text-xs text-blue-200">
-                      {stockSymbol ? `Analizăm ${stockSymbol}` : 'Asistent Trading'}
+                      {stockSymbol ? t('trading.analyzingSymbol', { symbol: stockSymbol }) : t('trading.tradingAssistant')}
                     </p>
                     {user && aiQueriesRemaining !== null && (
                       <p className="text-xs text-blue-100 mt-1">
                         {subscriptionLevel === 'pro' ? (
                           <span className="flex items-center gap-1">
-                            <span className="text-amber-300">👑 PRO:</span> Întrebări nelimitate
+                            <span className="text-amber-300">👑 PRO:</span> {t('trading.proUnlimited')}
                           </span>
                         ) : (
                           <span className={aiQueriesRemaining === 0 ? 'text-red-300 font-bold' : ''}>
-                            {aiQueriesRemaining === 0 ? '🔒 Limită atinsă!' : `💬 ${aiQueriesRemaining} întrebări rămase azi`}
+                            {aiQueriesRemaining === 0 ? `🔒 ${t('trading.limitReached')}` : `💬 ${t('trading.questionsRemaining', { count: aiQueriesRemaining })}`}
                           </span>
                         )}
                       </p>
@@ -352,10 +355,8 @@ const TradingCompanion = ({
               {conversation.length === 0 && (
                 <div className="space-y-4">
                   <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
-                      👋 Salut! Sunt aici să te ajut să gândești clar înainte de orice decizie de investiții.
-                      <br /><br />
-                      Nu îți spun ce să faci - dar te ajut să pui întrebările potrivite.
+                    <p className="text-sm text-blue-700 dark:text-blue-300 whitespace-pre-line">
+                      {`👋 ${t('trading.welcomeMessage')}`}
                     </p>
                   </div>
 
@@ -363,7 +364,7 @@ const TradingCompanion = ({
                   {tips.length > 0 && (
                     <div className="space-y-2">
                       <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                        <Lightbulb className="w-3 h-3" /> Gânduri rapide:
+                        <Lightbulb className="w-3 h-3" /> {t('trading.quickThoughts')}
                       </p>
                       {tips.map((tip, idx) => (
                         <div key={idx} className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 rounded p-2">
@@ -376,7 +377,7 @@ const TradingCompanion = ({
                   {/* Suggested Questions */}
                   <div className="space-y-2">
                     <p className="text-xs font-medium text-muted-foreground">
-                      Sau întreabă direct:
+                      {t('trading.askDirectly')}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {suggestedQuestions.slice(0, 2).map((q, idx) => (
@@ -440,7 +441,7 @@ const TradingCompanion = ({
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Întreabă orice despre această acțiune..."
+                  placeholder={t('trading.inputPlaceholder')}
                   className="flex-1 px-4 py-2 rounded-full border bg-background focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   disabled={loading}
                 />
@@ -454,7 +455,7 @@ const TradingCompanion = ({
                 </Button>
               </div>
               <p className="text-xs text-center text-muted-foreground mt-2">
-                Nu sunt sfaturi financiare • Doar gânduri pentru reflecție
+                {t('trading.notFinancialAdvice')}
               </p>
             </div>
           </motion.div>

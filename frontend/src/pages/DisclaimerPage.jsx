@@ -14,137 +14,116 @@ export default function DisclaimerPage() {
       <SEO title="Disclaimer | FinRomania" description="Legal disclaimer - FinRomania provides educational content, not investment advice." />
       <Link to="/">
         <Button variant="ghost" size="sm">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t('disclaimerPage.backButton')}
         </Button>
       </Link>
 
       <div className="flex items-center gap-3">
         <AlertTriangle className="w-8 h-8 text-yellow-600" />
-        <h1 className="text-3xl font-bold">Declinare Responsabilitate</h1>
+        <h1 className="text-3xl font-bold">{t('disclaimerPage.title')}</h1>
       </div>
-      
-      <p className="text-muted-foreground">Ultima actualizare: 23 Decembrie 2025</p>
+
+      <p className="text-muted-foreground">{t('disclaimerPage.lastUpdated')}</p>
 
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Avertisment Important</AlertTitle>
+        <AlertTitle>{t('disclaimerPage.warningTitle')}</AlertTitle>
         <AlertDescription>
-          Informațiile de pe FinRomania NU constituie sfaturi de investiții. 
-          Orice decizie financiară este responsabilitatea dumneavoastră.
+          {t('disclaimerPage.warningText')}
         </AlertDescription>
       </Alert>
 
       <Card>
         <CardContent className="prose dark:prose-invert max-w-none p-6 space-y-6">
           <section>
-            <h2 className="text-xl font-semibold">1. Scop informativ</h2>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section1Title')}</h2>
             <p>
-              Toate informațiile, datele, știrile și analizele prezentate pe platforma FinRomania 
-              sunt oferite exclusiv în scop informativ și educațional. Conținutul nu trebuie 
-              interpretat ca:
+              {t('disclaimerPage.section1Text')}
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Sfaturi de investiții sau financiare</li>
-              <li>Recomandări de cumpărare sau vânzare de instrumente financiare</li>
-              <li>Analize profesionale de investiții</li>
-              <li>Consultanță fiscală sau juridică</li>
+              <li>{t('disclaimerPage.section1Item1')}</li>
+              <li>{t('disclaimerPage.section1Item2')}</li>
+              <li>{t('disclaimerPage.section1Item3')}</li>
+              <li>{t('disclaimerPage.section1Item4')}</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">2. Nu suntem consilieri financiari</h2>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section2Title')}</h2>
             <p>
-              FinRomania NU este o firmă de consultanță financiară, nu deține autorizații de la 
-              ASF (Autoritatea de Supraveghere Financiară) și nu oferă servicii de consultanță 
-              în investiții.
+              {t('disclaimerPage.section2Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">3. Acuratețea datelor</h2>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section3Title')}</h2>
             <p>
-              Deși depunem eforturi pentru a prezenta informații corecte și actualizate, 
-              NU garantăm:
+              {t('disclaimerPage.section3Text')}
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Acuratețea, completitudinea sau actualitatea informațiilor</li>
-              <li>Absența erorilor în datele prezentate</li>
-              <li>Actualizarea în timp real a prețurilor sau cotațiilor</li>
-              <li>Disponibilitatea neîntreruptă a serviciului</li>
+              <li>{t('disclaimerPage.section3Item1')}</li>
+              <li>{t('disclaimerPage.section3Item2')}</li>
+              <li>{t('disclaimerPage.section3Item3')}</li>
+              <li>{t('disclaimerPage.section3Item4')}</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">4. Surse externe</h2>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section4Title')}</h2>
             <p>
-              Știrile și informațiile sunt agregate din surse terțe (Ziarul Financiar, Profit.ro, 
-              Bursa, etc.). Nu ne asumăm responsabilitatea pentru conținutul, acuratețea sau 
-              opiniile exprimate în aceste surse externe.
+              {t('disclaimerPage.section4Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">5. Riscuri asociate investițiilor</h2>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section5Title')}</h2>
             <p className="font-semibold">
-              Investițiile în instrumente financiare implică riscuri semnificative, inclusiv 
-              pierderea parțială sau totală a capitalului investit.
+              {t('disclaimerPage.section5Text1')}
             </p>
             <p>
-              Performanțele trecute nu garantează rezultate viitoare. Trebuie să înțelegeți 
-              pe deplin riscurile înainte de a investi și să nu investiți bani pe care nu vă 
-              permiteți să îi pierdeți.
+              {t('disclaimerPage.section5Text2')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">6. Consultați un profesionist</h2>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section6Title')}</h2>
             <p>
-              Înainte de a lua orice decizie de investiții, vă recomandăm să consultați un 
-              consilier financiar autorizat care poate evalua situația dumneavoastră financiară 
-              individuală și obiectivele de investiții.
+              {t('disclaimerPage.section6Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">7. Limitarea răspunderii</h2>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section7Title')}</h2>
             <p>
-              În limita maximă permisă de lege, FinRomania și operatorii săi nu sunt responsabili 
-              pentru nicio pierdere sau daună (inclusiv, fără limitare, pierderi financiare, 
-              pierderi de profit, pierderi de date) rezultate din utilizarea sau imposibilitatea 
-              de a utiliza această platformă.
+              {t('disclaimerPage.section7Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">8. Date BVB</h2>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section8Title')}</h2>
             <p className="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg">
-              <strong>Informație:</strong> Datele despre acțiunile de pe Bursa de Valori București (BVB) 
-              sunt furnizate de un furnizor licențiat de date financiare. Datele sunt reale și 
-              se actualizează automat la fiecare 5 minute. Cu toate acestea, pot exista întârzieri sau 
-              discrepanțe față de datele oficiale BVB. Verificați întotdeauna cu surse oficiale înainte 
-              de a lua decizii de investiții.
+              <strong>{t('disclaimerPage.section8Label')}</strong> {t('disclaimerPage.section8Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">9. Surse de date</h2>
-            <p>Platforma FinRomania agregă date din următoarele surse:</p>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section9Title')}</h2>
+            <p>{t('disclaimerPage.section9Text')}</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>Acțiuni BVB:</strong> Furnizor licențiat de date financiare</li>
-              <li><strong>Indici globali:</strong> Yahoo Finance (yfinance)</li>
-              <li><strong>Cursuri valutare:</strong> Banca Națională a României (BNR)</li>
-              <li><strong>Știri:</strong> Agregate din surse românești (Ziarul Financiar, Profit.ro, Bursa, Wall-Street)</li>
+              <li><strong>{t('disclaimerPage.section9Item1Label')}</strong> {t('disclaimerPage.section9Item1Text')}</li>
+              <li><strong>{t('disclaimerPage.section9Item2Label')}</strong> {t('disclaimerPage.section9Item2Text')}</li>
+              <li><strong>{t('disclaimerPage.section9Item3Label')}</strong> {t('disclaimerPage.section9Item3Text')}</li>
+              <li><strong>{t('disclaimerPage.section9Item4Label')}</strong> {t('disclaimerPage.section9Item4Text')}</li>
             </ul>
             <p className="mt-2">
-              Fiecare sursă poate avea politici proprii de actualizare și acuratețe. 
-              FinRomania nu garantează datele furnizate de terți.
+              {t('disclaimerPage.section9Footer')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">10. Contact</h2>
+            <h2 className="text-xl font-semibold">{t('disclaimerPage.section10Title')}</h2>
             <p>
-              Pentru clarificări: <strong>contact@finromania.ro</strong>
+              {t('disclaimerPage.section10Text')} <strong>contact@finromania.ro</strong>
             </p>
           </section>
         </CardContent>

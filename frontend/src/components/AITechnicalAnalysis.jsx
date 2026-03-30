@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Brain, TrendingUp, TrendingDown, Minus, Lock, Crown, 
+import {
+  Brain, TrendingUp, TrendingDown, Minus, Lock, Crown,
   Activity, Target, BarChart3, Zap, RefreshCw, ChevronDown
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
@@ -11,15 +12,16 @@ import { Link } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const PERIODS = [
-  { label: '1 Săpt', value: '1w' },
-  { label: '1 Lună', value: '1m' },
-  { label: '3 Luni', value: '3m' },
-  { label: '6 Luni', value: '6m' },
-  { label: '1 An', value: '1y' },
+const PERIOD_KEYS = [
+  { key: 'techAnalysis.week1', value: '1w' },
+  { key: 'techAnalysis.month1', value: '1m' },
+  { key: 'techAnalysis.month3', value: '3m' },
+  { key: 'techAnalysis.month6', value: '6m' },
+  { key: 'techAnalysis.year1', value: '1y' },
 ];
 
 export default function AITechnicalAnalysis({ symbol, isPro, token }) {
+  const { t } = useTranslation();
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -48,10 +50,10 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
         setIsOpen(true);
       } else {
         const err = await res.json();
-        setError(err.detail || 'Eroare la analiză');
+        setError(err.detail || t('techAnalysis.errorAnalysis'));
       }
     } catch (err) {
-      setError('Nu s-a putut conecta la server');
+      setError(t('techAnalysis.couldNotConnect'));
     } finally {
       setLoading(false);
     }
@@ -82,38 +84,38 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Brain className="w-5 h-5 text-amber-500" />
-            Analiză AI Tehnică
+            {t('techAnalysis.title')}
             <Badge className="bg-amber-500">PRO</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center py-6">
           <Lock className="w-12 h-12 mx-auto text-amber-400 mb-4" />
-          <h3 className="font-semibold mb-2">Funcție PRO</h3>
+          <h3 className="font-semibold mb-2">{t('techAnalysis.proFeature')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            AI-ul nostru analizează automat indicatorii tehnici și îți oferă o recomandare personalizată.
+            {t('techAnalysis.proDescription')}
           </p>
           <ul className="text-sm text-left space-y-2 mb-4 max-w-xs mx-auto">
             <li className="flex items-center gap-2">
               <Target className="w-4 h-4 text-amber-500" />
-              Suport & Rezistență automat
+              {t('techAnalysis.supportResistance')}
             </li>
             <li className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-blue-500" />
-              RSI, MA20, MA50 calculate
+              {t('techAnalysis.rsiCalculated')}
             </li>
             <li className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-green-500" />
-              Evaluare: FAVORABIL/RISCANT/NEUTRU
+              {t('techAnalysis.evaluation')}
             </li>
             <li className="flex items-center gap-2">
               <Brain className="w-4 h-4 text-blue-500" />
-              Interpretare AI în română
+              {t('techAnalysis.aiInterpretation')}
             </li>
           </ul>
           <Link to="/pricing">
             <Button className="bg-gradient-to-r from-amber-500 to-orange-500">
               <Crown className="w-4 h-4 mr-2" />
-              Upgrade la PRO - 49 lei/lună
+              {t('techAnalysis.upgradePro')}
             </Button>
           </Link>
         </CardContent>
@@ -127,7 +129,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-lg">
             <Brain className="w-5 h-5 text-amber-500" />
-            Analiză AI Tehnică
+            {t('techAnalysis.title')}
             <Badge className="bg-gradient-to-r from-amber-500 to-orange-500">PRO</Badge>
           </div>
           {analysis && (
@@ -145,8 +147,8 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
       <CardContent>
         {/* Period selector + Run button */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span className="text-sm text-muted-foreground">Perioadă:</span>
-          {PERIODS.map(p => (
+          <span className="text-sm text-muted-foreground">{t('techAnalysis.period')}</span>
+          {PERIOD_KEYS.map(p => (
             <Button
               key={p.value}
               size="sm"
@@ -154,7 +156,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
               onClick={() => setPeriod(p.value)}
               className={period === p.value ? 'bg-amber-500 hover:bg-amber-600' : ''}
             >
-              {p.label}
+              {t(p.key)}
             </Button>
           ))}
           <Button
@@ -163,9 +165,9 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
             className="ml-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:opacity-90"
           >
             {loading ? (
-              <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Analizez...</>
+              <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> {t('techAnalysis.analyzing')}</>
             ) : (
-              <><Brain className="w-4 h-4 mr-2" /> Analizează</>
+              <><Brain className="w-4 h-4 mr-2" /> {t('techAnalysis.analyze')}</>
             )}
           </Button>
         </div>
@@ -192,11 +194,11 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                   {getSignalIcon(analysis.analysis?.signal)}
                   <div>
                     <p className="font-bold text-lg">{analysis.analysis?.signal}</p>
-                    <p className="text-sm opacity-80">Nivel de încredere: {analysis.analysis?.confidence}%</p>
+                    <p className="text-sm opacity-80">{t('techAnalysis.confidenceLevel', { percent: analysis.analysis?.confidence })}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm opacity-70">Preț curent</p>
+                  <p className="text-sm opacity-70">{t('techAnalysis.currentPrice')}</p>
                   <p className="font-bold text-xl">{analysis.analysis?.current_price?.toFixed(2)} RON</p>
                 </div>
               </div>
@@ -205,7 +207,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Target className="w-3 h-3 text-green-500" /> Suport
+                    <Target className="w-3 h-3 text-green-500" /> {t('techAnalysis.support')}
                   </p>
                   <p className="text-lg font-bold text-green-600">
                     {analysis.analysis?.support?.toFixed(2)} RON
@@ -213,7 +215,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                 </div>
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Target className="w-3 h-3 text-red-500" /> Rezistență
+                    <Target className="w-3 h-3 text-red-500" /> {t('techAnalysis.resistance')}
                   </p>
                   <p className="text-lg font-bold text-red-600">
                     {analysis.analysis?.resistance?.toFixed(2)} RON
@@ -229,21 +231,21 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                   }`}>
                     {analysis.analysis?.rsi?.toFixed(1)}
                     <span className="text-xs ml-1">
-                      {analysis.analysis?.rsi < 30 ? '(supravândut)' :
-                       analysis.analysis?.rsi > 70 ? '(supracumpărat)' : ''}
+                      {analysis.analysis?.rsi < 30 ? t('techAnalysis.oversold') :
+                       analysis.analysis?.rsi > 70 ? t('techAnalysis.overbought') : ''}
                     </span>
                   </p>
                 </div>
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    {getTrendIcon(analysis.analysis?.trend_direction)} Trend
+                    {getTrendIcon(analysis.analysis?.trend_direction)} {t('techAnalysis.trend')}
                   </p>
                   <p className={`text-lg font-bold capitalize ${
                     analysis.analysis?.trend_direction === 'bullish' ? 'text-green-600' :
                     analysis.analysis?.trend_direction === 'bearish' ? 'text-red-600' : 'text-gray-600'
                   }`}>
-                    {analysis.analysis?.trend_direction === 'bullish' ? 'Ascendent' :
-                     analysis.analysis?.trend_direction === 'bearish' ? 'Descendent' : 'Neutru'}
+                    {analysis.analysis?.trend_direction === 'bullish' ? t('techAnalysis.bullish') :
+                     analysis.analysis?.trend_direction === 'bearish' ? t('techAnalysis.bearish') : t('techAnalysis.neutral')}
                     <span className="text-xs ml-1">({analysis.analysis?.trend_strength}%)</span>
                   </p>
                 </div>
@@ -254,11 +256,11 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                 {/* Volume Analysis */}
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                    <BarChart3 className="w-3 h-3 text-blue-500" /> Volum
+                    <BarChart3 className="w-3 h-3 text-blue-500" /> {t('common.volume')}
                   </p>
                   <p className="text-lg font-bold">
                     {analysis.analysis?.volume_ratio?.toFixed(2)}x
-                    <span className="text-xs ml-1 font-normal text-muted-foreground">vs medie</span>
+                    <span className="text-xs ml-1 font-normal text-muted-foreground">{t('techAnalysis.vsAverage')}</span>
                   </p>
                   <p className={`text-xs mt-1 ${
                     analysis.analysis?.volume_status === 'FOARTE_MARE' ? 'text-orange-600' :
@@ -272,7 +274,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                 {/* Market Context */}
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                    <TrendingUp className="w-3 h-3 text-blue-500" /> Piața BVB
+                    <TrendingUp className="w-3 h-3 text-blue-500" /> {t('techAnalysis.bvbMarket')}
                   </p>
                   <p className={`text-lg font-bold ${
                     analysis.analysis?.bet_change > 0 ? 'text-green-600' :
@@ -288,7 +290,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
                 {/* Liquidity */}
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
-                    <Zap className="w-3 h-3 text-cyan-500" /> Lichiditate
+                    <Zap className="w-3 h-3 text-cyan-500" /> {t('techAnalysis.liquidity')}
                   </p>
                   <p className="text-lg font-bold">
                     {analysis.analysis?.liquidity_score}/5
@@ -327,7 +329,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
               {/* Reasons */}
               {analysis.analysis?.reasons?.length > 0 && (
                 <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border">
-                  <p className="text-xs text-muted-foreground mb-2">Factori de evaluare:</p>
+                  <p className="text-xs text-muted-foreground mb-2">{t('techAnalysis.evaluationFactors')}</p>
                   <ul className="text-sm space-y-1">
                     {analysis.analysis.reasons.map((reason, idx) => (
                       <li key={idx} className="flex items-center gap-2">
@@ -342,7 +344,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
               {/* Warnings */}
               {analysis.analysis?.warnings?.length > 0 && (
                 <div className="bg-orange-50 dark:bg-orange-950/20 p-3 rounded-lg border border-orange-200 dark:border-orange-800">
-                  <p className="text-xs text-orange-700 dark:text-orange-400 font-medium mb-2">⚠️ Avertismente:</p>
+                  <p className="text-xs text-orange-700 dark:text-orange-400 font-medium mb-2">{`⚠️ ${t('techAnalysis.warnings')}`}</p>
                   <ul className="text-sm space-y-1 text-orange-700 dark:text-orange-300">
                     {analysis.analysis.warnings.map((warning, idx) => (
                       <li key={idx} className="flex items-center gap-2">
@@ -358,7 +360,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
               <div className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/20 dark:to-blue-950/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
                 <div className="flex items-center gap-2 mb-2">
                   <Brain className="w-5 h-5 text-blue-600" />
-                  <p className="font-semibold text-blue-800 dark:text-blue-300">Interpretare AI</p>
+                  <p className="font-semibold text-blue-800 dark:text-blue-300">{t('techAnalysis.aiInterpretationTitle')}</p>
                 </div>
                 <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                   {analysis.ai_interpretation}
@@ -367,7 +369,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
 
               {/* Disclaimer */}
               <p className="text-xs text-muted-foreground text-center">
-                ⚠️ Aceasta NU este recomandare de investiții. Fă propria cercetare înainte de orice decizie.
+                {`⚠️ ${t('techAnalysis.disclaimer')}`}
               </p>
             </motion.div>
           )}
@@ -377,7 +379,7 @@ export default function AITechnicalAnalysis({ symbol, isPro, token }) {
         {!analysis && !loading && (
           <div className="text-center py-4 text-sm text-muted-foreground">
             <Brain className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            Selectează o perioadă și apasă "Analizează" pentru a primi recomandarea AI
+            {t('techAnalysis.initialPrompt')}
           </div>
         )}
       </CardContent>

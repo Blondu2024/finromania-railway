@@ -11,30 +11,30 @@ import SEO from '../components/SEO';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const LEVEL_INFO = {
+const getLevelInfo = (t) => ({
   intermediate: {
-    name: 'Mediu',
-    description: 'Indicatori tehnici și analiză avansată',
+    name: t('education.levelIntermediate'),
+    description: t('education.descIntermediate'),
     color: 'blue',
     unlocks: [
-      'Indicatori tehnici (RSI, MA, MACD)',
-      'Toate acțiunile BVB',
-      'AI Advisor avansat',
-      'Portofoliu diversificat'
+      t('education.unlockTechIndicators'),
+      t('education.unlockAllBVB'),
+      t('education.unlockAdvancedAI'),
+      t('education.unlockDiversifiedPortfolio')
     ]
   },
   advanced: {
-    name: 'Expert',
-    description: 'Analiză fundamentală și grafice pro',
+    name: t('education.levelAdvanced'),
+    description: t('education.descAdvanced'),
     color: 'blue',
     unlocks: [
-      'Analiză fundamentală completă',
-      'AI trasează linii pe grafice',
-      'Calculator fiscal PF/SRL',
-      'Toate piețele (BVB + Global)'
+      t('education.unlockFundamentalAnalysis'),
+      t('education.unlockAICharts'),
+      t('education.unlockTaxCalc'),
+      t('education.unlockAllMarkets')
     ]
   }
-};
+});
 
 export default function QuizPage() {
   const { t } = useTranslation();
@@ -148,7 +148,7 @@ export default function QuizPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
-            <p>Se încarcă quiz-ul...</p>
+            <p>{t('education.loadingQuiz')}</p>
           </CardContent>
         </Card>
       </div>
@@ -161,16 +161,16 @@ export default function QuizPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <Lock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Autentificare necesară</h2>
-            <p className="text-gray-500 mb-4">Trebuie să fii autentificat pentru a accesa quiz-ul.</p>
-            <Button onClick={() => navigate('/login')}>Conectează-te</Button>
+            <h2 className="text-xl font-bold mb-2">{t('education.authRequired')}</h2>
+            <p className="text-gray-500 mb-4">{t('education.loginForQuiz')}</p>
+            <Button onClick={() => navigate('/login')}>{t('education.loginButton')}</Button>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  const levelInfo = LEVEL_INFO[level];
+  const levelInfo = getLevelInfo(t)[level];
   
   if (!levelInfo) {
     return (
@@ -178,8 +178,8 @@ export default function QuizPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Nivel invalid</h2>
-            <Button onClick={() => navigate('/')}>Înapoi acasă</Button>
+            <h2 className="text-xl font-bold mb-2">{t('education.invalidLevel')}</h2>
+            <Button onClick={() => navigate('/')}>{t('education.backHome')}</Button>
           </CardContent>
         </Card>
       </div>
@@ -195,19 +195,19 @@ export default function QuizPage() {
             {results.passed ? (
               <>
                 <Trophy className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-green-600 mb-2">Felicitări! 🎉</h2>
+                <h2 className="text-2xl font-bold text-green-600 mb-2">{t('education.congratulations')} 🎉</h2>
                 <p className="text-lg mb-4">{results.message}</p>
                 <Badge className="bg-green-500 text-white text-lg px-4 py-2">
-                  {results.score}/{results.total} răspunsuri corecte
+                  {results.score}/{results.total} {t('education.correctAnswers')}
                 </Badge>
               </>
             ) : (
               <>
                 <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-red-600 mb-2">Mai încearcă!</h2>
+                <h2 className="text-2xl font-bold text-red-600 mb-2">{t('education.tryAgain')}</h2>
                 <p className="text-lg mb-4">{results.message}</p>
                 <Badge variant="destructive" className="text-lg px-4 py-2">
-                  {results.score}/{results.total} răspunsuri corecte
+                  {results.score}/{results.total} {t('education.correctAnswers')}
                 </Badge>
               </>
             )}
@@ -220,7 +220,7 @@ export default function QuizPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-500" />
-                Funcții deblocate
+                {t('education.featuresUnlocked')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -239,7 +239,7 @@ export default function QuizPage() {
         {/* Detailed results */}
         <Card>
           <CardHeader>
-            <CardTitle>Răspunsurile tale</CardTitle>
+            <CardTitle>{t('education.yourAnswers')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {results.results?.map((r, idx) => (
@@ -257,7 +257,7 @@ export default function QuizPage() {
                     <p className="font-medium">{r.question}</p>
                     {!r.is_correct && (
                       <p className="text-sm text-gray-500 mt-1">
-                        <span className="text-red-500">Răspunsul tău</span> vs <span className="text-green-500">Răspunsul corect</span>
+                        <span className="text-red-500">{t('education.yourAnswer')}</span> vs <span className="text-green-500">{t('education.correctAnswer')}</span>
                       </p>
                     )}
                     <p className="text-sm text-blue-600 mt-2 italic">{r.explanation}</p>
@@ -273,11 +273,11 @@ export default function QuizPage() {
           {!results.passed && (
             <Button onClick={() => window.location.reload()}>
               <RefreshCw className="w-4 h-4 mr-2" />
-              Încearcă din nou
+              {t('education.retryQuiz')}
             </Button>
           )}
           <Button variant="outline" onClick={() => navigate('/')}>
-            Înapoi acasă
+            {t('education.backHome')}
           </Button>
         </div>
       </div>
@@ -297,7 +297,7 @@ export default function QuizPage() {
         <CardContent className="p-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold">Quiz - Nivel {levelInfo.name}</h1>
+              <h1 className="text-2xl font-bold">{t('education.quizLevel', { level: levelInfo.name })}</h1>
               <p className="text-blue-100">{quizData?.instructions}</p>
             </div>
             <div className="text-right">
@@ -305,7 +305,7 @@ export default function QuizPage() {
                 <Clock className="w-5 h-5 inline mr-1" />
                 {formatTime(timeLeft)}
               </div>
-              <p className="text-sm text-blue-200">Timp rămas</p>
+              <p className="text-sm text-blue-200">{t('education.timeRemaining')}</p>
             </div>
           </div>
         </CardContent>
@@ -314,8 +314,8 @@ export default function QuizPage() {
       {/* Progress */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span>Întrebarea {currentQuestion + 1} din {quizData?.total_questions}</span>
-          <span>{answeredCount} răspunsuri date</span>
+          <span>{t('education.questionOf', { current: currentQuestion + 1, total: quizData?.total_questions })}</span>
+          <span>{t('education.answersGiven', { count: answeredCount })}</span>
         </div>
         <Progress value={progress} className="h-2" />
       </div>
@@ -353,7 +353,7 @@ export default function QuizPage() {
           onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
           disabled={currentQuestion === 0}
         >
-          Înapoi
+          {t('education.previous')}
         </Button>
         
         <div className="flex gap-2">
@@ -379,7 +379,7 @@ export default function QuizPage() {
           <Button
             onClick={() => setCurrentQuestion(prev => prev + 1)}
           >
-            Următoarea
+            {t('education.nextQuestion')}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         ) : (
@@ -393,7 +393,7 @@ export default function QuizPage() {
             ) : (
               <CheckCircle className="w-4 h-4 mr-2" />
             )}
-            Finalizează Quiz
+            {t('education.finishQuiz')}
           </Button>
         )}
       </div>
@@ -402,7 +402,7 @@ export default function QuizPage() {
       {answeredCount < (quizData?.total_questions || 0) && (
         <p className="text-center text-amber-500 text-sm">
           <AlertCircle className="w-4 h-4 inline mr-1" />
-          Mai ai {(quizData?.total_questions || 0) - answeredCount} întrebări fără răspuns
+          {t('education.unansweredWarning', { count: (quizData?.total_questions || 0) - answeredCount })}
         </p>
       )}
     </div>

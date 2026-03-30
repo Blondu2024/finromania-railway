@@ -69,7 +69,7 @@ export default function PortfolioPage() {
   };
 
   const resetPortfolio = async () => {
-    if (!window.confirm('Ești sigur că vrei să resetezi portofoliul? Toate pozițiile vor fi închise.')) {
+    if (!window.confirm(t('virtualPortfolio.resetConfirm'))) {
       return;
     }
 
@@ -94,7 +94,7 @@ export default function PortfolioPage() {
 
       if (res.ok) {
         const result = await res.json();
-        alert(`Poziție închisă!\nP&L: ${result.pnl.toFixed(2)} RON (${result.pnl_percent.toFixed(2)}%)`);
+        alert(`${t('virtualPortfolio.positionClosed')}\nP&L: ${result.pnl.toFixed(2)} RON (${result.pnl_percent.toFixed(2)}%)`);
         fetchPortfolio();
       }
     } catch (error) {
@@ -106,10 +106,10 @@ export default function PortfolioPage() {
     return (
       <div className="text-center py-12">
         <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-        <h2 className="text-xl font-semibold">Portofoliu Virtual</h2>
-        <p className="text-muted-foreground mb-4">Trebuie să fii conectat pentru a accesa portofoliul.</p>
+        <h2 className="text-xl font-semibold">{t('virtualPortfolio.title')}</h2>
+        <p className="text-muted-foreground mb-4">{t('virtualPortfolio.loginRequired')}</p>
         <Link to="/login">
-          <Button size="lg">Conectare</Button>
+          <Button size="lg">{t('virtualPortfolio.loginButton')}</Button>
         </Link>
       </div>
     );
@@ -125,27 +125,27 @@ export default function PortfolioPage() {
               <DollarSign className="w-12 h-12 text-orange-600" />
             </div>
             <Badge variant="destructive" className="text-lg px-4 py-2">
-              🚧 BETA - Coming Soon
+              🚧 {t('virtualPortfolio.betaComingSoon')}
             </Badge>
-            <h2 className="text-2xl font-bold">Portofoliu Virtual în Dezvoltare</h2>
+            <h2 className="text-2xl font-bold">{t('virtualPortfolio.inDevelopment')}</h2>
             <p className="text-muted-foreground">
-              Lucrăm la un portofoliu de trading profesional cu grafice live, leverage realistic și AI guidance.
+              {t('virtualPortfolio.developmentDesc')}
             </p>
             <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm text-blue-900">
-                💡 <strong>Între timp:</strong> Încearcă <Link to="/trading-school" className="text-blue-600 underline font-semibold">Trading School</Link> - 
-                Învață trading prin lecții interactive și quizzes!
+                💡 <strong>{t('virtualPortfolio.meanwhile')}</strong> {t('virtualPortfolio.meanwhileTry')} <Link to="/trading-school" className="text-blue-600 underline font-semibold">Trading School</Link> -
+                {t('virtualPortfolio.meanwhileDesc')}
               </p>
             </div>
             <div className="flex gap-3 justify-center">
               <Link to="/trading-school">
                 <Button size="lg">
-                  🎓 Începe Învățarea
+                  🎓 {t('virtualPortfolio.startLearning')}
                 </Button>
               </Link>
               <Link to="/">
                 <Button variant="outline" size="lg">
-                  ← Acasă
+                  ← {t('virtualPortfolio.home')}
                 </Button>
               </Link>
             </div>
@@ -159,7 +159,7 @@ export default function PortfolioPage() {
     return (
       <div className="text-center py-12">
         <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
-        <p>Se încarcă portofoliul...</p>
+        <p>{t('virtualPortfolio.loading')}</p>
       </div>
     );
   }
@@ -171,30 +171,30 @@ export default function PortfolioPage() {
         <Card className="border-2 border-blue-200">
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
-              🎉 Bine ai venit la Trading Simulator!
+              🎉 {t('virtualPortfolio.welcomeTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <Alert>
               <Info className="w-4 h-4" />
               <AlertDescription>
-                <strong>DEMO MODE:</strong> Folosești bani 100% virtuali (50,000 RON). Învață trading fără risc real!
+                <strong>{t('virtualPortfolio.demoMode')}</strong> {t('virtualPortfolio.demoDesc')}
               </AlertDescription>
             </Alert>
 
             <div>
-              <h3 className="font-semibold mb-2">📖 Ce vei învăța:</h3>
+              <h3 className="font-semibold mb-2">📖 {t('virtualPortfolio.whatYouLearn')}</h3>
               <ul className="space-y-2 text-sm">
-                <li>✓ Cum să cumperi și vinzi acțiuni</li>
-                <li>✓ Leverage (efect de levier) și riscuri</li>
-                <li>✓ Stop Loss pentru protecție</li>
-                <li>✓ Strategii de investiții</li>
-                <li>✓ Indicatori tehnici (RSI, MACD)</li>
+                <li>✓ {t('virtualPortfolio.learnBuySell')}</li>
+                <li>✓ {t('virtualPortfolio.learnLeverage')}</li>
+                <li>✓ {t('virtualPortfolio.learnStopLoss')}</li>
+                <li>✓ {t('virtualPortfolio.learnStrategies')}</li>
+                <li>✓ {t('virtualPortfolio.learnIndicators')}</li>
               </ul>
             </div>
 
             <div>
-              <h3 className="font-semibold mb-3">🎯 Selectează-ți nivelul de experiență:</h3>
+              <h3 className="font-semibold mb-3">🎯 {t('virtualPortfolio.selectLevel')}</h3>
               <div className="space-y-3">
                 <Card 
                   className="cursor-pointer hover:border-blue-500 transition-colors"
@@ -204,9 +204,9 @@ export default function PortfolioPage() {
                     <div className="flex items-start gap-3">
                       <span className="text-2xl">🌱</span>
                       <div className="flex-1">
-                        <h4 className="font-semibold">Începător</h4>
-                        <p className="text-sm text-muted-foreground">Leverage max 1:2, ghidare pas-cu-pas, protecții activate</p>
-                        <Badge variant="secondary" className="mt-2">Recomandat</Badge>
+                        <h4 className="font-semibold">{t('virtualPortfolio.beginner')}</h4>
+                        <p className="text-sm text-muted-foreground">{t('virtualPortfolio.beginnerDesc')}</p>
+                        <Badge variant="secondary" className="mt-2">{t('virtualPortfolio.recommended')}</Badge>
                       </div>
                     </div>
                   </CardContent>
@@ -220,8 +220,8 @@ export default function PortfolioPage() {
                     <div className="flex items-start gap-3">
                       <span className="text-2xl">🌿</span>
                       <div className="flex-1">
-                        <h4 className="font-semibold">Intermediar</h4>
-                        <p className="text-sm text-muted-foreground">Leverage max 1:5, warnings moderate</p>
+                        <h4 className="font-semibold">{t('virtualPortfolio.intermediate')}</h4>
+                        <p className="text-sm text-muted-foreground">{t('virtualPortfolio.intermediateDesc')}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -235,9 +235,9 @@ export default function PortfolioPage() {
                     <div className="flex items-start gap-3">
                       <span className="text-2xl">🌳</span>
                       <div className="flex-1">
-                        <h4 className="font-semibold">Avansat</h4>
-                        <p className="text-sm text-muted-foreground">Leverage max 1:10, protecții minime</p>
-                        <Badge variant="destructive" className="mt-2">Risc Ridicat</Badge>
+                        <h4 className="font-semibold">{t('virtualPortfolio.advanced')}</h4>
+                        <p className="text-sm text-muted-foreground">{t('virtualPortfolio.advancedDesc')}</p>
+                        <Badge variant="destructive" className="mt-2">{t('virtualPortfolio.highRisk')}</Badge>
                       </div>
                     </div>
                   </CardContent>
@@ -248,7 +248,7 @@ export default function PortfolioPage() {
             <Alert className="bg-yellow-50 border-yellow-200">
               <AlertTriangle className="w-4 h-4 text-yellow-600" />
               <AlertDescription className="text-yellow-800">
-                <strong>Important:</strong> Banii câștigați ușor, la fel de ușor se pierd. Învață strategii solide înainte de a risca!
+                <strong>{t('virtualPortfolio.importantWarning')}</strong> {t('virtualPortfolio.warningText')}
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -268,7 +268,7 @@ export default function PortfolioPage() {
       <Alert className="bg-green-50 border-green-200">
         <Info className="w-4 h-4 text-green-600" />
         <AlertDescription className="text-green-800">
-          <strong>🟢 DEMO MODE</strong> - Bani Virtuali · Capital: 50,000 RON · Nivel: <Badge variant="outline">{portfolio.experience_level}</Badge>
+          <strong>🟢 {t('virtualPortfolio.demoModeBanner')}</strong> - {t('virtualPortfolio.virtualMoney')} · {t('virtualPortfolio.capital')}: 50,000 RON · {t('virtualPortfolio.level')}: <Badge variant="outline">{portfolio.experience_level}</Badge>
         </AlertDescription>
       </Alert>
 
@@ -276,7 +276,7 @@ export default function PortfolioPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
-            <div className="text-sm text-muted-foreground mb-1">Valoare Totală</div>
+            <div className="text-sm text-muted-foreground mb-1">{t('virtualPortfolio.totalValue')}</div>
             <div className="text-2xl font-bold">{portfolio.total_value.toLocaleString('ro-RO')} RON</div>
             <div className={`text-sm flex items-center gap-1 ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
               {isProfitable ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
@@ -287,25 +287,25 @@ export default function PortfolioPage() {
 
         <Card>
           <CardContent className="p-4">
-            <div className="text-sm text-muted-foreground mb-1">Cash Disponibil</div>
+            <div className="text-sm text-muted-foreground mb-1">{t('virtualPortfolio.availableCash')}</div>
             <div className="text-2xl font-bold">{portfolio.cash.toLocaleString('ro-RO')} RON</div>
-            <div className="text-sm text-muted-foreground">Margin folosit: {portfolio.margin_used.toFixed(2)} RON</div>
+            <div className="text-sm text-muted-foreground">{t('virtualPortfolio.marginUsed')}: {portfolio.margin_used.toFixed(2)} RON</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4">
-            <div className="text-sm text-muted-foreground mb-1">Poziții Deschise</div>
+            <div className="text-sm text-muted-foreground mb-1">{t('virtualPortfolio.openPositionsCount')}</div>
             <div className="text-2xl font-bold">{portfolio.open_positions_count}</div>
-            <div className="text-sm text-muted-foreground">Valoare: {portfolio.positions_value.toFixed(2)} RON</div>
+            <div className="text-sm text-muted-foreground">{t('virtualPortfolio.positionsValue')}: {portfolio.positions_value.toFixed(2)} RON</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4">
-            <div className="text-sm text-muted-foreground mb-1">Leverage Maxim</div>
+            <div className="text-sm text-muted-foreground mb-1">{t('virtualPortfolio.maxLeverage')}</div>
             <div className="text-2xl font-bold">{portfolio.max_leverage}x</div>
-            <div className="text-sm text-muted-foreground">Tranzacții: {portfolio.trades_count}</div>
+            <div className="text-sm text-muted-foreground">{t('virtualPortfolio.trades')}: {portfolio.trades_count}</div>
           </CardContent>
         </Card>
       </div>
@@ -314,25 +314,25 @@ export default function PortfolioPage() {
       <div className="flex items-center gap-3 flex-wrap">
         <Button onClick={() => setShowTradeModal(true)}>
           <TrendingUp className="w-4 h-4 mr-2" />
-          Tranzacție Nouă
+          {t('virtualPortfolio.newTrade')}
         </Button>
         <Button variant="outline" onClick={fetchPortfolio}>
           <RefreshCw className="w-4 h-4 mr-2" />
-          Actualizează
+          {t('virtualPortfolio.refresh')}
         </Button>
         <Button variant="outline" onClick={resetPortfolio}>
-          🔄 Reset Portofoliu
+          🔄 {t('virtualPortfolio.resetPortfolio')}
         </Button>
         <Link to="/glossary">
           <Button variant="outline">
             <BookOpen className="w-4 h-4 mr-2" />
-            Glosar
+            {t('virtualPortfolio.glossary')}
           </Button>
         </Link>
         <Link to="/advisor">
           <Button variant="outline">
             <Bot className="w-4 h-4 mr-2" />
-            Consilier AI
+            {t('virtualPortfolio.aiAdvisor')}
           </Button>
         </Link>
       </div>
@@ -341,7 +341,7 @@ export default function PortfolioPage() {
       {portfolio.open_positions && portfolio.open_positions.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Poziții Deschise</CardTitle>
+            <CardTitle>{t('virtualPortfolio.openPositions')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -362,15 +362,15 @@ export default function PortfolioPage() {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                           <div>
-                            <div className="text-muted-foreground">Cantitate</div>
+                            <div className="text-muted-foreground">{t('virtualPortfolio.quantity')}</div>
                             <div className="font-medium">{pos.quantity}</div>
                           </div>
                           <div>
-                            <div className="text-muted-foreground">Entry</div>
+                            <div className="text-muted-foreground">{t('virtualPortfolio.entry')}</div>
                             <div className="font-medium">{pos.entry_price.toFixed(2)} RON</div>
                           </div>
                           <div>
-                            <div className="text-muted-foreground">Current</div>
+                            <div className="text-muted-foreground">{t('virtualPortfolio.current')}</div>
                             <div className="font-medium">{pos.current_price.toFixed(2)} RON</div>
                           </div>
                           <div>
@@ -392,7 +392,7 @@ export default function PortfolioPage() {
                         size="sm"
                         onClick={() => closePosition(pos.position_id)}
                       >
-                        Închide
+                        {t('virtualPortfolio.closePosition')}
                       </Button>
                     </div>
                   </CardContent>
@@ -409,7 +409,7 @@ export default function PortfolioPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="w-5 h-5" />
-              Realizări Deblocate
+              {t('virtualPortfolio.achievements')}
             </CardTitle>
           </CardHeader>
           <CardContent>

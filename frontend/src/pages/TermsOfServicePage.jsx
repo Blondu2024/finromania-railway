@@ -13,112 +13,99 @@ export default function TermsOfServicePage() {
       <SEO title="Terms of Service | FinRomania" description="FinRomania terms and conditions for using our financial education platform." />
       <Link to="/">
         <Button variant="ghost" size="sm">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Înapoi
+          <ArrowLeft className="w-4 h-4 mr-2" /> {t('termsPage.backButton')}
         </Button>
       </Link>
 
       <div className="flex items-center gap-3">
         <FileText className="w-8 h-8 text-blue-600" />
-        <h1 className="text-3xl font-bold">Termeni și Condiții</h1>
+        <h1 className="text-3xl font-bold">{t('termsPage.title')}</h1>
       </div>
-      
-      <p className="text-muted-foreground">Ultima actualizare: 23 Decembrie 2025</p>
+
+      <p className="text-muted-foreground">{t('termsPage.lastUpdated')}</p>
 
       <Card>
         <CardContent className="prose dark:prose-invert max-w-none p-6 space-y-6">
           <section>
-            <h2 className="text-xl font-semibold">1. Acceptarea termenilor</h2>
+            <h2 className="text-xl font-semibold">{t('termsPage.section1Title')}</h2>
             <p>
-              Prin accesarea și utilizarea platformei FinRomania, acceptați să fiți legat de acești 
-              Termeni și Condiții. Dacă nu sunteți de acord cu acești termeni, vă rugăm să nu 
-              utilizați site-ul nostru.
+              {t('termsPage.section1Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">2. Descrierea serviciului</h2>
+            <h2 className="text-xl font-semibold">{t('termsPage.section2Title')}</h2>
             <p>
-              FinRomania este o platformă de informare financiară care oferă:
+              {t('termsPage.section2Text')}
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Știri financiare din surse românești</li>
-              <li>Informații despre acțiuni de pe Bursa de Valori București</li>
-              <li>Cursuri valutare de la Banca Națională a României</li>
-              <li>Informații despre indici bursieri globali</li>
+              <li>{t('termsPage.section2Item1')}</li>
+              <li>{t('termsPage.section2Item2')}</li>
+              <li>{t('termsPage.section2Item3')}</li>
+              <li>{t('termsPage.section2Item4')}</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">3. Disclaimer financiar</h2>
+            <h2 className="text-xl font-semibold">{t('termsPage.section3Title')}</h2>
             <p className="font-semibold text-red-600 dark:text-red-400">
-              IMPORTANT: Informațiile prezentate pe FinRomania au caracter exclusiv informativ și 
-              NU constituie sfaturi de investiții, recomandări financiare sau îndemnuri de a cumpăra 
-              sau vinde instrumente financiare.
+              {t('termsPage.section3Text1')}
             </p>
             <p>
-              Deciziile de investiții trebuie luate pe baza propriei cercetări și, dacă este necesar, 
-              cu consultarea unui consilier financiar autorizat. Nu ne asumăm responsabilitatea pentru 
-              pierderile financiare rezultate din decizii bazate pe informațiile de pe această platformă.
+              {t('termsPage.section3Text2')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">4. Proprietate intelectuală</h2>
+            <h2 className="text-xl font-semibold">{t('termsPage.section4Title')}</h2>
             <p>
-              Conținutul platformei FinRomania, inclusiv logo-ul, designul, textele și codul sursă, 
-              este protejat de drepturile de autor. Știrile agregate sunt proprietatea surselor 
-              originale și sunt utilizate conform legilor privind drepturile de autor.
+              {t('termsPage.section4Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">5. Surse de date</h2>
-            <p>Datele prezentate provin din următoarele surse:</p>
+            <h2 className="text-xl font-semibold">{t('termsPage.section5Title')}</h2>
+            <p>{t('termsPage.section5Text')}</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>Știri:</strong> Ziarul Financiar, Profit.ro, Bursa, Wall-Street.ro, Capital.ro</li>
-              <li><strong>Cursuri valutare:</strong> Banca Națională a României (BNR)</li>
-              <li><strong>Indici globali:</strong> Yahoo Finance</li>
-              <li><strong>Date BVB:</strong> Date simulate (în curs de implementare date reale)</li>
+              <li><strong>{t('termsPage.section5Item1Label')}</strong> {t('termsPage.section5Item1Text')}</li>
+              <li><strong>{t('termsPage.section5Item2Label')}</strong> {t('termsPage.section5Item2Text')}</li>
+              <li><strong>{t('termsPage.section5Item3Label')}</strong> {t('termsPage.section5Item3Text')}</li>
+              <li><strong>{t('termsPage.section5Item4Label')}</strong> {t('termsPage.section5Item4Text')}</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">6. Limitarea răspunderii</h2>
+            <h2 className="text-xl font-semibold">{t('termsPage.section6Title')}</h2>
             <p>
-              FinRomania nu garantează acuratețea, completitudinea sau actualitatea informațiilor 
-              prezentate. Datele pot fi întârziate sau pot conține erori. Utilizați informațiile 
-              pe propria răspundere.
+              {t('termsPage.section6Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">7. Disponibilitatea serviciului</h2>
+            <h2 className="text-xl font-semibold">{t('termsPage.section7Title')}</h2>
             <p>
-              Ne rezervăm dreptul de a modifica, suspenda sau întrerupe serviciul în orice moment, 
-              fără notificare prealabilă. Nu garantăm disponibilitatea continuă a platformei.
+              {t('termsPage.section7Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">8. Modificări ale termenilor</h2>
+            <h2 className="text-xl font-semibold">{t('termsPage.section8Title')}</h2>
             <p>
-              Ne rezervăm dreptul de a modifica acești Termeni și Condiții în orice moment. 
-              Continuarea utilizării platformei după modificări constituie acceptarea noilor termeni.
+              {t('termsPage.section8Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">9. Legislație aplicabilă</h2>
+            <h2 className="text-xl font-semibold">{t('termsPage.section9Title')}</h2>
             <p>
-              Acești termeni sunt guvernați de legile României. Orice dispută va fi soluționată 
-              de instanțele competente din România.
+              {t('termsPage.section9Text')}
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold">10. Contact</h2>
+            <h2 className="text-xl font-semibold">{t('termsPage.section10Title')}</h2>
             <p>
-              Pentru întrebări despre acești Termeni și Condiții: <strong>contact@finromania.ro</strong>
+              {t('termsPage.section10Text')} <strong>contact@finromania.ro</strong>
             </p>
           </section>
         </CardContent>
