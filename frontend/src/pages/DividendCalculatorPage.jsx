@@ -104,11 +104,11 @@ const DividendStocksTable = ({ stocks, onAddToPortfolio }) => {
 const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
   const addHolding = (symbol) => {
     if (portfolio.find(h => h.symbol === symbol)) {
-      toast.error('Acțiunea există deja în portofoliu');
+      toast.error(t('dividends.alreadyInPortfolio'));
       return;
     }
     setPortfolio([...portfolio, { symbol, shares: 100 }]);
-    toast.success(`${symbol} adăugat în portofoliu`);
+    toast.success(`${symbol} ${t('dividends.addedToPortfolio')}`);
   };
 
   const removeHolding = (symbol) => {
@@ -170,7 +170,7 @@ const PortfolioBuilder = ({ portfolio, setPortfolio, stocks }) => {
                       className="w-24 text-right"
                       min="1"
                     />
-                    <span className="text-sm text-muted-foreground">acț.</span>
+                    <span className="text-sm text-muted-foreground">{t('common.sharesAbbr')}</span>
                   </div>
                   <div className="text-right min-w-[80px]">
                     <div className="text-green-600 font-bold">{dividendValue.toFixed(2)} RON</div>
@@ -443,7 +443,7 @@ const DividendHistoryTab = ({ isPro }) => {
       }
     } catch (err) {
       console.error('Error fetching analysis:', err);
-      toast.error('Eroare la încărcarea analizei');
+      toast.error(t('dividends.analysisError'));
     } finally {
       setLoadingAnalysis(false);
     }
@@ -452,13 +452,13 @@ const DividendHistoryTab = ({ isPro }) => {
   const toggleCompare = (symbol) => {
     setCompareSymbols(prev => {
       if (prev.includes(symbol)) return prev.filter(s => s !== symbol);
-      if (prev.length >= 4) { toast.error('Maxim 4 acțiuni pentru comparație'); return prev; }
+      if (prev.length >= 4) { toast.error(t('dividends.maxCompare')); return prev; }
       return [...prev, symbol];
     });
   };
 
   const runCompare = async () => {
-    if (compareSymbols.length < 2) { toast.error('Selectează minim 2 acțiuni'); return; }
+    if (compareSymbols.length < 2) { toast.error(t('dividends.minCompare')); return; }
     setLoadingCompare(true);
     try {
       const res = await fetch(`${API_URL}/api/bvb-dividends/compare?symbols=${compareSymbols.join(',')}`);
@@ -470,7 +470,7 @@ const DividendHistoryTab = ({ isPro }) => {
       }
     } catch (err) {
       console.error('Error comparing:', err);
-      toast.error('Eroare la comparație');
+      toast.error(t('dividends.compareError'));
     } finally {
       setLoadingCompare(false);
     }
@@ -627,7 +627,7 @@ const DividendHistoryTab = ({ isPro }) => {
                 </details>
 
                 <Button variant="ghost" size="sm" onClick={() => { setAnalysis(null); setSelectedSymbol(null); }}>
-                  Închide analiza
+                  {t('dividends.closeAnalysis')}
                 </Button>
               </CardContent>
             </Card>
@@ -756,7 +756,7 @@ const DividendHistoryTab = ({ isPro }) => {
                 <span className="text-xs text-muted-foreground">({compareSymbols.length}/4)</span>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="ghost" onClick={() => { setCompareSymbols([]); setCompareData(null); }}>Anulează</Button>
+                <Button size="sm" variant="ghost" onClick={() => { setCompareSymbols([]); setCompareData(null); }}>{t('common.cancel')}</Button>
                 <Button
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700"
@@ -788,7 +788,7 @@ const DividendHistoryTab = ({ isPro }) => {
           {loadingRankings ? (
             <div className="text-center py-8">
               <RefreshCw className="w-8 h-8 mx-auto animate-spin text-muted-foreground" />
-              <p className="text-sm text-muted-foreground mt-2">Se calculează scorurile...</p>
+              <p className="text-sm text-muted-foreground mt-2">{t('dividends.calculatingScores')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -920,7 +920,7 @@ export default function DividendCalculatorPage() {
         }
       } catch (err) {
         console.error('Error fetching stocks:', err);
-        toast.error('Eroare la încărcarea acțiunilor');
+        toast.error(t('dividends.stocksLoadError'));
       } finally {
         setLoadingStocks(false);
       }
@@ -930,7 +930,7 @@ export default function DividendCalculatorPage() {
 
   const addToPortfolio = (stock) => {
     if (portfolio.find(h => h.symbol === stock.symbol)) {
-      toast.error('Acțiunea există deja în portofoliu');
+      toast.error(t('dividends.alreadyInPortfolio'));
       return;
     }
     setPortfolio([...portfolio, { symbol: stock.symbol, shares: 100 }]);
@@ -1033,7 +1033,7 @@ export default function DividendCalculatorPage() {
                     <div className="flex items-center justify-between">
                       <Label className="flex items-center gap-2">
                         <RefreshCw className="w-4 h-4" />
-                        Reinvestire dividende
+                        {t('dividends.reinvestDividends')}
                       </Label>
                       <Switch checked={reinvest} onCheckedChange={setReinvest} />
                     </div>
