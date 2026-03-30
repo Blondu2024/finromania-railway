@@ -125,7 +125,7 @@ export default function QuickCalculator({ user }) {
             <Link to="/pricing">
               <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
                 <Crown className="w-4 h-4 mr-2" />
-                Upgrade la PRO - 49 RON/lună
+                {t('fiscal.upgradeProQuick')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -137,7 +137,7 @@ export default function QuickCalculator({ user }) {
           <Link to="/calculator-fiscal">
             <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600">
               <Calculator className="w-4 h-4 mr-2" />
-              Calculează Detaliat (Versiunea Completă)
+              {t('fiscal.calculateDetailed')}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>

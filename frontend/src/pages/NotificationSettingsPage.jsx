@@ -141,7 +141,7 @@ export default function NotificationSettingsPage() {
       
       if (permission === 'granted') {
         new Notification('🔔 FinRomania', {
-          body: 'Notificările sunt acum activate!',
+          body: t('notifications.activated'),
           icon: '/favicon.ico'
         });
       }
@@ -209,7 +209,7 @@ export default function NotificationSettingsPage() {
     <>
       <SEO
         title="{t('notifications.title')} | FinRomania"
-        description="Personalizează notificările pentru alerte de preț, știri și evenimente BVB."
+        description={t('notifications.chooseNotifications')}
       />
 
       <div className="max-w-3xl mx-auto space-y-6">
@@ -223,7 +223,7 @@ export default function NotificationSettingsPage() {
             {t('notifications.title')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Alege ce notificări vrei să primești
+            {t('notifications.chooseNotifications')}
           </p>
         </motion.div>
 
@@ -241,13 +241,13 @@ export default function NotificationSettingsPage() {
                     <div>
                       <p className="font-semibold">{t('notifications.enableBrowser')}</p>
                       <p className="text-sm text-muted-foreground">
-                        Pentru a primi notificări, trebuie să le activezi în browser.
+                        {t('notifications.enableBrowserDesc')}
                       </p>
                     </div>
                   </div>
                   <Button onClick={requestPermission}>
                     <Smartphone className="w-4 h-4 mr-2" />
-                    Activează
+                    {t('notifications.activate')}
                   </Button>
                 </div>
               </CardContent>
@@ -272,10 +272,10 @@ export default function NotificationSettingsPage() {
             <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <MailCheck className="w-5 h-5" />
-                Email Zilnic — Rezumatul Bursei
+                {t('notifications.dailyEmailTitle')}
               </CardTitle>
               <CardDescription className="text-blue-100">
-                Primești un email după ora 18:05, după închiderea BVB
+                {t('notifications.dailyEmailDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-5">
@@ -285,18 +285,18 @@ export default function NotificationSettingsPage() {
                     <Mail className={`w-5 h-5 ${emailSubscribed ? 'text-green-600' : 'text-muted-foreground'}`} />
                   </div>
                   <div>
-                    <p className="font-medium">Rezumat Zilnic BVB</p>
+                    <p className="font-medium">{t('notifications.dailySummaryBVB')}</p>
                     <p className="text-sm text-muted-foreground">
                       {emailSubscribed
-                        ? `Activ — emailul vine zilnic la ${user?.email}`
-                        : 'Dezactivat — nu primești emailul zilnic'}
+                        ? t('notifications.emailActiveAt', { email: user?.email })
+                        : t('notifications.emailDisabled')}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   {emailSaved && (
                     <Badge variant="outline" className="text-green-600 border-green-300">
-                      <Check className="w-3 h-3 mr-1" /> Salvat!
+                      <Check className="w-3 h-3 mr-1" /> {t('notifications.saved')}
                     </Badge>
                   )}
                   {emailLoading ? (
@@ -313,7 +313,7 @@ export default function NotificationSettingsPage() {
               {emailSubscribed && (
                 <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 text-sm text-green-700 dark:text-green-400 flex items-start gap-2">
                   <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>Ești abonat! Vei primi rezumatul zilnic la <strong>{user?.email}</strong> după ora 18:05 în zilele de tranzacționare.</span>
+                  <span dangerouslySetInnerHTML={{ __html: t('notifications.subscribedConfirmation', { email: user?.email }) }} />
                 </div>
               )}
             </CardContent>
@@ -322,13 +322,13 @@ export default function NotificationSettingsPage() {
 
         {/* Market Notifications */}
         <CategorySection
-          title="📈 Piață"
+          title={`📈 ${t('notifications.marketCategory')}`}
           icon={TrendingUp}
           color="from-blue-500 to-blue-600"
         >
           <ToggleItem
-            label="{t('notifications.exchangeSchedule')}"
-            description="Notificare când BVB se deschide (10:00) și se închide (18:00)"
+            label={t('notifications.exchangeSchedule')}
+            description={t('notifications.openCloseDesc')}
             checked={preferences.market_open_close}
             onChange={(v) => updatePreference('market_open_close', v)}
             icon={Globe}

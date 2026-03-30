@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   BarChart3, TrendingUp, TrendingDown, X, Plus, Search,
@@ -15,6 +16,7 @@ import StockLogo from './StockLogo';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function StockCompare({ initialSymbols = [], onClose }) {
+  const { t } = useTranslation();
   const [symbols, setSymbols] = useState(initialSymbols);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -103,17 +105,17 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
   };
 
   const metrics = [
-    { key: 'price', label: 'Preț', type: 'price', icon: DollarSign },
-    { key: 'change_percent', label: 'Variație Azi', type: 'percent', icon: TrendingUp },
-    { key: 'volume', label: 'Volum', type: 'number', icon: BarChart3 },
-    { key: 'pe_ratio', label: 'P/E Ratio', type: 'ratio', icon: Target },
-    { key: 'dividend_yield', label: 'Dividend Yield', type: 'percent', icon: Percent },
-    { key: 'roe', label: 'ROE', type: 'percent', icon: Activity },
-    { key: 'rsi', label: 'RSI (14)', type: 'ratio', icon: Activity },
-    { key: '52_week_high', label: '52W High', type: 'price', icon: TrendingUp },
-    { key: '52_week_low', label: '52W Low', type: 'price', icon: TrendingDown },
-    { key: 'pct_from_52w_high', label: 'vs 52W High', type: 'percent', icon: ArrowUpDown },
-    { key: 'pct_from_52w_low', label: 'vs 52W Low', type: 'percent', icon: ArrowUpDown },
+    { key: 'price', labelKey: 'compare.price', type: 'price', icon: DollarSign },
+    { key: 'change_percent', labelKey: 'compare.variationToday', type: 'percent', icon: TrendingUp },
+    { key: 'volume', labelKey: 'compare.volume', type: 'number', icon: BarChart3 },
+    { key: 'pe_ratio', labelKey: 'compare.peRatio', type: 'ratio', icon: Target },
+    { key: 'dividend_yield', labelKey: 'compare.dividendYield', type: 'percent', icon: Percent },
+    { key: 'roe', labelKey: 'compare.roe', type: 'percent', icon: Activity },
+    { key: 'rsi', labelKey: 'compare.rsi14', type: 'ratio', icon: Activity },
+    { key: '52_week_high', labelKey: 'compare.high52w', type: 'price', icon: TrendingUp },
+    { key: '52_week_low', labelKey: 'compare.low52w', type: 'price', icon: TrendingDown },
+    { key: 'pct_from_52w_high', labelKey: 'compare.vsHigh52w', type: 'percent', icon: ArrowUpDown },
+    { key: 'pct_from_52w_low', labelKey: 'compare.vsLow52w', type: 'percent', icon: ArrowUpDown },
   ];
 
   return (
@@ -223,7 +225,7 @@ export default function StockCompare({ initialSymbols = [], onClose }) {
                     <td className="p-2">
                       <div className="flex items-center gap-2">
                         <metric.icon className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-medium text-sm">{metric.label}</span>
+                        <span className="font-medium text-sm">{t(metric.labelKey)}</span>
                       </div>
                     </td>
                     {comparisonData.map(stock => {
