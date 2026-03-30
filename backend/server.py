@@ -147,6 +147,7 @@ class StockResponse(BaseModel):
     high: Optional[float] = None
     low: Optional[float] = None
     currency: Optional[str] = None
+    sector: Optional[str] = None
     market: Optional[str] = None
     source: Optional[str] = None
     is_mock: Optional[bool] = False
