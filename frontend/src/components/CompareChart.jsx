@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createChart, ColorType } from 'lightweight-charts';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -15,12 +16,13 @@ const TIMEFRAMES = [
   { label: '1A', value: '1y' },
 ];
 
-const MODES = [
-  { label: 'Performanță %', value: 'percent', icon: TrendingUp },
-  { label: 'Volum', value: 'volume', icon: BarChart3 },
-];
-
 export default function CompareChart({ symbols = [] }) {
+  const { t } = useTranslation();
+
+  const MODES = [
+    { label: t('chart.performance'), value: 'percent', icon: TrendingUp },
+    { label: t('chart.volume'), value: 'volume', icon: BarChart3 },
+  ];
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
   const [mode, setMode] = useState('percent');
@@ -228,7 +230,7 @@ export default function CompareChart({ symbols = [] }) {
         <div ref={chartContainerRef} className="w-full rounded-lg overflow-hidden" />
       ) : (
         <div className="h-[280px] flex items-center justify-center bg-muted/30 rounded-lg">
-          <p className="text-sm text-muted-foreground">Nu sunt date disponibile</p>
+          <p className="text-sm text-muted-foreground">{t('chart.noData')}</p>
         </div>
       )}
 

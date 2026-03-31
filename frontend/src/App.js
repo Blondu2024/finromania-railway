@@ -478,7 +478,7 @@ function Footer() {
         </div>
         <div className="border-t pt-4 text-center">
           <p className="text-xs text-muted-foreground">
-            © 2025 FinRomania - Toate drepturile rezervate
+            {t('footer.copyright')}
           </p>
         </div>
       </div>
@@ -490,6 +490,21 @@ function Footer() {
 // ============================================
 // ERROR BOUNDARY
 // ============================================
+function ErrorFallback() {
+  const { t } = useTranslation();
+  return (
+    <div className="min-h-screen flex items-center justify-center p-8">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-4">{t('error.title')}</h1>
+        <p className="text-muted-foreground mb-4">{t('error.message')}</p>
+        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+          {t('error.reload')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -500,17 +515,7 @@ class ErrorBoundary extends React.Component {
   }
   render() {
     if (this.state.hasError) {
-      return (
-        <div className="min-h-screen flex items-center justify-center p-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Ceva nu a mers bine</h1>
-            <p className="text-muted-foreground mb-4">Reincarca pagina pentru a continua.</p>
-            <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-              Reincarca
-            </button>
-          </div>
-        </div>
-      );
+      return <ErrorFallback />;
     }
     return this.props.children;
   }

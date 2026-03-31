@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertTriangle, TrendingUp, TrendingDown, Info, HelpCircle, DollarSign } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
@@ -13,6 +14,7 @@ import { Link } from 'react-router-dom';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
+  const { t } = useTranslation();
   const [stocks, setStocks] = useState([]);
   const [selectedStock, setSelectedStock] = useState(null);
   const [quantity, setQuantity] = useState(10);
@@ -84,21 +86,21 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
       const result = await res.json();
 
       if (res.ok) {
-        alert(`✅ Tranzacție executată!\nMargin folosit: ${result.margin_used.toFixed(2)} RON\nCash rămas: ${result.remaining_cash.toFixed(2)} RON`);
+        alert(t('trade.successAlert', {margin: result.margin_used.toFixed(2), cash: result.remaining_cash.toFixed(2)}));
         
         if (result.new_achievements && result.new_achievements.length > 0) {
-          alert(`🏆 Realizare nouă: ${result.new_achievements.join(', ')}`);
+          alert(t('trade.achievementAlert', {achievements: result.new_achievements.join(', ')}));
         }
         
         onSuccess();
         resetForm();
         onClose();
       } else {
-        alert(`❌ Eroare: ${result.detail}`);
+        alert(t('trade.errorAlert', {detail: result.detail}));
       }
     } catch (error) {
       console.error('Error executing trade:', error);
-      alert('Eroare la executarea tranzacției');
+      alert(t('trade.executionError'));
     } finally {
       setLoading(false);
     }
@@ -126,35 +128,35 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-orange-600">
               <AlertTriangle className="w-5 h-5" />
-              Atenție: Risc Ridicat!
+              {t('trade.leverageWarningTitle')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <Alert className="bg-orange-50 border-orange-200">
               <AlertDescription className="text-orange-800">
-                <strong>Leverage {leverage}x înseamnă:</strong>
+                <strong>{t('trade.leverageMeans', {leverage})}</strong>
                 <ul className="mt-2 space-y-1 list-disc list-inside">
-                  <li>Controlezi {leverage}x mai mulți bani</li>
-                  <li>Profiturile sunt amplificate cu {leverage}x</li>
-                  <li>⚠️ Pierderile sunt amplificate cu {leverage}x</li>
+                  <li>{t('trade.leverageControl', {leverage})}</li>
+                  <li>{t('trade.leverageProfit', {leverage})}</li>
+                  <li>{t('trade.leverageLoss', {leverage})}</li>
                 </ul>
               </AlertDescription>
             </Alert>
 
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">Exemplu:</h4>
-              <p className="text-sm">• Investești: {marginRequired.toFixed(2)} RON</p>
-              <p className="text-sm">• Controlezi: {positionValue.toFixed(2)} RON</p>
-              <p className="text-sm text-red-600 font-medium">• Dacă scade {(100/leverage).toFixed(0)}% → Pierzi tot capitalul!</p>
+              <h4 className="font-semibold mb-2">{t('trade.example')}</h4>
+              <p className="text-sm">• {t('trade.youInvest')} {marginRequired.toFixed(2)} RON</p>
+              <p className="text-sm">• {t('trade.youControl')} {positionValue.toFixed(2)} RON</p>
+              <p className="text-sm text-red-600 font-medium">• {t('trade.leverageRisk', {pct: (100/leverage).toFixed(0)})}</p>
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-medium">❓ Știi cum funcționează leverage-ul?</p>
+              <p className="text-sm font-medium">{t('trade.leverageQuestion')}</p>
               <div className="flex gap-2">
                 <Link to="/advisor" onClick={handleClose}>
                   <Button variant="outline" size="sm">
                     <HelpCircle className="w-4 h-4 mr-2" />
-                    Învață despre Leverage
+                    {t('trade.learnLeverage')}
                   </Button>
                 </Link>
               </div>
@@ -163,16 +165,16 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
             <Alert>
               <Info className="w-4 h-4" />
               <AlertDescription>
-                💡 Recomandare: Începe cu leverage 1x (fără levier) până înveți.
+                {t('trade.leverageRecommendation')}
               </AlertDescription>
             </Alert>
           </div>
           <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={() => setShowLeverageWarning(false)}>
-              Înapoi
+              {t('common.back')}
             </Button>
             <Button onClick={handleSubmit} disabled={loading}>
-              Am Înțeles, Continuă
+              {t('trade.understoodContinue')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -188,25 +190,25 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-yellow-600">
               <AlertTriangle className="w-5 h-5" />
-              Tranzacție fără protecție!
+              {t('trade.noProtection')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <Alert className="bg-yellow-50 border-yellow-200">
               <AlertDescription className="text-yellow-800">
-                <strong>Nu ai setat Stop Loss!</strong>
-                <p className="mt-2">Riscul: Poți pierde mai mult decât planifici.</p>
+                <strong>{t('trade.noStopLoss')}</strong>
+                <p className="mt-2">{t('trade.stopLossRisk')}</p>
               </AlertDescription>
             </Alert>
 
             <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">💡 Ce este Stop Loss?</h4>
-              <p className="text-sm">Stop Loss închide automat poziția când prețul scade la un nivel setat de tine, limitând pierderile.</p>
-              <p className="text-sm mt-2"><strong>Exemplu:</strong> Cumperi la {currentPrice} RON, setezi SL la {(currentPrice * 0.95).toFixed(2)} RON (-5%). Dacă scade, poziția se închide automat.</p>
+              <h4 className="font-semibold mb-2">{t('trade.whatIsStopLoss')}</h4>
+              <p className="text-sm">{t('trade.stopLossExplanation')}</p>
+              <p className="text-sm mt-2">{t('trade.stopLossExample', {price: currentPrice, sl: (currentPrice * 0.95).toFixed(2)})}</p>
             </div>
 
             <div className="space-y-2">
-              <Label>Sugestie Stop Loss (recomandat):</Label>
+              <Label>{t('trade.stopLossSuggestion')}</Label>
               <div className="flex gap-2">
                 <Button 
                   variant="outline" 
@@ -233,10 +235,10 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
           </div>
           <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={() => setShowNoStopLossWarning(false)}>
-              Adaugă Stop Loss
+              {t('trade.addStopLoss')}
             </Button>
             <Button variant="destructive" onClick={handleSubmit} disabled={loading}>
-              Continuă fără SL (risc)
+              {t('trade.continueWithoutSL')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -249,16 +251,16 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Tranzacție Nouă</DialogTitle>
+          <DialogTitle className="text-2xl">{t('trade.newTrade')}</DialogTitle>
           <DialogDescription>
-            Capital disponibil: <strong>{portfolio?.cash.toLocaleString('ro-RO')} RON</strong>
+            {t('trade.availableCapital')}: <strong>{portfolio?.cash.toLocaleString('ro-RO')} RON</strong>
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Stock Selection */}
           <div className="space-y-2">
-            <Label>Acțiune BVB</Label>
+            <Label>{t('trade.bvbStock')}</Label>
             <Select 
               value={selectedStock?.symbol} 
               onValueChange={(val) => setSelectedStock(stocks.find(s => s.symbol === val))}
@@ -276,8 +278,8 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
             </Select>
             {selectedStock && (
               <p className="text-sm text-muted-foreground">
-                Preț curent: <strong>{selectedStock.price} RON</strong> • 
-                Variație: <span className={selectedStock.change_percent >= 0 ? 'text-green-600' : 'text-red-600'}>
+                {t('trade.currentPrice')} <strong>{selectedStock.price} RON</strong> •
+                {t('trade.variation')} <span className={selectedStock.change_percent >= 0 ? 'text-green-600' : 'text-red-600'}>
                   {selectedStock.change_percent >= 0 ? '+' : ''}{selectedStock.change_percent}%
                 </span>
               </p>
@@ -286,7 +288,7 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
 
           {/* Position Type */}
           <div className="space-y-2">
-            <Label>Tip Poziție</Label>
+            <Label>{t('trade.positionType')}</Label>
             <div className="flex gap-2">
               <Button
                 variant={positionType === 'long' ? 'default' : 'outline'}
@@ -294,7 +296,7 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
                 className="flex-1"
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
-                LONG (Cumpără)
+                {t('trade.long')}
               </Button>
               <Button
                 variant={positionType === 'short' ? 'default' : 'outline'}
@@ -303,17 +305,17 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
                 disabled={portfolio?.experience_level === 'beginner'}
               >
                 <TrendingDown className="w-4 h-4 mr-2" />
-                SHORT (Vinde în lipsă)
+                {t('trade.short')}
               </Button>
             </div>
             {portfolio?.experience_level === 'beginner' && (
-              <p className="text-xs text-muted-foreground">SHORT disponibil de la nivel Intermediar</p>
+              <p className="text-xs text-muted-foreground">{t('trade.shortLocked')}</p>
             )}
           </div>
 
           {/* Quantity */}
           <div className="space-y-2">
-            <Label>Cantitate</Label>
+            <Label>{t('trade.quantity')}</Label>
             <Input 
               type="number" 
               value={quantity} 
@@ -325,7 +327,7 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
           {/* Leverage Slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>Leverage (Efect de levier)</Label>
+              <Label>{t('trade.leverageLabel')}</Label>
               <Badge variant={leverage > 1.5 ? 'destructive' : 'secondary'}>
                 {leverage}x
               </Badge>
@@ -338,14 +340,14 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
               step={0.5}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>1x (Fără levier)</span>
+              <span>1x ({t('trade.noLeverage')})</span>
               <span>Max: {maxLeverage}x</span>
             </div>
             {leverage > 1 && (
               <Alert className="bg-orange-50 border-orange-200">
                 <AlertTriangle className="w-4 h-4 text-orange-600" />
                 <AlertDescription className="text-orange-800 text-sm">
-                  Cu {leverage}x leverage, profitul ȘI pierderea se multiplică cu {leverage}!
+                  {t('trade.leverageNote', {leverage})}
                 </AlertDescription>
               </Alert>
             )}
@@ -354,7 +356,7 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
           {/* Stop Loss & Take Profit */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Stop Loss (RON) - Recomandat</Label>
+              <Label>{t('trade.stopLossLabel')}</Label>
               <Input 
                 type="number" 
                 value={stopLoss} 
@@ -364,7 +366,7 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
               />
             </div>
             <div className="space-y-2">
-              <Label>Take Profit (RON) - Opțional</Label>
+              <Label>{t('trade.takeProfitLabel')}</Label>
               <Input 
                 type="number" 
                 value={takeProfit} 
@@ -377,17 +379,17 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
 
           {/* Preview */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
-            <h4 className="font-semibold text-blue-900">Preview Tranzacție:</h4>
+            <h4 className="font-semibold text-blue-900">{t('trade.preview')}</h4>
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>Valoare poziție:</div>
+              <div>{t('trade.positionValue')}</div>
               <div className="font-medium text-right">{positionValue.toFixed(2)} RON</div>
-              
-              <div>Margin necesar:</div>
+
+              <div>{t('trade.marginRequired')}</div>
               <div className="font-medium text-right">{marginRequired.toFixed(2)} RON</div>
-              
-              <div>Cash după:</div>
+
+              <div>{t('trade.cashAfter')}</div>
               <div className={`font-medium text-right ${canAfford ? 'text-green-600' : 'text-red-600'}`}>
-                {canAfford ? (portfolio.cash - marginRequired).toFixed(2) : 'Insuficient'} RON
+                {canAfford ? (portfolio.cash - marginRequired).toFixed(2) : t('trade.insufficient')} RON
               </div>
             </div>
           </div>
@@ -396,7 +398,7 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
             <Alert variant="destructive">
               <AlertTriangle className="w-4 h-4" />
               <AlertDescription>
-                Cash insuficient! Reduce cantitatea sau leverage-ul.
+                {t('trade.insufficientCash')}
               </AlertDescription>
             </Alert>
           )}
@@ -404,14 +406,14 @@ export default function TradeModal({ open, onClose, onSuccess, portfolio }) {
 
         <DialogFooter className="flex gap-2">
           <Button variant="outline" onClick={handleClose}>
-            Anulează
+            {t('common.cancel')}
           </Button>
           <Button 
             onClick={handleSubmit} 
             disabled={!canAfford || loading || !selectedStock}
           >
             <DollarSign className="w-4 h-4 mr-2" />
-            {loading ? 'Procesare...' : 'Execută Tranzacția'}
+            {loading ? t('common.processing') : t('trade.execute')}
           </Button>
         </DialogFooter>
       </DialogContent>

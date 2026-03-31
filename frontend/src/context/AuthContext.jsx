@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { signInWithGoogle, firebaseSignOut } from '../config/firebase';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -8,6 +9,7 @@ const USER_KEY = 'finromania_user';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const { t } = useTranslation();
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem(USER_KEY);
     return savedUser ? JSON.parse(savedUser) : null;
@@ -111,18 +113,18 @@ export function AuthProvider({ children }) {
         } else {
           const error = await response.json();
           console.error('[Auth] Backend login error:', error);
-          alert('Eroare la autentificare. Încearcă din nou.');
+          alert(t('auth.error'));
         }
       } else {
         console.error('[Auth] Firebase login failed:', result.error);
         // Don't show error for user cancellation
         if (!result.error?.includes('popup-closed')) {
-          alert('Nu s-a putut realiza conectarea. Încearcă din nou.');
+          alert(t('auth.loginFailed'));
         }
       }
     } catch (error) {
       console.error('[Auth] Login error:', error);
-      alert('Eroare la conectare. Verifică conexiunea la internet.');
+      alert(t('auth.connectionError'));
     } finally {
       setLoading(false);
     }

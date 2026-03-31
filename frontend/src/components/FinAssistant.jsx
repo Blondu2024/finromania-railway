@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Bot, User, Sparkles, Bug, Lightbulb, HelpCircle, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
@@ -7,27 +8,29 @@ import { Textarea } from './ui/textarea';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-const SUGGESTIONS = [
-  "Cum setez alertă de preț?",
-  "Unde văd dividendele?",
-  "Ce e Screener PRO?",
-  "Cum devin PRO?",
+const SUGGESTIONS_KEYS = [
+  'finAssistant.suggestion1',
+  'finAssistant.suggestion2',
+  'finAssistant.suggestion3',
+  'finAssistant.suggestion4',
 ];
 
 export default function FinAssistant() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: 'Salut! 👋 Sunt asistentul FinRomania. Te pot ajuta să descoperi funcțiile platformei sau poți trimite feedback. Ce vrei să faci?'
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [feedbackMode, setFeedbackMode] = useState(null); // null, 'bug', 'idea', 'question'
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([{ role: 'assistant', content: t('finAssistant.welcome') }]);
+    }
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -39,7 +42,7 @@ export default function FinAssistant() {
 
   const sendMessage = async (text) => {
     if (!text.trim()) return;
-    
+
     const userMessage = { role: 'user', content: text };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
@@ -57,7 +60,7 @@ export default function FinAssistant() {
         setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
       } else {
         // Try to get error details
-        let errorMsg = 'Scuze, am întâmpinat o eroare. Te rog încearcă din nou.';
+        let errorMsg = t('finAssistant.error');
         try {
           const errorData = await res.json();
           console.error('Assistant API error:', res.status, errorData);
@@ -68,9 +71,9 @@ export default function FinAssistant() {
       }
     } catch (err) {
       console.error('Assistant connection error:', err);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Nu m-am putut conecta la server. Verifică conexiunea la internet și încearcă din nou.' 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: t('finAssistant.connectionError')
       }]);
     } finally {
       setLoading(false);
@@ -84,7 +87,7 @@ export default function FinAssistant() {
 
   const submitFeedback = async () => {
     if (!feedbackText.trim()) return;
-    
+
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/feedback`, {
@@ -101,7 +104,7 @@ export default function FinAssistant() {
         setFeedbackSent(true);
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: `✅ Mulțumim pentru feedback! Am primit ${feedbackMode === 'bug' ? 'raportul de eroare' : feedbackMode === 'idea' ? 'sugestia ta' : 'întrebarea ta'}. Echipa noastră o va analiza.`
+          content: t('finAssistant.feedbackSuccess', { type: feedbackMode === 'bug' ? t('finAssistant.bugReport') : feedbackMode === 'idea' ? t('finAssistant.yourIdea') : t('finAssistant.yourQuestion') })
         }]);
         setTimeout(() => {
           setFeedbackMode(null);
@@ -111,7 +114,7 @@ export default function FinAssistant() {
       } else {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: 'Nu am putut trimite feedback-ul. Te rog încearcă din nou.'
+          content: t('finAssistant.feedbackError')
         }]);
       }
     } catch (err) {
@@ -122,9 +125,9 @@ export default function FinAssistant() {
   };
 
   const feedbackLabels = {
-    bug: { icon: Bug, label: 'Raportează o eroare', color: 'text-red-500' },
-    idea: { icon: Lightbulb, label: 'Trimite o sugestie', color: 'text-yellow-500' },
-    question: { icon: HelpCircle, label: 'Pune o întrebare', color: 'text-blue-500' }
+    bug: { icon: Bug, label: t('finAssistant.reportBug'), color: 'text-red-500' },
+    idea: { icon: Lightbulb, label: t('finAssistant.sendIdea'), color: 'text-yellow-500' },
+    question: { icon: HelpCircle, label: t('finAssistant.askQuestion'), color: 'text-blue-500' }
   };
 
   return (
@@ -142,10 +145,10 @@ export default function FinAssistant() {
           >
             <Bot className="w-7 h-7 text-white" />
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
-            
+
             {/* Tooltip */}
             <div className="absolute right-full mr-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-              Întreabă-mă orice!
+              {t('finAssistant.askAnything')}
               <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-2 h-2 bg-gray-900 rotate-45" />
             </div>
           </motion.button>
@@ -176,7 +179,7 @@ export default function FinAssistant() {
                   </p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="text-white/80 hover:text-white transition-colors"
                 data-testid="assistant-close-btn"
@@ -196,11 +199,11 @@ export default function FinAssistant() {
                 >
                   <div className={`flex items-start gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      msg.role === 'user' 
-                        ? 'bg-blue-100 dark:bg-blue-900' 
+                      msg.role === 'user'
+                        ? 'bg-blue-100 dark:bg-blue-900'
                         : 'bg-blue-100 dark:bg-blue-900'
                     }`}>
-                      {msg.role === 'user' 
+                      {msg.role === 'user'
                         ? <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                         : <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       }
@@ -215,7 +218,7 @@ export default function FinAssistant() {
                   </div>
                 </motion.div>
               ))}
-              
+
               {loading && (
                 <div className="flex justify-start">
                   <div className="flex items-center gap-2">
@@ -232,7 +235,7 @@ export default function FinAssistant() {
                   </div>
                 </div>
               )}
-              
+
               <div ref={messagesEndRef} />
             </div>
 
@@ -246,17 +249,17 @@ export default function FinAssistant() {
                     {feedbackMode === 'question' && <HelpCircle className="w-4 h-4 text-blue-500" />}
                     {feedbackLabels[feedbackMode]?.label}
                   </span>
-                  <button 
+                  <button
                     onClick={() => { setFeedbackMode(null); setFeedbackText(''); }}
                     className="text-xs text-muted-foreground hover:text-foreground"
                   >
-                    Anulează
+                    {t('common.cancel')}
                   </button>
                 </div>
                 {feedbackSent ? (
                   <div className="flex items-center gap-2 text-green-600 py-2">
                     <CheckCircle className="w-5 h-5" />
-                    <span className="text-sm">Mulțumim! Feedback trimis.</span>
+                    <span className="text-sm">{t('finAssistant.feedbackSent')}</span>
                   </div>
                 ) : (
                   <>
@@ -264,19 +267,19 @@ export default function FinAssistant() {
                       value={feedbackText}
                       onChange={(e) => setFeedbackText(e.target.value)}
                       placeholder={
-                        feedbackMode === 'bug' ? 'Descrie problema întâmpinată...' :
-                        feedbackMode === 'idea' ? 'Descrie sugestia ta...' :
-                        'Scrie întrebarea ta...'
+                        feedbackMode === 'bug' ? t('finAssistant.placeholderBug') :
+                        feedbackMode === 'idea' ? t('finAssistant.placeholderIdea') :
+                        t('finAssistant.placeholderQuestion')
                       }
                       className="text-sm resize-none h-20 mb-2"
                     />
-                    <Button 
+                    <Button
                       onClick={submitFeedback}
                       disabled={loading || !feedbackText.trim()}
                       className="w-full bg-gradient-to-r from-blue-700 to-blue-500"
                       size="sm"
                     >
-                      {loading ? 'Se trimite...' : 'Trimite'}
+                      {loading ? t('common.sending') : t('common.send')}
                     </Button>
                   </>
                 )}
@@ -286,20 +289,20 @@ export default function FinAssistant() {
             {/* Suggestions & Feedback Buttons */}
             {!feedbackMode && messages.length <= 3 && (
               <div className="px-4 pb-2">
-                <p className="text-xs text-muted-foreground mb-2">Sugestii rapide:</p>
+                <p className="text-xs text-muted-foreground mb-2">{t('finAssistant.quickSuggestions')}</p>
                 <div className="flex flex-wrap gap-1 mb-3">
-                  {SUGGESTIONS.map((suggestion, idx) => (
+                  {SUGGESTIONS_KEYS.map((key, idx) => (
                     <button
                       key={idx}
-                      onClick={() => sendMessage(suggestion)}
+                      onClick={() => sendMessage(t(key))}
                       className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                     >
-                      {suggestion}
+                      {t(key)}
                     </button>
                   ))}
                 </div>
-                
-                <p className="text-xs text-muted-foreground mb-2">Sau trimite feedback:</p>
+
+                <p className="text-xs text-muted-foreground mb-2">{t('finAssistant.orSendFeedback')}</p>
                 <div className="flex gap-1">
                   <button
                     onClick={() => setFeedbackMode('bug')}
@@ -311,13 +314,13 @@ export default function FinAssistant() {
                     onClick={() => setFeedbackMode('idea')}
                     className="flex-1 text-xs px-2 py-1.5 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 rounded-lg hover:bg-yellow-100 dark:hover:bg-yellow-900/40 transition-colors flex items-center justify-center gap-1"
                   >
-                    <Lightbulb className="w-3 h-3" /> Idee
+                    <Lightbulb className="w-3 h-3" /> {t('finAssistant.idea')}
                   </button>
                   <button
                     onClick={() => setFeedbackMode('question')}
                     className="flex-1 text-xs px-2 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors flex items-center justify-center gap-1"
                   >
-                    <HelpCircle className="w-3 h-3" /> Întrebare
+                    <HelpCircle className="w-3 h-3" /> {t('finAssistant.question')}
                   </button>
                 </div>
               </div>
@@ -330,13 +333,13 @@ export default function FinAssistant() {
                   <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Întreabă-mă orice..."
+                    placeholder={t('finAssistant.inputPlaceholder')}
                     disabled={loading}
                     className="flex-1 text-sm"
                     data-testid="assistant-input"
                   />
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     size="icon"
                     disabled={loading || !input.trim()}
                     className="bg-gradient-to-r from-blue-700 to-blue-500 hover:opacity-90"

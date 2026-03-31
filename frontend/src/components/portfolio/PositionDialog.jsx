@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -9,6 +10,7 @@ import {
 } from '../ui/dialog';
 
 export default function PositionDialog({ open, onClose, onSave, editData, loading }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     symbol: '', shares: '', purchase_price: '', purchase_date: '', notes: ''
   });
@@ -30,11 +32,11 @@ export default function PositionDialog({ open, onClose, onSave, editData, loadin
   }, [editData, open]);
 
   const handleSave = () => {
-    if (!form.symbol.trim()) return setErr('Introdu simbolul acțiunii (ex: TLV)');
+    if (!form.symbol.trim()) return setErr(t('portfolio.errorSymbol'));
     if (!form.shares || isNaN(Number(form.shares)) || Number(form.shares) <= 0)
-      return setErr('Cantitate invalidă');
+      return setErr(t('portfolio.errorQuantity'));
     if (!form.purchase_price || isNaN(Number(form.purchase_price)) || Number(form.purchase_price) <= 0)
-      return setErr('Preț de intrare invalid');
+      return setErr(t('portfolio.errorPrice'));
     setErr('');
     onSave({
       symbol: form.symbol.trim().toUpperCase(),
@@ -51,12 +53,12 @@ export default function PositionDialog({ open, onClose, onSave, editData, loadin
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEdit ? `Editează ${editData?.symbol}` : 'Adaugă Poziție Nouă'}</DialogTitle>
+          <DialogTitle>{isEdit ? t('portfolio.editPosition', { symbol: editData?.symbol }) : t('portfolio.newPosition')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           {!isEdit && (
             <div>
-              <Label>Simbol BVB <span className="text-red-500">*</span></Label>
+              <Label>{t('portfolio.symbolBVB')} <span className="text-red-500">*</span></Label>
               <Input
                 placeholder="ex: TLV, SNP, BRD, H2O"
                 value={form.symbol}
@@ -68,7 +70,7 @@ export default function PositionDialog({ open, onClose, onSave, editData, loadin
           )}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Cantitate (nr. acțiuni) <span className="text-red-500">*</span></Label>
+              <Label>{t('portfolio.quantity')} <span className="text-red-500">*</span></Label>
               <Input
                 type="number"
                 min="1"
@@ -81,7 +83,7 @@ export default function PositionDialog({ open, onClose, onSave, editData, loadin
               />
             </div>
             <div>
-              <Label>Preț mediu intrare (RON) <span className="text-red-500">*</span></Label>
+              <Label>{t('portfolio.avgPrice')} <span className="text-red-500">*</span></Label>
               <Input
                 type="number"
                 min="0.01"
@@ -95,7 +97,7 @@ export default function PositionDialog({ open, onClose, onSave, editData, loadin
             </div>
           </div>
           <div>
-            <Label>Dată intrare</Label>
+            <Label>{t('portfolio.entryDate')}</Label>
             <Input
               type="date"
               value={form.purchase_date}
@@ -104,9 +106,9 @@ export default function PositionDialog({ open, onClose, onSave, editData, loadin
             />
           </div>
           <div>
-            <Label>Note (opțional)</Label>
+            <Label>{t('portfolio.notes')}</Label>
             <Textarea
-              placeholder="ex: Cumpărat la anunț dividende..."
+              placeholder={t('portfolio.notesPlaceholder')}
               value={form.notes}
               onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
               rows={2}
@@ -120,7 +122,7 @@ export default function PositionDialog({ open, onClose, onSave, editData, loadin
           )}
         </div>
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={onClose}>Anulează</Button>
+          <Button variant="outline" onClick={onClose}>{t('common.cancel')}</Button>
           <Button
             onClick={handleSave}
             disabled={loading}
@@ -128,7 +130,7 @@ export default function PositionDialog({ open, onClose, onSave, editData, loadin
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             {loading ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : null}
-            {isEdit ? 'Salvează' : 'Adaugă'}
+            {isEdit ? t('common.save') : t('common.add')}
           </Button>
         </DialogFooter>
       </DialogContent>

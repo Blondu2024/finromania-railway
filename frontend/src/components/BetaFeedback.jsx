@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, MessageSquare, AlertTriangle, Send, Bug, Lightbulb, HelpCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -10,6 +11,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Banner de disclaimer pentru versiunea BETA
 export function BetaDisclaimer() {
+  const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
   
   useEffect(() => {
@@ -34,12 +36,12 @@ export function BetaDisclaimer() {
           <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
           <span className="text-xs">
             <strong>BETA</strong>
-            <span className="hidden sm:inline"> - Datele pot conține erori. Nu luați decizii financiare exclusiv pe baza acestor date.</span>
+            <span className="hidden sm:inline"> - {t('beta.disclaimer')}</span>
           </span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <a href="mailto:feedback@finromania.ro?subject=Feedback%20FinRomania%20BETA" className="text-amber-950 hover:underline text-xs font-medium hidden sm:inline">
-            Trimite feedback →
+            {t('beta.sendFeedback')}
           </a>
           <Button 
             variant="ghost" 
@@ -69,6 +71,7 @@ export function BetaBadge() {
 
 // Buton Feedback Floating
 export function FeedbackButton() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [feedbackType, setFeedbackType] = useState('bug');
   const [message, setMessage] = useState('');
@@ -115,9 +118,9 @@ export function FeedbackButton() {
   };
 
   const feedbackTypes = [
-    { id: 'bug', label: 'Bug/Eroare', icon: Bug, color: 'text-red-500' },
-    { id: 'idea', label: 'Sugestie', icon: Lightbulb, color: 'text-yellow-500' },
-    { id: 'question', label: 'Întrebare', icon: HelpCircle, color: 'text-blue-500' },
+    { id: 'bug', label: t('feedback.typeBug'), icon: Bug, color: 'text-red-500' },
+    { id: 'idea', label: t('feedback.typeIdea'), icon: Lightbulb, color: 'text-yellow-500' },
+    { id: 'question', label: t('feedback.typeQuestion'), icon: HelpCircle, color: 'text-blue-500' },
   ];
 
   return (
@@ -126,7 +129,7 @@ export function FeedbackButton() {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-blue-700 to-blue-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
-        title="Trimite feedback"
+        title={t('feedback.sendFeedback')}
       >
         <MessageSquare className="w-6 h-6" />
         <span className="absolute -top-2 -right-2 bg-amber-500 text-amber-950 text-xs font-bold px-2 py-0.5 rounded-full">
@@ -142,14 +145,14 @@ export function FeedbackButton() {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="w-5 h-5 text-blue-600" />
-                  Feedback BETA
+                  {t('feedback.title')}
                 </CardTitle>
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setIsOpen(false)}>
                   <X className="w-4 h-4" />
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground">
-                Ajută-ne să îmbunătățim platforma! Raportează bug-uri sau sugestii.
+                {t('feedback.subtitle')}
               </p>
             </CardHeader>
             
@@ -159,14 +162,14 @@ export function FeedbackButton() {
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Send className="w-8 h-8 text-green-600" />
                   </div>
-                  <h3 className="text-lg font-semibold text-green-600">Mulțumim!</h3>
-                  <p className="text-muted-foreground">Feedback-ul tău a fost trimis.</p>
+                  <h3 className="text-lg font-semibold text-green-600">{t('feedback.thanks')}</h3>
+                  <p className="text-muted-foreground">{t('feedback.sent')}</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Feedback Type */}
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Tip feedback</label>
+                    <label className="text-sm font-medium mb-2 block">{t('feedback.typeLabel')}</label>
                     <div className="flex gap-2">
                       {feedbackTypes.map(type => (
                         <button
@@ -188,16 +191,16 @@ export function FeedbackButton() {
                   
                   {/* Message */}
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Mesajul tău *</label>
+                    <label className="text-sm font-medium mb-2 block">{t('feedback.messageLabel')}</label>
                     <Textarea
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder={
-                        feedbackType === 'bug' 
-                          ? 'Descrie problema întâmpinată...' 
+                        feedbackType === 'bug'
+                          ? t('feedback.placeholderBug')
                           : feedbackType === 'idea'
-                          ? 'Care e sugestia ta?'
-                          : 'Cu ce te putem ajuta?'
+                          ? t('feedback.placeholderIdea')
+                          : t('feedback.placeholderQuestion')
                       }
                       rows={4}
                       required
@@ -206,18 +209,18 @@ export function FeedbackButton() {
                   
                   {/* Email (optional) */}
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Email (opțional)</label>
+                    <label className="text-sm font-medium mb-2 block">{t('feedback.emailLabel')}</label>
                     <Input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="pentru a te contacta cu soluția"
+                      placeholder={t('feedback.emailPlaceholder')}
                     />
                   </div>
                   
                   {/* Info despre pagina curentă */}
                   <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
-                    📍 Pagina: {window.location.pathname}
+                    {t('feedback.currentPage')} {window.location.pathname}
                   </div>
                   
                   {/* Submit */}
@@ -227,11 +230,11 @@ export function FeedbackButton() {
                     disabled={!message.trim() || loading}
                   >
                     {loading ? (
-                      'Se trimite...'
+                      t('feedback.sending')
                     ) : (
                       <>
                         <Send className="w-4 h-4 mr-2" />
-                        Trimite Feedback
+                        {t('feedback.submit')}
                       </>
                     )}
                   </Button>

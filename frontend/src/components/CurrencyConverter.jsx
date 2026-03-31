@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRightLeft, RefreshCw, TrendingUp, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Button } from './ui/button';
@@ -8,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function CurrencyConverter({ variant = "full" }) {
+  const { t } = useTranslation();
   const [currencies, setCurrencies] = useState([]);
   const [popularPairs, setPopularPairs] = useState([]);
   const [amount, setAmount] = useState('100');
@@ -97,7 +99,7 @@ export default function CurrencyConverter({ variant = "full" }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
             <ArrowRightLeft className="w-5 h-5 text-blue-600" />
-            Convertor Valutar
+            {t('converter.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -156,8 +158,8 @@ export default function CurrencyConverter({ variant = "full" }) {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Convertor Valutar</h1>
-        <p className="text-muted-foreground">Rate de schimb actualizate în timp real</p>
+        <h1 className="text-3xl font-bold mb-2">{t('converter.title')}</h1>
+        <p className="text-muted-foreground">{t('converter.subtitle')}</p>
       </div>
 
       <Card>
@@ -165,14 +167,14 @@ export default function CurrencyConverter({ variant = "full" }) {
           <div className="grid md:grid-cols-[1fr,auto,1fr] gap-4 items-end">
             {/* From */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">De la</label>
+              <label className="text-sm font-medium">{t('converter.from')}</label>
               <div className="flex gap-2">
                 <Input
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   className="text-lg"
-                  placeholder="Sumă"
+                  placeholder={t('converter.amount')}
                 />
                 <Select value={fromCurrency} onValueChange={setFromCurrency}>
                   <SelectTrigger className="w-32">
@@ -196,7 +198,7 @@ export default function CurrencyConverter({ variant = "full" }) {
 
             {/* To */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">La</label>
+              <label className="text-sm font-medium">{t('converter.to')}</label>
               <div className="flex gap-2">
                 <div className="flex-1 text-lg font-semibold p-2 bg-muted rounded-md flex items-center justify-center min-h-[40px]">
                   {loading ? (
@@ -227,11 +229,11 @@ export default function CurrencyConverter({ variant = "full" }) {
                 {parseFloat(amount).toLocaleString('ro-RO')} {fromCurrency} = {result.result.toLocaleString('ro-RO', { maximumFractionDigits: 2 })} {toCurrency}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Rată: 1 {fromCurrency} = {result.rate.toFixed(6)} {toCurrency}
+                {t('converter.rate')}: 1 {fromCurrency} = {result.rate.toFixed(6)} {toCurrency}
               </p>
               {lastUpdated && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Actualizat: {lastUpdated}
+                  {t('converter.updated')}: {lastUpdated}
                 </p>
               )}
             </div>
@@ -244,7 +246,7 @@ export default function CurrencyConverter({ variant = "full" }) {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-green-600" />
-            Perechi Populare
+            {t('converter.popularPairs')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -271,7 +273,7 @@ export default function CurrencyConverter({ variant = "full" }) {
       {/* All Currencies */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Toate Valutele ({currencies.length})</CardTitle>
+          <CardTitle className="text-lg">{t('converter.allCurrencies')} ({currencies.length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2">

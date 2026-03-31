@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Search, X, TrendingUp, Newspaper, Loader2 } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
@@ -8,6 +9,7 @@ import { Button } from '../components/ui/button';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function SearchBar() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -63,7 +65,7 @@ export default function SearchBar() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Caută acțiuni, știri..."
+          placeholder={t('search.placeholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results && setIsOpen(true)}
@@ -87,7 +89,7 @@ export default function SearchBar() {
           {results.stocks?.length > 0 && (
             <div className="p-2">
               <p className="text-xs text-muted-foreground px-2 py-1 flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" /> Acțiuni
+                <TrendingUp className="w-3 h-3" /> {t('search.stocks')}
               </p>
               {results.stocks.map((stock, idx) => (
                 <button
@@ -110,7 +112,7 @@ export default function SearchBar() {
           {results.news?.length > 0 && (
             <div className="p-2 border-t">
               <p className="text-xs text-muted-foreground px-2 py-1 flex items-center gap-1">
-                <Newspaper className="w-3 h-3" /> Știri
+                <Newspaper className="w-3 h-3" /> {t('search.news')}
               </p>
               {results.news.slice(0, 5).map((article, idx) => (
                 <button
@@ -126,7 +128,7 @@ export default function SearchBar() {
           )}
           
           {results.total === 0 && (
-            <p className="p-4 text-center text-muted-foreground">Niciun rezultat pentru "{query}"</p>
+            <p className="p-4 text-center text-muted-foreground">{t('search.noResults', { query })}</p>
           )}
         </div>
       )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X, Share } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from './ui/button';
 
 // ─── Detectare platformă ──────────────────────────────────────────────────────
@@ -18,6 +19,7 @@ function getInstallContext() {
 
 // ─── Banner iOS (instrucțiuni Share → Adaugă la ecran) ───────────────────────
 function IOSInstallBanner({ onDismiss }) {
+  const { t } = useTranslation();
   return (
     <div
       className="fixed bottom-4 left-3 right-3 bg-white dark:bg-zinc-900 border border-border rounded-2xl p-4 shadow-2xl z-50 animate-in slide-in-from-bottom-4"
@@ -27,7 +29,7 @@ function IOSInstallBanner({ onDismiss }) {
       <button
         onClick={onDismiss}
         className="absolute top-3 right-3 p-1 hover:bg-muted rounded-full transition-colors"
-        aria-label="Închide"
+        aria-label={t('common.close')}
       >
         <X className="w-4 h-4 text-muted-foreground" />
       </button>
@@ -38,8 +40,8 @@ function IOSInstallBanner({ onDismiss }) {
           <span className="text-white font-bold text-lg">F</span>
         </div>
         <div>
-          <p className="font-bold text-sm">Instalează FinRomania</p>
-          <p className="text-xs text-muted-foreground">Acces rapid de pe ecranul principal</p>
+          <p className="font-bold text-sm">{t('pwa.installTitle')}</p>
+          <p className="text-xs text-muted-foreground">{t('pwa.subtitle')}</p>
         </div>
       </div>
 
@@ -47,22 +49,22 @@ function IOSInstallBanner({ onDismiss }) {
       <div className="space-y-2.5">
         <div className="flex items-center gap-3 text-sm">
           <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
-          <span>Apasă butonul <strong className="inline-flex items-center gap-1">Share <Share className="w-3.5 h-3.5 text-blue-600" /></strong> din bara Safari</span>
+          <span>{t('pwa.iosStep1Prefix')} <strong className="inline-flex items-center gap-1">Share <Share className="w-3.5 h-3.5 text-blue-600" /></strong> {t('pwa.iosStep1Suffix')}</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
-          <span>Selectează <strong>"Adaugă la ecranul de start"</strong></span>
+          <span>{t('pwa.iosStep2Prefix')} <strong>{t('pwa.iosStep2Action')}</strong></span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
-          <span>Apasă <strong>"Adaugă"</strong> — gata!</span>
+          <span>{t('pwa.iosStep3Prefix')} <strong>{t('pwa.iosStep3Action')}</strong> {t('pwa.iosStep3Done')}</span>
         </div>
       </div>
 
       {/* Arrow pointing down to share button */}
       <div className="flex justify-center mt-3">
         <p className="text-xs text-muted-foreground text-center">
-          Aplicația funcționează offline și se actualizează automat
+          {t('pwa.offlineNote')}
         </p>
       </div>
 
@@ -74,6 +76,7 @@ function IOSInstallBanner({ onDismiss }) {
 
 // ─── Banner Android/Desktop (beforeinstallprompt) ────────────────────────────
 function AndroidInstallBanner({ onInstall, onDismiss }) {
+  const { t } = useTranslation();
   return (
     <div
       className="fixed bottom-4 left-3 right-3 sm:left-auto sm:right-4 sm:w-80 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl p-4 shadow-2xl z-50 animate-in slide-in-from-bottom-4"
@@ -82,7 +85,7 @@ function AndroidInstallBanner({ onInstall, onDismiss }) {
       <button
         onClick={onDismiss}
         className="absolute top-2.5 right-2.5 p-1 hover:bg-white/20 rounded-full transition-colors"
-        aria-label="Închide"
+        aria-label={t('common.close')}
       >
         <X className="w-4 h-4" />
       </button>
@@ -92,9 +95,9 @@ function AndroidInstallBanner({ onInstall, onDismiss }) {
           <Download className="w-6 h-6" />
         </div>
         <div className="flex-1 min-w-0 pr-4">
-          <h4 className="font-bold text-sm">Instalează FinRomania</h4>
+          <h4 className="font-bold text-sm">{t('pwa.installTitle')}</h4>
           <p className="text-xs text-blue-100 mt-0.5">
-            Adaugă aplicația pe telefon pentru acces rapid, chiar și offline
+            {t('pwa.androidSubtitle')}
           </p>
           <Button
             onClick={onInstall}
@@ -103,7 +106,7 @@ function AndroidInstallBanner({ onInstall, onDismiss }) {
             className="mt-2 text-xs h-8"
             data-testid="pwa-install-btn"
           >
-            Instalează Acum
+            {t('pwa.installNow')}
           </Button>
         </div>
       </div>

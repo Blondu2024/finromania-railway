@@ -1,10 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown, Info } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 
 export default function IndexCard({ index, onSelect, isSelected }) {
+  const { t } = useTranslation();
   const getBadgeColor = (volatility) => {
     switch(volatility) {
       case 'high': return 'destructive';
@@ -81,7 +83,7 @@ export default function IndexCard({ index, onSelect, isSelected }) {
             size="lg"
             variant={isSelected ? 'default' : 'outline'}
           >
-            {isSelected ? '✓ Selectat' : 'Selectează'}
+            {isSelected ? t('common.selected') : t('common.select')}
           </Button>
         </div>
       </CardContent>

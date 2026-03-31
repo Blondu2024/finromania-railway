@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Upload, CheckCircle, AlertCircle, X, FileText, Loader2,
 } from 'lucide-react';
@@ -32,6 +33,7 @@ const BROKER_INFO = {
 };
 
 export default function CSVImportDialog({ open, onClose, token, onImportComplete }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState('upload'); // upload | preview | importing | done
   const [detectedBroker, setDetectedBroker] = useState(null);
   const [parsedPositions, setParsedPositions] = useState([]);
@@ -58,7 +60,7 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
   const handleFile = async (file) => {
     if (!file) return;
     if (!file.name.endsWith('.csv') && !file.name.endsWith('.txt')) {
-      toast.error('Selectează un fișier CSV');
+      toast.error(t('csv.selectFile'));
       return;
     }
 
@@ -74,7 +76,7 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.detail || 'Eroare la parsarea CSV-ului');
+        toast.error(data.detail || t('csv.parseError'));
         return;
       }
 
@@ -83,7 +85,7 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
       setErrors(data.errors || []);
       setStep('preview');
     } catch (e) {
-      toast.error('Eroare la citirea fișierului');
+      toast.error(t('csv.readError'));
     }
   };
 
@@ -104,16 +106,16 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.detail || 'Eroare la import');
+        toast.error(data.detail || t('csv.importError'));
         setStep('preview');
         return;
       }
 
       setImportResults(data);
       setStep('done');
-      toast.success(`${data.imported} poziții importate cu succes!`);
+      toast.success(t('csv.importSuccess', { count: data.imported }));
     } catch (e) {
-      toast.error('Eroare la import');
+      toast.error(t('csv.importError'));
       setStep('preview');
     } finally {
       setImporting(false);
@@ -128,7 +130,7 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Upload className="w-5 h-5 text-blue-600" />
-            Import Portofoliu din CSV
+            {t('csv.importTitle')}
           </DialogTitle>
         </DialogHeader>
 
@@ -154,8 +156,8 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
               data-testid="csv-drop-zone"
             >
               <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-50" />
-              <p className="font-medium mb-1">Trage fișierul CSV aici sau click pentru upload</p>
-              <p className="text-sm text-muted-foreground">Acceptăm fișiere .csv de la XTB, Tradeville sau format generic</p>
+              <p className="font-medium mb-1">{t('csv.dragOrClick')}</p>
+              <p className="text-sm text-muted-foreground">{t('csv.acceptedFormats')}</p>
               <input
                 ref={fileRef}
                 type="file"
@@ -168,7 +170,7 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
 
             {/* Generic format hint */}
             <div className="bg-muted/40 rounded-lg p-3 text-xs text-muted-foreground">
-              <p className="font-medium text-foreground mb-1">Format generic acceptat:</p>
+              <p className="font-medium text-foreground mb-1">{t('csv.genericFormat')}:</p>
               <code className="block bg-background border rounded p-2 font-mono text-xs mt-1">
                 Symbol,Quantity,Price<br />
                 TLV,100,24.50<br />
@@ -183,7 +185,7 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
           <div className="space-y-4 py-2">
             {brokerInfo && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Format detectat:</span>
+                <span className="text-sm text-muted-foreground">{t('csv.detectedFormat')}:</span>
                 <Badge className={brokerInfo.color}>{brokerInfo.name}</Badge>
                 <span className="text-xs text-muted-foreground">· {brokerInfo.symbol_note}</span>
               </div>
@@ -192,13 +194,13 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
             {errors.length > 0 && (
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
                 <p className="text-sm font-medium text-amber-700 dark:text-amber-400 mb-1">
-                  ⚠️ {errors.length} rânduri ignorate:
+                  {t('csv.rowsIgnored', { count: errors.length })}:
                 </p>
                 {errors.slice(0, 3).map((e, i) => (
                   <p key={i} className="text-xs text-amber-600 dark:text-amber-500">{e}</p>
                 ))}
                 {errors.length > 3 && (
-                  <p className="text-xs text-amber-500">...și {errors.length - 3} altele</p>
+                  <p className="text-xs text-amber-500">...{t('csv.andMore', { count: errors.length - 3 })}</p>
                 )}
               </div>
             )}
@@ -206,23 +208,23 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
             {parsedPositions.length === 0 ? (
               <div className="text-center py-8">
                 <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-2" />
-                <p className="font-medium">Nu s-au găsit poziții valide</p>
+                <p className="font-medium">{t('csv.noValidPositions')}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Verifică formatul fișierului sau încearcă un alt export
+                  {t('csv.checkFormat')}
                 </p>
-                <Button variant="outline" onClick={reset} className="mt-4">Încearcă alt fișier</Button>
+                <Button variant="outline" onClick={reset} className="mt-4">{t('csv.tryAnotherFile')}</Button>
               </div>
             ) : (
               <>
-                <p className="text-sm font-medium">{parsedPositions.length} poziții detectate:</p>
+                <p className="text-sm font-medium">{t('csv.positionsDetected', { count: parsedPositions.length })}:</p>
                 <div className="overflow-x-auto border rounded-lg">
                   <table className="w-full text-sm">
                     <thead className="bg-muted/50">
                       <tr>
-                        <th className="text-left px-3 py-2 font-medium">Simbol</th>
-                        <th className="text-right px-3 py-2 font-medium">Cantitate</th>
-                        <th className="text-right px-3 py-2 font-medium">Preț Intrare</th>
-                        <th className="text-right px-3 py-2 font-medium">Valoare Est.</th>
+                        <th className="text-left px-3 py-2 font-medium">{t('csv.symbol')}</th>
+                        <th className="text-right px-3 py-2 font-medium">{t('csv.quantity')}</th>
+                        <th className="text-right px-3 py-2 font-medium">{t('csv.entryPrice')}</th>
+                        <th className="text-right px-3 py-2 font-medium">{t('csv.estValue')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -240,7 +242,7 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
                   </table>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  * Pozițiile existente cu același simbol vor fi actualizate (cantitate + preț mediu)
+                  * {t('csv.existingNote')}
                 </p>
               </>
             )}
@@ -251,9 +253,9 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
         {step === 'importing' && (
           <div className="py-12 text-center">
             <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
-            <p className="font-medium">Se importă pozițiile...</p>
+            <p className="font-medium">{t('csv.importing')}</p>
             <p className="text-sm text-muted-foreground mt-1">
-              {parsedPositions.length} poziții în curs de procesare
+              {t('csv.processing', { count: parsedPositions.length })}
             </p>
           </div>
         )}
@@ -263,11 +265,11 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
           <div className="py-8 text-center space-y-4">
             <CheckCircle className="w-14 h-14 text-emerald-500 mx-auto" />
             <div>
-              <p className="text-xl font-bold">Import complet!</p>
+              <p className="text-xl font-bold">{t('csv.importComplete')}</p>
               <p className="text-muted-foreground mt-1">
-                {importResults.imported} poziții importate ·{' '}
-                {importResults.updated} actualizate ·{' '}
-                {importResults.skipped} ignorate
+                {importResults.imported} {t('csv.imported')} ·{' '}
+                {importResults.updated} {t('csv.updated')} ·{' '}
+                {importResults.skipped} {t('csv.skipped')}
               </p>
             </div>
             <Button
@@ -275,19 +277,19 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               <CheckCircle className="w-4 h-4 mr-2" />
-              Deschide Portofoliul
+              {t('csv.openPortfolio')}
             </Button>
           </div>
         )}
 
         <DialogFooter className="gap-2">
           {step === 'upload' && (
-            <Button variant="outline" onClick={handleClose}>Anulează</Button>
+            <Button variant="outline" onClick={handleClose}>{t('common.cancel')}</Button>
           )}
           {step === 'preview' && parsedPositions.length > 0 && (
             <>
               <Button variant="outline" onClick={reset}>
-                <X className="w-4 h-4 mr-1" /> Alt fișier
+                <X className="w-4 h-4 mr-1" /> {t('csv.anotherFile')}
               </Button>
               <Button
                 onClick={handleImport}
@@ -295,7 +297,7 @@ export default function CSVImportDialog({ open, onClose, token, onImportComplete
                 data-testid="csv-import-confirm-btn"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Importă {parsedPositions.length} poziții
+                {t('csv.importCount', { count: parsedPositions.length })}
               </Button>
             </>
           )}

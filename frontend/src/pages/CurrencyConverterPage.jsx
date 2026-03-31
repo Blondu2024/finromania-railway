@@ -583,7 +583,7 @@ export default function CurrencyConverterPage() {
                   <Coins className="w-6 h-6 text-blue-600" />
                   {t('converter.allCurrencies')} ({Object.keys(rates).length})
                 </motion.h2>
-                <p className="text-muted-foreground mb-6">Click pe o valută pentru a o selecta ca sursă</p>
+                <p className="text-muted-foreground mb-6">{t('converter.selectSource')}</p>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {Object.entries(rates).map(([code, data], idx) => (

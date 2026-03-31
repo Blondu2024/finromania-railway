@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown, Minus, RefreshCw, Info, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -6,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Gauge component for the fear & greed meter
-const FearGreedGauge = ({ score, label, color }) => {
+const FearGreedGauge = ({ score, label, color, fearLabel, greedLabel }) => {
   const rotation = (score / 100) * 180 - 90; // -90 to 90 degrees
   
   return (
@@ -54,8 +55,8 @@ const FearGreedGauge = ({ score, label, color }) => {
         })}
         
         {/* Labels */}
-        <text x="15" y="95" className="text-[8px] fill-gray-500">Frică</text>
-        <text x="165" y="95" className="text-[8px] fill-gray-500">Lăcomie</text>
+        <text x="15" y="95" className="text-[8px] fill-gray-500">{fearLabel}</text>
+        <text x="165" y="95" className="text-[8px] fill-gray-500">{greedLabel}</text>
       </svg>
       
       {/* Needle */}
@@ -74,6 +75,7 @@ const FearGreedGauge = ({ score, label, color }) => {
 };
 
 const FearGreedIndex = ({ compact = false }) => {
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -136,12 +138,12 @@ const FearGreedIndex = ({ compact = false }) => {
       <Card>
         <CardContent className="p-6 text-center">
           <AlertTriangle className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-          <p className="text-muted-foreground">Nu am putut încărca indicele</p>
+          <p className="text-muted-foreground">{t('fearGreed.error')}</p>
           <button
             onClick={fetchData}
             className="mt-2 text-blue-500 hover:text-blue-400 text-sm"
           >
-            Încearcă din nou
+            {t('common.tryAgain')}
           </button>
         </CardContent>
       </Card>
@@ -199,6 +201,8 @@ const FearGreedIndex = ({ compact = false }) => {
             score={data?.score || 50}
             label={data?.label || 'Neutru'}
             color={data?.color || '#ca8a04'}
+            fearLabel={t('fearGreed.fear')}
+            greedLabel={t('fearGreed.greed')}
           />
 
           <div className="mt-4">
@@ -230,7 +234,7 @@ const FearGreedIndex = ({ compact = false }) => {
               onClick={() => setShowDetails(!showDetails)}
               className="w-full text-sm text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 mb-3"
             >
-              {showDetails ? 'Ascunde detalii' : 'Vezi componentele'}
+              {showDetails ? t('fearGreed.hideDetails') : t('fearGreed.showComponents')}
               <svg
                 className={`w-4 h-4 transition-transform ${showDetails ? 'rotate-180' : ''}`}
                 fill="none"
@@ -249,7 +253,7 @@ const FearGreedIndex = ({ compact = false }) => {
                       <span className="text-foreground capitalize text-sm">
                         {key === 'rsi' ? 'RSI' :
                          key === 'momentum' ? 'Momentum' :
-                         key === 'volatility' ? 'Volatilitate' : 'Volum'}
+                         key === 'volatility' ? t('fearGreed.volatility') : t('fearGreed.volume')}
                       </span>
                       <span className="text-xs text-muted-foreground">({component.weight})</span>
                     </div>
@@ -278,7 +282,7 @@ const FearGreedIndex = ({ compact = false }) => {
 
         {/* Last Updated */}
         <p className="text-xs text-muted-foreground text-center mt-4">
-          Actualizat: {data?.last_updated ? new Date(data.last_updated).toLocaleString('ro-RO') : 'N/A'}
+          {t('converter.updated')}: {data?.last_updated ? new Date(data.last_updated).toLocaleString('ro-RO') : 'N/A'}
         </p>
       </CardContent>
     </Card>

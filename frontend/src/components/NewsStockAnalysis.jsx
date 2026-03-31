@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  TrendingUp, TrendingDown, Sparkles, BarChart3, AlertTriangle, 
-  Loader2, ChevronDown, ChevronUp, Globe, Zap, RefreshCw 
+import { useTranslation } from 'react-i18next';
+import {
+  TrendingUp, TrendingDown, Sparkles, BarChart3, AlertTriangle,
+  Loader2, ChevronDown, ChevronUp, Globe, Zap, RefreshCw
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
@@ -86,6 +87,7 @@ const ChartTooltip = ({ active, payload }) => {
 };
 
 export default function SmartNewsAnalysis({ article }) {
+  const { t } = useTranslation();
   const [recommendations, setRecommendations] = useState([]);
   const [assetsData, setAssetsData] = useState({});
   const [aiAnalysis, setAiAnalysis] = useState(null);
@@ -182,7 +184,7 @@ export default function SmartNewsAnalysis({ article }) {
       }
     } catch (error) {
       console.error('Error generating AI analysis:', error);
-      setAiAnalysis('Nu s-a putut genera analiza. Încearcă din nou mai târziu.');
+      setAiAnalysis(t('analysis.generateError'));
     } finally {
       setAiLoading(false);
     }
@@ -193,8 +195,8 @@ export default function SmartNewsAnalysis({ article }) {
       <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50">
         <CardContent className="p-6 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-600" />
-          <p className="font-medium">🔍 AI analizează știrea...</p>
-          <p className="text-sm text-muted-foreground mt-1">Identificăm activele financiare relevante</p>
+          <p className="font-medium">{t('analysis.analyzing')}</p>
+          <p className="text-sm text-muted-foreground mt-1">{t('analysis.identifyingAssets')}</p>
         </CardContent>
       </Card>
     );
@@ -209,12 +211,12 @@ export default function SmartNewsAnalysis({ article }) {
         >
           <CardTitle className="text-lg flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-blue-600" />
-            🤖 Analiză Inteligentă AI
+            {t('analysis.smartAnalysis')}
           </CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="bg-blue-100 text-blue-800">
               <Globe className="w-3 h-3 mr-1" />
-              {recommendations.length} active relevante
+              {recommendations.length} {t('analysis.relevantAssets')}
             </Badge>
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
@@ -223,7 +225,7 @@ export default function SmartNewsAnalysis({ article }) {
         {/* Keywords found */}
         {keywords.length > 0 && expanded && (
           <div className="flex flex-wrap gap-1 mt-2">
-            <span className="text-xs text-muted-foreground">Cuvinte cheie:</span>
+            <span className="text-xs text-muted-foreground">{t('analysis.keywords')}:</span>
             {keywords.map((kw, idx) => (
               <Badge key={idx} variant="outline" className="text-xs">
                 {kw}
@@ -283,7 +285,7 @@ export default function SmartNewsAnalysis({ article }) {
                     <div className="flex items-center justify-between mt-2 pt-2 border-t">
                       <span className="text-xs text-muted-foreground">
                         <Zap className="w-3 h-3 inline mr-1" />
-                        Detectat: "{rec.matched_keyword}"
+                        {t('analysis.detected')}: "{rec.matched_keyword}"
                       </span>
                       <span className="text-xs text-muted-foreground">
                         {data?.data_points} zile
@@ -301,7 +303,7 @@ export default function SmartNewsAnalysis({ article }) {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-yellow-500" />
-                  📝 Analiză Detaliată AI
+                  {t('analysis.detailedAnalysis')}
                 </CardTitle>
                 {aiAnalysis && (
                   <Button 
@@ -311,7 +313,7 @@ export default function SmartNewsAnalysis({ article }) {
                     disabled={aiLoading}
                   >
                     <RefreshCw className={`w-3 h-3 mr-1 ${aiLoading ? 'animate-spin' : ''}`} />
-                    Regenerează
+                    {t('analysis.regenerate')}
                   </Button>
                 )}
               </div>
@@ -322,13 +324,13 @@ export default function SmartNewsAnalysis({ article }) {
                   <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
                     <Sparkles className="w-8 h-8 text-blue-600" />
                   </div>
-                  <p className="font-medium mb-2">Obține o analiză AI detaliată</p>
+                  <p className="font-medium mb-2">{t('analysis.getDetailed')}</p>
                   <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-                    AI-ul va analiza știrea și va oferi perspective despre impactul potențial asupra piețelor financiare
+                    {t('analysis.aiWillAnalyze')}
                   </p>
                   <Button onClick={generateAiAnalysis} className="bg-blue-600 hover:bg-blue-700">
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Generează Analiză AI
+                    {t('analysis.generateAnalysis')}
                   </Button>
                 </div>
               )}
@@ -336,8 +338,8 @@ export default function SmartNewsAnalysis({ article }) {
               {aiLoading && (
                 <div className="text-center py-8">
                   <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-600" />
-                  <p className="font-medium">AI-ul analizează știrea...</p>
-                  <p className="text-sm text-muted-foreground">Acest proces poate dura câteva secunde</p>
+                  <p className="font-medium">{t('analysis.aiAnalyzing')}</p>
+                  <p className="text-sm text-muted-foreground">{t('analysis.processDuration')}</p>
                 </div>
               )}
               
@@ -355,7 +357,7 @@ export default function SmartNewsAnalysis({ article }) {
                       size="sm" 
                       onClick={() => setShowFullAnalysis(!showFullAnalysis)}
                     >
-                      {showFullAnalysis ? '↑ Arată mai puțin' : '↓ Arată mai mult'}
+                      {showFullAnalysis ? t('common.showLess') : t('common.showMore')}
                     </Button>
                   )}
                 </div>
@@ -367,9 +369,7 @@ export default function SmartNewsAnalysis({ article }) {
           <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
             <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-yellow-800">
-              <strong>Disclaimer:</strong> Această analiză este generată automat de AI în scop educațional și informativ. 
-              NU reprezintă sfat de investiții sau recomandare de tranzacționare. 
-              Deciziile financiare sunt responsabilitatea ta. Consultă un consilier financiar autorizat.
+              <strong>{t('analysis.disclaimer')}:</strong> {t('analysis.disclaimerText')}
             </p>
           </div>
         </CardContent>

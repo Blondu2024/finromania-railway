@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Bot, MessageCircle, Award, BookOpen, X, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -7,6 +8,7 @@ import { Badge } from './ui/badge';
 import { Link } from 'react-router-dom';
 
 export default function AIAssistant({ messages = [], achievements = [], onAskQuestion }) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
   const [question, setQuestion] = useState('');
 
@@ -37,7 +39,7 @@ export default function AIAssistant({ messages = [], achievements = [], onAskQue
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Bot className="w-5 h-5 text-blue-600" />
-            Asistentul Tău
+            {t('assistant.title')}
           </CardTitle>
           <Button
             variant="ghost"
@@ -66,7 +68,7 @@ export default function AIAssistant({ messages = [], achievements = [], onAskQue
               <div className="flex items-start gap-2">
                 <Bot className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
                 <p className="text-sm text-blue-900">
-                  Bună! Sunt aici să te ajut să înveți trading. La fiecare pas îți voi explica ce facem și de ce. 🎓
+                  {t('assistant.welcomeMessage')}
                 </p>
               </div>
             </div>
@@ -75,16 +77,16 @@ export default function AIAssistant({ messages = [], achievements = [], onAskQue
 
         {/* Quick Tips */}
         <div>
-          <h4 className="text-xs font-semibold text-muted-foreground mb-2">📚 Tips Rapide</h4>
+          <h4 className="text-xs font-semibold text-muted-foreground mb-2">{t('assistant.quickTips')}</h4>
           <div className="space-y-2 text-xs">
             <div className="bg-gray-50 p-2 rounded">
-              💡 Stop Loss te protejează de pierderi mari
+              {t('assistant.tip1')}
             </div>
             <div className="bg-gray-50 p-2 rounded">
-              ⚡ Leverage amplifică profitul ȘI pierderea
+              {t('assistant.tip2')}
             </div>
             <div className="bg-gray-50 p-2 rounded">
-              🎯 Diversifică - nu pune totul pe un singur activ
+              {t('assistant.tip3')}
             </div>
           </div>
         </div>
@@ -94,7 +96,7 @@ export default function AIAssistant({ messages = [], achievements = [], onAskQue
           <div>
             <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1">
               <Award className="w-3 h-3" />
-              Realizări
+              {t('assistant.achievements')}
             </h4>
             <div className="flex flex-wrap gap-1">
               {achievements.map((ach, idx) => (
@@ -110,7 +112,7 @@ export default function AIAssistant({ messages = [], achievements = [], onAskQue
         <div>
           <div className="flex gap-2">
             <Input
-              placeholder="Întreabă ceva..."
+              placeholder={t('assistant.askPlaceholder')}
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleAsk()}
@@ -127,13 +129,13 @@ export default function AIAssistant({ messages = [], achievements = [], onAskQue
           <Link to="/glossary" className="flex-1">
             <Button variant="outline" size="sm" className="w-full text-xs">
               <BookOpen className="w-3 h-3 mr-1" />
-              Glosar
+              {t('assistant.glossary')}
             </Button>
           </Link>
           <Link to="/advisor" className="flex-1">
             <Button variant="outline" size="sm" className="w-full text-xs">
               <Bot className="w-3 h-3 mr-1" />
-              AI Chat
+              {t('assistant.aiChat')}
             </Button>
           </Link>
         </div>

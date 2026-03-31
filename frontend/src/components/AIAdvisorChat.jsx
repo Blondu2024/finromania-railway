@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Send, Bot, User, Lock, Crown, AlertCircle, Sparkles, TrendingUp, BarChart3, BookOpen, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -9,29 +10,30 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const LEVEL_INFO = {
   beginner: {
-    name: 'Începător',
+    nameKey: 'advisor.levelBeginner',
     icon: BookOpen,
     color: 'text-green-500',
     bgColor: 'bg-green-500/10',
-    description: 'Focus pe dividende și acțiuni BET'
+    descKey: 'advisor.beginnerDesc'
   },
   intermediate: {
-    name: 'Mediu',
+    nameKey: 'advisor.levelIntermediate',
     icon: BarChart3,
     color: 'text-blue-500',
     bgColor: 'bg-blue-500/10',
-    description: 'Indicatori tehnici și analiză avansată'
+    descKey: 'advisor.intermediateDesc'
   },
   advanced: {
-    name: 'Expert',
+    nameKey: 'advisor.levelAdvanced',
     icon: TrendingUp,
     color: 'text-blue-500',
     bgColor: 'bg-blue-500/10',
-    description: 'Analiză fundamentală și grafice pro'
+    descKey: 'advisor.advancedDesc'
   }
 };
 
 const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
+  const { t } = useTranslation();
   const { user, token } = useAuth();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -47,7 +49,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
       // Add welcome message
       setMessages([{
         role: 'assistant',
-        content: `Salut! Sunt AI Advisor-ul tău financiar. ${symbol ? `Văd că analizezi ${symbol}.` : ''} Cu ce te pot ajuta astăzi?`,
+        content: t('advisor.welcome', {symbol: symbol || ''}),
         timestamp: new Date()
       }]);
     }
@@ -152,7 +154,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, {
         role: 'system',
-        content: 'A apărut o eroare. Te rog să încerci din nou.',
+        content: t('advisor.error'),
         isError: true,
         timestamp: new Date()
       }]);
@@ -170,10 +172,10 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
       <Card className="bg-zinc-900 border-zinc-700">
         <CardContent className="p-6 text-center">
           <Lock className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-white mb-2">Conectează-te pentru AI Advisor</h3>
-          <p className="text-gray-400 mb-4">Trebuie să fii autentificat pentru a folosi AI Advisor.</p>
+          <h3 className="text-lg font-semibold text-white mb-2">{t('advisor.loginRequired')}</h3>
+          <p className="text-gray-400 mb-4">{t('advisor.loginMessage')}</p>
           <Button variant="default" onClick={() => window.location.href = '/login'}>
-            Conectează-te
+            {t('advisor.login')}
           </Button>
         </CardContent>
       </Card>
@@ -208,7 +210,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
               <div className="flex items-center gap-2 mt-1">
                 <Badge className={`${levelInfo?.bgColor} ${levelInfo?.color}`}>
                   <LevelIcon className="w-3 h-3 mr-1" />
-                  {levelInfo?.name}
+                  {t(levelInfo?.nameKey)}
                 </Badge>
                 {symbol && (
                   <Badge variant="outline" className="text-gray-400 border-gray-600">
@@ -222,7 +224,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
           {/* Queries counter */}
           {!isUnlimited && (
             <div className="text-right">
-              <p className="text-xs text-gray-500">Întrebări rămase</p>
+              <p className="text-xs text-gray-500">{t('advisor.questionsRemaining')}</p>
               <p className={`text-lg font-bold ${queriesRemaining <= 1 ? 'text-red-400' : 'text-green-400'}`}>
                 {queriesRemaining}/5
               </p>
@@ -280,7 +282,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
 
               {msg.allowedSymbols && (
                 <div className="mt-2">
-                  <p className="text-xs text-gray-400">Simboluri disponibile la nivelul tău:</p>
+                  <p className="text-xs text-gray-400">{t('advisor.availableSymbols')}</p>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {msg.allowedSymbols.slice(0, 10).map(s => (
                       <Badge key={s} variant="outline" className="text-xs">
@@ -293,12 +295,12 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
 
               {msg.chartLines && (
                 <div className="mt-3 p-2 bg-zinc-900 rounded text-xs">
-                  <p className="text-gray-400 mb-1">📐 Linii pentru grafic:</p>
+                  <p className="text-gray-400 mb-1">{t('advisor.chartLines')}</p>
                   {msg.chartLines.supports?.map((s, i) => (
-                    <p key={`s-${i}`} className="text-green-400">• Suport: {s.price} RON</p>
+                    <p key={`s-${i}`} className="text-green-400">{t('advisor.support')} {s.price} RON</p>
                   ))}
                   {msg.chartLines.resistances?.map((r, i) => (
-                    <p key={`r-${i}`} className="text-red-400">• Rezistență: {r.price} RON</p>
+                    <p key={`r-${i}`} className="text-red-400">{t('advisor.resistance')} {r.price} RON</p>
                   ))}
                 </div>
               )}
@@ -315,7 +317,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
             <div className="bg-zinc-800 rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
-                <span className="text-gray-400 text-sm">Analizez datele...</span>
+                <span className="text-gray-400 text-sm">{t('advisor.analyzing')}</span>
               </div>
             </div>
           </div>
@@ -327,44 +329,44 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
       {/* Quick Questions */}
       {messages.length <= 2 && (
         <div className="px-4 pb-2">
-          <p className="text-xs text-gray-500 mb-2">Întrebări sugerate:</p>
+          <p className="text-xs text-gray-500 mb-2">{t('advisor.suggestedQuestions')}</p>
           <div className="flex flex-wrap gap-2">
             {symbol ? (
               <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="text-xs"
-                  onClick={() => handleQuickQuestion(`Care sunt perspectivele pentru ${symbol}?`)}
+                  onClick={() => handleQuickQuestion(t('advisor.perspectivesFor', {symbol}))}
                 >
-                  Perspective {symbol}
+                  {t('advisor.perspectives')} {symbol}
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="text-xs"
-                  onClick={() => handleQuickQuestion(`Analizează dividendele pentru ${symbol}`)}
+                  onClick={() => handleQuickQuestion(t('advisor.analyzeDividends', {symbol}))}
                 >
-                  Dividende
+                  {t('advisor.dividends')}
                 </Button>
               </>
             ) : (
               <>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="text-xs"
-                  onClick={() => handleQuickQuestion('Care sunt cele mai bune acțiuni pentru dividende pe BVB?')}
+                  onClick={() => handleQuickQuestion(t('advisor.bestDividends'))}
                 >
-                  Top Dividende BVB
+                  {t('advisor.topDividends')}
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="text-xs"
-                  onClick={() => handleQuickQuestion('Explică-mi ce înseamnă P/E ratio')}
+                  onClick={() => handleQuickQuestion(t('advisor.explainPE'))}
                 >
-                  Ce e P/E?
+                  {t('advisor.whatIsPE')}
                 </Button>
               </>
             )}
@@ -379,7 +381,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={`Întreabă despre ${symbol || 'piața BVB'}...`}
+            placeholder={t('advisor.askAbout', {topic: symbol || t('advisor.bvbMarket')})}
             className="flex-1 bg-zinc-800 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
             disabled={loading}
           />
@@ -399,7 +401,7 @@ const AIAdvisorChat = ({ symbol = null, marketType = 'bvb' }) => {
         {!isUnlimited && queriesRemaining <= 2 && queriesRemaining > 0 && (
           <p className="text-xs text-amber-400 mt-2 flex items-center gap-1">
             <AlertCircle className="w-3 h-3" />
-            Mai ai doar {queriesRemaining} întrebări gratuite azi
+            {t('advisor.queriesWarning', {remaining: queriesRemaining})}
           </p>
         )}
       </div>
