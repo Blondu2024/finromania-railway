@@ -110,6 +110,18 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"BVB dividends warmup failed (non-critical): {e}")
     
+    # Warmup BVB.ro fundamentals on startup if empty
+    async def _warmup_bvb_fundamentals():
+        try:
+            from scrapers.bvb_fundamentals_scraper import get_cached_fundamentals, run_fundamentals_scrape
+            existing, _ = await get_cached_fundamentals()
+            if not existing:
+                logger.info("🔄 Warming up BVB.ro fundamentals on startup...")
+                await run_fundamentals_scrape()
+        except Exception as e:
+            logger.warning(f"BVB fundamentals warmup failed (non-critical): {e}")
+
+    _asyncio.create_task(_warmup_bvb_fundamentals())
     _asyncio.create_task(_warmup_screener())
     _asyncio.create_task(_warmup_bvb_dividends())
     logger.info("✅ FinRomania API started successfully!")
@@ -636,11 +648,25 @@ async def get_bvb_stock_details(symbol: str, period: str = Query(default="1m"), 
         
         if not history:
             raise HTTPException(status_code=404, detail=f"Stock {symbol} not found")
-        
+
+        # Merge BVB.ro fundamentals
+        from scrapers.bvb_fundamentals_scraper import get_fundamentals_for_symbol
+        fund = await get_fundamentals_for_symbol(symbol.upper())
+        if fund:
+            history["pe_ratio"] = fund.get("per")
+            history["dividend_yield"] = fund.get("dividend_yield")
+            history["dividend_per_share"] = fund.get("dividend")
+            history["dividend_year"] = fund.get("dividend_year")
+            history["market_cap"] = fund.get("market_cap")
+            history["high_52w"] = fund.get("high_52w")
+            history["low_52w"] = fund.get("low_52w")
+            history["total_shares"] = fund.get("total_shares")
+            history["fundamentals_source"] = "BVB.ro"
+
         # Get related news
         stock_name = history.get('name', symbol)
         related_news = await news_service.search_news_by_topic(stock_name, limit=5)
-        
+
         return {
             **history,
             'related_news': related_news

@@ -177,6 +177,20 @@ async def refresh_fundamentals_cache_job():
         logger.error(f"❌ [JOB] Error refreshing fundamentals cache: {e}")
 
 
+async def scrape_bvb_fundamentals_job():
+    """
+    Job: Scrape fundamentale BVB.ro (PER, dividend, market cap, 52w) pentru toate acțiunile.
+    Date oficiale BVB.ro — nu se schimbă la minut, scraping 2x/zi e suficient.
+    """
+    try:
+        from scrapers.bvb_fundamentals_scraper import run_fundamentals_scrape
+        logger.info("🔄 [JOB] Scraping BVB.ro fundamentals (PER, dividend, market cap, 52w)...")
+        result = await run_fundamentals_scrape()
+        logger.info(f"✅ [JOB] BVB fundamentals done: {result['count']} stocks")
+    except Exception as e:
+        logger.error(f"❌ [JOB] Error scraping BVB fundamentals: {e}")
+
+
 def start_scheduler():
     """Start all scheduled jobs"""
     try:
@@ -289,6 +303,23 @@ def start_scheduler():
             replace_existing=True
         )
 
+        # Job 12: Scrape BVB.ro fundamentals (2x/zi: 07:30 + 18:30 Bucharest)
+        # PER, dividend, market cap, 52w — date oficiale BVB.ro
+        scheduler.add_job(
+            scrape_bvb_fundamentals_job,
+            trigger=CronTrigger(hour=7, minute=30, timezone='Europe/Bucharest'),
+            id='scrape_bvb_fundamentals_morning',
+            name='Scrape BVB.ro Fundamentals (Morning)',
+            replace_existing=True
+        )
+        scheduler.add_job(
+            scrape_bvb_fundamentals_job,
+            trigger=CronTrigger(hour=18, minute=30, timezone='Europe/Bucharest'),
+            id='scrape_bvb_fundamentals_evening',
+            name='Scrape BVB.ro Fundamentals (Evening)',
+            replace_existing=True
+        )
+
         # Start scheduler
         scheduler.start()
         logger.info("✅ Scheduler started with all jobs!")
@@ -302,6 +333,7 @@ def start_scheduler():
         logger.info("   • Daily summary email: daily at 18:05 (Europe/Bucharest)")
         logger.info("   • BVB.ro dividends scrape: daily at 7:00 AM (Europe/Bucharest)")
         logger.info("   • Fundamentals cache refresh: daily at 8:00 AM (Europe/Bucharest)")
+        logger.info("   • BVB.ro fundamentals scrape: daily at 7:30 + 18:30 (Europe/Bucharest)")
         
         # DON'T run jobs immediately at startup - let the scheduler handle them
         # This prevents blocking the application startup

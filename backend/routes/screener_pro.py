@@ -455,7 +455,8 @@ async def get_fundamentals_from_daily_cache(symbol: str) -> Optional[Dict]:
 async def refresh_fundamentals_daily_cache():
     """
     Actualizează cache-ul zilnic de fundamentale pentru toate acțiunile BVB.
-    Salvează din EODHD: P/E, ROE, EPS, D/E (valori reale, fără estimări).
+    Salvează din EODHD: ROE, EPS, D/E, beta (valori reale, fără estimări).
+    P/E, market_cap, 52w, dividend → vin din BVB.ro scraper (mai precise).
     Se rulează zilnic la 8:00 AM din scheduler.
     """
     try:
@@ -463,33 +464,44 @@ async def refresh_fundamentals_daily_cache():
         stocks = await db.stocks_bvb.find({}, {"_id": 0, "symbol": 1}).to_list(200)
         logger.info(f"[FUND CACHE] Starting daily refresh for {len(stocks)} stocks")
 
+        # Încarcă BVB.ro fundamentale pentru merge
+        from scrapers.bvb_fundamentals_scraper import get_cached_fundamentals
+        bvb_fund_map, _ = await get_cached_fundamentals()
+
         async with httpx.AsyncClient() as client:
             for stock in stocks:
                 symbol = stock.get("symbol")
                 try:
                     fund = await fetch_fundamentals(client, symbol)
-                    if fund:
-                        await db[FUNDAMENTALS_CACHE_COLLECTION].replace_one(
-                            {"symbol": symbol},
-                            {
-                                "symbol": symbol,
-                                "logo_url": fund.get("logo_url"),
-                                "pe_ratio": fund.get("pe_ratio"),
-                                "eps": fund.get("eps"),
-                                "roe": fund.get("roe"),
-                                "roa": fund.get("roa"),
-                                "profit_margin": fund.get("profit_margin"),
-                                "market_cap": fund.get("market_cap"),
-                                "pb_ratio": fund.get("pb_ratio"),
-                                "beta": fund.get("beta"),
-                                "book_value": fund.get("book_value"),
-                                "52_week_high": fund.get("52_week_high"),
-                                "52_week_low": fund.get("52_week_low"),
-                                "debt_equity": fund.get("debt_equity"),
-                                "cached_at": datetime.now(timezone.utc).isoformat(),
-                            },
-                            upsert=True
-                        )
+                    bvb = bvb_fund_map.get(symbol, {})
+
+                    # Merge: BVB.ro pentru P/E, market_cap, 52w → EODHD pentru restul
+                    merged = {
+                        "symbol": symbol,
+                        "logo_url": fund.get("logo_url") if fund else None,
+                        "pe_ratio": bvb.get("per") or (fund.get("pe_ratio") if fund else None),
+                        "eps": fund.get("eps") if fund else None,
+                        "roe": fund.get("roe") if fund else None,
+                        "roa": fund.get("roa") if fund else None,
+                        "profit_margin": fund.get("profit_margin") if fund else None,
+                        "market_cap": bvb.get("market_cap") or (fund.get("market_cap") if fund else None),
+                        "pb_ratio": fund.get("pb_ratio") if fund else None,
+                        "beta": fund.get("beta") if fund else None,
+                        "book_value": fund.get("book_value") if fund else None,
+                        "52_week_high": bvb.get("high_52w") or (fund.get("52_week_high") if fund else None),
+                        "52_week_low": bvb.get("low_52w") or (fund.get("52_week_low") if fund else None),
+                        "debt_equity": fund.get("debt_equity") if fund else None,
+                        "dividend_per_share": bvb.get("dividend"),
+                        "dividend_yield": bvb.get("dividend_yield"),
+                        "fundamentals_source": "BVB.ro+EODHD",
+                        "cached_at": datetime.now(timezone.utc).isoformat(),
+                    }
+
+                    await db[FUNDAMENTALS_CACHE_COLLECTION].replace_one(
+                        {"symbol": symbol},
+                        merged,
+                        upsert=True
+                    )
                     await asyncio.sleep(0.3)  # Rate limit EODHD
                 except Exception as e:
                     logger.warning(f"[FUND CACHE] Error for {symbol}: {e}")
@@ -658,7 +670,11 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict, bvb_records: Opt
         except Exception:
             bvb_records = []
 
-    # Încearcă cache-ul zilnic de fundamentale (P/E, ROE, EPS nu se schimbă intraday)
+    # === BVB.ro fundamentale (PER, dividend, market_cap, 52w) — sursa principală ===
+    from scrapers.bvb_fundamentals_scraper import get_fundamentals_for_symbol
+    bvb_fund = await get_fundamentals_for_symbol(symbol)
+
+    # === EODHD fundamentale (EPS, ROE, D/E, beta — ce BVB.ro nu oferă) ===
     fundamentals = await get_fundamentals_from_daily_cache(symbol)
 
     if fundamentals is None:
@@ -670,40 +686,54 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict, bvb_records: Opt
         # Cache hit: fetch doar technicals (date în timp real)
         technicals = await fetch_stock_technicals(client, symbol)
 
-    # === P/E: STRICT — EPS > 0, fără proiecții ===
+    # === P/E: PRIORITATE BVB.ro (oficial) → fallback EODHD ===
     pe_ratio = None
-    if fundamentals:
+    if bvb_fund and bvb_fund.get("per") and 0 < bvb_fund["per"] < 2000:
+        pe_ratio = bvb_fund["per"]
+    elif fundamentals:
         pe_raw = fundamentals.get("pe_ratio")
         eps = fundamentals.get("eps")
-
         if eps is not None and eps <= 0:
-            pe_ratio = None  # Companie cu pierderi sau zero profit → P/E invalid
+            pe_ratio = None
         elif pe_raw and 0 < pe_raw < 2000:
             pe_ratio = pe_raw
-        elif price and price > 0 and eps and eps > 0.01:
-            # Calculat din EPS real raportat (nu EPSEstimate)
-            calc = price / eps
-            if 0 < calc < 2000:
-                pe_ratio = calc
-    # Dacă nu avem date suficiente → pe_ratio rămâne None (nu estimăm)
 
-    # === ROE: STRICT — valoare raportată convertită în %, fără estimări ===
-    # Nu estimăm ROE din profit_margin sau alte surse derivate
+    # === ROE: STRICT — valoare raportată din EODHD ===
     roe_value = None
     if fundamentals:
         roe_raw = fundamentals.get("roe")
         if roe_raw is not None:
-            # EODHD returnează ca decimal (0.14 = 14%). Dacă > 10, e deja în %
             roe_value = roe_raw * 100 if abs(roe_raw) < 10 else roe_raw
 
-    # === Dividend Yield: STRICT — DOAR din dividende confirmate BVB.ro ===
-    confirmed_yield = _get_confirmed_yield_from_bvb(symbol, price, bvb_records)
+    # === Dividend Yield: PRIORITATE BVB.ro fundamentale → fallback dividende scraper ===
+    confirmed_yield = None
+    if bvb_fund and bvb_fund.get("dividend_yield") and bvb_fund["dividend_yield"] > 0:
+        confirmed_yield = bvb_fund["dividend_yield"]
+    else:
+        confirmed_yield = _get_confirmed_yield_from_bvb(symbol, price, bvb_records)
 
-    # === Debt/Equity din fundamentale (null dacă lipsesc date) ===
+    # === Market Cap, 52w: BVB.ro → fallback EODHD ===
+    market_cap = None
+    if bvb_fund and bvb_fund.get("market_cap"):
+        market_cap = bvb_fund["market_cap"]
+    elif fundamentals:
+        market_cap = fundamentals.get("market_cap")
+
+    high_52w = bvb_fund.get("high_52w") if bvb_fund else None
+    low_52w = bvb_fund.get("low_52w") if bvb_fund else None
+    if not high_52w and fundamentals:
+        high_52w = fundamentals.get("52_week_high")
+    if not low_52w and fundamentals:
+        low_52w = fundamentals.get("52_week_low")
+
+    # === Debt/Equity din EODHD (BVB.ro nu oferă) ===
     debt_equity = fundamentals.get("debt_equity") if fundamentals else None
 
-    # Calculate signal (uses raw fundamentals for internal calculations)
-    signal_data = calculate_signal(price, technicals, fundamentals or {})
+    # Calculate signal — P/E din BVB.ro acum
+    signal_fundamentals = dict(fundamentals) if fundamentals else {}
+    if pe_ratio:
+        signal_fundamentals["pe_ratio"] = pe_ratio
+    signal_data = calculate_signal(price, technicals, signal_fundamentals)
 
     return {
         "symbol": symbol,
@@ -722,18 +752,20 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict, bvb_records: Opt
         "sma50": round(technicals.get("sma50"), 2) if technicals.get("sma50") else None,
         "bb_upper": round(technicals.get("bb_upper"), 2) if technicals.get("bb_upper") else None,
         "bb_lower": round(technicals.get("bb_lower"), 2) if technicals.get("bb_lower") else None,
-        # Fundamentale — cache zilnic sau EODHD live (fără estimări)
+        # Fundamentale — BVB.ro (P/E, MCap, 52w, Div) + EODHD (EPS, ROE, D/E)
         "pe_ratio": round(pe_ratio, 2) if pe_ratio else None,
         "roe": round(roe_value, 2) if roe_value is not None else None,
         "eps": round(fundamentals.get("eps"), 2) if fundamentals and fundamentals.get("eps") is not None else None,
-        "dividend_yield": confirmed_yield,      # STRICT: BVB.ro confirmat sau null
+        "dividend_yield": confirmed_yield,      # BVB.ro oficial
+        "dividend_per_share": bvb_fund.get("dividend") if bvb_fund else None,
         "debt_equity": round(debt_equity, 2) if debt_equity is not None else None,
-        "market_cap": fundamentals.get("market_cap") if fundamentals else None,
+        "market_cap": market_cap,
         "pb_ratio": round(fundamentals.get("pb_ratio"), 2) if fundamentals and fundamentals.get("pb_ratio") else None,
-        "52_week_high": round(fundamentals.get("52_week_high"), 2) if fundamentals and fundamentals.get("52_week_high") else None,
-        "52_week_low": round(fundamentals.get("52_week_low"), 2) if fundamentals and fundamentals.get("52_week_low") else None,
+        "52_week_high": round(high_52w, 2) if high_52w else None,
+        "52_week_low": round(low_52w, 2) if low_52w else None,
         "beta": round(fundamentals.get("beta"), 3) if fundamentals and fundamentals.get("beta") else None,
         "200_day_ma": round(fundamentals.get("200_day_ma"), 2) if fundamentals and fundamentals.get("200_day_ma") else None,
+        "fundamentals_source": "BVB.ro" if bvb_fund else "EODHD",
         # Signal
         "signal": signal_data["signal"],
         "signal_text": signal_data["signal_text"],

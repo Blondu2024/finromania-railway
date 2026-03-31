@@ -168,10 +168,30 @@ class StockService:
             return bvb_mock.get_stock(symbol)
     
     async def get_all_bvb_stocks(self) -> List[Dict]:
-        """Obține toate stocks BVB din DB"""
+        """Obține toate stocks BVB din DB, cu fundamentale de pe BVB.ro"""
         db = await get_database()
-        cursor = db.stocks_bvb.find({}, {"_id": 0}).limit(100)
-        return await cursor.to_list(length=100)
+        stocks = await db.stocks_bvb.find({}, {"_id": 0}).limit(100).to_list(length=100)
+
+        # Merge fundamentale BVB.ro (PER, dividend, market_cap, 52w)
+        fundamentals = await db.bvb_fundamentals.find({}, {"_id": 0}).to_list(200)
+        fund_map = {f["symbol"]: f for f in fundamentals}
+
+        for stock in stocks:
+            sym = stock.get("symbol", "")
+            fund = fund_map.get(sym)
+            if fund:
+                stock["pe_ratio"] = fund.get("per")
+                stock["dividend_yield"] = fund.get("dividend_yield")
+                stock["dividend_per_share"] = fund.get("dividend")
+                stock["dividend_year"] = fund.get("dividend_year")
+                stock["market_cap"] = fund.get("market_cap")
+                stock["high_52w"] = fund.get("high_52w")
+                stock["low_52w"] = fund.get("low_52w")
+                stock["total_shares"] = fund.get("total_shares")
+                stock["fundamentals_source"] = "BVB.ro"
+                stock["fundamentals_updated"] = fund.get("scraped_at")
+
+        return stocks
     
     async def get_all_global_indices(self) -> List[Dict]:
         """Obține toți indicii globali din DB"""
