@@ -103,6 +103,9 @@ async def scrape_stock_fundamentals(client: httpx.AsyncClient, symbol: str) -> O
         "total_shares": None,
         "nominal_value": None,
         "dividend_yield": None,
+        "eps": None,
+        "pb_ratio": None,
+        "divy_official": None,
         "source": "BVB.ro",
         "source_url": url,
     }
@@ -136,6 +139,15 @@ async def scrape_stock_fundamentals(client: httpx.AsyncClient, symbol: str) -> O
 
         elif cell == "Valoare Nominala":
             data["nominal_value"] = _parse_ro_number(next_val)
+
+        elif cell == "EPS":
+            data["eps"] = _parse_ro_number(next_val)
+
+        elif cell == "P/BV":
+            data["pb_ratio"] = _parse_ro_number(next_val)
+
+        elif cell == "DIVY":
+            data["divy_official"] = _parse_ro_number(next_val)
 
         elif cell == "Pret referinta":
             ref_price = _parse_ro_number(next_val)

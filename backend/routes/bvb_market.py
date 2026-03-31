@@ -43,66 +43,48 @@ BVB_INDICES = {
     }
 }
 
-# Backup index data if Yahoo doesn't have real-time
-# IMPORTANT: Aceste valori trebuie actualizate manual periodic!
-# Sursa: https://tradingeconomics.com/romania/stock-market
-# Ultima actualizare: 20 martie 2026
-BVB_INDEX_FALLBACK = {
-    "BET": {"value": 28012.98, "change": -210.39, "change_percent": -0.0074},
-    "BETTR": {"value": 66834.21, "change": -498.12, "change_percent": -0.0074},
-    "BETFI": {"value": 75621.45, "change": -587.23, "change_percent": -0.0078},
-    "BETNG": {"value": 1523.67, "change": -11.32, "change_percent": -0.0074},
-    "BETXT": {"value": 1834.52, "change": -13.87, "change_percent": -0.0075}
-}
-
-
 @router.get("/indices")
 async def get_bvb_indices(response: Response):
     """Get all BVB indices with current values from TradingView (real-time data)"""
-    # Prevent caching for live data
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
-    
+
     try:
-        # Folosim TradingView pentru date exacte în timp real
         from apis.tradingview_client import get_tradingview_client
-        
+        db = await get_database()
+
         tv_client = get_tradingview_client()
         indices = await tv_client.get_bvb_indices()
-        
+
         if indices:
-            logger.info(f"Got {len(indices)} indices from TradingView")
+            # Cache successful result in MongoDB
+            await db.bvb_indices_cache.replace_one(
+                {"_id": "latest"},
+                {"_id": "latest", "indices": indices, "updated_at": datetime.now(timezone.utc).isoformat(), "source": "TradingView"},
+                upsert=True
+            )
             return {
                 "indices": indices,
                 "source": "TradingView",
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }
-        
-        # Fallback dacă TradingView nu răspunde
-        logger.warning("TradingView unavailable, using fallback data")
-        fallback_indices = []
-        for key, info in BVB_INDICES.items():
-            fallback = BVB_INDEX_FALLBACK.get(key, {})
-            fallback_indices.append({
-                "id": key,
-                "symbol": info["symbol"],
-                "name": info["name"],
-                "description": info["description"],
-                "components": info["components"],
-                "value": fallback.get("value", 0),
-                "change": fallback.get("change", 0),
-                "change_percent": round(fallback.get("change_percent", 0) * 100, 2),
-                "is_live": False,
-                "source": "fallback",
-                "timestamp": datetime.now(timezone.utc).isoformat()
-            })
-        
-        return {
-            "indices": fallback_indices,
-            "source": "fallback",
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }
-        
+
+        # Fallback: last successful data from MongoDB
+        cached = await db.bvb_indices_cache.find_one({"_id": "latest"})
+        if cached:
+            logger.warning("TradingView unavailable, serving cached indices")
+            return {
+                "indices": cached["indices"],
+                "source": "cache",
+                "updated_at": cached.get("updated_at"),
+                "is_cached": True
+            }
+
+        logger.error("No index data available (TradingView failed, no cache)")
+        raise HTTPException(status_code=503, detail="Index data temporarily unavailable")
+
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error fetching BVB indices: {e}")
         raise HTTPException(status_code=500, detail=str(e))

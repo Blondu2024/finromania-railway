@@ -120,6 +120,14 @@ class DailySummaryService:
         if not self._is_market_day():
             return None
 
+        # Check if already generated today (prevent duplicates on redeploy)
+        db = await get_database()
+        date_key = self._get_today_date_key()
+        existing = await db.daily_summaries.find_one({"date_key": date_key})
+        if existing:
+            logger.info(f"Daily summary already exists for {date_key}, skipping generation")
+            return existing
+
         logger.info("🔄 Generating daily summary...")
 
         # Colectează datele de piață
@@ -253,14 +261,20 @@ class DailySummaryService:
             logger.info(f"Daily Summary: Got {len(indices)} indices from TradingView")
         except Exception as e:
             logger.warning(f"Could not fetch BVB indices from TradingView: {e}")
-            # Fallback la valorile hardcodate
-            from routes.bvb_market import BVB_INDEX_FALLBACK
-            for key, fallback in BVB_INDEX_FALLBACK.items():
-                indices[key] = {
-                    "value": fallback.get("value", 0),
-                    "change_percent": round(fallback.get("change_percent", 0) * 100, 2),
-                    "is_live": False
-                }
+            # Fallback: use last cached indices from MongoDB
+            try:
+                db_cache = await get_database()
+                cached = await db_cache.bvb_indices_cache.find_one({"_id": "latest"})
+                if cached:
+                    for idx in cached.get("indices", []):
+                        indices[idx["id"]] = {
+                            "value": idx.get("value"),
+                            "change_percent": idx.get("change_percent"),
+                            "is_live": False
+                        }
+                    logger.info(f"Daily Summary: Using {len(indices)} cached indices")
+            except Exception as e2:
+                logger.error(f"Could not load cached indices: {e2}")
         
         # Sortează pentru top gainers/losers
         # IMPORTANT: Excludem acțiunile cu volum 0 (nu s-au tranzacționat azi = prețuri vechi)
@@ -651,9 +665,24 @@ Cea mai mare lichiditate a fost pe {top_vol.get('symbol')}, cu un volum de {vol_
     async def send_to_all_subscribers(self) -> Dict:
         """Trimite rezumatul zilnic la toți userii abonați (plan Resend $20 = 10k/lună)"""
         db = await get_database()
+        date_key = self._get_today_date_key()
+
+        # Check if emails were already sent today (prevent duplicates on redeploy)
+        lock = await db.email_send_locks.find_one({"date_key": date_key})
+        if lock and lock.get("emails_sent"):
+            logger.info(f"Emails already sent for {date_key}, skipping")
+            return {"sent": 0, "failed": 0, "skipped": 0, "already_sent": True}
+
+        # Mark as sending (lock)
+        await db.email_send_locks.update_one(
+            {"date_key": date_key},
+            {"$set": {"date_key": date_key, "emails_sent": True, "sent_at": datetime.now(timezone.utc).isoformat()}},
+            upsert=True
+        )
+
         results = {"sent": 0, "failed": 0, "skipped": 0, "limit_reached": False}
         DAILY_LIMIT = 500  # Plan $20 Resend = 10k/lună, ~330/zi - lăsăm buffer pentru alerte
-        
+
         try:
             subscribers = await db.users.find({
                 "daily_summary_enabled": True,

@@ -705,9 +705,25 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict, bvb_records: Opt
         if roe_raw is not None:
             roe_value = roe_raw * 100 if abs(roe_raw) < 10 else roe_raw
 
-    # === Dividend Yield: PRIORITATE BVB.ro fundamentale → fallback dividende scraper ===
+    # === EPS: PRIORITATE BVB.ro (oficial) → fallback EODHD ===
+    eps_value = None
+    if bvb_fund and bvb_fund.get("eps") is not None:
+        eps_value = bvb_fund["eps"]
+    elif fundamentals and fundamentals.get("eps") is not None:
+        eps_value = fundamentals.get("eps")
+
+    # === P/B: PRIORITATE BVB.ro (oficial) → fallback EODHD ===
+    pb_ratio_value = None
+    if bvb_fund and bvb_fund.get("pb_ratio") is not None:
+        pb_ratio_value = bvb_fund["pb_ratio"]
+    elif fundamentals and fundamentals.get("pb_ratio"):
+        pb_ratio_value = fundamentals.get("pb_ratio")
+
+    # === Dividend Yield: PRIORITATE BVB.ro divy_official → BVB.ro dividend_yield → fallback dividende scraper ===
     confirmed_yield = None
-    if bvb_fund and bvb_fund.get("dividend_yield") and bvb_fund["dividend_yield"] > 0:
+    if bvb_fund and bvb_fund.get("divy_official") is not None and bvb_fund["divy_official"] > 0:
+        confirmed_yield = bvb_fund["divy_official"]
+    elif bvb_fund and bvb_fund.get("dividend_yield") and bvb_fund["dividend_yield"] > 0:
         confirmed_yield = bvb_fund["dividend_yield"]
     else:
         confirmed_yield = _get_confirmed_yield_from_bvb(symbol, price, bvb_records)
@@ -755,12 +771,12 @@ async def process_stock(client: httpx.AsyncClient, stock: Dict, bvb_records: Opt
         # Fundamentale — BVB.ro (P/E, MCap, 52w, Div) + EODHD (EPS, ROE, D/E)
         "pe_ratio": round(pe_ratio, 2) if pe_ratio else None,
         "roe": round(roe_value, 2) if roe_value is not None else None,
-        "eps": round(fundamentals.get("eps"), 2) if fundamentals and fundamentals.get("eps") is not None else None,
+        "eps": round(eps_value, 2) if eps_value is not None else None,
         "dividend_yield": confirmed_yield,      # BVB.ro oficial
         "dividend_per_share": bvb_fund.get("dividend") if bvb_fund else None,
         "debt_equity": round(debt_equity, 2) if debt_equity is not None else None,
         "market_cap": market_cap,
-        "pb_ratio": round(fundamentals.get("pb_ratio"), 2) if fundamentals and fundamentals.get("pb_ratio") else None,
+        "pb_ratio": round(pb_ratio_value, 2) if pb_ratio_value else None,
         "52_week_high": round(high_52w, 2) if high_52w else None,
         "52_week_low": round(low_52w, 2) if low_52w else None,
         "beta": round(fundamentals.get("beta"), 3) if fundamentals and fundamentals.get("beta") else None,
