@@ -417,6 +417,10 @@ async def get_dividend_stocks():
 
     cutoff = (datetime.now(timezone.utc) - timedelta(days=400)).strftime("%Y-%m-%d")
 
+    # Load BVB.ro fundamentals (DIVY oficial, EPS, P/BV)
+    from scrapers.bvb_fundamentals_scraper import get_cached_fundamentals
+    bvb_fund_map, _ = await get_cached_fundamentals()
+
     for symbol, payments in by_symbol.items():
         recent = [p for p in payments if p.get("ex_date", "") >= cutoff]
         if not recent:
@@ -428,25 +432,29 @@ async def get_dividend_stocks():
 
         latest = max(recent, key=lambda p: p.get("ex_date", ""))
         current_price = await get_current_price(symbol)
-        div_yield = latest.get("dividend_yield", 0)
+        fund = bvb_fund_map.get(symbol, {})
+
+        # DIVY: prioritate BVB.ro oficial > calculat
+        div_yield = fund.get("divy_official") or latest.get("dividend_yield", 0)
         if div_yield <= 0 and current_price > 0:
             div_yield = trailing_annual / current_price * 100
-        # Estimate price from yield + DPS when not in main stocks list
         if current_price <= 0 and div_yield > 0 and trailing_annual > 0:
             current_price = trailing_annual / (div_yield / 100)
 
         stocks.append({
             "symbol": symbol,
             "name": latest.get("company", symbol),
-            "sector": "BVB",
+            "sector": fund.get("sector", "BVB"),
             "price": round(current_price, 2),
             "dividend_per_share": round(trailing_annual, 4),
             "dividend_yield": round(div_yield, 2),
             "ex_date": latest.get("ex_date"),
             "payment_date": latest.get("payment_date"),
+            "eps": fund.get("eps"),
+            "per": fund.get("per"),
+            "pb_ratio": fund.get("pb_ratio"),
             "data_source": "BVB.ro (oficial)",
             "payments_12m": len(recent),
-            "note": f"Trailing 12M: {len(recent)} plăți de pe BVB.ro",
         })
         seen_symbols.add(symbol)
 
