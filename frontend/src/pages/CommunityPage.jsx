@@ -1,163 +1,112 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  MessageSquare, Heart, Send, ArrowLeft, Clock, User,
-  Crown, Lock, Trash2, ChevronRight, Users, Reply
+  MessageSquare, Send, ArrowLeft, Users, Lock, Crown,
+  Hash, Wallet, BarChart3, GraduationCap, Receipt, Globe, Trash2
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import SEO from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+const WS_URL = API_URL.replace('https://', 'wss://').replace('http://', 'ws://');
+
+const ICONS = {
+  wallet: Wallet,
+  chart: BarChart3,
+  graduation: GraduationCap,
+  receipt: Receipt,
+  globe: Globe,
+  message: MessageSquare,
+};
+
+const COLORS = {
+  green: 'from-green-500 to-green-600',
+  blue: 'from-blue-500 to-blue-600',
+  purple: 'from-purple-500 to-purple-600',
+  orange: 'from-orange-500 to-orange-600',
+  cyan: 'from-cyan-500 to-cyan-600',
+  slate: 'from-slate-500 to-slate-600',
+};
 
 // ============================================
-// TOPIC CARD
+// CHANNEL LIST (sidebar)
 // ============================================
-function TopicCard({ topic, onClick }) {
-  const colorMap = {
-    green: 'from-green-500 to-green-600',
-    blue: 'from-blue-500 to-blue-600',
-    purple: 'from-purple-500 to-purple-600',
-    orange: 'from-orange-500 to-orange-600',
-    cyan: 'from-cyan-500 to-cyan-600',
-    red: 'from-red-500 to-red-600',
-  };
+function ChannelList({ channels, activeId, onSelect, loading }) {
+  if (loading) return <div className="p-4 text-sm text-muted-foreground">Se incarca...</div>;
 
   return (
-    <Card
-      className="cursor-pointer hover:shadow-lg transition-all hover:-translate-y-0.5 border-0 shadow-md"
-      onClick={() => onClick(topic.id)}
-    >
-      <CardContent className="p-5">
-        <div className="flex items-start gap-4">
-          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorMap[topic.color] || colorMap.blue} flex items-center justify-center text-2xl shadow-sm`}>
-            {topic.icon}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-base">{topic.name}</h3>
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            </div>
-            <p className="text-sm text-muted-foreground mt-0.5">{topic.description}</p>
-            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <MessageSquare className="w-3 h-3" />
-                {topic.post_count || 0} discutii
-              </span>
-              {topic.last_author && (
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {topic.last_author}
-                </span>
+    <div className="space-y-1 p-2">
+      {channels.map((ch) => {
+        const Icon = ICONS[ch.icon] || Hash;
+        const isActive = ch.id === activeId;
+
+        return (
+          <button
+            key={ch.id}
+            onClick={() => onSelect(ch)}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all ${
+              isActive
+                ? 'bg-blue-500 text-white shadow-md'
+                : 'hover:bg-accent text-foreground'
+            }`}
+          >
+            <Icon className="w-4 h-4 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium truncate">{ch.name}</span>
+                {ch.online_count > 0 && (
+                  <span className={`flex items-center gap-1 text-xs ${isActive ? 'text-white/80' : 'text-green-500'}`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    {ch.online_count}
+                  </span>
+                )}
+              </div>
+              {ch.last_message && (
+                <p className={`text-xs truncate mt-0.5 ${isActive ? 'text-white/60' : 'text-muted-foreground'}`}>
+                  {ch.last_message.author}: {ch.last_message.content}
+                </p>
               )}
             </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
 // ============================================
-// POST CARD
+// MESSAGE BUBBLE
 // ============================================
-function PostCard({ post, onOpen, onLike, onDelete, currentUserId, isPro }) {
-  const timeAgo = (dateStr) => {
-    const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
-    if (diff < 60) return 'acum';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-    return `${Math.floor(diff / 86400)}z`;
-  };
-
-  const isLiked = post.likes?.includes(currentUserId);
-  const isAuthor = post.author_id === currentUserId;
+function MessageBubble({ msg, isOwn, onDelete }) {
+  const time = new Date(msg.created_at).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <Card className="border-0 shadow-sm hover:shadow-md transition-all">
-      <CardContent className="p-4">
-        {/* Author row */}
-        <div className="flex items-center gap-2 mb-2">
-          {post.author_picture ? (
-            <img src={post.author_picture} alt="" className="w-7 h-7 rounded-full" />
-          ) : (
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-              <User className="w-3.5 h-3.5 text-white" />
-            </div>
-          )}
-          <span className="font-medium text-sm">{post.author_name}</span>
-          <Badge variant="outline" className="text-xs px-1.5 py-0 bg-amber-50 text-amber-700 border-amber-200">
-            PRO
-          </Badge>
-          <span className="text-xs text-muted-foreground ml-auto">{timeAgo(post.created_at)}</span>
+    <div className={`flex gap-2.5 px-4 py-1 hover:bg-accent/30 group ${isOwn ? '' : ''}`}>
+      {msg.author_picture ? (
+        <img src={msg.author_picture} alt="" className="w-8 h-8 rounded-full mt-0.5 flex-shrink-0" />
+      ) : (
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mt-0.5 flex-shrink-0">
+          <span className="text-white text-xs font-bold">{msg.author_name?.[0]?.toUpperCase()}</span>
         </div>
-
-        {/* Title + Content */}
-        {post.title && (
-          <h4 className="font-semibold mb-1">{post.title}</h4>
-        )}
-        <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
-          {post.content.length > 300 ? post.content.slice(0, 300) + '...' : post.content}
-        </p>
-
-        {/* Actions */}
-        <div className="flex items-center gap-3 mt-3 pt-2 border-t border-gray-100 dark:border-gray-800">
-          <button
-            onClick={(e) => { e.stopPropagation(); onLike(post.post_id); }}
-            disabled={!isPro}
-            className={`flex items-center gap-1 text-xs transition-colors ${
-              isLiked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
-            } ${!isPro ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          >
-            <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-current' : ''}`} />
-            {post.like_count || 0}
-          </button>
-
-          <button
-            onClick={() => onOpen(post.post_id)}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-500 cursor-pointer transition-colors"
-          >
-            <Reply className="w-3.5 h-3.5" />
-            {post.reply_count || 0} raspunsuri
-          </button>
-
-          {isAuthor && (
+      )}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline gap-2">
+          <span className="font-semibold text-sm">{msg.author_name}</span>
+          <span className="text-xs text-muted-foreground">{time}</span>
+          {isOwn && (
             <button
-              onClick={(e) => { e.stopPropagation(); onDelete(post.post_id); }}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-red-500 cursor-pointer ml-auto transition-colors"
+              onClick={() => onDelete(msg.message_id)}
+              className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-red-500 transition-all"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3 h-3" />
             </button>
           )}
         </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ============================================
-// PRO PAYWALL BANNER
-// ============================================
-function ProWriteBanner() {
-  return (
-    <Card className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20">
-      <CardContent className="p-4 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center">
-          <Lock className="w-5 h-5 text-white" />
-        </div>
-        <div className="flex-1">
-          <p className="font-semibold text-sm">Vrei sa participi la discutii?</p>
-          <p className="text-xs text-muted-foreground">Utilizatorii PRO pot scrie mesaje si raspunsuri.</p>
-        </div>
-        <Button size="sm" className="bg-amber-500 hover:bg-amber-600" asChild>
-          <a href="/pricing">
-            <Crown className="w-4 h-4 mr-1" /> Upgrade PRO
-          </a>
-        </Button>
-      </CardContent>
-    </Card>
+        <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+      </div>
+    </div>
   );
 }
 
@@ -165,414 +114,270 @@ function ProWriteBanner() {
 // MAIN COMPONENT
 // ============================================
 export default function CommunityPage() {
-  const { t } = useTranslation();
   const { user, token } = useAuth();
 
-  const [topics, setTopics] = useState([]);
-  const [selectedTopic, setSelectedTopic] = useState(null);
-  const [posts, setPosts] = useState([]);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [replies, setReplies] = useState([]);
+  const [channels, setChannels] = useState([]);
+  const [activeChannel, setActiveChannel] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [onlineCount, setOnlineCount] = useState(0);
+  const [canWrite, setCanWrite] = useState(false);
+  const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(true);
+  const [typingUser, setTypingUser] = useState(null);
+  const [showSidebar, setShowSidebar] = useState(true);
 
-  // Write state
-  const [newPostContent, setNewPostContent] = useState('');
-  const [newPostTitle, setNewPostTitle] = useState('');
-  const [newReply, setNewReply] = useState('');
-  const [posting, setPosting] = useState(false);
-
+  const wsRef = useRef(null);
+  const messagesEndRef = useRef(null);
+  const typingTimeout = useRef(null);
   const isPro = user?.subscription_level === 'pro';
-  const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
 
-  // Fetch topics
-  const fetchTopics = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/community/topics`);
-      if (res.ok) {
-        const data = await res.json();
-        setTopics(data.topics);
-      }
-    } catch (err) {
-      console.error('Error fetching topics:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch posts for a topic
-  const fetchPosts = useCallback(async (topicId) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_URL}/api/community/topics/${topicId}/posts`);
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(data.posts);
-        setSelectedTopic(data.topic);
-      }
-    } catch (err) {
-      console.error('Error fetching posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch post with replies
-  const fetchPostDetail = useCallback(async (postId) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_URL}/api/community/posts/${postId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setSelectedPost(data.post);
-        setReplies(data.replies);
-      }
-    } catch (err) {
-      console.error('Error fetching post:', err);
-    } finally {
-      setLoading(false);
-    }
+  // Auto-scroll to bottom
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
   useEffect(() => {
-    fetchTopics();
-  }, [fetchTopics]);
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
-  // Auto-refresh posts every 15s when viewing a topic
+  // Fetch channels
   useEffect(() => {
-    if (!selectedTopic) return;
-    const interval = setInterval(() => {
-      if (selectedPost) {
-        fetchPostDetail(selectedPost.post_id);
-      } else {
-        fetchPosts(selectedTopic.id);
-      }
-    }, 15000);
-    return () => clearInterval(interval);
-  }, [selectedTopic, selectedPost, fetchPosts, fetchPostDetail]);
+    fetch(`${API_URL}/api/community/channels`)
+      .then(r => r.json())
+      .then(data => {
+        setChannels(data.channels);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
-  // Create post
-  const handleCreatePost = async () => {
-    if (!newPostContent.trim()) return;
-    setPosting(true);
-    try {
-      const res = await fetch(`${API_URL}/api/community/topics/${selectedTopic.id}/posts`, {
-        method: 'POST',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: newPostContent,
-          title: newPostTitle || null
-        })
+  // Connect WebSocket when channel changes
+  useEffect(() => {
+    if (!activeChannel) return;
+
+    // Load message history
+    fetch(`${API_URL}/api/community/channels/${activeChannel.id}/messages?limit=50`)
+      .then(r => r.json())
+      .then(data => {
+        setMessages(data.messages);
+        setOnlineCount(data.online_count);
+        scrollToBottom();
       });
-      if (res.ok) {
-        setNewPostContent('');
-        setNewPostTitle('');
-        fetchPosts(selectedTopic.id);
-      } else {
-        const err = await res.json();
-        alert(err.detail);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setPosting(false);
-    }
-  };
 
-  // Reply to post
-  const handleReply = async () => {
-    if (!newReply.trim()) return;
-    setPosting(true);
-    try {
-      const res = await fetch(`${API_URL}/api/community/posts/${selectedPost.post_id}/reply`, {
-        method: 'POST',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newReply })
-      });
-      if (res.ok) {
-        setNewReply('');
-        fetchPostDetail(selectedPost.post_id);
-      } else {
-        const err = await res.json();
-        alert(err.detail);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setPosting(false);
-    }
-  };
+    // Connect WebSocket
+    const ws = new WebSocket(`${WS_URL}/api/community/ws/${activeChannel.id}`);
+    wsRef.current = ws;
 
-  // Like post
-  const handleLike = async (postId) => {
-    if (!isPro) return;
-    try {
-      const res = await fetch(`${API_URL}/api/community/posts/${postId}/like`, {
-        method: 'POST',
-        headers
-      });
-      if (res.ok) {
-        // Refresh current view
-        if (selectedPost) {
-          fetchPostDetail(selectedPost.post_id);
-        } else if (selectedTopic) {
-          fetchPosts(selectedTopic.id);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Delete post
-  const handleDelete = async (postId) => {
-    if (!window.confirm('Sigur vrei sa stergi aceasta postare?')) return;
-    try {
-      const res = await fetch(`${API_URL}/api/community/posts/${postId}`, {
-        method: 'DELETE',
-        headers
-      });
-      if (res.ok) {
-        if (selectedPost?.post_id === postId) {
-          setSelectedPost(null);
-          setReplies([]);
-          fetchPosts(selectedTopic.id);
-        } else {
-          fetchPosts(selectedTopic.id);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Navigate back
-  const goBack = () => {
-    if (selectedPost) {
-      setSelectedPost(null);
-      setReplies([]);
-      fetchPosts(selectedTopic.id);
-    } else if (selectedTopic) {
-      setSelectedTopic(null);
-      setPosts([]);
-    }
-  };
-
-  // ============================================
-  // RENDER: Post Detail View
-  // ============================================
-  if (selectedPost) {
-    const timeAgo = (dateStr) => {
-      const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
-      if (diff < 60) return 'acum';
-      if (diff < 3600) return `${Math.floor(diff / 60)}m`;
-      if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
-      return `${Math.floor(diff / 86400)}z`;
+    ws.onopen = () => {
+      // Send auth
+      ws.send(JSON.stringify({
+        type: 'auth',
+        token: token || null
+      }));
     };
 
-    return (
-      <>
-        <SEO title={`${selectedPost.title || 'Discutie'} | Comunitate FinRomania`} />
-        <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
-          <Button variant="ghost" size="sm" onClick={goBack}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> Inapoi
-          </Button>
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
 
-          {/* Main post */}
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                {selectedPost.author_picture ? (
-                  <img src={selectedPost.author_picture} alt="" className="w-8 h-8 rounded-full" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
-                  </div>
-                )}
-                <div>
-                  <span className="font-medium text-sm">{selectedPost.author_name}</span>
-                  <span className="text-xs text-muted-foreground ml-2">{timeAgo(selectedPost.created_at)}</span>
-                </div>
-                <Badge variant="outline" className="text-xs px-1.5 py-0 bg-amber-50 text-amber-700 border-amber-200">PRO</Badge>
-              </div>
+      if (data.type === 'auth_ok') {
+        setCanWrite(data.can_write);
+      } else if (data.type === 'new_message') {
+        setMessages(prev => [...prev, data.message]);
+      } else if (data.type === 'message_deleted') {
+        setMessages(prev => prev.filter(m => m.message_id !== data.message_id));
+      } else if (data.type === 'online_count') {
+        setOnlineCount(data.count);
+      } else if (data.type === 'typing') {
+        if (data.user_name !== user?.name) {
+          setTypingUser(data.user_name);
+          clearTimeout(typingTimeout.current);
+          typingTimeout.current = setTimeout(() => setTypingUser(null), 2000);
+        }
+      }
+    };
 
-              {selectedPost.title && <h2 className="text-lg font-bold mb-2">{selectedPost.title}</h2>}
-              <p className="text-sm whitespace-pre-wrap leading-relaxed">{selectedPost.content}</p>
-            </CardContent>
-          </Card>
+    ws.onclose = () => {
+      // Reconnect after 3s
+      setTimeout(() => {
+        if (activeChannel && wsRef.current === ws) {
+          // Will trigger re-run of this effect via state
+        }
+      }, 3000);
+    };
 
-          {/* Replies */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-muted-foreground px-1">
-              {replies.length} {replies.length === 1 ? 'raspuns' : 'raspunsuri'}
-            </h3>
+    return () => {
+      ws.close();
+      wsRef.current = null;
+    };
+  }, [activeChannel, token, user?.name, scrollToBottom]);
 
-            {replies.map((reply) => (
-              <Card key={reply.post_id} className="border-0 shadow-sm ml-4 border-l-2 border-l-blue-200">
-                <CardContent className="p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    {reply.author_picture ? (
-                      <img src={reply.author_picture} alt="" className="w-6 h-6 rounded-full" />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center">
-                        <User className="w-3 h-3 text-white" />
-                      </div>
-                    )}
-                    <span className="font-medium text-xs">{reply.author_name}</span>
-                    <span className="text-xs text-muted-foreground">{timeAgo(reply.created_at)}</span>
-                    {reply.author_id === user?.user_id && (
-                      <button onClick={() => handleDelete(reply.post_id)} className="ml-auto text-muted-foreground hover:text-red-500">
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-sm whitespace-pre-wrap">{reply.content}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+  // Send message
+  const handleSend = () => {
+    if (!inputText.trim() || !wsRef.current || !canWrite) return;
 
-          {/* Reply form or paywall */}
-          {isPro ? (
-            <div className="flex gap-2">
-              <input
-                value={newReply}
-                onChange={(e) => setNewReply(e.target.value)}
-                placeholder="Scrie un raspuns..."
-                className="flex-1 px-3 py-2 rounded-lg border bg-background text-sm"
-                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleReply()}
-              />
-              <Button onClick={handleReply} disabled={posting || !newReply.trim()} size="sm">
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
-          ) : (
-            <ProWriteBanner />
-          )}
-        </div>
-      </>
-    );
-  }
+    wsRef.current.send(JSON.stringify({
+      type: 'message',
+      content: inputText.trim()
+    }));
+
+    setInputText('');
+  };
+
+  // Send typing indicator
+  const handleTyping = () => {
+    if (wsRef.current && canWrite) {
+      wsRef.current.send(JSON.stringify({ type: 'typing' }));
+    }
+  };
+
+  // Delete message
+  const handleDelete = async (messageId) => {
+    if (!token) return;
+    await fetch(`${API_URL}/api/community/messages/${messageId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+  };
+
+  // Select channel
+  const selectChannel = (ch) => {
+    setActiveChannel(ch);
+    setMessages([]);
+    setShowSidebar(false); // Hide sidebar on mobile
+  };
 
   // ============================================
-  // RENDER: Topic Posts View
-  // ============================================
-  if (selectedTopic) {
-    return (
-      <>
-        <SEO title={`${selectedTopic.name} | Comunitate FinRomania`} />
-        <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={goBack}>
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <span className="text-2xl">{selectedTopic.icon}</span>
-            <div>
-              <h1 className="text-xl font-bold">{selectedTopic.name}</h1>
-              <p className="text-sm text-muted-foreground">{selectedTopic.description}</p>
-            </div>
-          </div>
-
-          {/* New post form (PRO only) */}
-          {isPro ? (
-            <Card className="border-0 shadow-md">
-              <CardContent className="p-4 space-y-2">
-                <input
-                  value={newPostTitle}
-                  onChange={(e) => setNewPostTitle(e.target.value)}
-                  placeholder="Titlu (optional)"
-                  className="w-full px-3 py-2 rounded-lg border bg-background text-sm font-medium"
-                />
-                <textarea
-                  value={newPostContent}
-                  onChange={(e) => setNewPostContent(e.target.value)}
-                  placeholder="Ce vrei sa discuti?"
-                  rows={3}
-                  className="w-full px-3 py-2 rounded-lg border bg-background text-sm resize-none"
-                />
-                <div className="flex justify-end">
-                  <Button
-                    onClick={handleCreatePost}
-                    disabled={posting || !newPostContent.trim()}
-                    size="sm"
-                  >
-                    <Send className="w-4 h-4 mr-2" />
-                    {posting ? 'Se posteaza...' : 'Posteaza'}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <ProWriteBanner />
-          )}
-
-          {/* Posts list */}
-          {loading ? (
-            <div className="text-center py-8 text-muted-foreground">Se incarca...</div>
-          ) : posts.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="font-medium">Inca nu sunt discutii</p>
-              <p className="text-sm mt-1">Fii primul care deschide o discutie!</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {posts.map((post) => (
-                <PostCard
-                  key={post.post_id}
-                  post={post}
-                  onOpen={fetchPostDetail}
-                  onLike={handleLike}
-                  onDelete={handleDelete}
-                  currentUserId={user?.user_id}
-                  isPro={isPro}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </>
-    );
-  }
-
-  // ============================================
-  // RENDER: Topics Overview
+  // RENDER
   // ============================================
   return (
     <>
-      <SEO
-        title="Comunitate | FinRomania"
-        description="Discuta cu alti investitori romani despre BVB, dividende, strategii si taxe."
-      />
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto shadow-lg">
-            <Users className="w-7 h-7 text-white" />
+      <SEO title="Chat Comunitate | FinRomania" description="Chat live cu investitori romani" />
+
+      <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
+        {/* Sidebar — Channel List */}
+        <div className={`${showSidebar ? 'flex' : 'hidden'} md:flex flex-col w-full md:w-64 border-r bg-card flex-shrink-0`}>
+          <div className="p-3 border-b">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h2 className="font-bold text-sm">Comunitate</h2>
+                <p className="text-xs text-muted-foreground">Chat live investitori</p>
+              </div>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold">Comunitate</h1>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Discuta cu alti investitori romani. Intreaba, imparte experienta, invata impreuna.
-          </p>
+
+          <div className="flex-1 overflow-y-auto">
+            <ChannelList
+              channels={channels}
+              activeId={activeChannel?.id}
+              onSelect={selectChannel}
+              loading={loading}
+            />
+          </div>
+
           {!isPro && (
-            <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-200">
-              <Lock className="w-3 h-3 mr-1" />
-              Citesti gratuit. PRO pentru a scrie.
-            </Badge>
+            <div className="p-3 border-t bg-amber-50 dark:bg-amber-950/20">
+              <div className="flex items-center gap-2 text-xs">
+                <Lock className="w-3.5 h-3.5 text-amber-500" />
+                <span className="text-amber-700 dark:text-amber-400">Citesti gratuit. <a href="/pricing" className="underline font-medium">PRO</a> pentru a scrie.</span>
+              </div>
+            </div>
           )}
         </div>
 
-        {/* Topics grid */}
-        {loading ? (
-          <div className="text-center py-8 text-muted-foreground">Se incarca...</div>
+        {/* Chat Area */}
+        {activeChannel ? (
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Channel Header */}
+            <div className="h-12 border-b flex items-center gap-3 px-4 bg-card flex-shrink-0">
+              <button onClick={() => { setActiveChannel(null); setShowSidebar(true); }} className="md:hidden">
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <Hash className="w-4 h-4 text-muted-foreground" />
+              <span className="font-semibold text-sm">{activeChannel.name}</span>
+              <div className="flex items-center gap-1.5 ml-auto text-xs text-muted-foreground">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                {onlineCount} online
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto py-4 space-y-1">
+              {messages.length === 0 && (
+                <div className="text-center py-16 text-muted-foreground">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                  <p className="font-medium">Niciun mesaj inca</p>
+                  <p className="text-sm mt-1">Fii primul care scrie in #{activeChannel.name}!</p>
+                </div>
+              )}
+
+              {messages.map((msg) => (
+                <MessageBubble
+                  key={msg.message_id}
+                  msg={msg}
+                  isOwn={msg.author_id === user?.user_id}
+                  onDelete={handleDelete}
+                />
+              ))}
+
+              {typingUser && (
+                <div className="px-4 py-1 text-xs text-muted-foreground italic">
+                  {typingUser} scrie...
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            {canWrite ? (
+              <div className="border-t p-3 bg-card flex-shrink-0">
+                <div className="flex gap-2">
+                  <input
+                    value={inputText}
+                    onChange={(e) => { setInputText(e.target.value); handleTyping(); }}
+                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
+                    placeholder={`Scrie in #${activeChannel.name}...`}
+                    className="flex-1 px-4 py-2.5 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    maxLength={1000}
+                  />
+                  <Button onClick={handleSend} disabled={!inputText.trim()} className="rounded-xl px-4">
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="border-t p-3 bg-amber-50 dark:bg-amber-950/20 flex-shrink-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Lock className="w-4 h-4 text-amber-500" />
+                    <span className="text-amber-700 dark:text-amber-400">
+                      {user ? 'Upgrade la PRO ca sa scrii mesaje' : 'Logheaza-te si upgrade la PRO'}
+                    </span>
+                  </div>
+                  <Button size="sm" className="bg-amber-500 hover:bg-amber-600 rounded-lg" asChild>
+                    <a href="/pricing">
+                      <Crown className="w-3.5 h-3.5 mr-1" /> PRO
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {topics.map((topic) => (
-              <TopicCard
-                key={topic.id}
-                topic={topic}
-                onClick={(id) => fetchPosts(id)}
-              />
-            ))}
+          /* No channel selected — show welcome */
+          <div className="flex-1 hidden md:flex items-center justify-center text-center p-8">
+            <div>
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-4">
+                <MessageSquare className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-xl font-bold mb-2">Comunitate FinRomania</h2>
+              <p className="text-muted-foreground text-sm max-w-sm">
+                Alege un canal din stanga si intra in discutie cu alti investitori romani. Mesajele apar live, instant.
+              </p>
+            </div>
           </div>
         )}
       </div>

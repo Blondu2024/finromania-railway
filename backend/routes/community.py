@@ -1,338 +1,387 @@
 """
-Community Forum pentru FinRomania
-PRO users: citesc + scriu
-FREE users: doar citesc (paywall pe scriere)
+Community Chat LIVE pentru FinRomania — stil Discord/Telegram
+WebSocket real-time: mesajele apar instant la toti userii din canal
+PRO: citesc + scriu
+FREE: doar citesc (paywall pe scriere)
 """
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Set
 from datetime import datetime, timezone
 import uuid
+import json
+import logging
 from config.database import get_database
-from routes.auth import require_auth, get_current_user_optional
+from routes.auth import require_auth
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/community", tags=["community"])
 
 # ============================================
-# TOPICURI PREDEFINITE
+# CANALE CHAT PREDEFINITE
 # ============================================
-TOPICS = [
+CHANNELS = [
     {
         "id": "dividende",
         "name": "Dividende BVB",
-        "description": "Discuții despre dividende, randamente, calendar ex-dividend",
-        "icon": "💰",
+        "description": "Randamente, calendar ex-dividend, strategii dividende",
+        "icon": "wallet",
         "color": "green"
     },
     {
         "id": "analiza-actiuni",
-        "name": "Analiză Acțiuni",
-        "description": "Analize tehnice și fundamentale, opinii despre companii BVB",
-        "icon": "📊",
+        "name": "Analiza Actiuni",
+        "description": "Analize tehnice si fundamentale, opinii companii BVB",
+        "icon": "chart",
         "color": "blue"
     },
     {
         "id": "incepatori",
-        "name": "Întrebări Începători",
-        "description": "Întrebări de bază, sfaturi pentru cei care încep să investească",
-        "icon": "🎓",
+        "name": "Intrebari Incepatori",
+        "description": "Intrebari de baza, sfaturi pentru cei care incep",
+        "icon": "graduation",
         "color": "purple"
     },
     {
         "id": "fiscal",
         "name": "Taxe & Fiscal",
-        "description": "Impozite pe investiții, Declarația Unică, CASS, optimizare fiscală",
-        "icon": "🧾",
+        "description": "Impozite, Declaratia Unica, CASS, optimizare fiscala",
+        "icon": "receipt",
         "color": "orange"
     },
     {
         "id": "piete-internationale",
-        "name": "Piețe Internaționale",
-        "description": "S&P 500, ETF-uri, acțiuni US/EU, crypto",
-        "icon": "🌍",
+        "name": "Piete Internationale",
+        "description": "S&P 500, ETF-uri, actiuni US/EU, crypto",
+        "icon": "globe",
         "color": "cyan"
     },
     {
-        "id": "strategii",
-        "name": "Strategii & Portofoliu",
-        "description": "DCA, value investing, dividend growth, alocarea portofoliului",
-        "icon": "🎯",
-        "color": "red"
+        "id": "general",
+        "name": "General",
+        "description": "Discutii libere despre investitii si piete",
+        "icon": "message",
+        "color": "slate"
     }
 ]
 
-TOPIC_IDS = {t["id"] for t in TOPICS}
+CHANNEL_IDS = {c["id"] for c in CHANNELS}
+
+
+# ============================================
+# WEBSOCKET CONNECTION MANAGER
+# ============================================
+class ConnectionManager:
+    """Gestioneaza conexiunile WebSocket per canal"""
+
+    def __init__(self):
+        # channel_id -> set of WebSocket connections
+        self.channels: Dict[str, Set[WebSocket]] = {}
+        # websocket -> user info
+        self.users: Dict[WebSocket, dict] = {}
+
+    async def connect(self, websocket: WebSocket, channel_id: str, user_info: dict):
+        await websocket.accept()
+        if channel_id not in self.channels:
+            self.channels[channel_id] = set()
+        self.channels[channel_id].add(websocket)
+        self.users[websocket] = {**user_info, "channel_id": channel_id}
+
+        # Broadcast cine e online
+        await self.broadcast_online_count(channel_id)
+
+    def disconnect(self, websocket: WebSocket):
+        user = self.users.pop(websocket, None)
+        if user:
+            channel_id = user.get("channel_id")
+            if channel_id and channel_id in self.channels:
+                self.channels[channel_id].discard(websocket)
+
+    async def broadcast_to_channel(self, channel_id: str, message: dict):
+        """Trimite mesaj la TOTI userii din canal — instant"""
+        if channel_id not in self.channels:
+            return
+        dead = set()
+        for ws in self.channels[channel_id]:
+            try:
+                await ws.send_json(message)
+            except Exception:
+                dead.add(ws)
+        # Curata conexiuni moarte
+        for ws in dead:
+            self.disconnect(ws)
+
+    async def broadcast_online_count(self, channel_id: str):
+        count = len(self.channels.get(channel_id, set()))
+        await self.broadcast_to_channel(channel_id, {
+            "type": "online_count",
+            "count": count
+        })
+
+    def get_online_count(self, channel_id: str) -> int:
+        return len(self.channels.get(channel_id, set()))
+
+
+manager = ConnectionManager()
 
 
 # ============================================
 # MODELS
 # ============================================
-class CreatePostRequest(BaseModel):
-    content: str
-    title: Optional[str] = None
-
-
-class CreateReplyRequest(BaseModel):
+class SendMessageRequest(BaseModel):
     content: str
 
 
 # ============================================
-# HELPERS
-# ============================================
-def _require_pro(user: dict):
-    """Verifică dacă userul are PRO activ"""
-    if user.get("subscription_level") != "pro":
-        raise HTTPException(
-            status_code=403,
-            detail="Doar utilizatorii PRO pot scrie în comunitate. Upgrade la PRO pentru a participa!"
-        )
-    # Verifică expirare
-    expires = user.get("subscription_expires_at")
-    if expires:
-        exp_dt = datetime.fromisoformat(expires.replace("Z", "+00:00")) if isinstance(expires, str) else expires
-        if exp_dt < datetime.now(timezone.utc):
-            raise HTTPException(
-                status_code=403,
-                detail="Abonamentul PRO a expirat. Reînnoiește pentru a scrie în comunitate!"
-            )
-
-
-# ============================================
-# ENDPOINTS
+# REST ENDPOINTS
 # ============================================
 
-@router.get("/topics")
-async def get_topics(request=None):
-    """Lista topicurilor cu numărul de posturi"""
+@router.get("/channels")
+async def get_channels():
+    """Lista canalelor cu numar mesaje si online count"""
     db = await get_database()
 
-    topics_with_counts = []
-    for topic in TOPICS:
-        post_count = await db.community_posts.count_documents({
-            "topic_id": topic["id"],
-            "parent_id": None  # Doar posturi principale, nu reply-uri
-        })
-        last_post = await db.community_posts.find_one(
-            {"topic_id": topic["id"]},
-            {"_id": 0, "created_at": 1, "author_name": 1},
+    channels_data = []
+    for ch in CHANNELS:
+        msg_count = await db.chat_messages.count_documents({"channel_id": ch["id"]})
+        last_msg = await db.chat_messages.find_one(
+            {"channel_id": ch["id"]},
+            {"_id": 0, "created_at": 1, "author_name": 1, "content": 1},
             sort=[("created_at", -1)]
         )
 
-        topics_with_counts.append({
-            **topic,
-            "post_count": post_count,
-            "last_activity": last_post.get("created_at") if last_post else None,
-            "last_author": last_post.get("author_name") if last_post else None
+        channels_data.append({
+            **ch,
+            "message_count": msg_count,
+            "online_count": manager.get_online_count(ch["id"]),
+            "last_message": {
+                "author": last_msg.get("author_name"),
+                "content": last_msg.get("content", "")[:50],
+                "time": last_msg.get("created_at")
+            } if last_msg else None
         })
 
-    return {"topics": topics_with_counts}
+    return {"channels": channels_data}
 
 
-@router.get("/topics/{topic_id}/posts")
-async def get_topic_posts(
-    topic_id: str,
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, ge=1, le=50)
+@router.get("/channels/{channel_id}/messages")
+async def get_channel_messages(
+    channel_id: str,
+    limit: int = Query(default=50, ge=1, le=100),
+    before: Optional[str] = None
 ):
-    """Listează posturile dintr-un topic (disponibil pentru toți)"""
-    if topic_id not in TOPIC_IDS:
-        raise HTTPException(status_code=404, detail="Topic negăsit")
+    """Incarca istoricul mesajelor (scroll up = mesaje mai vechi)"""
+    if channel_id not in CHANNEL_IDS:
+        raise HTTPException(status_code=404, detail="Canal negasit")
 
     db = await get_database()
 
-    # Posturi principale (nu reply-uri)
-    posts = await db.community_posts.find(
-        {"topic_id": topic_id, "parent_id": None},
-        {"_id": 0}
-    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    query = {"channel_id": channel_id}
+    if before:
+        query["created_at"] = {"$lt": before}
 
-    # Pentru fiecare post, adaugă nr de reply-uri
-    for post in posts:
-        reply_count = await db.community_posts.count_documents({
-            "parent_id": post["post_id"]
-        })
-        post["reply_count"] = reply_count
+    messages = await db.chat_messages.find(
+        query, {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
 
-    total = await db.community_posts.count_documents({
-        "topic_id": topic_id, "parent_id": None
+    # Inverseaza — cele mai vechi primele (cronologic)
+    messages.reverse()
+
+    channel_info = next((c for c in CHANNELS if c["id"] == channel_id), None)
+
+    return {
+        "channel": channel_info,
+        "messages": messages,
+        "online_count": manager.get_online_count(channel_id),
+        "has_more": len(messages) == limit
+    }
+
+
+@router.post("/channels/{channel_id}/messages")
+async def send_message_rest(
+    channel_id: str,
+    data: SendMessageRequest,
+    user: dict = Depends(require_auth)
+):
+    """Trimite mesaj via REST (fallback daca WebSocket nu merge)"""
+    if channel_id not in CHANNEL_IDS:
+        raise HTTPException(status_code=404, detail="Canal negasit")
+
+    if user.get("subscription_level") != "pro":
+        raise HTTPException(status_code=403, detail="Doar PRO pot scrie")
+
+    content = data.content.strip()
+    if not content or len(content) > 1000:
+        raise HTTPException(status_code=400, detail="Mesaj invalid (1-1000 caractere)")
+
+    db = await get_database()
+
+    msg = {
+        "message_id": f"msg_{uuid.uuid4().hex[:12]}",
+        "channel_id": channel_id,
+        "author_id": user["user_id"],
+        "author_name": user.get("name", "Anonim"),
+        "author_picture": user.get("picture"),
+        "content": content,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+
+    await db.chat_messages.insert_one(msg)
+    msg.pop("_id", None)
+
+    # Broadcast la toti din canal
+    await manager.broadcast_to_channel(channel_id, {
+        "type": "new_message",
+        "message": msg
     })
 
-    topic_info = next((t for t in TOPICS if t["id"] == topic_id), None)
-
-    return {
-        "topic": topic_info,
-        "posts": posts,
-        "total": total,
-        "skip": skip,
-        "limit": limit
-    }
+    return {"message": msg}
 
 
-@router.get("/posts/{post_id}")
-async def get_post_with_replies(post_id: str):
-    """Un post cu toate reply-urile (disponibil pentru toți)"""
-    db = await get_database()
-
-    post = await db.community_posts.find_one(
-        {"post_id": post_id},
-        {"_id": 0}
-    )
-    if not post:
-        raise HTTPException(status_code=404, detail="Postare negăsită")
-
-    # Reply-uri
-    replies = await db.community_posts.find(
-        {"parent_id": post_id},
-        {"_id": 0}
-    ).sort("created_at", 1).to_list(100)
-
-    return {
-        "post": post,
-        "replies": replies
-    }
-
-
-@router.post("/topics/{topic_id}/posts")
-async def create_post(
-    topic_id: str,
-    data: CreatePostRequest,
+@router.delete("/messages/{message_id}")
+async def delete_message(
+    message_id: str,
     user: dict = Depends(require_auth)
 ):
-    """Creează un post nou (doar PRO)"""
-    if topic_id not in TOPIC_IDS:
-        raise HTTPException(status_code=404, detail="Topic negăsit")
-
-    _require_pro(user)
-
-    content = data.content.strip()
-    if len(content) < 5:
-        raise HTTPException(status_code=400, detail="Mesajul e prea scurt (minim 5 caractere)")
-    if len(content) > 2000:
-        raise HTTPException(status_code=400, detail="Mesajul e prea lung (maxim 2000 caractere)")
-
+    """Sterge mesaj (autor sau admin)"""
     db = await get_database()
 
-    post = {
-        "post_id": f"post_{uuid.uuid4().hex[:12]}",
-        "topic_id": topic_id,
-        "parent_id": None,
-        "author_id": user["user_id"],
-        "author_name": user.get("name", "Anonim"),
-        "author_picture": user.get("picture"),
-        "title": data.title.strip()[:100] if data.title else None,
-        "content": content,
-        "likes": [],
-        "like_count": 0,
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
+    msg = await db.chat_messages.find_one({"message_id": message_id})
+    if not msg:
+        raise HTTPException(status_code=404, detail="Mesaj negasit")
 
-    await db.community_posts.insert_one(post)
-    post.pop("_id", None)
+    if msg.get("author_id") != user["user_id"] and not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Nu poti sterge mesajul altcuiva")
 
-    return {"post": post}
+    channel_id = msg.get("channel_id")
+    await db.chat_messages.delete_one({"message_id": message_id})
 
-
-@router.post("/posts/{post_id}/reply")
-async def reply_to_post(
-    post_id: str,
-    data: CreateReplyRequest,
-    user: dict = Depends(require_auth)
-):
-    """Răspunde la un post (doar PRO)"""
-    _require_pro(user)
-
-    content = data.content.strip()
-    if len(content) < 2:
-        raise HTTPException(status_code=400, detail="Răspunsul e prea scurt")
-    if len(content) > 1000:
-        raise HTTPException(status_code=400, detail="Răspunsul e prea lung (maxim 1000 caractere)")
-
-    db = await get_database()
-
-    # Verifică că postul părinte există
-    parent = await db.community_posts.find_one({"post_id": post_id}, {"_id": 0, "topic_id": 1})
-    if not parent:
-        raise HTTPException(status_code=404, detail="Postarea nu există")
-
-    reply = {
-        "post_id": f"reply_{uuid.uuid4().hex[:12]}",
-        "topic_id": parent["topic_id"],
-        "parent_id": post_id,
-        "author_id": user["user_id"],
-        "author_name": user.get("name", "Anonim"),
-        "author_picture": user.get("picture"),
-        "title": None,
-        "content": content,
-        "likes": [],
-        "like_count": 0,
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
-
-    await db.community_posts.insert_one(reply)
-    reply.pop("_id", None)
-
-    return {"reply": reply}
-
-
-@router.post("/posts/{post_id}/like")
-async def toggle_like(
-    post_id: str,
-    user: dict = Depends(require_auth)
-):
-    """Like/unlike un post (doar PRO)"""
-    _require_pro(user)
-
-    db = await get_database()
-
-    post = await db.community_posts.find_one({"post_id": post_id})
-    if not post:
-        raise HTTPException(status_code=404, detail="Postarea nu există")
-
-    likes = post.get("likes", [])
-    user_id = user["user_id"]
-
-    if user_id in likes:
-        # Unlike
-        likes.remove(user_id)
-        action = "unliked"
-    else:
-        # Like
-        likes.append(user_id)
-        action = "liked"
-
-    await db.community_posts.update_one(
-        {"post_id": post_id},
-        {"$set": {"likes": likes, "like_count": len(likes)}}
-    )
-
-    return {"action": action, "like_count": len(likes)}
-
-
-@router.delete("/posts/{post_id}")
-async def delete_post(
-    post_id: str,
-    user: dict = Depends(require_auth)
-):
-    """Șterge un post (autor propriu sau admin)"""
-    db = await get_database()
-
-    post = await db.community_posts.find_one({"post_id": post_id})
-    if not post:
-        raise HTTPException(status_code=404, detail="Postarea nu există")
-
-    # Verifică permisiuni
-    is_author = post.get("author_id") == user["user_id"]
-    is_admin = user.get("is_admin", False)
-
-    if not is_author and not is_admin:
-        raise HTTPException(status_code=403, detail="Nu poți șterge postarea altcuiva")
-
-    # Șterge postul + reply-urile
-    await db.community_posts.delete_many({
-        "$or": [
-            {"post_id": post_id},
-            {"parent_id": post_id}
-        ]
+    # Broadcast stergere
+    await manager.broadcast_to_channel(channel_id, {
+        "type": "message_deleted",
+        "message_id": message_id
     })
 
     return {"deleted": True}
+
+
+# ============================================
+# WEBSOCKET — CHAT LIVE
+# ============================================
+
+@router.websocket("/ws/{channel_id}")
+async def websocket_chat(websocket: WebSocket, channel_id: str):
+    """
+    WebSocket endpoint pentru chat live.
+    Client trimite: {"type": "auth", "token": "..."} la connect
+    Apoi: {"type": "message", "content": "text"}
+    Server trimite: {"type": "new_message", "message": {...}}
+    """
+    if channel_id not in CHANNEL_IDS:
+        await websocket.close(code=4004, reason="Canal negasit")
+        return
+
+    db = await get_database()
+    user = None
+
+    try:
+        await websocket.accept()
+
+        # Asteapta auth message
+        auth_data = await websocket.receive_json()
+
+        if auth_data.get("type") != "auth" or not auth_data.get("token"):
+            # User FREE — poate asculta dar nu scrie
+            user = {"user_id": "anon", "name": "Vizitator", "subscription_level": "free"}
+            await websocket.send_json({"type": "auth_ok", "can_write": False})
+        else:
+            # Verifica token
+            token = auth_data["token"]
+            session = await db.user_sessions.find_one(
+                {"session_token": token}, {"_id": 0}
+            )
+
+            if session:
+                user_data = await db.users.find_one(
+                    {"user_id": session["user_id"]}, {"_id": 0}
+                )
+                if user_data:
+                    user = user_data
+                    is_pro = user.get("subscription_level") == "pro"
+                    await websocket.send_json({
+                        "type": "auth_ok",
+                        "can_write": is_pro,
+                        "user_name": user.get("name")
+                    })
+                else:
+                    user = {"user_id": "anon", "name": "Vizitator", "subscription_level": "free"}
+                    await websocket.send_json({"type": "auth_ok", "can_write": False})
+            else:
+                user = {"user_id": "anon", "name": "Vizitator", "subscription_level": "free"}
+                await websocket.send_json({"type": "auth_ok", "can_write": False})
+
+        # Inregistreaza in canal
+        if channel_id not in manager.channels:
+            manager.channels[channel_id] = set()
+        manager.channels[channel_id].add(websocket)
+        manager.users[websocket] = {**user, "channel_id": channel_id}
+
+        # Broadcast online count
+        await manager.broadcast_online_count(channel_id)
+
+        # Asteapta mesaje
+        while True:
+            data = await websocket.receive_json()
+
+            if data.get("type") == "message":
+                # Verifica PRO
+                if user.get("subscription_level") != "pro":
+                    await websocket.send_json({
+                        "type": "error",
+                        "detail": "Doar utilizatorii PRO pot scrie. Upgrade la PRO!"
+                    })
+                    continue
+
+                content = data.get("content", "").strip()
+                if not content or len(content) > 1000:
+                    await websocket.send_json({
+                        "type": "error",
+                        "detail": "Mesaj invalid (1-1000 caractere)"
+                    })
+                    continue
+
+                # Salveaza in DB
+                msg = {
+                    "message_id": f"msg_{uuid.uuid4().hex[:12]}",
+                    "channel_id": channel_id,
+                    "author_id": user["user_id"],
+                    "author_name": user.get("name", "Anonim"),
+                    "author_picture": user.get("picture"),
+                    "content": content,
+                    "created_at": datetime.now(timezone.utc).isoformat()
+                }
+
+                await db.chat_messages.insert_one(msg)
+                msg.pop("_id", None)
+
+                # Broadcast la TOTI din canal — INSTANT
+                await manager.broadcast_to_channel(channel_id, {
+                    "type": "new_message",
+                    "message": msg
+                })
+
+            elif data.get("type") == "typing":
+                # Broadcast typing indicator
+                await manager.broadcast_to_channel(channel_id, {
+                    "type": "typing",
+                    "user_name": user.get("name", "Cineva")
+                })
+
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
+    finally:
+        manager.disconnect(websocket)
+        if channel_id in manager.channels:
+            await manager.broadcast_online_count(channel_id)
