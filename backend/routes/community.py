@@ -227,7 +227,7 @@ async def create_post(
     }
 
     await db.community_posts.insert_one(post)
-    del post["_id"] if "_id" in post else None
+    post.pop("_id", None)
 
     return {"post": post}
 
@@ -269,7 +269,7 @@ async def reply_to_post(
     }
 
     await db.community_posts.insert_one(reply)
-    del reply["_id"] if "_id" in reply else None
+    reply.pop("_id", None)
 
     return {"reply": reply}
 
