@@ -171,7 +171,7 @@ export default function DailySummaryPage() {
                     <span className="font-semibold text-sm">{s.symbol}</span>
                     <span className="text-xs text-muted-foreground ml-2">{s.name?.substring(0, 18)}</span>
                   </div>
-                  <span className="text-green-600 font-bold text-sm">+{s.change?.toFixed(2)}%</span>
+                  <span className="text-green-600 font-bold text-sm">+{(s.change_percent ?? s.change)?.toFixed(2)}%</span>
                 </Link>
               ))}
             </div>
@@ -189,7 +189,7 @@ export default function DailySummaryPage() {
                     <span className="font-semibold text-sm">{s.symbol}</span>
                     <span className="text-xs text-muted-foreground ml-2">{s.name?.substring(0, 18)}</span>
                   </div>
-                  <span className="text-red-600 font-bold text-sm">{s.change?.toFixed(2)}%</span>
+                  <span className="text-red-600 font-bold text-sm">{(s.change_percent ?? s.change)?.toFixed(2)}%</span>
                 </Link>
               ))}
             </div>

@@ -155,11 +155,11 @@ class DailySummaryService:
                 "indices": market_data.get("indices", {}),
                 "sentiment": market_data["sentiment"],
                 "top_gainers": [
-                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent"), "price": s.get("price")}
+                    {"symbol": s.get("symbol"), "name": s.get("name"), "change_percent": s.get("change_percent"), "price": s.get("price")}
                     for s in market_data["top_gainers"]
                 ],
                 "top_losers": [
-                    {"symbol": s.get("symbol"), "name": s.get("name"), "change": s.get("change_percent"), "price": s.get("price")}
+                    {"symbol": s.get("symbol"), "name": s.get("name"), "change_percent": s.get("change_percent"), "price": s.get("price")}
                     for s in market_data["top_losers"]
                 ],
                 "top_volume": [
