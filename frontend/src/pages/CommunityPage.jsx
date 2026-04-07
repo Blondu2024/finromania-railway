@@ -237,6 +237,19 @@ export default function CommunityPage() {
     fetchTopics();
   }, [fetchTopics]);
 
+  // Auto-refresh posts every 15s when viewing a topic
+  useEffect(() => {
+    if (!selectedTopic) return;
+    const interval = setInterval(() => {
+      if (selectedPost) {
+        fetchPostDetail(selectedPost.post_id);
+      } else {
+        fetchPosts(selectedTopic.id);
+      }
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [selectedTopic, selectedPost, fetchPosts, fetchPostDetail]);
+
   // Create post
   const handleCreatePost = async () => {
     if (!newPostContent.trim()) return;
