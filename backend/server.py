@@ -65,6 +65,7 @@ from routes.daily_summary import router as daily_summary_router
 from routes.stock_compare import router as stock_compare_router
 from routes.bvb_dividends import router as bvb_dividends_router
 from routes.portfolio_import import router as portfolio_import_router
+from routes.community import router as community_router
 
 # Configure logging
 logging.basicConfig(
@@ -744,6 +745,7 @@ app.include_router(ai_technical_analysis_router)  # AI Technical Analysis PRO
 app.include_router(daily_summary_router, prefix="/api")  # Daily Market Summary Email
 app.include_router(stock_compare_router)  # Stock Comparison & 52 Week Extremes
 app.include_router(bvb_dividends_router)  # BVB.ro Dividends (scraped)
+app.include_router(community_router, prefix="/api")  # Community Forum
 
 # Stripe Webhook endpoint
 from fastapi import Request as FastAPIRequest

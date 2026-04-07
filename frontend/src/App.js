@@ -5,7 +5,7 @@ import {
   BarChart3, Menu, Moon, Sun, User, LogOut, Star, Briefcase, Shield,
   TrendingUp, Globe, Calendar, Crown, Calculator, Building2, RefreshCw,
   GraduationCap, BookOpen, AlertTriangle, Bell, Settings, Search,
-  ChevronRight, Activity, FileText, Newspaper, Coins, BookMarked
+  ChevronRight, Activity, FileText, Newspaper, Coins, BookMarked, MessageSquare
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from './components/ui/sheet';
@@ -61,6 +61,7 @@ const FAQPage = lazy(() => import('./pages/FAQPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
+const CommunityPage = lazy(() => import('./pages/CommunityPage'));
 const FiscalCalculatorPage = lazy(() => import('./pages/FiscalCalculatorPage'));
 const FiscalSimulatorPage = lazy(() => import('./pages/FiscalSimulatorPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
@@ -171,6 +172,7 @@ function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen }) {
     { path: '/global', label: t('nav.globalMarkets') },
     { path: '/news', label: t('nav.news') },
     { path: '/rezumat-zilnic', label: t('nav.summary') },
+    { path: '/community', label: t('nav.community', 'Comunitate') },
   ];
 
   return (
@@ -247,6 +249,7 @@ function Sidebar({ mobileOpen, onMobileClose }) {
         { path: '/global', label: t('nav.globalMarkets'), icon: Globe },
         { path: '/calendar', label: t('nav.dividendCalc'), icon: Calendar },
         { path: '/news', label: t('nav.news'), icon: Newspaper },
+        { path: '/community', label: t('nav.community', 'Comunitate'), icon: MessageSquare },
       ],
     },
     {
@@ -397,6 +400,7 @@ function AppRouter() {
           <Route path="/education" element={<EducationPage />} />
           <Route path="/education/success" element={<EducationPage />} />
           <Route path="/education/lesson/:lessonId" element={<LessonPage />} />
+          <Route path="/community" element={<CommunityPage />} />
           <Route path="/risk-assessment" element={<RiskAssessmentPage />} />
           <Route path="/advisor" element={<AIAdvisorPage />} />
           <Route path="/converter" element={<CurrencyConverterPage />} />
