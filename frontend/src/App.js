@@ -162,7 +162,7 @@ function UserMenu() {
 // ============================================
 // TOP NAVBAR — Simple, main items only
 // ============================================
-function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen }) {
+function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen, hasNewChat }) {
   const location = useLocation();
   const { t } = useTranslation();
 
@@ -172,7 +172,7 @@ function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen }) {
     { path: '/global', label: t('nav.globalMarkets') },
     { path: '/news', label: t('nav.news') },
     { path: '/rezumat-zilnic', label: t('nav.summary') },
-    { path: '/community', label: t('nav.community', 'Comunitate') },
+    { path: '/community', label: t('nav.community', 'Comunitate'), notify: hasNewChat },
   ];
 
   return (
@@ -191,13 +191,16 @@ function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen }) {
             <Link
               key={item.path}
               to={item.path}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+              className={`relative px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                 location.pathname === item.path
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:text-foreground hover:bg-accent'
               }`}
             >
               {item.label}
+              {item.notify && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">!</span>
+              )}
             </Link>
           ))}
         </nav>
@@ -236,10 +239,17 @@ function TopNavbar({ darkMode, toggleDarkMode, onMobileSidebarOpen }) {
 // ============================================
 // SIDEBAR — stil profesional, mereu vizibil pe desktop
 // ============================================
-function Sidebar({ mobileOpen, onMobileClose }) {
+function Sidebar({ mobileOpen, onMobileClose, hasNewChat }) {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslation();
+
+  // Cand userul e pe /community, marcheaza ca citit
+  useEffect(() => {
+    if (location.pathname === '/community') {
+      localStorage.setItem('community_last_seen', new Date().toISOString());
+    }
+  }, [location.pathname]);
 
   const sections = [
     {
@@ -249,7 +259,7 @@ function Sidebar({ mobileOpen, onMobileClose }) {
         { path: '/global', label: t('nav.globalMarkets'), icon: Globe },
         { path: '/calendar', label: t('nav.dividendCalc'), icon: Calendar },
         { path: '/news', label: t('nav.news'), icon: Newspaper },
-        { path: '/community', label: t('nav.community', 'Comunitate'), icon: MessageSquare },
+        { path: '/community', label: t('nav.community', 'Comunitate'), icon: MessageSquare, badge: hasNewChat ? '!' : null, badgeColor: 'bg-red-500' },
       ],
     },
     {
@@ -538,11 +548,31 @@ function App() {
     return false;
   });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [hasNewChat, setHasNewChat] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
+
+  // Verifica mesaje noi in comunitate la fiecare 30s
+  useEffect(() => {
+    const checkNewMessages = async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/community/channels`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const lastSeen = localStorage.getItem('community_last_seen') || '0';
+        const hasNew = data.channels?.some(ch =>
+          ch.last_message?.time && ch.last_message.time > lastSeen
+        );
+        setHasNewChat(hasNew);
+      } catch (e) { /* ignore */ }
+    };
+    checkNewMessages();
+    const interval = setInterval(checkNewMessages, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <AuthProvider>
@@ -556,6 +586,7 @@ function App() {
             darkMode={darkMode}
             toggleDarkMode={() => setDarkMode(!darkMode)}
             onMobileSidebarOpen={() => setSidebarOpen(true)}
+            hasNewChat={hasNewChat}
           />
 
           {/* Ticker bar */}
@@ -568,6 +599,7 @@ function App() {
             <Sidebar
               mobileOpen={sidebarOpen}
               onMobileClose={() => setSidebarOpen(false)}
+              hasNewChat={hasNewChat}
             />
             <div className="flex-1 min-w-0 flex flex-col">
             <main className="flex-1 px-3 lg:px-6 py-4 lg:py-5 bg-background min-w-0 overflow-x-hidden">
