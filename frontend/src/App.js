@@ -392,7 +392,8 @@ function AppRouter() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/watchlist" element={<WatchlistPage />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/manage" element={<AdminPage />} />
           <Route path="/education" element={<EducationPage />} />
           <Route path="/education/success" element={<EducationPage />} />
           <Route path="/education/lesson/:lessonId" element={<LessonPage />} />

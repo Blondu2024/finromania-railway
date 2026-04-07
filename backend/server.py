@@ -27,7 +27,6 @@ from routes.portfolio_v2 import router as portfolio_router
 from routes.admin import router as admin_router
 from routes.newsletter import router as newsletter_router
 from routes.search import router as search_router
-from routes.analytics import router as analytics_router
 from routes.education import router as education_router
 from routes.risk_assessment import router as risk_assessment_router
 from routes.ai_advisor import router as ai_advisor_router
@@ -707,7 +706,6 @@ app.include_router(portfolio_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(newsletter_router, prefix="/api")
 app.include_router(search_router, prefix="/api")
-app.include_router(analytics_router, prefix="/api")
 app.include_router(education_router, prefix="/api")
 app.include_router(risk_assessment_router, prefix="/api")
 app.include_router(ai_advisor_router, prefix="/api")

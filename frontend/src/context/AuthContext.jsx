@@ -103,7 +103,9 @@ export function AuthProvider({ children }) {
             user_id: data.user_id,
             email: data.email,
             name: data.name,
-            picture: data.picture
+            picture: data.picture,
+            is_admin: data.is_admin || false,
+            subscription_level: data.subscription_level
           };
           
           localStorage.setItem(USER_KEY, JSON.stringify(userData));

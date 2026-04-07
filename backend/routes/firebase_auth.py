@@ -57,6 +57,8 @@ class FirebaseLoginResponse(BaseModel):
     picture: Optional[str] = None
     session_token: str
     is_new_user: bool = False
+    is_admin: bool = False
+    subscription_level: Optional[str] = None
 
 
 def verify_firebase_token(id_token: str) -> dict:
@@ -212,7 +214,9 @@ async def firebase_login(request: FirebaseLoginRequest):
             name=user_data.get("name", ""),
             picture=user_data.get("picture"),
             session_token=session_token,
-            is_new_user=is_new_user
+            is_new_user=is_new_user,
+            is_admin=user_data.get("is_admin", False),
+            subscription_level=user_data.get("subscription_level")
         )
 
     except HTTPException:

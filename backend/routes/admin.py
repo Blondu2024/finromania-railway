@@ -9,7 +9,7 @@ from config.database import get_database
 from routes.auth import require_auth
 from bson import ObjectId
 
-router = APIRouter(prefix="/api/admin", tags=["admin"])
+router = APIRouter(prefix="/admin", tags=["admin"])
 
 # Admin emails
 ADMIN_EMAILS = ["tanasecristian2007@gmail.com", "contact@finromania.ro"]
