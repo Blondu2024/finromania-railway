@@ -23,8 +23,10 @@ router = APIRouter(prefix="/fiscal", tags=["fiscal-calculator"])
 
 # Salariu minim brut pe economie 2026
 # Ian-Iun 2026: 4.050 RON, Iul-Dec 2026: 4.325 RON
+# ATENȚIE: Pragurile CASS se recalculează din iulie cu noul minim!
 # Folosim 4.050 RON ca baza pentru CASS (prima jumatate a anului)
 SALARIU_MINIM_BRUT = 4050  # RON/luna (ianuarie-iunie 2026)
+SALARIU_MINIM_S2 = 4325    # RON/luna (iulie-decembrie 2026) — afectează CASS din S2
 
 # Prag CASS pentru venituri din investitii
 # CASS se datoreaza daca venitul TOTAL din investitii > 6 salarii minime brute
@@ -46,10 +48,19 @@ IMPOZIT_BVB_TERMEN_SCURT = 0.06     # 6% - detinere < 365 zile (2026)
 IMPOZIT_INTERNATIONAL = 0.16       # 16% pentru piete straine (2026)
 
 # === DIVIDENDE ===
-# Impozit pe dividende 2026: 16% (crescut de la 10% in 2025)
+# Impozit pe dividende 2026: 16% (crescut de la 8% in 2024 → 10% in 2025 → 16% in 2026)
 # Retinut la sursa de catre societate
 IMPOZIT_DIVIDENDE_RO = 0.16        # 16% pentru dividende romanesti (2026)
 IMPOZIT_DIVIDENDE_STRAINE = 0.16   # 16% pentru dividende din strainatate (2026)
+
+# === CRYPTO (Criptomonede) 2026 ===
+# Impozit 16% pe câștigul net (vânzare - achiziție)
+# Scutire: tranzacții individuale < 200 RON ȘI total anual < 600 RON
+# CASS: se datorează dacă câștigul depășește 6 salarii minime
+# Obligatoriu: Declarația Unică
+IMPOZIT_CRYPTO = 0.16             # 16% pe câștig net (2026, crescut de la 10%)
+CRYPTO_SCUTIRE_TRANZACTIE = 200   # RON - scutire per tranzacție
+CRYPTO_SCUTIRE_ANUAL = 600        # RON - scutire total anual
 
 # Reținere la sursă în alte țări (tratate de evitare a dublei impuneri)
 RETINERE_USA = 0.15               # 15% reținere SUA (cu W-8BEN) sau 30% fără
@@ -78,6 +89,7 @@ class TipEntitate(str, Enum):
 class TipPiata(str, Enum):
     BVB = "bvb"                    # Bursa de Valori București
     INTERNATIONAL = "international"  # Piețe străine (US, EU, etc.)
+    CRYPTO = "crypto"              # Criptomonede (Bitcoin, Ethereum, etc.)
 
 
 class PerioadaDetinere(str, Enum):
@@ -338,6 +350,100 @@ def calcul_pf_international(input_data: CalculFiscalInput) -> ScenariuFiscal:
     )
 
 
+def calcul_pf_crypto(input_data: CalculFiscalInput) -> ScenariuFiscal:
+    """
+    Calculează impozitele pentru Persoană Fizică - CRIPTOMONEDE
+
+    LEGISLAȚIE 2026:
+    - Impozit: 16% pe câștigul net (vânzare - achiziție)
+    - Scutire: tranzacții individuale < 200 RON ȘI total anual < 600 RON
+    - CASS: 10% dacă câștigul depășește 6 salarii minime
+    - Obligatoriu: Declarația Unică (formularul 212)
+    - Pierderile se compensează cu câștigurile în același an
+    """
+    castig = input_data.castig_capital_anual
+    dividende = input_data.dividende_anuale  # staking/yield
+    venit_total = castig + dividende
+
+    # Verificare scutire
+    scutire = False
+    if castig <= CRYPTO_SCUTIRE_ANUAL:
+        scutire = True
+
+    # Impozit pe câștig
+    if scutire:
+        impozit_castig = 0
+        nota_castig = f"Câștig {castig:,.0f} RON ≤ {CRYPTO_SCUTIRE_ANUAL} RON → SCUTIT de impozit"
+    else:
+        impozit_castig = castig * IMPOZIT_CRYPTO
+        nota_castig = f"16% × {castig:,.0f} RON = {impozit_castig:,.0f} RON"
+
+    # Staking/yield se impozitează ca dividende (16%)
+    impozit_div = dividende * IMPOZIT_CRYPTO if dividende > 0 else 0
+
+    # CASS
+    cass = 0
+    nota_cass = ""
+    if venit_total <= CASS_PRAG_6:
+        nota_cass = f"CASS: 0 RON (venit {venit_total:,.0f} RON sub pragul de {CASS_PRAG_6:,.0f} RON)"
+    elif venit_total <= CASS_PRAG_12:
+        baza_cass = CASS_PRAG_6
+        cass = baza_cass * CASS_RATE
+        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (6 salarii minime) = {cass:,.0f} RON"
+    elif venit_total <= CASS_PRAG_24:
+        baza_cass = CASS_PRAG_12
+        cass = baza_cass * CASS_RATE
+        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (12 salarii minime) = {cass:,.0f} RON"
+    else:
+        baza_cass = CASS_PRAG_24
+        cass = baza_cass * CASS_RATE
+        nota_cass = f"CASS 10% × {baza_cass:,.0f} RON (24 salarii minime, plafonat) = {cass:,.0f} RON"
+
+    total_taxe = impozit_castig + impozit_div + cass
+    venit_net = venit_total - total_taxe
+    rata_efectiva = (total_taxe / venit_total * 100) if venit_total > 0 else 0
+
+    detalii = [
+        f"Câștig din crypto: {castig:,.0f} RON",
+        f"Staking/yield: {dividende:,.0f} RON",
+        f"Impozit câștig: {nota_castig}",
+        nota_cass,
+        "📋 Trebuie completată Declarația Unică (212)",
+        f"Scutire: tranzacții < {CRYPTO_SCUTIRE_TRANZACTIE} RON și total < {CRYPTO_SCUTIRE_ANUAL} RON/an",
+    ]
+
+    avantaje = [
+        "Pierderile se compensează cu câștigurile",
+        f"Scutire sub {CRYPTO_SCUTIRE_ANUAL} RON/an",
+        "Fără reținere la sursă (exchange-uri)",
+    ]
+
+    dezavantaje = [
+        "Impozit 16% pe câștig net (crescut de la 10%)",
+        "Calcul manual complex (DeFi, swap-uri)",
+        "Obligatoriu Declarația Unică",
+        "CASS suplimentar peste 6 salarii minime",
+        "Evidența tuturor tranzacțiilor",
+    ]
+
+    return ScenariuFiscal(
+        tip_entitate="pf_crypto",
+        nume_entitate="Persoană Fizică (Criptomonede)",
+        venit_brut=venit_total,
+        impozit_castig_capital=impozit_castig,
+        impozit_dividende=impozit_div,
+        cass=cass,
+        cas=0,
+        alte_taxe=0,
+        total_taxe=total_taxe,
+        venit_net=venit_net,
+        rata_efectiva_impozitare=rata_efectiva,
+        detalii=detalii,
+        avantaje=avantaje,
+        dezavantaje=dezavantaje
+    )
+
+
 def calcul_pfa_investitii(input_data: CalculFiscalInput) -> ScenariuFiscal:
     """
     Calculează pentru PFA - NU este recomandat pentru investiții pure!
@@ -580,6 +686,10 @@ async def calculeaza_impozite(
             calcul_pf_bvb(input_data),
             calcul_pfa_investitii(input_data),
             calcul_srl_micro_investitii(input_data)
+        ]
+    elif input_data.tip_piata == TipPiata.CRYPTO:
+        scenarii = [
+            calcul_pf_crypto(input_data),
         ]
     else:  # INTERNATIONAL
         scenarii = [

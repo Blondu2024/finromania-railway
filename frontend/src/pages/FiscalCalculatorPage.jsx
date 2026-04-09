@@ -450,9 +450,10 @@ export default function FiscalCalculatorPage() {
               <div className="space-y-3">
                 <Label>{t('fiscal.market')}</Label>
                 <Tabs value={tipPiata} onValueChange={setTipPiata}>
-                  <TabsList className="grid grid-cols-2 w-full">
+                  <TabsList className="grid grid-cols-3 w-full">
                     <TabsTrigger value="bvb">🇷🇴 BVB</TabsTrigger>
                     <TabsTrigger value="international">🌍 Global</TabsTrigger>
+                    <TabsTrigger value="crypto">₿ Crypto</TabsTrigger>
                   </TabsList>
                 </Tabs>
                 {tipPiata === 'bvb' && (
@@ -460,6 +461,9 @@ export default function FiscalCalculatorPage() {
                 )}
                 {tipPiata === 'international' && (
                   <p className="text-xs text-yellow-600">⚠️ {t('fiscal.internationalRates')}: 16%</p>
+                )}
+                {tipPiata === 'crypto' && (
+                  <p className="text-xs text-orange-600">₿ Crypto: 16% (scutire sub 600 RON/an)</p>
                 )}
               </div>
 
