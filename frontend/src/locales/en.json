@@ -674,7 +674,20 @@
     "exemptions": "Applied exemptions",
     "itConditions": "IT conditions: IT degree, company with 80%+ IT revenue, gross ≥ 10,000 RON",
     "constrConditions": "Construction conditions: gross ≥ 4,050 RON, NACE 41-43",
-    "salaryDisclaimer": "Educational calculator. Consult a tax expert for your real situation."
+    "salaryDisclaimer": "Educational calculator. Consult a tax expert for your real situation.",
+    "cheltuieliLunare": "Monthly Expenses (RON)",
+    "cheltuieliHint": "Monthly operational expenses (rent, utilities, materials, etc.)",
+    "nrAngajati": "Number of Employees",
+    "salariuMediuBrut": "Average Gross Salary (RON)",
+    "cascadaBuzunar": "Income → Pocket Waterfall",
+    "cascadaDesc": "How much effectively ends up in your pocket after all taxes",
+    "cifraAfaceri": "Revenue",
+    "cheltuieliOp": "Operational expenses",
+    "costSalarii": "Salary costs",
+    "totalTaxe": "Total taxes",
+    "inBuzunar": "IN YOUR POCKET",
+    "rataRetinere": "State retention rate",
+    "cascadaNote": "Fill in expenses and employees for each entity to see the waterfall"
   },
   "dividends": {
     "calendarTitle": "Dividend Calendar & Events",

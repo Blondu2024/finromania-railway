@@ -674,7 +674,20 @@
     "exemptions": "Scutiri aplicate",
     "itConditions": "Condiții IT: studii superioare IT, firmă cu 80%+ venituri IT, brut ≥ 10,000 RON",
     "constrConditions": "Condiții construcții: brut ≥ 4,050 RON, CAEN 41-43",
-    "salaryDisclaimer": "Calculator educativ. Consultați un expert contabil pentru situația reală."
+    "salaryDisclaimer": "Calculator educativ. Consultați un expert contabil pentru situația reală.",
+    "cheltuieliLunare": "Cheltuieli Lunare (RON)",
+    "cheltuieliHint": "Cheltuieli operaționale lunare (chirii, utilități, materiale, etc.)",
+    "nrAngajati": "Număr Angajați",
+    "salariuMediuBrut": "Salariu Mediu Brut (RON)",
+    "cascadaBuzunar": "Cascada Venit → Buzunar",
+    "cascadaDesc": "Cât îți rămâne efectiv în buzunar după toate taxele",
+    "cifraAfaceri": "Cifra de afaceri",
+    "cheltuieliOp": "Cheltuieli operaționale",
+    "costSalarii": "Cost salarii",
+    "totalTaxe": "Total taxe",
+    "inBuzunar": "ÎN BUZUNAR",
+    "rataRetinere": "Rata reținere stat",
+    "cascadaNote": "Completează cheltuielile și angajații la fiecare entitate pentru a vedea cascada"
   },
   "dividends": {
     "calendarTitle": "Calendar Dividende & Evenimente",

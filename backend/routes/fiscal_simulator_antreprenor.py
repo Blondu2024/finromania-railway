@@ -93,6 +93,10 @@ class EntitateInput(BaseModel):
     norma_venit_anuala: Optional[float] = Field(default=None, description="Norma de venit ANAF pentru PFA normă")
     an_infiintare: Optional[int] = Field(default=None, description="Anul înființării firmei")
     marja_profit: Optional[float] = Field(default=20, ge=1, le=90, description="Marjă profit % pentru SRL Profit")
+    # CASCADA VENIT → BUZUNAR
+    cheltuieli_lunare: Optional[float] = Field(default=None, ge=0, description="Cheltuieli operaționale lunare RON")
+    numar_angajati: Optional[int] = Field(default=0, ge=0, description="Număr angajați")
+    salariu_mediu_brut: Optional[float] = Field(default=0, ge=0, description="Salariu mediu brut angajați RON")
     
 class SimulatorInput(BaseModel):
     """Input pentru simulatorul fiscal"""
@@ -135,6 +139,7 @@ class RezultatEntitate(BaseModel):
     # CÂMPURI NOI
     pasi_calcul: List[PasCalcul] = Field(default=[])
     comparatii: List[ComparatieAlternativa] = Field(default=[])
+    cascada_buzunar: Optional[Dict] = Field(default=None, description="Cascada venit→buzunar (dacă sunt cheltuieli/angajați)")
 
 class SimulatorOutput(BaseModel):
     """Output-ul simulatorului"""
@@ -382,6 +387,9 @@ def calculeaza_impozit_entitate(entitate: EntitateInput, an_curent: int = 2026) 
         regim_tva = "⚠️ Trebuie înregistrat TVA (depășit prag)"
         observatii.append(f"Venitul depășește pragul TVA de {PRAG_TVA:,} RON!")
     
+    # Calculează cascada buzunar dacă are cheltuieli/angajați
+    cascada = calculeaza_cascada_buzunar(entitate)
+
     return RezultatEntitate(
         nume=entitate.nume or f"{entitate.tip.value.upper()}",
         tip=entitate.tip.value,
@@ -392,8 +400,130 @@ def calculeaza_impozit_entitate(entitate: EntitateInput, an_curent: int = 2026) 
         scutiri_active=scutiri,
         observatii=observatii,
         pasi_calcul=pasi_calcul,
-        comparatii=comparatii
+        comparatii=comparatii,
+        cascada_buzunar=cascada
     )
+
+def calculeaza_cascada_buzunar(entitate: EntitateInput) -> Optional[Dict]:
+    """
+    Calculează cascada completă Venit → Buzunar.
+    Se aplică doar dacă userul a completat cheltuieli sau angajați.
+    """
+    venit = entitate.venit_anual_estimat
+    cheltuieli_an = (entitate.cheltuieli_lunare or 0) * 12
+    nr_ang = entitate.numar_angajati or 0
+    sal_brut = entitate.salariu_mediu_brut or 0
+
+    # Dacă nu a completat nimic extra, nu calculăm cascada
+    if cheltuieli_an == 0 and nr_ang == 0:
+        return None
+
+    # Cost salarii anual (brut + CAM 2.25%)
+    cost_salarii_an = nr_ang * sal_brut * 12 * 1.0225 if nr_ang > 0 and sal_brut > 0 else 0
+
+    pasi = []
+    pasi.append({"etapa": "Cifra de afaceri", "valoare": round(venit), "semn": ""})
+
+    if cheltuieli_an > 0:
+        pasi.append({"etapa": "Cheltuieli operaționale", "valoare": round(cheltuieli_an), "semn": "-"})
+
+    if cost_salarii_an > 0:
+        pasi.append({"etapa": f"Cost salarii ({nr_ang} ang × {sal_brut:,.0f} brut × 12 × 1.0225 CAM)", "valoare": round(cost_salarii_an), "semn": "-"})
+
+    if entitate.tip == TipEntitate.SRL_MICRO:
+        # Micro: impozit pe CIFRA DE AFACERI, nu pe profit!
+        impozit_micro = round(venit * IMPOZIT_MICRO / 100)
+        pasi.append({"etapa": f"Impozit micro ({IMPOZIT_MICRO}% pe cifra de afaceri)", "valoare": impozit_micro, "semn": "-"})
+
+        profit_contabil = venit - cheltuieli_an - cost_salarii_an - impozit_micro
+        pasi.append({"etapa": "Profit contabil", "valoare": round(profit_contabil), "semn": "="})
+
+        # Dividende pe profitul distribuit (doar dacă > 0)
+        if profit_contabil > 0:
+            impozit_div = round(profit_contabil * IMPOZIT_DIVIDENDE / 100)
+            pasi.append({"etapa": f"Impozit dividende ({IMPOZIT_DIVIDENDE}%)", "valoare": impozit_div, "semn": "-"})
+
+            # CASS pe dividende dacă depășesc pragul
+            dupa_div = profit_contabil - impozit_div
+            cass_div = 0
+            if dupa_div > CASS_BAZA_MINIMA:
+                baza_cass = min(dupa_div, CASS_BAZA_MAXIMA)
+                cass_div = round(baza_cass * 0.10)
+                pasi.append({"etapa": f"CASS dividende (10%, bază {baza_cass:,.0f})", "valoare": cass_div, "semn": "-"})
+
+            in_buzunar = round(profit_contabil - impozit_div - cass_div)
+            total_taxe = impozit_micro + impozit_div + cass_div
+        else:
+            in_buzunar = round(profit_contabil)
+            total_taxe = impozit_micro
+
+    elif entitate.tip == TipEntitate.SRL_PROFIT:
+        # Profit: impozit pe PROFIT (cifra - cheltuieli)
+        profit_impozabil = venit - cheltuieli_an - cost_salarii_an
+        pasi.append({"etapa": "Profit impozabil", "valoare": round(profit_impozabil), "semn": "="})
+
+        if profit_impozabil > 0:
+            impozit_profit = round(profit_impozabil * IMPOZIT_PROFIT / 100)
+            pasi.append({"etapa": f"Impozit profit ({IMPOZIT_PROFIT}%)", "valoare": impozit_profit, "semn": "-"})
+
+            profit_net = profit_impozabil - impozit_profit
+            pasi.append({"etapa": "Profit net", "valoare": round(profit_net), "semn": "="})
+
+            impozit_div = round(profit_net * IMPOZIT_DIVIDENDE / 100)
+            pasi.append({"etapa": f"Impozit dividende ({IMPOZIT_DIVIDENDE}%)", "valoare": impozit_div, "semn": "-"})
+
+            # CASS pe dividende
+            dupa_div = profit_net - impozit_div
+            cass_div = 0
+            if dupa_div > CASS_BAZA_MINIMA:
+                baza_cass = min(dupa_div, CASS_BAZA_MAXIMA)
+                cass_div = round(baza_cass * 0.10)
+                pasi.append({"etapa": f"CASS dividende (10%, bază {baza_cass:,.0f})", "valoare": cass_div, "semn": "-"})
+
+            in_buzunar = round(profit_net - impozit_div - cass_div)
+            total_taxe = impozit_profit + impozit_div + cass_div
+        else:
+            in_buzunar = round(profit_impozabil)
+            total_taxe = 0
+
+    elif entitate.tip in [TipEntitate.PFA_REAL, TipEntitate.PFA_NORMA]:
+        # PFA: impozit + CAS opțional + CASS
+        venit_net_pfa = venit - cheltuieli_an - cost_salarii_an
+        pasi.append({"etapa": "Venit net PFA", "valoare": round(venit_net_pfa), "semn": "="})
+
+        if venit_net_pfa > 0:
+            impozit_pfa = round(venit_net_pfa * PFA_IMPOZIT / 100)
+            pasi.append({"etapa": f"Impozit venit ({PFA_IMPOZIT}%)", "valoare": impozit_pfa, "semn": "-"})
+
+            # CASS obligatoriu
+            cass_pfa = 0
+            if venit_net_pfa > CASS_BAZA_MINIMA:
+                baza_cass = min(venit_net_pfa, CASS_BAZA_MAXIMA)
+                cass_pfa = round(baza_cass * 0.10)
+                pasi.append({"etapa": f"CASS (10%, bază {baza_cass:,.0f})", "valoare": cass_pfa, "semn": "-"})
+
+            in_buzunar = round(venit_net_pfa - impozit_pfa - cass_pfa)
+            total_taxe = impozit_pfa + cass_pfa
+        else:
+            in_buzunar = round(venit_net_pfa)
+            total_taxe = 0
+    else:
+        return None
+
+    pasi.append({"etapa": "ÎN BUZUNAR", "valoare": in_buzunar, "semn": "=final"})
+
+    rata_retinere = round((total_taxe / venit * 100), 1) if venit > 0 else 0
+
+    return {
+        "cifra_afaceri": round(venit),
+        "cheltuieli_operationale": round(cheltuieli_an),
+        "cost_salarii": round(cost_salarii_an),
+        "total_taxe": total_taxe,
+        "in_buzunar": in_buzunar,
+        "rata_retinere": rata_retinere,
+        "pasi": pasi,
+    }
+
 
 def verifica_agregare_micro(entitati: List[EntitateInput], alte_asocieri: bool = False) -> List[AvertismentFiscal]:
     """Verifică regula agregării veniturilor pentru micro"""

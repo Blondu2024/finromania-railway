@@ -343,7 +343,7 @@ export default function FiscalSimulatorPage() {
   const ENTITY_TYPES = getEntityTypes(t);
   const CAEN_CODES = getCaenCodes(t);
   const [entities, setEntities] = useState([
-    { tip: 'srl_micro', nume: '', cod_caen: 'none', venit_anual_estimat: 0, procent_detinere: 100, are_angajati: false, platitor_tva: false, norma_venit_anuala: 0, an_infiintare: null, marja_profit: 20 }
+    { tip: 'srl_micro', nume: '', cod_caen: 'none', venit_anual_estimat: 0, procent_detinere: 100, are_angajati: false, platitor_tva: false, norma_venit_anuala: 0, an_infiintare: null, marja_profit: 20, cheltuieli_lunare: 0, numar_angajati: 0, salariu_mediu_brut: 0 }
   ]);
   const [areSalariu, setAreSalariu] = useState(false);
   const [salariuBrut, setSalariuBrut] = useState(0);
@@ -363,7 +363,10 @@ export default function FiscalSimulatorPage() {
       platitor_tva: false,
       norma_venit_anuala: 0,
       an_infiintare: null,
-      marja_profit: 20
+      marja_profit: 20,
+      cheltuieli_lunare: 0,
+      numar_angajati: 0,
+      salariu_mediu_brut: 0
     }]);
   };
 
@@ -617,6 +620,47 @@ export default function FiscalSimulatorPage() {
                     <Label>{t('simulator.vatPayer')}</Label>
                   </div>
                 </div>
+
+                {/* Cascadă: cheltuieli + angajați (pt SRL/PFA) */}
+                {entity.tip !== 'pf' && entity.tip !== 'pfi' && (
+                  <div className="mt-4 pt-4 border-t border-dashed space-y-3">
+                    <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                      <Wallet className="w-3 h-3" />
+                      {t('simulator.cascadaBuzunar')} — {t('simulator.cascadaDesc')}
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">{t('simulator.cheltuieliLunare')}</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          value={entity.cheltuieli_lunare || ''}
+                          onChange={(e) => updateEntity(index, 'cheltuieli_lunare', parseFloat(e.target.value) || 0)}
+                        />
+                        <p className="text-xs text-muted-foreground">{t('simulator.cheltuieliHint')}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">{t('simulator.nrAngajati')}</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={entity.numar_angajati || ''}
+                          onChange={(e) => updateEntity(index, 'numar_angajati', parseInt(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">{t('simulator.salariuMediuBrut')}</Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={entity.salariu_mediu_brut || ''}
+                          onChange={(e) => updateEntity(index, 'salariu_mediu_brut', parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -811,6 +855,45 @@ export default function FiscalSimulatorPage() {
                           </span>
                         </div>
                       ))}
+                    </div>
+                  )}
+
+                  {/* Cascada Venit → Buzunar */}
+                  {e.cascada_buzunar && (
+                    <div className="mt-3 p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <p className="text-sm font-semibold text-green-700 dark:text-green-400 mb-3 flex items-center gap-2">
+                        <Wallet className="w-4 h-4" />
+                        {t('simulator.cascadaBuzunar')}
+                      </p>
+
+                      <div className="space-y-1.5">
+                        {e.cascada_buzunar.pasi.map((pas, j) => (
+                          <div key={j} className={`flex justify-between items-center py-1.5 px-2 rounded text-sm ${
+                            pas.semn === '=final' ? 'bg-green-100 dark:bg-green-900/40 font-bold text-green-700 dark:text-green-300 border-2 border-green-300 dark:border-green-700' :
+                            pas.semn === '=' ? 'bg-white dark:bg-zinc-800 font-medium border' : ''
+                          }`}>
+                            <div className="flex items-center gap-2">
+                              {pas.semn === '-' && <span className="text-red-500 font-mono w-4">−</span>}
+                              {pas.semn === '=' && <span className="text-blue-500 font-mono w-4">=</span>}
+                              {pas.semn === '=final' && <span className="text-green-600 font-mono w-4">★</span>}
+                              {pas.semn === '' && <span className="font-mono w-4"> </span>}
+                              <span>{pas.etapa}</span>
+                            </div>
+                            <span className={`font-mono ${
+                              pas.semn === '-' ? 'text-red-600' :
+                              pas.semn === '=final' ? 'text-green-700 dark:text-green-300 text-base' :
+                              pas.semn === '=' ? 'text-blue-600' : ''
+                            }`}>
+                              {pas.valoare?.toLocaleString('ro-RO')} RON
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-3 flex justify-between items-center text-xs text-muted-foreground pt-2 border-t border-green-200 dark:border-green-800">
+                        <span>{t('simulator.totalTaxe')}: {e.cascada_buzunar.total_taxe?.toLocaleString('ro-RO')} RON</span>
+                        <span>{t('simulator.rataRetinere')}: {e.cascada_buzunar.rata_retinere}%</span>
+                      </div>
                     </div>
                   )}
 
