@@ -597,3 +597,236 @@ async def import_firebase_users(user: dict = Depends(require_admin)):
         "total_firebase_users": stats["imported"] + stats["skipped_existing"] + stats["skipped_no_email"] + stats["errors"],
         "users": stats["users"]
     }
+
+
+@router.post("/migrate-emergent-users")
+async def migrate_emergent_users(secret: str = ""):
+    """
+    One-time migration: insert old Emergent users directly into MongoDB.
+    Protected by secret key (no auth needed — runs once, then remove).
+    """
+    if secret != "finromania2026migrate":
+        raise HTTPException(status_code=403, detail="Invalid secret")
+
+    USERS = [
+        {"email": "nicolaehag@gmail.com", "uid": "9TeEvPWMj6g4sQCTDZl5k24REo23", "created": "2026-03-29"},
+        {"email": "kozma_attila7@yahoo.com", "uid": "OqQCZYVxKkgBulZYkDr8GJkTqk23", "created": "2026-03-28"},
+        {"email": "silviugiurca@yahoo.com", "uid": "d0DpqP5hGhWy9iSaPAF0JNjoHtK2", "created": "2026-03-27"},
+        {"email": "archir.constantin@gmail.com", "uid": "MImjTJB2Vkc98Bh253R039ljdQq1", "created": "2026-03-26"},
+        {"email": "adrianionita4025@gmail.com", "uid": "tgjuTS4yXheGr5h602UEP7zOlu13", "created": "2026-03-26"},
+        {"email": "buncescu@gmail.com", "uid": "CEIkPDVqNoehEAVvt0HmumROFl53", "created": "2026-03-25"},
+        {"email": "vivisor72@gmail.com", "uid": "cEDE68CqDRPigVZPOKnGHscronv2", "created": "2026-03-23"},
+        {"email": "gabrielavornicu06@gmail.com", "uid": "8DCU0ZaHyxgTPHu9ynKTykdhYfH3", "created": "2026-03-23"},
+        {"email": "vasilemarian76@gmail.com", "uid": "0D9XTv7x1PfQq0V6vmYAx8xCa5V2", "created": "2026-03-22"},
+        {"email": "adrian.sorocaniuc@yahoo.com", "uid": "hHVWjMkj1yOGJnSYWmsKiZXs5wk1", "created": "2026-03-21"},
+        {"email": "dobroviciandrei@googlemail.com", "uid": "VwzKD4z8uIMy1PfTJLqZH5zKlqB2", "created": "2026-03-21"},
+        {"email": "miciicercetasi@gmail.com", "uid": "nFsfguG8gETQar4cKVvP74wsPfj1", "created": "2026-03-21"},
+        {"email": "evilush@gmail.com", "uid": "Kn5AZyrIxJbuHMpuYTHi6iShtHm1", "created": "2026-03-20"},
+        {"email": "clasadeengleza6a@gmail.com", "uid": "wPMoIWlvO8Mwu7zBJGSm3tWIAJ23", "created": "2026-03-20"},
+        {"email": "catalin_td@yahoo.com", "uid": "xqfbw5OQHsezZV7ZYpSkfNwr1Rl2", "created": "2026-03-20"},
+        {"email": "olaridaniel@gmail.com", "uid": "PzAxznfITBSWaaUIhbvKjUYGKyE2", "created": "2026-03-20"},
+        {"email": "pasulacatalin@gmail.com", "uid": "UYOARU84iMb8KCzArhrPartnRUW2", "created": "2026-03-20"},
+        {"email": "serbandascal@gmail.com", "uid": "wFSlqFrdalbnEYSkleelzWo4hA82", "created": "2026-03-20"},
+        {"email": "gabitzugabitu@gmail.com", "uid": "D92iAMPB7HWgTMdrWwMXUHHqUGt1", "created": "2026-03-19"},
+        {"email": "sandaionutalin@gmail.com", "uid": "KEOfFa5K3YgvaoO9xS1oGrD37v32", "created": "2026-03-19"},
+        {"email": "pmirceamd@gmail.com", "uid": "vFyf65Pk7Ghf53Beb9fAR0PBC422", "created": "2026-03-18"},
+        {"email": "ovidiumelinte21@gmail.com", "uid": "A6E7Fb0LUFNgNeHhdBNwUKJhWon2", "created": "2026-03-18"},
+        {"email": "cimpean.ioan@gmail.com", "uid": "Aq04sxoDBUcGzkIR0Vk89mOkAm53", "created": "2026-03-18"},
+        {"email": "costidragnea@yahoo.com", "uid": "M0nOL08DtWMO7PvK5aNkKPTQygW2", "created": "2026-03-18"},
+        {"email": "daniel.olteniceanu@gmail.com", "uid": "vZUXGw8aiCZT5k7DMWOXli3dBIE2", "created": "2026-03-18"},
+        {"email": "dr.penamarian@gmail.com", "uid": "HZM8ueCsjSPODtlwRrcyFV9mqZW2", "created": "2026-03-17"},
+        {"email": "flambartcluj@gmail.com", "uid": "edoXwwhK7ehEt6fdjvYuNsU0KL43", "created": "2026-03-17"},
+        {"email": "bogdan.cercel@gmail.com", "uid": "G8gwG6CenHOcQs9YqASSg8z4H6n1", "created": "2026-03-16"},
+        {"email": "raducannicolae@gmail.com", "uid": "50SgYbhEWbdFVUh7kvTHfpwqF7q1", "created": "2026-03-16"},
+        {"email": "delfhinblue@gmail.com", "uid": "m9jHM7WvI9WnjEHb2eySarNlAjB3", "created": "2026-03-16"},
+        {"email": "elasticbombastic3@gmail.com", "uid": "TRbGZPk04tayM7leQft2cKvchf03", "created": "2026-03-16"},
+        {"email": "ctmmariana@gmail.com", "uid": "sMfqteinv4hGip5N99m1bmxpC1V2", "created": "2026-03-16"},
+        {"email": "haloiu.mihai@gmail.com", "uid": "I6s3Gk3JwyPQjtoFWWr56jfA8d62", "created": "2026-03-16"},
+        {"email": "alexandru.pos@gmail.com", "uid": "I39pTT0Yz2NMhTbV08wPgbmvFL13", "created": "2026-03-15"},
+        {"email": "razvan.mirodotescu@gmail.com", "uid": "6bkTwI4YWcUaPoZ7bRUWQXoTWMy2", "created": "2026-03-15"},
+        {"email": "biscacristian@gmail.com", "uid": "j0l8o5q1J2c7h1oQ6RXmrPbOpDF2", "created": "2026-03-15"},
+        {"email": "valentin.panti@gmail.com", "uid": "KXh2dTT117Z2roGTwnnnNE8jamk2", "created": "2026-03-15"},
+        {"email": "karatimad@gmail.com", "uid": "0QoCgw9iTuYk16UAS3uANa55nX82", "created": "2026-03-15"},
+        {"email": "gentilomm@gmail.com", "uid": "nnk5RSMQdiXPKcxyOtJRC8eAK5q2", "created": "2026-03-14"},
+        {"email": "shopping.melinte@gmail.com", "uid": "DBheUtaCyUPxGwH1WxEVea4Vl2I2", "created": "2026-03-14"},
+        {"email": "catalin.ba@gmail.com", "uid": "6OIBCE75etX9gY3jdJRL39Hgi9a2", "created": "2026-03-14"},
+        {"email": "bolojan@gmail.com", "uid": "ZzYv7oNWsbTYSpTgpz2EeekBz403", "created": "2026-03-14"},
+        {"email": "claudia.pop89@gmail.com", "uid": "w3dJoWcSeBUZBqD1ghthpzAKMdb2", "created": "2026-03-14"},
+        {"email": "sebastiangordan7@gmail.com", "uid": "saNtt9vedZhhn50xEBguiehDVcl2", "created": "2026-03-14"},
+        {"email": "lucian82luci@yahoo.com", "uid": "3FPtn9zvJTctEsW2D8cJ6VUQkYJ2", "created": "2026-03-14"},
+        {"email": "loveritza2020@gmail.com", "uid": "zO1rHogJNQMVmBtlySJsZW1kwfw1", "created": "2026-03-14"},
+        {"email": "bogdan.catre@gmail.com", "uid": "UHjiaJxEuSXseae7toBop5FP6xv1", "created": "2026-03-14"},
+        {"email": "marius.garip@gmail.com", "uid": "PSQS0ddXjKU8edBrog3oNffHTSf1", "created": "2026-03-14"},
+        {"email": "alexmakerulzz@gmail.com", "uid": "YXgquOwKXpab3kPzfbgv58RsRBd2", "created": "2026-03-14"},
+        {"email": "valibutuc17@gmail.com", "uid": "OgYChr9blKRBDutNdCs6R984lev1", "created": "2026-03-14"},
+        {"email": "ghiorghitaionel@gmail.com", "uid": "hV8vYkYmj7RnIgZKYXQNeO2tt7m1", "created": "2026-03-14"},
+        {"email": "ovi.paduraru@gmail.com", "uid": "LTZNZgz8YIfB49PJNsWAcnOJrFg2", "created": "2026-03-14"},
+        {"email": "petcu.nicu131@gmail.com", "uid": "wzAwnvVAtbMeuyeJpUerdR20PrC2", "created": "2026-03-14"},
+        {"email": "razvanbobon@yahoo.com", "uid": "sDwr0SO7x6cOk0aLznQjoMbQW783", "created": "2026-03-14"},
+        {"email": "ambrozinightwish@gmail.com", "uid": "8WnqLaM18ScagCdhCYg7DHBtX3G2", "created": "2026-03-14"},
+        {"email": "ramonasirb1@gmail.com", "uid": "6yHlGcNhN8VE2sDocLSZlnWmwp33", "created": "2026-03-14"},
+        {"email": "dungatul@gmail.com", "uid": "0Q0rd5iClSVfXhNAJdT6e3asHGZ2", "created": "2026-03-14"},
+        {"email": "gigi.diaconeasa@gmail.com", "uid": "K5bc8lCBvlbcIy5cmiFkXGgQyUq2", "created": "2026-03-14"},
+        {"email": "cursuriav@gmail.com", "uid": "grBWSa8WgAVQ7WrXRxujdlfOMPg2", "created": "2026-03-14"},
+        {"email": "custoom.11@gmail.com", "uid": "990vSRuJ7ze8asZFNd9MqmjKbfo2", "created": "2026-03-14"},
+        {"email": "ionut.dumitru@gmail.com", "uid": "WnDyh3b0sdPZVhJURqHzcVvIP3D3", "created": "2026-03-14"},
+        {"email": "flaviusburtescu@gmail.com", "uid": "1bQIBZaBHwO7bQkRyWPHrkWO42v1", "created": "2026-03-14"},
+        {"email": "ciprian.belcea@gmail.com", "uid": "0zGImUFfOzfSdN8SK0HzTASueZI3", "created": "2026-03-14"},
+        {"email": "homeass91@gmail.com", "uid": "yhVcNZ51xdU7rqzkVACoLPYQhbq2", "created": "2026-03-14"},
+        {"email": "sergiucostea.cj@gmail.com", "uid": "BQUIoTYYkyLJ4CMq9OTd1VXJP1H3", "created": "2026-03-14"},
+        {"email": "razvi.cr@gmail.com", "uid": "XgQC9TigykXjEWRQmIS90D2d6bL2", "created": "2026-03-14"},
+        {"email": "catalin.monica@gmail.com", "uid": "8iVTgQWHjSWtoNDcqt9MYA0BkFo2", "created": "2026-03-14"},
+        {"email": "corneliustrg71@gmail.com", "uid": "8rXCXNBFqQN0ggs5CMyYcQmyApo1", "created": "2026-03-14"},
+        {"email": "puianmarius@gmail.com", "uid": "22Rnj5ejR7bWrmFafZx0VeqpOcj1", "created": "2026-03-14"},
+        {"email": "luca_totto@yahoo.com", "uid": "A8Muuw5XCpdbRDJPpWMmalQJKs73", "created": "2026-03-14"},
+        {"email": "kankuroandrei@yahoo.com", "uid": "ETsWyjNPQKOERkKLipZIJYAYv472", "created": "2026-03-14"},
+        {"email": "danut.922@gmail.com", "uid": "E7C3JP2htcOAuKzNr20xUxgtlDc2", "created": "2026-03-14"},
+        {"email": "alexmpopa@gmail.com", "uid": "5AIGF8lPsgX5x1qL0nroKnfegpp2", "created": "2026-03-13"},
+        {"email": "ionut.negru87@gmail.com", "uid": "IZM7Q1immTW0696FLkPMZAgtlFo1", "created": "2026-03-13"},
+        {"email": "nagy.christian@gmail.com", "uid": "8ub4rmM3BmaSiMx557itD7X9JMr2", "created": "2026-03-13"},
+        {"email": "postolache11andrei@gmail.com", "uid": "jkVMco1nHlQjqti5d94VCSvgV8s2", "created": "2026-03-13"},
+        {"email": "gourmetgift.ro@gmail.com", "uid": "fnCxHiPeEQNWNkfQtkkN1ETNAbo2", "created": "2026-03-13"},
+        {"email": "ilie.cretu@yahoo.com", "uid": "HaCrbdPJw3U7TBerFtDYV9Z6yn23", "created": "2026-03-13"},
+        {"email": "eg.toma@outlook.com", "uid": "Ce6L9CDJJ8R7VmFFUBjxKCXQiHu1", "created": "2026-03-13"},
+        {"email": "polki101010@gmail.com", "uid": "JE0uIAfCoiPmEpKNWXV1xZPImbN2", "created": "2026-03-13"},
+        {"email": "madalin.druga@yahoo.com", "uid": "RKXvcCIjWte8044VpwfSrWPghK13", "created": "2026-03-13"},
+        {"email": "pop.silvium@gmail.com", "uid": "6nuQ9YwO5YUR3npU3ay7BZN9HqC2", "created": "2026-03-13"},
+        {"email": "r.florin01@gmail.com", "uid": "U2DS2Pxs5CacgDFDJGI8eGUqjn22", "created": "2026-03-13"},
+        {"email": "medinstpro@gmail.com", "uid": "KdkfVOqaJCUJxoVXp0x1ZjZrWeY2", "created": "2026-03-13"},
+        {"email": "mitris.gelu@gmail.com", "uid": "nr3C24G05RfuO9dxx1h5nyayUWp2", "created": "2026-03-13"},
+        {"email": "lazeahoratiu@gmail.com", "uid": "4t5uvzbVTLUPDavzpoPQXqVkVYL2", "created": "2026-03-13"},
+        {"email": "calinxp@gmail.com", "uid": "IdNXVWUqRWOOyk5v4p6SA4c6Wpw1", "created": "2026-03-13"},
+        {"email": "yo.spiro@gmail.com", "uid": "9iXPDX4ywQgXbpohyg2iDv39u7s2", "created": "2026-03-13"},
+        {"email": "andreea.stoia@gmail.com", "uid": "nOcKZ9RaDRRXrzgXFlR7mjCPdbJ2", "created": "2026-03-13"},
+        {"email": "lpizevska@gmail.com", "uid": "XQCunQs5RjZVV8k5RcKNUkgEo5p2", "created": "2026-03-13"},
+        {"email": "ruscumihai@gmail.com", "uid": "sctlnCev8ZSRzcXzxy2CNJLQrpL2", "created": "2026-03-13"},
+        {"email": "sergo3@gmail.com", "uid": "GZmuVIC41Ee3w2fwgRqcTnrdPbc2", "created": "2026-03-13"},
+        {"email": "catalinmincu2002@yahoo.com", "uid": "1HbR7DMs6Jh2JuWt6CTSa9sAu522", "created": "2026-03-13"},
+        {"email": "iulianpeptu@gmail.com", "uid": "U0dgZYfkekekzFeEMJIJwVIpPAR2", "created": "2026-03-13"},
+        {"email": "george.burduhos@gmail.com", "uid": "3nT3itsTHSgMUFipFq3VHTzT1vT2", "created": "2026-03-13"},
+        {"email": "dr.alexandar94@gmail.com", "uid": "3YpzZ1vXp1R8UQ2IWPgmVYnwTKi1", "created": "2026-03-13"},
+        {"email": "vladadrianrusu@gmail.com", "uid": "SlQfIRYcgYNiSyUdU8LB2dsxVf03", "created": "2026-03-13"},
+        {"email": "paulbode2000@gmail.com", "uid": "my6ApEkBLCcgV1ooDK5RcnOfnvv2", "created": "2026-03-13"},
+        {"email": "sports6501@gmail.com", "uid": "F086x68CasYKjS6ATVJwNjwbi113", "created": "2026-03-13"},
+        {"email": "nucului42c18@gmail.com", "uid": "Ev26IbkMg4M2I4UC41XvVs4nIsB3", "created": "2026-03-13"},
+        {"email": "danny.fratean@gmail.com", "uid": "UFADB8WCUdVW3hai0OB77MUQWYm1", "created": "2026-03-13"},
+        {"email": "paraschivu.alexandru@gmail.com", "uid": "J6nd7rleJAUFxTFjLblBz0bAtZE3", "created": "2026-03-13"},
+        {"email": "goosila@gmail.com", "uid": "LVymcP5Ea5SH5HaRnGbsnT6zcBv2", "created": "2026-03-13"},
+        {"email": "flavius.ionel99@e-uvt.ro", "uid": "zPO1RLJModcKJVUQ3eISYMWPTGy2", "created": "2026-03-13"},
+        {"email": "lilian.marin21@gmail.com", "uid": "JZgxrY6qXmX0mjvLyakK4hG2zX62", "created": "2026-03-13"},
+        {"email": "lcpcristi@gmail.com", "uid": "fGyjxcsXMGQMeB7CcLjDGusQc1t1", "created": "2026-03-13"},
+        {"email": "dan741976@gmail.com", "uid": "7WUS6uzihPf1fdVPadwzqm5zvn82", "created": "2026-03-13"},
+        {"email": "sorinat@gmail.com", "uid": "IaUemE6uxZTFufJSGaC2maYsnWS2", "created": "2026-03-13"},
+        {"email": "stanculescu.dan@gmail.com", "uid": "910Wva5QzsT7NL6z5RrNTUNdWmy1", "created": "2026-03-13"},
+        {"email": "petrovicistefan@gmail.com", "uid": "Qe6av1oICuRgnWkaYsACu0HPq722", "created": "2026-03-13"},
+        {"email": "iulian.baiculescu@gmail.com", "uid": "8LgICChXQzfvmZtESXexRXwnhMm1", "created": "2026-03-13"},
+        {"email": "cagil_ali@yahoo.com", "uid": "ub1ByxLfpIfFaggZvhoVYEYKmM03", "created": "2026-03-13"},
+        {"email": "dand2408@gmail.com", "uid": "rgaZoJMyitUI3bulGvE9IzQ6Blf1", "created": "2026-03-13"},
+        {"email": "aureliandraghici@gmail.com", "uid": "76pE8o21i4OaQiHUu7rLfPfQo7H3", "created": "2026-03-13"},
+        {"email": "dadalau.cristi@gmail.com", "uid": "vKXozNYl44NaP31TRxiXbLZTF1k2", "created": "2026-03-13"},
+        {"email": "botnariuc.dorin@gmail.com", "uid": "XwO1hlFeEYeVmJGBQ54Llyb3U892", "created": "2026-03-13"},
+        {"email": "silviubadalache@gmail.com", "uid": "HROQv4UMC8Sc0miT2O9RvYmIZ7t2", "created": "2026-03-13"},
+        {"email": "prohuf@gmail.com", "uid": "FKFx3mbIl9aOAPRO3DzpZU3K38G2", "created": "2026-03-13"},
+        {"email": "iulimog@gmail.com", "uid": "0Qq4dt0v9MfkDAufvpOoayVc0Ug2", "created": "2026-03-13"},
+        {"email": "florinzaharia007@gmail.com", "uid": "pP5bjlyKcaQXrkJFNQda6lN9np33", "created": "2026-03-13"},
+        {"email": "eliseironcea1@gmail.com", "uid": "cOxYtOmMI6UFU8XmWrhRRn0aNeE2", "created": "2026-03-13"},
+        {"email": "mihaelacozma68@gmail.com", "uid": "VpR8LUHeBkbNRRgUOY4BHabjqpv1", "created": "2026-03-13"},
+        {"email": "mihaideneanu@gmail.com", "uid": "MlEKhXHKKEX68bvwIJDUAspcrKl2", "created": "2026-03-13"},
+        {"email": "tomamihai091@gmail.com", "uid": "M9xu46xvNhfPV3U4DGcaZDxOp032", "created": "2026-03-13"},
+        {"email": "rmanolescu@gmail.com", "uid": "kNtcS8EglEdk2WVvi2B9J90ii9K2", "created": "2026-03-13"},
+        {"email": "ardeleanb.adriana@gmail.com", "uid": "8r7XAlJKBuRxys4DfP4QXGv4lED3", "created": "2026-03-13"},
+        {"email": "dinca.alex04@gmail.com", "uid": "hYGLXeNAbHebJ2opvWp2OWr5Ujm2", "created": "2026-03-13"},
+        {"email": "analarisa.bucur@gmail.com", "uid": "XarliiTjQFblr9iqNcaZII0Q15y1", "created": "2026-03-13"},
+        {"email": "bpriceputu@gmail.com", "uid": "VmAQmSIEUSdpYhf8R13NPfbO3gp1", "created": "2026-03-13"},
+        {"email": "maricelmatei@gmail.com", "uid": "5CgRbzJDaqRXz7FENBFo2cnyEQ23", "created": "2026-03-13"},
+        {"email": "cristiantoma1984@gmail.com", "uid": "tgjt6lG3fDSNz6ESsgPDT4CHJnw1", "created": "2026-03-13"},
+        {"email": "gsilviuu@gmail.com", "uid": "BrcYpRtW03Z3UvI3TRIEHakLWGD2", "created": "2026-03-13"},
+        {"email": "adizbang@gmail.com", "uid": "XOxr02JUB2dWyLdXOCCa8CoinUT2", "created": "2026-03-13"},
+        {"email": "gchristian27.cg@gmail.com", "uid": "mLUi1lLUa2fnpMY9mkBMnhClGYj1", "created": "2026-03-13"},
+        {"email": "4netit2@gmail.com", "uid": "EqVBZEuzYmhNHvvZGOSaM70dW2D3", "created": "2026-03-13"},
+        {"email": "mihai.rognean@gmail.com", "uid": "KKxrymiq7RWljYCDWXqN8sTnsFo1", "created": "2026-03-13"},
+        {"email": "adicrocodyl@gmail.com", "uid": "hci1MMN2w3SU7DXZTtVhUB6vzP93", "created": "2026-03-12"},
+        {"email": "clioapolo1@gmail.com", "uid": "E80nwdNsf3YNMd92bJeBi7H7M2i1", "created": "2026-03-12"},
+        {"email": "pitesti1234@gmail.com", "uid": "H48ThXDo6qgLU8Q9SenJOyaE93S2", "created": "2026-03-12"},
+        {"email": "juvete0758689601@gmail.com", "uid": "0uCMZ1zhmUhhnthnBQsOjIqkzH73", "created": "2026-03-12"},
+        {"email": "sorinmunteanu1969@gmail.com", "uid": "urHKqaTlWLe8iHjQj37ptlICvjs1", "created": "2026-03-12"},
+        {"email": "sitestiri@gmail.com", "uid": "qJpdN3XbiQOiVbUmCqqEEMTGjqB3", "created": "2026-03-12"},
+        {"email": "danutza3@gmail.com", "uid": "47UBR7xgUuVGfXy74hVOK86q5li2", "created": "2026-03-12"},
+        {"email": "vladilaoctavian@gmail.com", "uid": "bwaKCSwWPhfRXdVRbFpQz62gfb12", "created": "2026-03-12"},
+        {"email": "alin.andries@gmail.com", "uid": "LmhP1mA7YTZ5U3KOTqxFJAHtkGj2", "created": "2026-03-12"},
+        {"email": "dan.mihai.lunganul@gmail.com", "uid": "8uS84znoWWdCG0QfQkKbpftN7xI2", "created": "2026-03-12"},
+        {"email": "maporumbescu@gmail.com", "uid": "KJN1Tt6woNU4DwFinw5lPyTH6f12", "created": "2026-03-12"},
+        {"email": "eherisanu@gmail.com", "uid": "CWFUra2GMoa1YKIMTKleF2wfdlm2", "created": "2026-03-12"},
+        {"email": "adryanleonte@gmail.com", "uid": "5lffo2dnggfzVhaPaBvJwo6OfQy1", "created": "2026-03-12"},
+        {"email": "felix.stanculet@gmail.com", "uid": "1h8JRHCjVbfPmsDVcEcAMaPDCDP2", "created": "2026-03-12"},
+        {"email": "nickpesca@gmail.com", "uid": "3s3L4cidFRQy8ShenQuSuSlXpiz1", "created": "2026-03-12"},
+        {"email": "dumalex999@gmail.com", "uid": "9fyOQzz9k8YOE4kHCE9tQRuz4qs2", "created": "2026-03-12"},
+        {"email": "ionutgardalean@gmail.com", "uid": "BUo79ev2OvML5X1YTVlCwoq1qy43", "created": "2026-03-12"},
+        {"email": "mirceat3@gmail.com", "uid": "O1AYjE5SSSQQK7d36wCUPW3SkAp2", "created": "2026-03-12"},
+        {"email": "cosmin.potrocamedrea@gmail.com", "uid": "QRmYxa2ptZTuAXfG9f27W6zlNaJ2", "created": "2026-03-12"},
+        {"email": "mdan93s4@gmail.com", "uid": "BZxjyUYYdtfAvFn0yGj57UiPxSe2", "created": "2026-03-12"},
+        {"email": "laminoarelor14@googlemail.com", "uid": "6jwXEy8o8caXHzLrYmnmZVBmB8V2", "created": "2026-03-12"},
+        {"email": "fzamfir@gmail.com", "uid": "GZU9C0730Ea4vH8kdUaCvROCdpx2", "created": "2026-03-12"},
+        {"email": "adrian.tanasescu.97@gmail.com", "uid": "AOk4yFay4jbk1DTNK98fMXs6SO92", "created": "2026-03-12"},
+        {"email": "blondu2024@gmail.com", "uid": "Pbf63hG40JUwYcYIWEUYKxnVXKs2", "created": "2026-01-14"},
+        {"email": "contact.smartconvertpro@gmail.com", "uid": "wF8BZWiysXdroqEC3T8Ba46v2CB2", "created": "2026-01-12"},
+        {"email": "profirer@gmail.com", "uid": "6iWPoBzbysVEpmfK4KlCzsStFUa2", "created": "2026-01-07"},
+        {"email": "nahidirayanxan@gmail.com", "uid": "rSBqXCjadnU8K7whpDsZC79pnCP2", "created": "2026-01-04"},
+        {"email": "reitazafina@gmail.com", "uid": "6y6xIkZxppVutNpimDLKsytIBcB3", "created": "2026-01-02"},
+        {"email": "profirecristiandaniel@gmail.com", "uid": "x5T7cw7ONkekDGNxrJheB70xysG2", "created": "2026-01-02"},
+        {"email": "contact@finromania.ro", "uid": "TPEP1AE2GMUPtAXEdL0ozdOgg3h2", "created": "2025-12-30"},
+        {"email": "tanasecristian2007@gmail.com", "uid": "oY2SBusXvDdrWR027XqAGAHtH053", "created": "2025-12-30"},
+    ]
+
+    import uuid as _uuid
+    db = await get_database()
+    free_pro_deadline = datetime(2026, 6, 5, tzinfo=timezone.utc)
+    admin_emails = ["tanasecristian2007@gmail.com", "contact@finromania.ro"]
+
+    imported = 0
+    skipped = 0
+    errors = 0
+
+    for u in USERS:
+        email = u["email"]
+        existing = await db.users.find_one({"email": email})
+        if existing:
+            skipped += 1
+            continue
+
+        new_user = {
+            "user_id": str(_uuid.uuid4()),
+            "email": email,
+            "name": email.split("@")[0],
+            "firebase_uid": u["uid"],
+            "auth_provider": "firebase_google",
+            "created_at": f"{u['created']}T00:00:00+00:00",
+            "last_login": f"{u['created']}T00:00:00+00:00",
+            "is_admin": email.lower() in admin_emails,
+            "ai_credits_used": 0,
+            "total_logins": 0,
+            "is_early_adopter": True,
+            "subscription_level": "pro",
+            "subscription_expires_at": free_pro_deadline.isoformat(),
+            "subscription_source": "emergent_migration",
+            "unlocked_levels": ["beginner", "intermediate", "advanced"],
+            "experience_level": "advanced",
+            "daily_summary_enabled": True,
+            "migrated_from": "emergent",
+            "migrated_at": datetime.now(timezone.utc).isoformat()
+        }
+
+        try:
+            await db.users.insert_one(new_user)
+            imported += 1
+        except Exception as e:
+            errors += 1
+            logger.error(f"Error importing {email}: {e}")
+
+    return {
+        "success": True,
+        "imported": imported,
+        "skipped_existing": skipped,
+        "errors": errors,
+        "total": len(USERS)
+    }
