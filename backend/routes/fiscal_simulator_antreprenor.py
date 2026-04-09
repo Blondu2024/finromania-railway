@@ -159,8 +159,33 @@ class SimulatorOutput(BaseModel):
 
 def verifica_scutiri_caen(cod_caen: str) -> Dict:
     """Verifică dacă un cod CAEN are scutiri speciale"""
+    # Verifică în lista locală
     if cod_caen in CAEN_SCUTIRI:
         return CAEN_SCUTIRI[cod_caen]
+    # Verifică și în baza extinsă caen_data
+    try:
+        try:
+            from routes.caen_data import CAEN_DATABASE
+        except ImportError:
+            from backend.routes.caen_data import CAEN_DATABASE
+        if cod_caen in CAEN_DATABASE:
+            info = CAEN_DATABASE[cod_caen]
+            result = {"nume": info["nume"]}
+            if info.get("scutire_profit"):
+                result["scutire_profit"] = True
+                result["conditii"] = info.get("conditii", "")
+            if info.get("scutire_tva"):
+                result["scutire_tva"] = True
+                result["conditii"] = info.get("conditii", "")
+            if info.get("regim_special_tva"):
+                result["regim_special_tva"] = True
+                result["conditii"] = info.get("conditii", "")
+            if info.get("regim_special_salarii"):
+                result["regim_special_salarii"] = True
+                result["conditii"] = info.get("conditii", "")
+            return result
+    except ImportError:
+        pass
     return {}
 
 def calculeaza_impozit_entitate(entitate: EntitateInput, an_curent: int = 2026) -> RezultatEntitate:

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/SEO';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -10,9 +10,134 @@ import { Switch } from '../components/ui/switch';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Plus, Trash2, Calculator, AlertTriangle, Info, AlertCircle, Building2, User, Briefcase, Wallet, ArrowRightLeft, Users, BadgeCheck } from 'lucide-react';
+import { Plus, Trash2, Calculator, AlertTriangle, Info, AlertCircle, Building2, User, Briefcase, Wallet, ArrowRightLeft, Users, BadgeCheck, Search, ChevronDown } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+
+// ============================================
+// CAEN SEARCHABLE DROPDOWN COMPONENT
+// ============================================
+
+function CaenSearchDropdown({ value, onChange, t }) {
+  const [caenData, setCaenData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/caen/search`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) setCaenData(data.results || []);
+      })
+      .catch(() => {});
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!searchQuery) return caenData;
+    const q = searchQuery.toLowerCase();
+    return caenData.filter(c =>
+      c.cod.includes(q) || c.nume.toLowerCase().includes(q) || (c.categorie || '').toLowerCase().includes(q)
+    );
+  }, [caenData, searchQuery]);
+
+  const grouped = useMemo(() => {
+    const groups = {};
+    filtered.forEach(c => {
+      const cat = c.categorie || 'Altele';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(c);
+    });
+    return groups;
+  }, [filtered]);
+
+  const selectedLabel = useMemo(() => {
+    if (!value || value === 'none') return t('simulator.caenNone');
+    const found = caenData.find(c => c.cod === value);
+    return found ? `${found.cod} - ${found.nume}` : value;
+  }, [value, caenData, t]);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+      >
+        <span className="truncate text-left">{selectedLabel}</span>
+        <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg max-h-72 overflow-hidden">
+          {/* Search input */}
+          <div className="p-2 border-b sticky top-0 bg-popover">
+            <div className="flex items-center gap-2 px-2 border rounded-md">
+              <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+              <input
+                type="text"
+                className="flex-1 py-1.5 text-sm bg-transparent outline-none"
+                placeholder={t('simulator.caenNone')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {/* Options */}
+          <div className="overflow-y-auto max-h-56">
+            {/* "None" option */}
+            <button
+              type="button"
+              className={`w-full text-left px-3 py-1.5 text-sm hover:bg-accent ${!value || value === 'none' ? 'bg-accent font-medium' : ''}`}
+              onClick={() => { onChange('none'); setIsOpen(false); setSearchQuery(''); }}
+            >
+              {t('simulator.caenNone')}
+            </button>
+
+            {Object.entries(grouped).map(([cat, codes]) => (
+              <div key={cat}>
+                <div className="px-3 py-1 text-xs font-semibold text-muted-foreground bg-muted sticky top-0">
+                  {cat} ({codes.length})
+                </div>
+                {codes.map(c => (
+                  <button
+                    key={c.cod}
+                    type="button"
+                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-accent flex items-center justify-between gap-2 ${value === c.cod ? 'bg-accent font-medium' : ''}`}
+                    onClick={() => { onChange(c.cod); setIsOpen(false); setSearchQuery(''); }}
+                  >
+                    <span className="truncate">
+                      <span className="font-mono text-xs mr-1">{c.cod}</span>
+                      {c.nume}
+                    </span>
+                    <span className="flex gap-1 shrink-0">
+                      {c.scutire_profit && <Badge variant="outline" className="text-xs text-green-600 py-0 px-1">IT</Badge>}
+                      {c.scutire_tva && <Badge variant="outline" className="text-xs text-blue-600 py-0 px-1">TVA</Badge>}
+                      {c.regim_special_salarii && <Badge variant="outline" className="text-xs text-purple-600 py-0 px-1">Sal</Badge>}
+                      {c.regim_special_tva && <Badge variant="outline" className="text-xs text-amber-600 py-0 px-1">Agr</Badge>}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ))}
+
+            {filtered.length === 0 && (
+              <p className="px-3 py-4 text-sm text-muted-foreground text-center">
+                Niciun rezultat pentru "{searchQuery}"
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Close dropdown on outside click */}
+      {isOpen && (
+        <div className="fixed inset-0 z-40" onClick={() => { setIsOpen(false); setSearchQuery(''); }} />
+      )}
+    </div>
+  );
+}
 
 // ============================================
 // SALARY CALCULATOR COMPONENT
@@ -321,27 +446,9 @@ function getEntityTypes(t) {
   ];
 }
 
-function getCaenCodes(t) {
-  return [
-    { value: 'none', label: t('simulator.caenNone') },
-    { value: '6201', label: t('simulator.caen6201') },
-    { value: '6202', label: t('simulator.caen6202') },
-    { value: '6209', label: t('simulator.caen6209') },
-    { value: '6311', label: t('simulator.caen6311') },
-    { value: '6312', label: t('simulator.caen6312') },
-    { value: '8621', label: t('simulator.caen8621') },
-    { value: '8622', label: t('simulator.caen8622') },
-    { value: '8559', label: t('simulator.caen8559') },
-    { value: '4711', label: t('simulator.caen4711') },
-    { value: '4719', label: t('simulator.caen4719') },
-    { value: '7022', label: t('simulator.caen7022') },
-  ];
-}
-
 export default function FiscalSimulatorPage() {
   const { t } = useTranslation();
   const ENTITY_TYPES = getEntityTypes(t);
-  const CAEN_CODES = getCaenCodes(t);
   const [entities, setEntities] = useState([
     { tip: 'srl_micro', nume: '', cod_caen: 'none', venit_anual_estimat: 0, procent_detinere: 100, are_angajati: false, platitor_tva: false, norma_venit_anuala: 0, an_infiintare: null, marja_profit: 20, cheltuieli_lunare: 0, numar_angajati: 0, salariu_mediu_brut: 0 }
   ]);
@@ -522,19 +629,11 @@ export default function FiscalSimulatorPage() {
 
                 <div className="space-y-2">
                   <Label>{t('simulator.caenCode')}</Label>
-                  <Select
+                  <CaenSearchDropdown
                     value={entity.cod_caen}
-                    onValueChange={(v) => updateEntity(index, 'cod_caen', v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('simulator.selectPlaceholder')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CAEN_CODES.map(c => (
-                        <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={(v) => updateEntity(index, 'cod_caen', v)}
+                    t={t}
+                  />
                 </div>
 
                 <div className="space-y-2">
