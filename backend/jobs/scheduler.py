@@ -272,7 +272,9 @@ def start_scheduler():
             trigger=CronTrigger(hour=18, minute=5, day_of_week='mon-fri', timezone='Europe/Bucharest'),
             id='send_daily_summary',
             name='Send Daily Market Summary',
-            replace_existing=True
+            replace_existing=True,
+            max_instances=1,  # Previne executia paralela (fix duplicate emails)
+            coalesce=True     # Daca a ratat triggerul, ruleaza o singura data nu de N ori
         )
         
         # Job 9: Update Screener PRO cache (every 45 minutes - background scan)

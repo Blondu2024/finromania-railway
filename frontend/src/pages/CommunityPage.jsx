@@ -129,6 +129,8 @@ export default function CommunityPage() {
   const wsRef = useRef(null);
   const messagesEndRef = useRef(null);
   const typingTimeout = useRef(null);
+  const reconnectTimeout = useRef(null);
+  const reconnectAttempts = useRef(0);
   const isPro = user?.subscription_level === 'pro';
 
   // Auto-scroll to bottom
@@ -164,50 +166,65 @@ export default function CommunityPage() {
         scrollToBottom();
       });
 
-    // Connect WebSocket
-    const ws = new WebSocket(`${WS_URL}/api/community/ws/${activeChannel.id}`);
-    wsRef.current = ws;
+    let isCancelled = false;
+    reconnectAttempts.current = 0;
 
-    ws.onopen = () => {
-      // Send auth
-      ws.send(JSON.stringify({
-        type: 'auth',
-        token: token || null
-      }));
-    };
+    function connectWS() {
+      if (isCancelled) return;
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      const ws = new WebSocket(`${WS_URL}/api/community/ws/${activeChannel.id}`);
+      wsRef.current = ws;
 
-      if (data.type === 'auth_ok') {
-        setCanWrite(data.can_write);
-      } else if (data.type === 'new_message') {
-        setMessages(prev => [...prev, data.message]);
-      } else if (data.type === 'message_deleted') {
-        setMessages(prev => prev.filter(m => m.message_id !== data.message_id));
-      } else if (data.type === 'online_count') {
-        setOnlineCount(data.count);
-      } else if (data.type === 'typing') {
-        if (data.user_name !== user?.name) {
-          setTypingUser(data.user_name);
-          clearTimeout(typingTimeout.current);
-          typingTimeout.current = setTimeout(() => setTypingUser(null), 2000);
+      ws.onopen = () => {
+        reconnectAttempts.current = 0;
+        ws.send(JSON.stringify({
+          type: 'auth',
+          token: token || null
+        }));
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'auth_ok') {
+          setCanWrite(data.can_write);
+        } else if (data.type === 'new_message') {
+          setMessages(prev => [...prev, data.message]);
+        } else if (data.type === 'message_deleted') {
+          setMessages(prev => prev.filter(m => m.message_id !== data.message_id));
+        } else if (data.type === 'online_count') {
+          setOnlineCount(data.count);
+        } else if (data.type === 'typing') {
+          if (data.user_name !== user?.name) {
+            setTypingUser(data.user_name);
+            clearTimeout(typingTimeout.current);
+            typingTimeout.current = setTimeout(() => setTypingUser(null), 2000);
+          }
         }
-      }
-    };
+      };
 
-    ws.onclose = () => {
-      // Reconnect after 3s
-      setTimeout(() => {
-        if (activeChannel && wsRef.current === ws) {
-          // Will trigger re-run of this effect via state
-        }
-      }, 3000);
-    };
+      ws.onclose = () => {
+        if (isCancelled) return;
+        // Reconnect cu backoff: 1s, 2s, 4s, max 10s
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 10000);
+        reconnectAttempts.current += 1;
+        reconnectTimeout.current = setTimeout(connectWS, delay);
+      };
+
+      ws.onerror = () => {
+        // onclose va fi apelat automat dupa onerror
+      };
+    }
+
+    connectWS();
 
     return () => {
-      ws.close();
-      wsRef.current = null;
+      isCancelled = true;
+      clearTimeout(reconnectTimeout.current);
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
   }, [activeChannel, token, user?.name, scrollToBottom]);
 

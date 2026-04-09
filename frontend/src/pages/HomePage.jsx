@@ -105,7 +105,7 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 60000);
+    const interval = setInterval(fetchData, 120000); // 2 min — datele BVB se updateaza la 15 min
     return () => clearInterval(interval);
   }, [fetchData]);
 

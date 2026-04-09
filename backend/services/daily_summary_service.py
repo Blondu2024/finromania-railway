@@ -664,21 +664,23 @@ Cea mai mare lichiditate a fost pe {top_vol.get('symbol')}, cu un volum de {vol_
     
     async def send_to_all_subscribers(self) -> Dict:
         """Trimite rezumatul zilnic la toți userii abonați (plan Resend $20 = 10k/lună)"""
+        from pymongo.errors import DuplicateKeyError
+
         db = await get_database()
         date_key = self._get_today_date_key()
 
-        # Check if emails were already sent today (prevent duplicates on redeploy)
-        lock = await db.email_send_locks.find_one({"date_key": date_key})
-        if lock and lock.get("emails_sent"):
-            logger.info(f"Emails already sent for {date_key}, skipping")
+        # ATOMIC lock — doar UN SINGUR proces poate reusi insert-ul
+        # Al doilea va primi DuplicateKeyError (unique index pe date_key)
+        try:
+            await db.email_send_locks.insert_one({
+                "date_key": date_key,
+                "emails_sent": True,
+                "sent_at": datetime.now(timezone.utc).isoformat()
+            })
+            logger.info(f"📧 Acquired email send lock for {date_key}")
+        except DuplicateKeyError:
+            logger.info(f"⏭️ Emails already sent for {date_key} (lock exists), skipping")
             return {"sent": 0, "failed": 0, "skipped": 0, "already_sent": True}
-
-        # Mark as sending (lock)
-        await db.email_send_locks.update_one(
-            {"date_key": date_key},
-            {"$set": {"date_key": date_key, "emails_sent": True, "sent_at": datetime.now(timezone.utc).isoformat()}},
-            upsert=True
-        )
 
         results = {"sent": 0, "failed": 0, "skipped": 0, "limit_reached": False}
         DAILY_LIMIT = 500  # Plan $20 Resend = 10k/lună, ~330/zi - lăsăm buffer pentru alerte

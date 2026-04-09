@@ -23,6 +23,10 @@ RUN echo 'server { \
     listen $PORT; \
     root /usr/share/nginx/html; \
     index index.html; \
+    gzip on; \
+    gzip_vary on; \
+    gzip_min_length 256; \
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml image/svg+xml; \
     location / { try_files $uri $uri/ /index.html; } \
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ { \
         expires 1y; \

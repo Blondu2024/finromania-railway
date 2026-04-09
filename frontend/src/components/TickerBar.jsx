@@ -32,8 +32,8 @@ export default function TickerBar() {
     };
 
     fetchData();
-    // Update la 30 secunde - date cu delay 15min
-    const interval = setInterval(fetchData, 30000);
+    // Update la 60 secunde - datele se schimba pe backend la 5-15 min
+    const interval = setInterval(fetchData, 60000);
     return () => clearInterval(interval);
   }, []);
 

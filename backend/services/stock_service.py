@@ -142,15 +142,24 @@ class StockService:
             
             db = await get_database()
             count = 0
-            
+
+            # Pre-load logo_url from fundamentals cache (avoid N+1 at query time)
+            logo_cache = {}
+            fund_docs = await db.fundamentals_daily_cache.find({}, {"_id": 0, "symbol": 1, "logo_url": 1}).to_list(200)
+            for doc in fund_docs:
+                if doc.get("logo_url"):
+                    logo_cache[doc["symbol"]] = doc["logo_url"]
+
             for stock in stocks:
+                if stock.get("symbol") in logo_cache:
+                    stock["logo_url"] = logo_cache[stock["symbol"]]
                 await db.stocks_bvb.update_one(
                     {'symbol': stock['symbol']},
                     {'$set': stock},
                     upsert=True
                 )
                 count += 1
-            
+
             logger.info(f"✅ Updated {count} BVB stocks ({data_source})")
             return count
             

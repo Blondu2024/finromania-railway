@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy requirements first for layer caching
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt uvloop httptools
 
 # Copy application code
 COPY . .
@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 8000
 
 # Start command - uses shell to expand $PORT env var
-CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000} --loop uvloop --http httptools --timeout-keep-alive 120"]

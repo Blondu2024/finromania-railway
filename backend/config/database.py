@@ -73,4 +73,10 @@ async def create_indexes():
     await db.user_sessions.create_index('session_token')
     await db.user_portfolios.create_index('user_id')
 
+    # Email send lock — unique per day, prevents duplicate sends
+    await db.email_send_locks.create_index('date_key', unique=True)
+
+    # Chat messages index for community
+    await db.chat_messages.create_index([('channel_id', 1), ('created_at', -1)])
+
     logger.info("✅ Database indexes created")

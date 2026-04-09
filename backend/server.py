@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Query, Response
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 import os
 import logging
 from pathlib import Path
@@ -346,16 +347,7 @@ async def get_bvb_stocks(response: Response):
             await stock_service.update_bvb_stocks()
             stocks = await db.stocks_bvb.find({}, {"_id": 0}).limit(100).to_list(100)
 
-        # Enrich with logo_url from fundamentals cache
-        logo_cache = {}
-        fund_docs = await db.fundamentals_daily_cache.find({}, {"_id": 0, "symbol": 1, "logo_url": 1}).to_list(200)
-        for doc in fund_docs:
-            if doc.get("logo_url"):
-                logo_cache[doc["symbol"]] = doc["logo_url"]
-        for stock in stocks:
-            if stock.get("symbol") in logo_cache:
-                stock["logo_url"] = logo_cache[stock["symbol"]]
-
+        # logo_url is pre-embedded at update time (stock_service.update_bvb_stocks)
         return stocks
     except Exception as e:
         logger.error(f"Error getting BVB stocks: {e}")
@@ -797,6 +789,9 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+# GZip — comprimă răspunsurile > 500 bytes (reduce payload 70-80%)
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 # ============================================
 # ROOT HEALTH CHECK (Required for Kubernetes)
