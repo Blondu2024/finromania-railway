@@ -506,3 +506,94 @@ async def toggle_admin(user_id: str, user: dict = Depends(require_admin)):
     )
     
     return {"message": f"Admin status set to {new_status} for user {user_id}"}
+
+
+# ============================================
+# IMPORT FIREBASE USERS (one-time migration)
+# ============================================
+
+@router.post("/import-firebase-users")
+async def import_firebase_users(user: dict = Depends(require_admin)):
+    """
+    Importă toți userii din Firebase în MongoDB.
+    - Userii care există deja (by email) sunt skipped
+    - Userii noi primesc PRO gratuit până pe 5 iunie 2026
+    - Returnează statistici detaliate
+    """
+    import uuid as _uuid
+    from firebase_admin import auth as fb_auth
+
+    db = await get_database()
+    free_pro_deadline = datetime(2026, 6, 5, tzinfo=timezone.utc)
+
+    stats = {"imported": 0, "skipped_existing": 0, "skipped_no_email": 0, "errors": 0, "users": []}
+
+    try:
+        # List ALL Firebase users (paginated automatically)
+        page = fb_auth.list_users()
+        while page:
+            for fb_user in page.users:
+                email = fb_user.email
+                if not email:
+                    stats["skipped_no_email"] += 1
+                    continue
+
+                # Check if already in MongoDB
+                existing = await db.users.find_one({"email": email})
+                if existing:
+                    stats["skipped_existing"] += 1
+                    stats["users"].append({"email": email, "status": "exists"})
+                    continue
+
+                # Create new user in MongoDB
+                new_user = {
+                    "user_id": str(_uuid.uuid4()),
+                    "email": email,
+                    "name": fb_user.display_name or email.split("@")[0],
+                    "picture": fb_user.photo_url,
+                    "firebase_uid": fb_user.uid,
+                    "auth_provider": "firebase_google",
+                    "created_at": datetime.fromtimestamp(fb_user.user_metadata.creation_timestamp / 1000, tz=timezone.utc).isoformat() if fb_user.user_metadata.creation_timestamp else datetime.now(timezone.utc).isoformat(),
+                    "last_login": datetime.now(timezone.utc).isoformat(),
+                    "is_admin": False,
+                    "ai_credits_used": 0,
+                    "total_logins": 0,
+                    "is_early_adopter": True,
+                    "subscription_level": "pro",
+                    "subscription_expires_at": free_pro_deadline.isoformat(),
+                    "subscription_source": "emergent_migration",
+                    "unlocked_levels": ["beginner", "intermediate", "advanced"],
+                    "experience_level": "advanced",
+                    "daily_summary_enabled": True,
+                    "migrated_from": "emergent",
+                    "migrated_at": datetime.now(timezone.utc).isoformat()
+                }
+
+                try:
+                    await db.users.insert_one(new_user)
+                    stats["imported"] += 1
+                    stats["users"].append({"email": email, "name": new_user["name"], "status": "imported"})
+                    logger.info(f"✅ Imported Firebase user: {email}")
+                except Exception as e:
+                    stats["errors"] += 1
+                    stats["users"].append({"email": email, "status": f"error: {e}"})
+                    logger.error(f"Error importing {email}: {e}")
+
+            # Next page
+            page = page.get_next_page()
+
+    except Exception as e:
+        logger.error(f"Firebase list_users error: {e}")
+        raise HTTPException(status_code=500, detail=f"Firebase error: {e}")
+
+    logger.info(f"🔄 Firebase import done: {stats['imported']} imported, {stats['skipped_existing']} existing, {stats['errors']} errors")
+
+    return {
+        "success": True,
+        "imported": stats["imported"],
+        "skipped_existing": stats["skipped_existing"],
+        "skipped_no_email": stats["skipped_no_email"],
+        "errors": stats["errors"],
+        "total_firebase_users": stats["imported"] + stats["skipped_existing"] + stats["skipped_no_email"] + stats["errors"],
+        "users": stats["users"]
+    }
