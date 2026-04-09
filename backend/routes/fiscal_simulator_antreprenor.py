@@ -666,3 +666,261 @@ Detalii pe entități:
         "context_pentru_ai": context,
         "nota": "Integrare AI disponibilă în versiunea PRO"
     }
+
+# ============================================
+# CALCULATOR COST SALARIAL 2026
+# ============================================
+
+class SectorSalariu(str, Enum):
+    NORMAL = "normal"
+    CONSTRUCTII = "constructii"
+    IT = "it"
+    AGRICULTURA = "agricultura"
+    ALIMENTAR = "alimentar"
+
+class TipCalculSalariu(str, Enum):
+    BRUT_LA_NET = "brut_la_net"
+    NET_LA_BRUT = "net_la_brut"
+
+class SalariuInput(BaseModel):
+    """Input pentru calculul salarial"""
+    suma: float = Field(ge=0, description="Salariu brut SAU net (RON)")
+    tip_calcul: TipCalculSalariu = Field(default=TipCalculSalariu.BRUT_LA_NET)
+    numar_persoane_intretinere: int = Field(default=0, ge=0, le=4)
+    sector: SectorSalariu = Field(default=SectorSalariu.NORMAL)
+    tip_contract: str = Field(default="full_time")  # full_time / part_time
+
+class SalariuOutput(BaseModel):
+    """Output detaliat calcul salarial"""
+    salariu_brut: float
+    cas_angajat: float
+    cas_procent: float
+    cass_angajat: float
+    cass_procent: float
+    deducere_personala: float
+    baza_impozabila: float
+    impozit_venit: float
+    impozit_procent: float
+    salariu_net: float
+    cam_angajator: float
+    cam_procent: float
+    cost_total_angajator: float
+    sector: str
+    scutiri_aplicate: List[str]
+    pasi_calcul: List[Dict]
+    comparatie_sectoare: List[Dict]
+
+
+def calculeaza_deducere_personala(brut: float, nr_persoane: int = 0) -> float:
+    """
+    Deducere personală 2026:
+    - Brut <= 2,000: 300 RON
+    - 2,001 - 4,050: descrescător proporțional
+    - Peste 4,050: 0 RON
+    - +100 RON/persoană în întreținere (max 4)
+    """
+    if brut <= 2000:
+        deducere_baza = 300
+    elif brut <= 4050:
+        # Interpolare liniară descrescătoare: 300 → 0 între 2000 și 4050
+        deducere_baza = 300 * (4050 - brut) / (4050 - 2000)
+    else:
+        deducere_baza = 0
+
+    # Bonus persoane în întreținere (max 4)
+    persoane = min(nr_persoane, 4)
+    deducere_persoane = persoane * 100
+
+    # Deducerea pentru persoane se aplică doar dacă brut <= 4050
+    if brut <= 4050:
+        return round(deducere_baza + deducere_persoane, 2)
+    else:
+        return 0
+
+
+def calculeaza_salariu_din_brut(
+    brut: float,
+    sector: SectorSalariu,
+    nr_persoane: int = 0
+) -> Dict:
+    """Calculează net din brut, cu toate contribuțiile"""
+    scutiri = []
+
+    # Determinăm contribuțiile pe sector
+    if sector == SectorSalariu.CONSTRUCTII:
+        cas_procent = 25.0  # CAS standard (angajatul plătește)
+        cass_procent = 10.0
+        impozit_scutit = True
+        scutiri.append("Scutire impozit venit (sector construcții)")
+        scutiri.append("Condiție: salariu brut >= 4,050 RON și activitate CAEN 41-43")
+    elif sector == SectorSalariu.IT:
+        cas_procent = 25.0
+        cass_procent = 10.0
+        impozit_scutit = True
+        scutiri.append("Scutire impozit venit (sector IT)")
+        scutiri.append("Condiții: studii superioare IT, firma cu 80%+ venituri IT, brut >= 10,000 RON")
+    elif sector == SectorSalariu.AGRICULTURA:
+        cas_procent = 25.0
+        cass_procent = 10.0
+        impozit_scutit = True
+        scutiri.append("Scutire impozit venit (sector agricultură)")
+        scutiri.append("Condiție: activitate agricolă conform Cod Fiscal")
+    elif sector == SectorSalariu.ALIMENTAR:
+        cas_procent = 25.0
+        cass_procent = 10.0
+        impozit_scutit = True
+        scutiri.append("Scutire impozit venit (sector alimentar)")
+        scutiri.append("Condiție: activitate industrie alimentară conform OUG")
+    else:
+        cas_procent = 25.0
+        cass_procent = 10.0
+        impozit_scutit = False
+
+    # Pas 1: CAS angajat
+    cas_angajat = round(brut * cas_procent / 100, 2)
+
+    # Pas 2: CASS angajat
+    cass_angajat = round(brut * cass_procent / 100, 2)
+
+    # Pas 3: Deducere personală
+    deducere = calculeaza_deducere_personala(brut, nr_persoane)
+
+    # Pas 4: Baza impozabilă
+    baza_impozabila = max(brut - cas_angajat - cass_angajat - deducere, 0)
+
+    # Pas 5: Impozit venit
+    if impozit_scutit:
+        impozit_venit = 0
+        impozit_procent = 0
+    else:
+        impozit_procent = 10.0
+        impozit_venit = round(baza_impozabila * impozit_procent / 100, 2)
+
+    # Pas 6: Net
+    salariu_net = round(brut - cas_angajat - cass_angajat - impozit_venit, 2)
+
+    # Pas 7: CAM angajator
+    cam_procent = 2.25
+    cam_angajator = round(brut * cam_procent / 100, 2)
+
+    # Cost total angajator
+    cost_total = round(brut + cam_angajator, 2)
+
+    # Pași de calcul pentru afișare
+    pasi = [
+        {"descriere": "Salariu brut", "formula": "", "valoare": brut, "semn": ""},
+        {"descriere": f"CAS angajat ({cas_procent}%)", "formula": f"{brut:,.0f} × {cas_procent}%", "valoare": cas_angajat, "semn": "-"},
+        {"descriere": f"CASS angajat ({cass_procent}%)", "formula": f"{brut:,.0f} × {cass_procent}%", "valoare": cass_angajat, "semn": "-"},
+    ]
+    if deducere > 0:
+        pasi.append({"descriere": f"Deducere personală ({nr_persoane} pers.)", "formula": "", "valoare": deducere, "semn": "info"})
+    pasi.append({"descriere": "Bază impozabilă", "formula": f"{brut:,.0f} - {cas_angajat:,.0f} - {cass_angajat:,.0f} - {deducere:,.0f}", "valoare": baza_impozabila, "semn": "="})
+
+    if impozit_scutit:
+        pasi.append({"descriere": "Impozit venit (SCUTIT)", "formula": "Sector cu scutire", "valoare": 0, "semn": "-"})
+    else:
+        pasi.append({"descriere": f"Impozit venit ({impozit_procent}%)", "formula": f"{baza_impozabila:,.0f} × {impozit_procent}%", "valoare": impozit_venit, "semn": "-"})
+
+    pasi.append({"descriere": "SALARIU NET", "formula": "", "valoare": salariu_net, "semn": "="})
+    pasi.append({"descriere": f"CAM angajator ({cam_procent}%)", "formula": f"{brut:,.0f} × {cam_procent}%", "valoare": cam_angajator, "semn": "+"})
+    pasi.append({"descriere": "COST TOTAL ANGAJATOR", "formula": f"{brut:,.0f} + {cam_angajator:,.0f}", "valoare": cost_total, "semn": "="})
+
+    return {
+        "salariu_brut": brut,
+        "cas_angajat": cas_angajat,
+        "cas_procent": cas_procent,
+        "cass_angajat": cass_angajat,
+        "cass_procent": cass_procent,
+        "deducere_personala": deducere,
+        "baza_impozabila": baza_impozabila,
+        "impozit_venit": impozit_venit,
+        "impozit_procent": impozit_procent,
+        "salariu_net": salariu_net,
+        "cam_angajator": cam_angajator,
+        "cam_procent": cam_procent,
+        "cost_total_angajator": cost_total,
+        "sector": sector.value,
+        "scutiri_aplicate": scutiri,
+        "pasi_calcul": pasi,
+    }
+
+
+def calculeaza_brut_din_net(
+    net_dorit: float,
+    sector: SectorSalariu,
+    nr_persoane: int = 0
+) -> Dict:
+    """Calcul invers: din net dorit găsește brutul necesar (iterativ)"""
+    # Estimare inițială
+    brut_estimat = net_dorit * 1.45  # Aproximare inițială
+
+    for _ in range(50):  # Max 50 iterații
+        rezultat = calculeaza_salariu_din_brut(brut_estimat, sector, nr_persoane)
+        diferenta = net_dorit - rezultat["salariu_net"]
+
+        if abs(diferenta) < 0.5:  # Precizie sub 1 RON
+            break
+
+        brut_estimat += diferenta * 0.8  # Factor de convergență
+
+    # Recalculăm cu brutul final rotunjit
+    brut_final = round(brut_estimat, 0)
+    return calculeaza_salariu_din_brut(brut_final, sector, nr_persoane)
+
+
+@router.post("/calcul-salariu")
+async def calculeaza_cost_salarial(input_data: SalariuInput):
+    """
+    Calculator cost salarial complet 2026.
+    Calculează brut→net sau net→brut, cu toate contribuțiile.
+    Include comparație între sectoare (normal, IT, construcții, agricultură, alimentar).
+    SCOP EDUCATIV!
+    """
+    try:
+        # Calcul principal
+        if input_data.tip_calcul == TipCalculSalariu.NET_LA_BRUT:
+            rezultat = calculeaza_brut_din_net(
+                input_data.suma,
+                input_data.sector,
+                input_data.numar_persoane_intretinere
+            )
+        else:
+            rezultat = calculeaza_salariu_din_brut(
+                input_data.suma,
+                input_data.sector,
+                input_data.numar_persoane_intretinere
+            )
+
+        brut_pentru_comparatie = rezultat["salariu_brut"]
+
+        # Comparație între toate sectoarele
+        comparatie_sectoare = []
+        for sec in SectorSalariu:
+            comp = calculeaza_salariu_din_brut(
+                brut_pentru_comparatie,
+                sec,
+                input_data.numar_persoane_intretinere
+            )
+            comparatie_sectoare.append({
+                "sector": sec.value,
+                "brut": comp["salariu_brut"],
+                "net": comp["salariu_net"],
+                "impozit": comp["impozit_venit"],
+                "cas": comp["cas_angajat"],
+                "cass": comp["cass_angajat"],
+                "cam": comp["cam_angajator"],
+                "cost_angajator": comp["cost_total_angajator"],
+                "scutiri": comp["scutiri_aplicate"],
+            })
+
+        rezultat["comparatie_sectoare"] = comparatie_sectoare
+
+        return {
+            "success": True,
+            **rezultat,
+            "disclaimer": "Calculator educativ. Consultați un expert contabil pentru situația dumneavoastră reală."
+        }
+
+    except Exception as e:
+        logger.error(f"Eroare calcul salariu: {e}")
+        raise HTTPException(status_code=500, detail=f"Eroare la calcul: {str(e)}")

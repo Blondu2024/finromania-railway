@@ -9,9 +9,306 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Switch } from '../components/ui/switch';
 import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
-import { Plus, Trash2, Calculator, AlertTriangle, Info, AlertCircle, Building2, User, Briefcase } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Plus, Trash2, Calculator, AlertTriangle, Info, AlertCircle, Building2, User, Briefcase, Wallet, ArrowRightLeft, Users, BadgeCheck } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+
+// ============================================
+// SALARY CALCULATOR COMPONENT
+// ============================================
+
+function SalaryCalculator({ t }) {
+  const [suma, setSuma] = useState(5000);
+  const [tipCalcul, setTipCalcul] = useState('brut_la_net');
+  const [sector, setSector] = useState('normal');
+  const [nrPersoane, setNrPersoane] = useState(0);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const SECTORS = [
+    { value: 'normal', label: t('simulator.sectorNormal') },
+    { value: 'it', label: t('simulator.sectorIT') },
+    { value: 'constructii', label: t('simulator.sectorConstructii') },
+    { value: 'agricultura', label: t('simulator.sectorAgricultura') },
+    { value: 'alimentar', label: t('simulator.sectorAlimentar') },
+  ];
+
+  const calculate = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_URL}/api/fiscal-simulator/calcul-salariu`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          suma,
+          tip_calcul: tipCalcul,
+          sector,
+          numar_persoane_intretinere: nrPersoane,
+          tip_contract: 'full_time'
+        })
+      });
+      if (!response.ok) throw new Error(t('simulator.errorSimulation'));
+      const data = await response.json();
+      setResult(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getSectorLabel = (val) => {
+    const s = SECTORS.find(s => s.value === val);
+    return s ? s.label : val;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Input Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wallet className="w-5 h-5" />
+            {t('simulator.salaryCalc')}
+          </CardTitle>
+          <CardDescription>{t('simulator.salaryCalcDesc')}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Tip calcul toggle */}
+          <div className="flex gap-2">
+            <Button
+              variant={tipCalcul === 'brut_la_net' ? 'default' : 'outline'}
+              onClick={() => setTipCalcul('brut_la_net')}
+              className="flex-1"
+              size="sm"
+            >
+              <ArrowRightLeft className="w-4 h-4 mr-1" />
+              {t('simulator.brutToNet')}
+            </Button>
+            <Button
+              variant={tipCalcul === 'net_la_brut' ? 'default' : 'outline'}
+              onClick={() => setTipCalcul('net_la_brut')}
+              className="flex-1"
+              size="sm"
+            >
+              <ArrowRightLeft className="w-4 h-4 mr-1" />
+              {t('simulator.netToBrut')}
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Sumă */}
+            <div className="space-y-2">
+              <Label>{t('simulator.salaryAmount')}</Label>
+              <Input
+                type="number"
+                min="0"
+                value={suma}
+                onChange={(e) => setSuma(parseFloat(e.target.value) || 0)}
+                placeholder={tipCalcul === 'brut_la_net' ? t('simulator.salaryBrutPlaceholder') : t('simulator.salaryNetPlaceholder')}
+              />
+            </div>
+
+            {/* Sector */}
+            <div className="space-y-2">
+              <Label>{t('simulator.sector')}</Label>
+              <Select value={sector} onValueChange={setSector}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SECTORS.map(s => (
+                    <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Nr persoane întreținere */}
+            <div className="space-y-2 md:col-span-2">
+              <Label className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                {t('simulator.persIntretinere')}: {nrPersoane}
+              </Label>
+              <div className="flex items-center gap-3">
+                {[0, 1, 2, 3, 4].map(n => (
+                  <Button
+                    key={n}
+                    variant={nrPersoane === n ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setNrPersoane(n)}
+                    className="w-10 h-10"
+                  >
+                    {n}
+                  </Button>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">{t('simulator.persIntretinereHint')}</p>
+            </div>
+          </div>
+
+          {/* Calculate Button */}
+          <Button onClick={calculate} disabled={loading || suma <= 0} className="w-full" size="lg">
+            <Calculator className="w-5 h-5 mr-2" />
+            {loading ? t('fiscal.calculating') : t('simulator.calculate')}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Error */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>{t('simulator.errorLabel')}</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Results */}
+      {result && (
+        <>
+          {/* Main Result Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('simulator.salaryResult')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {/* Big numbers */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg text-center">
+                  <p className="text-sm text-muted-foreground">{t('simulator.salaryBrut')}</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {result.salariu_brut?.toLocaleString('ro-RO')} RON
+                  </p>
+                </div>
+                <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg text-center">
+                  <p className="text-sm text-muted-foreground">{t('simulator.salaryNet')}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {result.salariu_net?.toLocaleString('ro-RO')} RON
+                  </p>
+                </div>
+                <div className="p-4 bg-orange-50 dark:bg-orange-950 rounded-lg text-center">
+                  <p className="text-sm text-muted-foreground">{t('simulator.costTotalAngajator')}</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {result.cost_total_angajator?.toLocaleString('ro-RO')} RON
+                  </p>
+                </div>
+              </div>
+
+              {/* Exemptions */}
+              {result.scutiri_aplicate && result.scutiri_aplicate.length > 0 && (
+                <div className="mb-4">
+                  {result.scutiri_aplicate.map((s, i) => (
+                    <Badge key={i} variant="secondary" className="mr-1 mb-1 text-green-600">
+                      <BadgeCheck className="w-3 h-3 mr-1" />
+                      {s}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Calculation Steps — Waterfall */}
+              <div className="p-4 bg-gray-50 dark:bg-zinc-900 rounded-lg">
+                <p className="text-sm font-medium text-muted-foreground mb-3">{t('simulator.pasiiCalcul')}</p>
+                <div className="space-y-2">
+                  {result.pasi_calcul?.map((pas, i) => (
+                    <div key={i} className={`flex justify-between items-center py-1.5 px-2 rounded text-sm ${
+                      pas.semn === '=' ? 'bg-white dark:bg-zinc-800 font-semibold border' :
+                      pas.semn === 'info' ? 'text-blue-600' : ''
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        {pas.semn === '-' && <span className="text-red-500 font-mono w-4">−</span>}
+                        {pas.semn === '+' && <span className="text-orange-500 font-mono w-4">+</span>}
+                        {pas.semn === '=' && <span className="text-green-600 font-mono w-4">=</span>}
+                        {pas.semn === '' && <span className="font-mono w-4"> </span>}
+                        {pas.semn === 'info' && <Info className="w-3 h-3 text-blue-500" />}
+                        <span>{pas.descriere}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {pas.formula && <span className="text-xs text-muted-foreground hidden md:inline">{pas.formula}</span>}
+                        <span className={`font-mono ${
+                          pas.semn === '-' ? 'text-red-600' :
+                          pas.semn === '+' ? 'text-orange-600' :
+                          pas.semn === '=' ? 'text-green-600 font-bold' :
+                          pas.semn === 'info' ? 'text-blue-600' : ''
+                        }`}>
+                          {pas.valoare?.toLocaleString('ro-RO')} RON
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Sector Comparison Table */}
+          {result.comparatie_sectoare && result.comparatie_sectoare.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ArrowRightLeft className="w-5 h-5" />
+                  {t('simulator.comparatieSectoare')}
+                </CardTitle>
+                <CardDescription>{t('simulator.comparatieDesc')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-2 px-2">{t('simulator.sectorCol')}</th>
+                        <th className="text-right py-2 px-2">{t('simulator.netCol')}</th>
+                        <th className="text-right py-2 px-2">{t('simulator.impozitCol')}</th>
+                        <th className="text-right py-2 px-2 hidden md:table-cell">{t('simulator.costCol')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {result.comparatie_sectoare.map((comp, i) => (
+                        <tr key={i} className={`border-b last:border-0 ${comp.sector === result.sector ? 'bg-blue-50 dark:bg-blue-950/30 font-medium' : ''}`}>
+                          <td className="py-2 px-2">
+                            {getSectorLabel(comp.sector)}
+                            {comp.scutiri?.length > 0 && (
+                              <Badge variant="outline" className="ml-2 text-xs text-green-600">scutit</Badge>
+                            )}
+                          </td>
+                          <td className="text-right py-2 px-2 font-mono text-green-600">
+                            {comp.net?.toLocaleString('ro-RO')}
+                          </td>
+                          <td className="text-right py-2 px-2 font-mono text-red-600">
+                            {comp.impozit?.toLocaleString('ro-RO')}
+                          </td>
+                          <td className="text-right py-2 px-2 font-mono hidden md:table-cell">
+                            {comp.cost_angajator?.toLocaleString('ro-RO')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Disclaimer */}
+          <Alert className="bg-gray-100 dark:bg-gray-900">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              {t('simulator.salaryDisclaimer')}
+            </AlertDescription>
+          </Alert>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ============================================
+// ENTITY TYPES & CAEN CODES
+// ============================================
 
 function getEntityTypes(t) {
   return [
@@ -145,6 +442,25 @@ export default function FiscalSimulatorPage() {
           {t('simulator.rules2026Desc')}
         </AlertDescription>
       </Alert>
+
+      {/* Tabs: Calculator Salariu | Simulator Entități */}
+      <Tabs defaultValue="salary" className="mb-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="salary" className="flex items-center gap-2">
+            <Wallet className="w-4 h-4" />
+            {t('simulator.salaryCalcTab')}
+          </TabsTrigger>
+          <TabsTrigger value="entities" className="flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            {t('simulator.simulatorTab')}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="salary">
+          <SalaryCalculator t={t} />
+        </TabsContent>
+
+        <TabsContent value="entities">
 
       {/* Entities Input */}
       <Card className="mb-6">
@@ -550,6 +866,9 @@ export default function FiscalSimulatorPage() {
           </Alert>
         </div>
       )}
+
+        </TabsContent>
+      </Tabs>
     </div>
     </>
   );
